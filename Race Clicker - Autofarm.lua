@@ -10,7 +10,7 @@ end
 
 -- // Variables \\ --
 
-local delay1 = 1
+local delay1 = 0.845
 local delay2 = 0.1
 
 local Removed = false
