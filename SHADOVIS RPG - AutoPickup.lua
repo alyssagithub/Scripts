@@ -7,6 +7,8 @@ while AutoPickup and task.wait() do
 		for i,v in pairs(workspace.Projectiles:GetDescendants()) do
 			if v:IsA("ProximityPrompt") and not table.find(Blacklist, v.Parent.Name) then
 				fireproximityprompt(v)
+			elseif v.Name == "Part" then -- optional, for autopumpkin to reduce lag, if you don't want it just remove this section
+			    v:Destroy() -- and this section
 			end
 		end
 	end
