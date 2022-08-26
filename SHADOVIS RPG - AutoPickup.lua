@@ -1,4 +1,4 @@
-getgenv().AutoPickup = truee
+getgenv().AutoPickup = true
 
 local Blacklist = {"ItemName", "ItemName", "ItemName"} -- Replace ItemName with the item's name that you don't want to pick up, to add more slots create a new string and seperate with a comma
 
