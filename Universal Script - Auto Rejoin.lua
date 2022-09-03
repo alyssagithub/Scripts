@@ -1,6 +1,6 @@
 -- Feel free to put this in your auto execute folder, as this should not affect any game's gameplay nor be detected.
 
-repeat wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
+repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
  
 local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
  
