@@ -6,9 +6,9 @@ local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromp
  
 po.ChildAdded:connect(function(a)
     if a.Name == 'ErrorPrompt' then
-        repeat
+        while true do
             ts:Teleport(game.PlaceId)
             task.wait(2)
-        until false
+        end
     end
 end)
