@@ -650,7 +650,7 @@ elseif game.PlaceId == 10925589760 then
 
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-					task.wait()
+					task.wait(.1)
 					game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
 				end
 				IsInLoopMerge = false
