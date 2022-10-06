@@ -26,6 +26,18 @@ end)
 
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
+local function Credits(Window)
+	local Credits = Window:MakeTab({
+		Name = "Credits",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+
+	Credits:AddLabel("Inferno X was made by alyssa#2303")
+
+	Credits:AddLabel("discord.gg/rtgv8Jp3fM")
+end
+
 if game.PlaceId == 9757510382 then
 	local Sniping
 
@@ -475,15 +487,7 @@ elseif game.PlaceId == 9264596435 then
 		end
 	})
 
-	local Credits = Window:MakeTab({
-		Name = "Credits",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Credits:AddLabel("This Script was made by alyssa#2303")
-
-	Credits:AddLabel("discord.gg/rtgv8Jp3fM")
+	Credits(Window)
 
 	OrionLib:Init()
 elseif game.PlaceId == 10779604733 then
@@ -495,7 +499,7 @@ elseif game.PlaceId == 10779604733 then
 	local IsInLoopAutoCase
 	local IsInLoopMouse
 
-	local CaseList = {}
+	local CaseList = {--[["Total Darkness", "Darker Days", "Immortal Case", "Proper Business", "Low Demand Seeker", "Captain Doge Case", "Dreb Case", "The Millionaire", "Rap Chaser", "Gamer's Paradise", "Greedy 1%", "Crazy Hair Case", "Hallows Eve", "Toxic Rares", "Blackout Case", "Her Majesty's Case", "70% Random", "Bean's Surprise", "I Ain't Scared", "Devil's Case", "Paris Case", "Musical Case", ".01% Pull", "Value Eater", "Basic Value Case", "Fancy Case", "Case Emperor", "Rap Killer", "Brighter Days", "Red Case", "Inferno Case", "Von Case", "Switch it Up", "Rare Case", "Guapfeds Case", "Her Eyes", "Legendary's Justice", "Like Clockwork", "UKOYZ Case", "Green Case", "Bling Case", "Money Muncher", "Ice Case", "Vampire Case", "Hat Case", "The Gucci Case", "Pink Paradise", "Jackis_betters Case", "Abel's God Case", "Good Knight", "Value Hunter", "Of The Fall", "Valk Case", "Winter Case", "Budget Flip", "Lemon's Interstellar Case", "Antler Case", "Forever Blue Case", "Rap Demand", "Rags to Riches"]]}
 
 	local SelectedCase
 
@@ -508,21 +512,24 @@ elseif game.PlaceId == 10779604733 then
 		for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
 			if v:IsA("Frame") then
 				table.insert(CaseList, v.Name)
-				repeat task.wait() until CaseDropdown
-				CaseDropdown:Refresh({v.Name}, false)
 			end
 		end
+		table.sort(CaseList, function(a, b)
+			return a < b
+		end)
 	end
 
 	if #Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren() == 2 then
-		Click(Player.PlayerGui["Interact_Gui"]["Frame_Switch"])
+		if Player.PlayerGui["Interact_Gui"]["Background_Frame"].Visible == false then
+			Click(Player.PlayerGui["Interact_Gui"]["Frame_Switch"])
 
-		task.wait(.25)
+			task.wait(.25)
+		end
 
 		Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"]["Game_Category_1"]["Game_Cases"]["Icon_Game"])
-
+		
 		task.wait(1)
-
+		
 		task.spawn(SetCaseList)
 	else
 		task.spawn(SetCaseList)
@@ -553,45 +560,50 @@ elseif game.PlaceId == 10779604733 then
 
 	Main:AddLabel("Press right click once to temp disable the auto clicker.")
 
-	CaseDropdown = Main:AddDropdown({
-		Name = "Case",
-		Options = CaseList,
-		Callback = function(Value)
-			SelectedCase = Value
-		end
-	})
-
-	Main:AddToggle({
-		Name = "Auto Case Open",
-		Default = false,
-		Save = true,
-		Flag = "AutoCaseOpen",
-		Callback = function(Value)
-			AutoCaseLooping = Value
-			while AutoCaseLooping and task.wait() do
-				IsInLoopAutoCase = true
-				for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
-					if v.Name == SelectedCase then
-						Click(v)
-					end
-				end
-
-				Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"]) 
-
-				task.wait(.25)
-
-				Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
-				repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
-				IsInLoopAutoCase = false
+	task.defer(function()
+		Main:AddDropdown({
+			Name = "Case",
+			Options = CaseList,
+			Callback = function(Value)
+				SelectedCase = Value
 			end
-		end
-	})
+		})
+
+
+		Main:AddToggle({
+			Name = "Auto Case Open",
+			Default = false,
+			Save = true,
+			Flag = "AutoCaseOpen",
+			Callback = function(Value)
+				AutoCaseLooping = Value
+				while AutoCaseLooping and task.wait() do
+					IsInLoopAutoCase = true
+					for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
+						if v.Name == SelectedCase then
+							Click(v)
+						end
+					end
+
+					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"]) 
+
+					task.wait(.25)
+
+					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
+					repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
+					IsInLoopAutoCase = false
+				end
+			end
+		})
+	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
 		IsInLoopMouse = true
 		task.wait(3)
 		IsInLoopMouse = false
 	end)
+
+	Credits(Window)
 
 	OrionLib:Init()
 elseif game.PlaceId == 10925589760 then
@@ -696,6 +708,8 @@ elseif game.PlaceId == 10925589760 then
 			end
 		end
 	})
+
+	Credits(Window)
 
 	OrionLib:Init()
 end
