@@ -666,9 +666,12 @@ elseif game.PlaceId == 10925589760 then
 		Callback = function(Value)
 			AutoUpgradeLooping = Value
 			while AutoUpgradeLooping and task.wait() do
-				for i,v in pairs({"SpawnTier", "MaxBlocks", "Cooldown"}) do
-					game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer(v)
-				end
+				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("SpawnTier")
+				task.wait(.15)
+				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("MaxBlocks")
+				task.wait(.15)
+				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("Cooldown")
+				task.wait(.15)
 			end
 		end
 	})
