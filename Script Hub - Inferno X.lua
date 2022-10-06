@@ -685,6 +685,7 @@ elseif game.PlaceId == 10925589760 then
 				if IsInLoopMerge then
 					repeat task.wait() until not IsInLoopMerge
 				end
+				Player.Character.HumanoidRootPart.Anchored = false
 				if game:GetService("Workspace").Obby.Blocker.Transparency == 1 then
 					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
 				end
