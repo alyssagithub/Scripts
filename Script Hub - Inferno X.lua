@@ -579,11 +579,9 @@ elseif game.PlaceId == 10779604733 then
 				AutoCaseLooping = Value
 				while AutoCaseLooping and task.wait() do
 					IsInLoopAutoCase = true
-					for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
-						if v.Name == SelectedCase then
-							Click(v)
-						end
-					end
+					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase))
+					
+					task.wait(.25)
 
 					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"]) 
 
@@ -595,6 +593,9 @@ elseif game.PlaceId == 10779604733 then
 				end
 			end
 		})
+		
+		Main:AddLabel("You must be able to see the case on the cases page")
+		Main:AddLabel("-for the script to be able to click it.")
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
