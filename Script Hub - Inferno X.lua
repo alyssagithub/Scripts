@@ -591,6 +591,13 @@ elseif game.PlaceId == 10779604733 then
 							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
 							repeat task.wait(.5) until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
 							AutoClickLooping = true
+							task.spawn(function()
+								if AutoClickLooping then
+									while AutoClickLooping and task.wait() do
+										Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
+									end
+								end
+							end)
 						end
 					end
 				end
@@ -617,9 +624,7 @@ elseif game.PlaceId == 10925589760 then
 	local AutoMergeLooping
 	local AutoUpgradeLooping
 	local AutoObbyLooping
-
-	local IsInLoopMerge
-	local IsInLoopObby
+	local AutoRebirthLooping
 
 	local Blocks = {}
 
@@ -641,6 +646,7 @@ elseif game.PlaceId == 10925589760 then
 			while AutoTapLooping and task.wait() do
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					game:GetService("ReplicatedStorage").Functions.Tap:FireServer(v)
+					task.wait()
 				end
 			end
 		end
@@ -653,19 +659,18 @@ elseif game.PlaceId == 10925589760 then
 		Flag = "AutoMerge",
 		Callback = function(Value)
 			AutoMergeLooping = Value
-			if not AutoMergeLooping then
-				Player.Character.HumanoidRootPart.Anchored = false
-			end
 			if AutoMergeLooping then
 				while AutoMergeLooping and task.wait() do
 					Player.Character.HumanoidRootPart.Anchored = true
 
 					for i,v in pairs(Plot.Blocks:GetChildren()) do
 						game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-						task.wait(.1)
+						task.wait()
 						game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
 					end
 				end
+			else
+				Player.Character.HumanoidRootPart.Anchored = false
 			end
 		end
 	})
@@ -679,11 +684,10 @@ elseif game.PlaceId == 10925589760 then
 			AutoUpgradeLooping = Value
 			while AutoUpgradeLooping and task.wait() do
 				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("SpawnTier")
-				task.wait(1)
+				task.wait()
 				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("MaxBlocks")
-				task.wait(1)
+				task.wait()
 				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("Cooldown")
-				task.wait(1)
 			end
 		end
 	})
@@ -702,7 +706,35 @@ elseif game.PlaceId == 10925589760 then
 					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
 					repeat task.wait() until game:GetService("Workspace").Obby.Blocker.Transparency ~= 1
 					AutoMergeLooping = true
+					task.spawn(function()
+						if AutoMergeLooping then
+							while AutoMergeLooping and task.wait() do
+								Player.Character.HumanoidRootPart.Anchored = true
+
+								for i,v in pairs(Plot.Blocks:GetChildren()) do
+									game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
+									task.wait()
+									game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
+								end
+							end
+						else
+							Player.Character.HumanoidRootPart.Anchored = false
+						end
+					end)
 				end
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "Auto Rebirth",
+		Default = false,
+		Save = true,
+		Flag = "AutoRebirth",
+		Callback = function(Value)
+			AutoRebirthLooping = Value
+			while AutoRebirthLooping and task.wait(1) do
+				game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
 			end
 		end
 	})
