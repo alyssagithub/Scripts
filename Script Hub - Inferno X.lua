@@ -616,7 +616,16 @@ elseif game.PlaceId == 10779604733 then
 	Player:GetMouse().Button2Down:Connect(function()
 		AutoClickLooping = false
 		task.wait(3)
-		AutoClickLooping = true
+		if OriginalAutoClickLooping then
+			AutoClickLooping = true
+			task.spawn(function()
+				if AutoClickLooping then
+					while AutoClickLooping and task.wait() do
+						Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
+					end
+				end
+			end)
+		end
 	end)
 
 	Credits(Window)
