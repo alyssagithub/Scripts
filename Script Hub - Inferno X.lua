@@ -33,9 +33,9 @@ local function Credits(Window)
 		PremiumOnly = false
 	})
 
-	Credits:AddLabel("Inferno X was made by alyssa#2303")
+	Credits:AddLabel("🔥 Inferno X was made by alyssa#2303 🔥")
 
-	Credits:AddLabel("discord.gg/rtgv8Jp3fM")
+	Credits:AddLabel("➡ discord.gg/rtgv8Jp3fM ⬅")
 end
 
 if game.PlaceId == 9757510382 then
@@ -50,7 +50,7 @@ if game.PlaceId == 9757510382 then
 	})
 
 	Main:AddToggle({
-		Name = "New Item Sniper",
+		Name = "📈 New Item Sniper",
 		Default = false,
 		Save = true,
 		Flag = "NewItemSniper",
@@ -166,7 +166,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Automatics:AddToggle({
-		Name = "Auto Swing",
+		Name = "🤺 Auto Swing",
 		Default = false,
 		Save = true,
 		Flag = "AutoSwing",
@@ -183,7 +183,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Automatics:AddToggle({
-		Name = "Auto Swing 2",
+		Name = "🤺 Auto Swing 2",
 		Default = false,
 		Save = true,
 		Flag = "AutoSwing2",
@@ -201,7 +201,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Automatics:AddToggle({
-		Name = "Auto Progress",
+		Name = "📊 Auto Progress",
 		Default = false,
 		Save = true,
 		Flag = "AutoNextLevel",
@@ -232,7 +232,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Automatics:AddToggle({
-		Name = "Auto Reincarnate",
+		Name = "🔁 Auto Reincarnate",
 		Default = false,
 		Save = true,
 		Flag = "AutoReincarnate",
@@ -275,7 +275,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Automatics:AddToggle({
-		Name = "Auto Mob TP",
+		Name = "⚡ Auto Mob TP",
 		Default = false,
 		Save = true,
 		Flag = "AutoMobTP",
@@ -302,7 +302,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Automatics:AddToggle({
-		Name = "Auto Use Skills",
+		Name = "⚔ Auto Use Skills",
 		Default = false,
 		Save = true,
 		Flag = "AutoUseSkills",
@@ -324,7 +324,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Heroes:AddToggle({
-		Name = "Auto Hire Heroes",
+		Name = "👍 Auto Hire Heroes",
 		Default = false,
 		Save = true,
 		Flag = "AutoHire",
@@ -375,7 +375,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Dropdown = Heroes:AddDropdown({
-		Name = "Hero to Upgrade (leave blank for all)",
+		Name = "📃 Hero to Upgrade (leave blank for all)",
 		Default = "None",
 		Options = HeroesList,
 		Save = true,
@@ -390,7 +390,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Heroes:AddSlider({
-		Name = "Max Upgrade Level",
+		Name = "🎚 Max Upgrade Level",
 		Min = 0,
 		Max = 1000,
 		Default = 25,
@@ -412,7 +412,7 @@ elseif game.PlaceId == 9264596435 then
 	end
 
 	Heroes:AddToggle({
-		Name = "Auto Upgrade Hero(es)",
+		Name = "📈 Auto Upgrade Hero(es)",
 		Default = false,
 		Save = true,
 		Flag = "AutoUpgrade",
@@ -440,7 +440,7 @@ elseif game.PlaceId == 9264596435 then
 
 
 	Chests:AddDropdown({
-		Name = "Chest to Purchase",
+		Name = "📦 Chest to Purchase",
 		Options = {"Wooden", "Silver", "Golden", "Legendary"},
 		Save = true,
 		Flag = "SelectedChest",
@@ -450,7 +450,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Chests:AddToggle({
-		Name = "Auto Buy Chest",
+		Name = "💵 Auto Buy Chest",
 		Default = false,
 		Callback = function(Value)
 			ChestLooping = Value
@@ -469,7 +469,7 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	PlotDropdown = Misc:AddDropdown({
-		Name = "Plot",
+		Name = "🏠 Plot",
 		Default = "Your Own Plot",
 		Options = PlotList,
 		Callback = function(Value)
@@ -493,7 +493,7 @@ elseif game.PlaceId == 9264596435 then
 elseif game.PlaceId == 10779604733 then
 	local AutoClickLooping
 	local AutoCaseLooping
-	
+
 	local OriginalAutoClickLooping
 
 	local CaseList = {--[["Total Darkness", "Darker Days", "Immortal Case", "Proper Business", "Low Demand Seeker", "Captain Doge Case", "Dreb Case", "The Millionaire", "Rap Chaser", "Gamer's Paradise", "Greedy 1%", "Crazy Hair Case", "Hallows Eve", "Toxic Rares", "Blackout Case", "Her Majesty's Case", "70% Random", "Bean's Surprise", "I Ain't Scared", "Devil's Case", "Paris Case", "Musical Case", ".01% Pull", "Value Eater", "Basic Value Case", "Fancy Case", "Case Emperor", "Rap Killer", "Brighter Days", "Red Case", "Inferno Case", "Von Case", "Switch it Up", "Rare Case", "Guapfeds Case", "Her Eyes", "Legendary's Justice", "Like Clockwork", "UKOYZ Case", "Green Case", "Bling Case", "Money Muncher", "Ice Case", "Vampire Case", "Hat Case", "The Gucci Case", "Pink Paradise", "Jackis_betters Case", "Abel's God Case", "Good Knight", "Value Hunter", "Of The Fall", "Valk Case", "Winter Case", "Budget Flip", "Lemon's Interstellar Case", "Antler Case", "Forever Blue Case", "Rap Demand", "Rags to Riches"]]}
@@ -541,7 +541,7 @@ elseif game.PlaceId == 10779604733 then
 	})
 
 	Main:AddToggle({
-		Name = "Auto Clicker",
+		Name = "🖱 Auto Clicker",
 		Default = false,
 		Save = true,
 		Flag = "AutoClick",
@@ -560,7 +560,7 @@ elseif game.PlaceId == 10779604733 then
 
 	task.defer(function()
 		Main:AddDropdown({
-			Name = "Case",
+			Name = "📃 Case",
 			Options = CaseList,
 			Save = true,
 			Flag = "SelectedCase",
@@ -571,7 +571,7 @@ elseif game.PlaceId == 10779604733 then
 
 
 		Main:AddToggle({
-			Name = "Auto Case Open",
+			Name = "💼 Auto Case Open",
 			Default = false,
 			Save = true,
 			Flag = "AutoCaseOpen",
@@ -630,7 +630,7 @@ elseif game.PlaceId == 10925589760 then
 	local AutoUpgradeLooping
 	local AutoObbyLooping
 	local AutoRebirthLooping
-	
+
 	local OriginalAutoMergeLooping
 
 	local Blocks = {}
@@ -644,7 +644,7 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Main:AddToggle({
-		Name = "Auto Tap",
+		Name = "🖱 Auto Tap",
 		Default = false,
 		Save = true,
 		Flag = "AutoTap",
@@ -660,7 +660,7 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Main:AddToggle({
-		Name = "Auto Merge",
+		Name = "🤝 Auto Merge",
 		Default = false,
 		Save = true,
 		Flag = "AutoMerge",
@@ -683,7 +683,7 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Main:AddToggle({
-		Name = "Auto Buy Upgrades",
+		Name = "📈 Auto Buy Upgrades",
 		Default = false,
 		Save = true,
 		Flag = "AutoBuyUpgrades",
@@ -700,7 +700,7 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Main:AddToggle({
-		Name = "Auto Complete Obby",
+		Name = "🏁 Auto Complete Obby",
 		Default = false,
 		Save = true,
 		Flag = "AutoCompleteObby",
@@ -734,9 +734,9 @@ elseif game.PlaceId == 10925589760 then
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
-		Name = "Auto Rebirth",
+		Name = "🔁 Auto Rebirth",
 		Default = false,
 		Save = true,
 		Flag = "AutoRebirth",
