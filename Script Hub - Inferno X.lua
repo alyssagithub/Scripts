@@ -646,7 +646,6 @@ elseif game.PlaceId == 10925589760 then
 			while AutoTapLooping and task.wait() do
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					game:GetService("ReplicatedStorage").Functions.Tap:FireServer(v)
-					game:GetService("ReplicatedStorage").Functions.Core.GetData:InvokeServer()
 				end
 			end
 		end
