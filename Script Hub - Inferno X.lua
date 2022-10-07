@@ -496,13 +496,14 @@ elseif game.PlaceId == 10779604733 then
 
 	local OriginalAutoClickLooping
 
-	local CaseList = {--[["Total Darkness", "Darker Days", "Immortal Case", "Proper Business", "Low Demand Seeker", "Captain Doge Case", "Dreb Case", "The Millionaire", "Rap Chaser", "Gamer's Paradise", "Greedy 1%", "Crazy Hair Case", "Hallows Eve", "Toxic Rares", "Blackout Case", "Her Majesty's Case", "70% Random", "Bean's Surprise", "I Ain't Scared", "Devil's Case", "Paris Case", "Musical Case", ".01% Pull", "Value Eater", "Basic Value Case", "Fancy Case", "Case Emperor", "Rap Killer", "Brighter Days", "Red Case", "Inferno Case", "Von Case", "Switch it Up", "Rare Case", "Guapfeds Case", "Her Eyes", "Legendary's Justice", "Like Clockwork", "UKOYZ Case", "Green Case", "Bling Case", "Money Muncher", "Ice Case", "Vampire Case", "Hat Case", "The Gucci Case", "Pink Paradise", "Jackis_betters Case", "Abel's God Case", "Good Knight", "Value Hunter", "Of The Fall", "Valk Case", "Winter Case", "Budget Flip", "Lemon's Interstellar Case", "Antler Case", "Forever Blue Case", "Rap Demand", "Rags to Riches"]]}
+	local CaseList = {}
 
 	local SelectedCase
 
 	local function Click(v)
 		VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
-		VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,false,v,1) 
+		VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,false,v,1)
+		print("Clicked "..v.Name)
 	end
 
 	local function SetCaseList()
@@ -511,6 +512,10 @@ elseif game.PlaceId == 10779604733 then
 				table.insert(CaseList, v.Name)
 			end
 		end
+
+		Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"].ChildAdded:Connect(function(v)
+			table.insert(CaseList, v.Name)
+		end)
 		table.sort(CaseList, function(a, b)
 			return a < b
 		end)
@@ -539,8 +544,17 @@ elseif game.PlaceId == 10779604733 then
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
+	
+	local function StartClicking()
+		AutoClickLooping = OriginalAutoClickLooping
+		task.spawn(function()
+			while AutoClickLooping and task.wait() do
+				Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
+			end
+		end)
+	end
 
-	Main:AddToggle({
+	AutoClicker = Main:AddToggle({
 		Name = "🖱 Auto Clicker",
 		Default = false,
 		Save = true,
@@ -548,17 +562,13 @@ elseif game.PlaceId == 10779604733 then
 		Callback = function(Value)
 			AutoClickLooping = Value
 			OriginalAutoClickLooping = Value
-			if AutoClickLooping then
-				while AutoClickLooping and task.wait() do
-					Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
-				end
-			end
+			StartClicking()
 		end
 	})
 
 	Main:AddLabel("Press right click once to temp disable the auto clicker.")
 
-	task.defer(function()
+	task.spawn(function()
 		Main:AddDropdown({
 			Name = "📃 Case",
 			Options = CaseList,
@@ -577,54 +587,45 @@ elseif game.PlaceId == 10779604733 then
 			Flag = "AutoCaseOpen",
 			Callback = function(Value)
 				AutoCaseLooping = Value
-				while AutoCaseLooping and task.wait() do
-					if SelectedCase then
+				if AutoCaseLooping then
+					while AutoCaseLooping and SelectedCase and task.wait() do
 						local CaseMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Title_Price").Text:gsub("%p", "")
 						local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
 						if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
 							AutoClickLooping = false
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase))
-
-							task.wait(.25)
-
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"])
-
-							task.wait(.3)
-
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
-							repeat task.wait(.5) until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
-							if OriginalAutoClickLooping then
-								AutoClickLooping = true
-								task.spawn(function()
-									if AutoClickLooping then
-										while AutoClickLooping and task.wait() do
-											Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
-										end
-									end
-								end)
+							while not Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
+								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Icon_Case"))
 							end
+							
+							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
+								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"])
+							end
+							
+							StartClicking()
+							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == true
+							AutoClickLooping = false
+							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"].Visible and task.wait() do
+								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
+							end
+						else
+							StartClicking()
 						end
 					end
+				else
+					StartClicking()
 				end
 			end
 		})
 
 		Main:AddLabel("You must be able to see the case on the cases page")
-		Main:AddLabel("-for the script to be able to click it.")
+		Main:AddLabel("for the script to be able to click it.")
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
 		AutoClickLooping = false
 		task.wait(3)
-		if OriginalAutoClickLooping then
-			AutoClickLooping = true
-			task.spawn(function()
-				if AutoClickLooping then
-					while AutoClickLooping and task.wait() do
-						Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
-					end
-				end
-			end)
+		if not AutoCaseLooping then
+			StartClicking()
 		end
 	end)
 
@@ -721,24 +722,22 @@ elseif game.PlaceId == 10925589760 then
 					Player.Character.HumanoidRootPart.Anchored = false
 					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
 					repeat task.wait() until game:GetService("Workspace").Obby.Blocker.Transparency ~= 1
-					if OriginalAutoMergeLooping then
-						AutoMergeLooping = true
-						task.spawn(function()
-							if AutoMergeLooping then
-								while AutoMergeLooping and task.wait() do
-									Player.Character.HumanoidRootPart.Anchored = true
+					AutoMergeLooping = OriginalAutoMergeLooping
+					task.spawn(function()
+						if AutoMergeLooping then
+							while AutoMergeLooping and task.wait() do
+								Player.Character.HumanoidRootPart.Anchored = true
 
-									for i,v in pairs(Plot.Blocks:GetChildren()) do
-										game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-										task.wait()
-										game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
-									end
+								for i,v in pairs(Plot.Blocks:GetChildren()) do
+									game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
+									task.wait()
+									game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
 								end
-							else
-								Player.Character.HumanoidRootPart.Anchored = false
 							end
-						end)
-					end
+						else
+							Player.Character.HumanoidRootPart.Anchored = false
+						end
+					end)
 				end
 			end
 		end
