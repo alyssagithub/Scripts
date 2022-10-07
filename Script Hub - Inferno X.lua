@@ -581,7 +581,7 @@ elseif game.PlaceId == 10779604733 then
 					IsInLoopAutoCase = true
 					local CaseMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase)["Title_Price"].Text:gsub("%p", "")
 					local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
-					if tonumber(CaseMoney) > tonumber(PlayerMoney) then
+					if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
 						IsInLoopAutoCase = true
 						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase))
 
