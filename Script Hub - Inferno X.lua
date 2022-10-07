@@ -493,6 +493,8 @@ elseif game.PlaceId == 9264596435 then
 elseif game.PlaceId == 10779604733 then
 	local AutoClickLooping
 	local AutoCaseLooping
+	
+	local OriginalAutoClickLooping
 
 	local CaseList = {--[["Total Darkness", "Darker Days", "Immortal Case", "Proper Business", "Low Demand Seeker", "Captain Doge Case", "Dreb Case", "The Millionaire", "Rap Chaser", "Gamer's Paradise", "Greedy 1%", "Crazy Hair Case", "Hallows Eve", "Toxic Rares", "Blackout Case", "Her Majesty's Case", "70% Random", "Bean's Surprise", "I Ain't Scared", "Devil's Case", "Paris Case", "Musical Case", ".01% Pull", "Value Eater", "Basic Value Case", "Fancy Case", "Case Emperor", "Rap Killer", "Brighter Days", "Red Case", "Inferno Case", "Von Case", "Switch it Up", "Rare Case", "Guapfeds Case", "Her Eyes", "Legendary's Justice", "Like Clockwork", "UKOYZ Case", "Green Case", "Bling Case", "Money Muncher", "Ice Case", "Vampire Case", "Hat Case", "The Gucci Case", "Pink Paradise", "Jackis_betters Case", "Abel's God Case", "Good Knight", "Value Hunter", "Of The Fall", "Valk Case", "Winter Case", "Budget Flip", "Lemon's Interstellar Case", "Antler Case", "Forever Blue Case", "Rap Demand", "Rags to Riches"]]}
 
@@ -545,6 +547,7 @@ elseif game.PlaceId == 10779604733 then
 		Flag = "AutoClick",
 		Callback = function(Value)
 			AutoClickLooping = Value
+			OriginalAutoClickLooping = Value
 			if AutoClickLooping then
 				while AutoClickLooping and task.wait() do
 					Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
@@ -590,14 +593,16 @@ elseif game.PlaceId == 10779604733 then
 
 							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
 							repeat task.wait(.5) until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
-							AutoClickLooping = true
-							task.spawn(function()
-								if AutoClickLooping then
-									while AutoClickLooping and task.wait() do
-										Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
+							if OriginalAutoClickLooping then
+								AutoClickLooping = true
+								task.spawn(function()
+									if AutoClickLooping then
+										while AutoClickLooping and task.wait() do
+											Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
+										end
 									end
-								end
-							end)
+								end)
+							end
 						end
 					end
 				end
@@ -625,6 +630,8 @@ elseif game.PlaceId == 10925589760 then
 	local AutoUpgradeLooping
 	local AutoObbyLooping
 	local AutoRebirthLooping
+	
+	local OriginalAutoMergeLooping
 
 	local Blocks = {}
 
@@ -659,10 +666,10 @@ elseif game.PlaceId == 10925589760 then
 		Flag = "AutoMerge",
 		Callback = function(Value)
 			AutoMergeLooping = Value
+			OriginalAutoMergeLooping = Value
 			if AutoMergeLooping then
 				while AutoMergeLooping and task.wait() do
 					Player.Character.HumanoidRootPart.Anchored = true
-
 					for i,v in pairs(Plot.Blocks:GetChildren()) do
 						game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
 						task.wait()
@@ -705,22 +712,24 @@ elseif game.PlaceId == 10925589760 then
 					Player.Character.HumanoidRootPart.Anchored = false
 					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
 					repeat task.wait() until game:GetService("Workspace").Obby.Blocker.Transparency ~= 1
-					AutoMergeLooping = true
-					task.spawn(function()
-						if AutoMergeLooping then
-							while AutoMergeLooping and task.wait() do
-								Player.Character.HumanoidRootPart.Anchored = true
+					if OriginalAutoMergeLooping then
+						AutoMergeLooping = true
+						task.spawn(function()
+							if AutoMergeLooping then
+								while AutoMergeLooping and task.wait() do
+									Player.Character.HumanoidRootPart.Anchored = true
 
-								for i,v in pairs(Plot.Blocks:GetChildren()) do
-									game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-									task.wait()
-									game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
+									for i,v in pairs(Plot.Blocks:GetChildren()) do
+										game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
+										task.wait()
+										game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
+									end
 								end
+							else
+								Player.Character.HumanoidRootPart.Anchored = false
 							end
-						else
-							Player.Character.HumanoidRootPart.Anchored = false
-						end
-					end)
+						end)
+					end
 				end
 			end
 		end
