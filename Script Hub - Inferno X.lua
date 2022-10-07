@@ -494,11 +494,6 @@ elseif game.PlaceId == 10779604733 then
 	local AutoClickLooping
 	local AutoCaseLooping
 
-	local PreviousAutoClickLooping
-
-	local IsInLoopAutoCase
-	local IsInLoopMouse
-
 	local CaseList = {--[["Total Darkness", "Darker Days", "Immortal Case", "Proper Business", "Low Demand Seeker", "Captain Doge Case", "Dreb Case", "The Millionaire", "Rap Chaser", "Gamer's Paradise", "Greedy 1%", "Crazy Hair Case", "Hallows Eve", "Toxic Rares", "Blackout Case", "Her Majesty's Case", "70% Random", "Bean's Surprise", "I Ain't Scared", "Devil's Case", "Paris Case", "Musical Case", ".01% Pull", "Value Eater", "Basic Value Case", "Fancy Case", "Case Emperor", "Rap Killer", "Brighter Days", "Red Case", "Inferno Case", "Von Case", "Switch it Up", "Rare Case", "Guapfeds Case", "Her Eyes", "Legendary's Justice", "Like Clockwork", "UKOYZ Case", "Green Case", "Bling Case", "Money Muncher", "Ice Case", "Vampire Case", "Hat Case", "The Gucci Case", "Pink Paradise", "Jackis_betters Case", "Abel's God Case", "Good Knight", "Value Hunter", "Of The Fall", "Valk Case", "Winter Case", "Budget Flip", "Lemon's Interstellar Case", "Antler Case", "Forever Blue Case", "Rap Demand", "Rags to Riches"]]}
 
 	local SelectedCase
@@ -550,8 +545,8 @@ elseif game.PlaceId == 10779604733 then
 		Flag = "AutoClick",
 		Callback = function(Value)
 			AutoClickLooping = Value
-			while AutoClickLooping and task.wait() do
-				if not IsInLoopAutoCase and not IsInLoopMouse then
+			if AutoClickLooping then
+				while AutoClickLooping and task.wait() do
 					Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
 				end
 			end
@@ -584,7 +579,7 @@ elseif game.PlaceId == 10779604733 then
 						local CaseMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Title_Price").Text:gsub("%p", "")
 						local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
 						if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
-							IsInLoopAutoCase = true
+							AutoClickLooping = false
 							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase))
 
 							task.wait(.25)
@@ -595,7 +590,7 @@ elseif game.PlaceId == 10779604733 then
 
 							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
 							repeat task.wait(.5) until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
-							IsInLoopAutoCase = false
+							AutoClickLooping = true
 						end
 					end
 				end
@@ -607,9 +602,9 @@ elseif game.PlaceId == 10779604733 then
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
-		IsInLoopMouse = true
+		AutoClickLooping = false
 		task.wait(3)
-		IsInLoopMouse = false
+		AutoClickLooping = true
 	end)
 
 	Credits(Window)
@@ -661,19 +656,16 @@ elseif game.PlaceId == 10925589760 then
 			if not AutoMergeLooping then
 				Player.Character.HumanoidRootPart.Anchored = false
 			end
-			while AutoMergeLooping and task.wait() do
-				IsInLoopMerge = true
-				if IsInLoopObby then
-					repeat task.wait() until not IsInLoopObby
-				end
-				Player.Character.HumanoidRootPart.Anchored = true
+			if AutoMergeLooping then
+				while AutoMergeLooping and task.wait() do
+					Player.Character.HumanoidRootPart.Anchored = true
 
-				for i,v in pairs(Plot.Blocks:GetChildren()) do
-					game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-					task.wait(.1)
-					game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
+					for i,v in pairs(Plot.Blocks:GetChildren()) do
+						game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
+						task.wait(.1)
+						game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
+					end
 				end
-				IsInLoopMerge = false
 			end
 		end
 	})
@@ -687,11 +679,11 @@ elseif game.PlaceId == 10925589760 then
 			AutoUpgradeLooping = Value
 			while AutoUpgradeLooping and task.wait() do
 				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("SpawnTier")
-				task.wait(.15)
+				task.wait(1)
 				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("MaxBlocks")
-				task.wait(.15)
+				task.wait(1)
 				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("Cooldown")
-				task.wait(.15)
+				task.wait(1)
 			end
 		end
 	})
@@ -704,15 +696,13 @@ elseif game.PlaceId == 10925589760 then
 		Callback = function(Value)
 			AutoObbyLooping = Value
 			while AutoObbyLooping and task.wait() do
-				IsInLoopObby = true
-				if IsInLoopMerge then
-					repeat task.wait() until not IsInLoopMerge
-				end
-				Player.Character.HumanoidRootPart.Anchored = false
 				if game:GetService("Workspace").Obby.Blocker.Transparency == 1 then
+					AutoMergeLooping = false
+					Player.Character.HumanoidRootPart.Anchored = false
 					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
+					repeat task.wait() until game:GetService("Workspace").Obby.Blocker.Transparency ~= 1
+					AutoMergeLooping = true
 				end
-				IsInLoopObby = false
 			end
 		end
 	})
