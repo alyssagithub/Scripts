@@ -551,7 +551,7 @@ elseif game.PlaceId == 10779604733 then
 		Callback = function(Value)
 			AutoClickLooping = Value
 			while AutoClickLooping and task.wait() do
-				if not IsInLoopMouse and not IsInLoopAutoCase then
+				if not IsInLoopAutoCase and not IsInLoopMouse then
 					Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
 				end
 			end
@@ -564,6 +564,8 @@ elseif game.PlaceId == 10779604733 then
 		Main:AddDropdown({
 			Name = "Case",
 			Options = CaseList,
+			Save = true,
+			Flag = "SelectedCase",
 			Callback = function(Value)
 				SelectedCase = Value
 			end
@@ -578,21 +580,23 @@ elseif game.PlaceId == 10779604733 then
 			Callback = function(Value)
 				AutoCaseLooping = Value
 				while AutoCaseLooping and task.wait() do
-					local CaseMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase)["Title_Price"].Text:gsub("%p", "")
-					local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
-					if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
-						IsInLoopAutoCase = true
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase))
+					if SelectedCase then
+						local CaseMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Title_Price").Text:gsub("%p", "")
+						local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
+						if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
+							IsInLoopAutoCase = true
+							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase))
 
-						task.wait(.25)
+							task.wait(.25)
 
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"]) 
+							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"])
 
-						task.wait(.25)
+							task.wait(.3)
 
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
-						repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
-						IsInLoopAutoCase = false
+							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
+							repeat task.wait(.5) until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == false
+							IsInLoopAutoCase = false
+						end
 					end
 				end
 			end
