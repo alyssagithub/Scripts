@@ -611,11 +611,11 @@ elseif game.PlaceId == 10779604733 then
 							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"].Visible and task.wait() do
 								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
 							end
-						else
+						elseif AutoClickLooping == false then
 							StartClicking()
 						end
 					end
-				else
+				elseif AutoClickLooping == false then
 					StartClicking()
 				end
 			end
