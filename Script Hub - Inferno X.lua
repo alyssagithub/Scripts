@@ -493,6 +493,7 @@ elseif game.PlaceId == 9264596435 then
 elseif game.PlaceId == 10779604733 then
 	local AutoClickLooping
 	local AutoCaseLooping
+	local MouseButton2Looping
 
 	local OriginalAutoClickLooping
 
@@ -611,7 +612,7 @@ elseif game.PlaceId == 10779604733 then
 							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"].Visible and task.wait() do
 								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
 							end
-						elseif AutoClickLooping == false then
+						elseif OriginalAutoClickLooping and not AutoClickLooping and not MouseButton2Looping then
 							StartClicking()
 						end
 					end
@@ -623,11 +624,13 @@ elseif game.PlaceId == 10779604733 then
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
+		MouseButton2Looping = true
 		AutoClickLooping = false
 		task.wait(3)
 		if not AutoCaseLooping then
 			StartClicking()
 		end
+		MouseButton2Looping = false
 	end)
 
 	Credits(Window)
