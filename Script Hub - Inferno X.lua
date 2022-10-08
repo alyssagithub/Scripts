@@ -72,6 +72,8 @@ if game.PlaceId == 9757510382 then
 			end)
 		end
 	})
+	
+	Credits(Window)
 
 	OrionLib:Init()
 elseif game.PlaceId == 9264596435 then
