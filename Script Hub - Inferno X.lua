@@ -544,7 +544,7 @@ elseif game.PlaceId == 10779604733 then
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	local function StartClicking()
 		AutoClickLooping = OriginalAutoClickLooping
 		task.spawn(function()
@@ -593,14 +593,18 @@ elseif game.PlaceId == 10779604733 then
 						local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
 						if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
 							AutoClickLooping = false
-							while not Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
-								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Icon_Case"))
+							while not Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible do
+								Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]
+								task.wait()
+								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase):FindFirstChild("Icon_Case"))
+								task.wait()
+								Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]
 							end
-							
+
 							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
 								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"])
 							end
-							
+
 							StartClicking()
 							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == true
 							AutoClickLooping = false
@@ -616,9 +620,6 @@ elseif game.PlaceId == 10779604733 then
 				end
 			end
 		})
-
-		Main:AddLabel("You must be able to see the case on the cases page")
-		Main:AddLabel("for the script to be able to click it.")
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
