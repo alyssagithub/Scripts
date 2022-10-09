@@ -290,18 +290,16 @@ elseif game.PlaceId == 9264596435 then
 			while MobLooping and task.wait() do
 				repeat task.wait() until Plot.Enemy:GetChildren()[1]
 				local Enemy = Plot.Enemy:GetChildren()[1]
-				if (Player.Character:FindFirstChild("HumanoidRootPart").Position - Enemy.Position).Magnitude >= 10 then
-					IsInLoopMobTP = true
-					if IsInLoopReincarnate then
-						repeat task.wait() until not IsInLoopReincarnate
-					elseif IsInLoopNextLevel then
-						repeat task.wait() until not IsInLoopNextLevel
-					elseif IsInLoopAutoHire then
-						repeat task.wait() until not IsInLoopAutoHire
-					end
-					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(Enemy.Position.X, Enemy.Position.Y, Enemy.Position.Z + 5)
-					IsInLoopMobTP = false
+				IsInLoopMobTP = true
+				if IsInLoopReincarnate then
+					repeat task.wait() until not IsInLoopReincarnate
+				elseif IsInLoopNextLevel then
+					repeat task.wait() until not IsInLoopNextLevel
+				elseif IsInLoopAutoHire then
+					repeat task.wait() until not IsInLoopAutoHire
 				end
+				Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(Enemy.Position.X, Enemy.Position.Y, Enemy.Position.Z + 5)
+				IsInLoopMobTP = false
 			end
 		end
 	})
