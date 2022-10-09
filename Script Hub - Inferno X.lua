@@ -687,7 +687,7 @@ elseif game.PlaceId == 10925589760 then
 			OriginalAutoMergeLooping = Value
 			while AutoMergeLooping and task.wait() do
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
-					v.CFrame = CFrame.new(409, 9, 85)
+					v.CFrame = CFrame.new(427, 9, 97)
 				end
 			end
 		end
