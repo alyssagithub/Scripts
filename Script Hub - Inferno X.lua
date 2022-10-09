@@ -647,6 +647,7 @@ elseif game.PlaceId == 10925589760 then
 	local AutoUpgradeLooping
 	local AutoObbyLooping
 	local AutoRebirthLooping
+	local InfObbyMultiLooping
 
 	local OriginalAutoMergeLooping
 
@@ -684,17 +685,10 @@ elseif game.PlaceId == 10925589760 then
 		Callback = function(Value)
 			AutoMergeLooping = Value
 			OriginalAutoMergeLooping = Value
-			if AutoMergeLooping then
-				while AutoMergeLooping and task.wait() do
-					Player.Character.HumanoidRootPart.Anchored = true
-					for i,v in pairs(Plot.Blocks:GetChildren()) do
-						game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-						task.wait()
-						game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
-					end
+			while AutoMergeLooping and task.wait() do
+				for i,v in pairs(Plot.Blocks:GetChildren()) do
+					v.CFrame = CFrame.new(409, 9, 85)
 				end
-			else
-				Player.Character.HumanoidRootPart.Anchored = false
 			end
 		end
 	})
@@ -725,26 +719,8 @@ elseif game.PlaceId == 10925589760 then
 			AutoObbyLooping = Value
 			while AutoObbyLooping and task.wait() do
 				if game:GetService("Workspace").Obby.Blocker.Transparency == 1 then
-					AutoMergeLooping = false
-					Player.Character.HumanoidRootPart.Anchored = false
-					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
+					Player.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
 					repeat task.wait() until game:GetService("Workspace").Obby.Blocker.Transparency ~= 1
-					AutoMergeLooping = OriginalAutoMergeLooping
-					task.spawn(function()
-						if AutoMergeLooping then
-							while AutoMergeLooping and task.wait() do
-								Player.Character.HumanoidRootPart.Anchored = true
-
-								for i,v in pairs(Plot.Blocks:GetChildren()) do
-									game:GetService("ReplicatedStorage").Functions.TakeBlock:FireServer(v)
-									task.wait()
-									game:GetService("ReplicatedStorage").Functions.DropBlock:FireServer()
-								end
-							end
-						else
-							Player.Character.HumanoidRootPart.Anchored = false
-						end
-					end)
 				end
 			end
 		end
@@ -759,6 +735,20 @@ elseif game.PlaceId == 10925589760 then
 			AutoRebirthLooping = Value
 			while AutoRebirthLooping and task.wait(1) do
 				game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
+			end
+		end
+	})
+
+	Main:AddToggle({
+		Name = "🎉 (Synapse X) Infinite Obby Multiplier",
+		Default = false,
+		Save = true,
+		Flag = "InfObbyMulti",
+		Callback = function(Value)
+			InfObbyMultiLooping = Value
+			while InfObbyMultiLooping and task.wait(1) do
+				firetouchinterest(Player.Character.HumanoidRootPart, workspace.Obby.Finish, 0)
+				firetouchinterest(Player.Character.HumanoidRootPart, workspace.Obby.Finish, 1)
 			end
 		end
 	})
