@@ -72,7 +72,7 @@ if game.PlaceId == 9757510382 then
 			end)
 		end
 	})
-	
+
 	Credits(Window)
 
 	OrionLib:Init()
@@ -177,7 +177,7 @@ elseif game.PlaceId == 9264596435 then
 			while SwingLooping and task.wait(0.14) do
 				repeat task.wait() until Player.Character:FindFirstChild("HumanoidRootPart")
 				repeat task.wait() until Plot.Enemy:GetChildren()[1]
-				
+
 				if (Player.Character:FindFirstChild("HumanoidRootPart").Position - Plot.Enemy:GetChildren()[1].Position).Magnitude <= 13 then
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.Swing:FireServer(Plot.Enemy:GetChildren()[1])
 				end
@@ -195,7 +195,7 @@ elseif game.PlaceId == 9264596435 then
 			while Swing2Looping and task.wait(0.14) do
 				repeat task.wait() until Player.Character:FindFirstChild("HumanoidRootPart")
 				repeat task.wait() until Plot.Enemy:GetChildren()[1]
-				
+
 				if (Player.Character:FindFirstChild("HumanoidRootPart").Position - Plot.Enemy:GetChildren()[1].Position).Magnitude <= 13 then
 					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1)
 					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
@@ -222,9 +222,9 @@ elseif game.PlaceId == 9264596435 then
 						repeat task.wait() until not IsInLoopAutoHire
 					end
 					SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").Position
-					
+
 					repeat task.wait() until Plot.Buttons:FindFirstChild("NextLevel"):FindFirstChild("Touch")
-					
+
 					local Pos = Plot.Buttons:FindFirstChild("NextLevel").Touch.Position
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(Vector3.new(Pos.X, Pos.Y + 5, Pos.Z))
 
@@ -348,7 +348,7 @@ elseif game.PlaceId == 9264596435 then
 					IsInLoopAutoHire = true
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToMain:FireServer()
 
-					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero")
+					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") or Plot.Heroes:FindFirstChild("The Reaper")
 
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Player)
 					IsInLoopAutoHire = false
