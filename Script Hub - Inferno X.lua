@@ -38,6 +38,12 @@ local function Credits(Window)
 	Credits:AddLabel("➡ discord.gg/rtgv8Jp3fM ⬅")
 end
 
+local function Click(v)
+	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
+	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,false,v,1)
+	print("Clicked "..v.Name)
+end
+
 if game.PlaceId == 9757510382 then
 	local Sniping
 
@@ -504,12 +510,6 @@ elseif game.PlaceId == 10779604733 then
 
 	local SelectedCase
 
-	local function Click(v)
-		VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
-		VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,false,v,1)
-		print("Clicked "..v.Name)
-	end
-
 	local function SetCaseList()
 		for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
 			if v:IsA("Frame") then
@@ -701,11 +701,11 @@ elseif game.PlaceId == 10925589760 then
 		Callback = function(Value)
 			AutoUpgradeLooping = Value
 			while AutoUpgradeLooping and task.wait() do
-				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("SpawnTier")
+				firesignal(Player.PlayerGui.World.Wall.Upgrades.SpawnTier.Buy.Activated)
 				task.wait()
-				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("MaxBlocks")
+				firesignal(Player.PlayerGui.World.Wall.Upgrades.MaxBlocks.Buy.Activated)
 				task.wait()
-				game:GetService("ReplicatedStorage").Functions.BuyUpgrade:FireServer("Cooldown")
+				firesignal(Player.PlayerGui.World.Wall.Upgrades.Cooldown.Buy.Activated)
 			end
 		end
 	})
