@@ -734,7 +734,7 @@ elseif game.PlaceId == 10925589760 then
 		Callback = function(Value)
 			AutoRebirthLooping = Value
 			while AutoRebirthLooping and task.wait(1) do
-				game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
+				firesignal(Player.PlayerGui.World.Wall.Rebirths.Rebirth.Buy.Activated)
 			end
 		end
 	})
