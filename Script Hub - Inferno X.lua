@@ -740,7 +740,7 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Main:AddToggle({
-		Name = "🎉 (Synapse X) Infinite Obby Multiplier",
+		Name = "🎉 Infinite Obby Multiplier",
 		Default = false,
 		Save = true,
 		Flag = "InfObbyMulti",
