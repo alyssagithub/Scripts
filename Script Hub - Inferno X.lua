@@ -80,8 +80,6 @@ if game.PlaceId == 9757510382 then
 	})
 
 	Credits(Window)
-
-	OrionLib:Init()
 elseif game.PlaceId == 9264596435 then
 	local Plot
 	local PlayerPlot
@@ -497,8 +495,6 @@ elseif game.PlaceId == 9264596435 then
 	})
 
 	Credits(Window)
-
-	OrionLib:Init()
 elseif game.PlaceId == 10779604733 then
 	local AutoClickLooping
 	local AutoCaseLooping
@@ -637,8 +633,6 @@ elseif game.PlaceId == 10779604733 then
 	end)
 
 	Credits(Window)
-
-	OrionLib:Init()
 elseif game.PlaceId == 10925589760 then
 	local Plot = workspace.Plots:FindFirstChild(Player.Name)
 
@@ -734,7 +728,7 @@ elseif game.PlaceId == 10925589760 then
 		Callback = function(Value)
 			AutoRebirthLooping = Value
 			while AutoRebirthLooping and task.wait(1) do
-				firesignal(Player.PlayerGui.World.Wall.Rebirths.Rebirth.Buy.Activated)
+				game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
 			end
 		end
 	})
@@ -754,6 +748,6 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Credits(Window)
-
-	OrionLib:Init()
 end
+
+OrionLib:Init()
