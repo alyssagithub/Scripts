@@ -262,7 +262,7 @@ elseif game.PlaceId == 9264596435 then
 					task.wait()
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToMain:FireServer()
 
-					task.wait(.5)
+					task.wait(1)
 
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2041, 59, -26)
 
@@ -273,9 +273,7 @@ elseif game.PlaceId == 9264596435 then
 						task.wait(1)
 					until Player.PlayerGui.Main.ChestOpening.Visible == true
 
-					if Plot.Owner.Value ~= Player then
-						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
-					end
+					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
 
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
 					IsInLoopReincarnate = false
@@ -352,7 +350,7 @@ elseif game.PlaceId == 9264596435 then
 
 					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") or Plot.Heroes:FindFirstChild("The Reaper")
 
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Player)
+					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
 					IsInLoopAutoHire = false
 				end
 
