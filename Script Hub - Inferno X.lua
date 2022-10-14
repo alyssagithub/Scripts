@@ -644,8 +644,8 @@ elseif game.PlaceId == 10779604733 then
 		Main:AddToggle({
 			Name = "🤖 Auto Case Battle",
 			Default = false,
-			--Save = true,
-			--Flag = "AutoCaseBattle",
+			Save = true,
+			Flag = "AutoCaseBattle",
 			Callback = function(Value)
 				AutoBattleLooping = Value
 				while AutoBattleLooping and task.wait() do
