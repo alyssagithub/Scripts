@@ -709,7 +709,7 @@ elseif game.PlaceId == 10779604733 then
 		})
 		
 		Main:AddButton({
-			Name = "Auto Get Pumpkins",
+			Name = "🎃 Auto Get Pumpkins",
 			Callback = function()
 				for i,v in pairs(workspace:GetChildren()) do
 					if v.Name == "Event_Pumpkin" then
