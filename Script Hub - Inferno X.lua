@@ -733,7 +733,7 @@ elseif game.PlaceId == 10779604733 then
 					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Button_Create"])
 
 					repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == true
-					
+
 					if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Mode"].Text ~= "1v1v1" then
 						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Mode"])
 						task.wait(.25)
@@ -782,7 +782,7 @@ elseif game.PlaceId == 10779604733 then
 							v.Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]
 
 							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name).Visible == true
-							
+
 							for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name)["Player_List"]:GetChildren()) do
 								if v:IsA("Frame") and v:FindFirstChild("Button_Call") then
 									Click(v["Button_Call"])
@@ -791,9 +791,9 @@ elseif game.PlaceId == 10779604733 then
 							end
 
 							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name)["Button_Games_List"])
-							
+
 							task.wait(.25)
-							
+
 							table.insert(DoneList, v.Name)
 						end
 					end
@@ -939,6 +939,87 @@ elseif game.PlaceId == 10925589760 then
 		end
 	})
 
+	Credits(Window)
+elseif game.PlaceId == 9625096419 then
+	local AutoTapLooping
+	local AutoHatchLooping
+	local AutoWheelLooping
+	
+	local SelectedEgg
+	
+	local EggList = {}
+	
+	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
+		v.Name = "Event"..i
+	end
+
+	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Functions:GetChildren()) do
+		v.Name = "Function"..i
+	end
+	
+	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
+		table.insert(EggList, v.Name)
+	end
+	
+	local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+
+	local Main = Window:MakeTab({
+		Name = "Main",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Main:AddToggle({
+		Name = "🖱 Auto Tap",
+		Default = false,
+		Save = true,
+		Flag = "AutoTap",
+		Callback = function(Value)
+			AutoTapLooping = Value
+			while AutoTapLooping and task.wait() do
+				game:GetService("ReplicatedStorage").Communication.Events.Event89:FireServer()
+			end
+		end
+	})
+	
+	Main:AddDropdown({
+		Name = "🥚 Egg",
+		Options = EggList,
+		Save = true,
+		Flag = "SelectedEgg",
+		Callback = function(Value)
+			SelectedEgg = Value
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🐤 Auto Hatch Egg",
+		Default = false,
+		Save = true,
+		Flag = "AutoHatch",
+		Callback = function(Value)
+			AutoHatchLooping = Value
+			while AutoHatchLooping and task.wait() do
+				game:GetService("ReplicatedStorage").Communication.Events.Event108:FireServer(SelectedEgg, 3)
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🍀 Auto Claim Wheel",
+		Default = false,
+		Save = true,
+		Flag = "AutoClaimWheel",
+		Callback = function(Value)
+			AutoWheelLooping = Value
+			while AutoWheelLooping and task.wait() do
+				for i,v in pairs({1, 2, 3, 4, 5, 6}) do
+					game:GetService("ReplicatedStorage").Communication.Events.Event80:FireServer(v)
+				end
+			end
+		end
+	})
+	
 	Credits(Window)
 end
 
