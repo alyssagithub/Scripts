@@ -947,13 +947,13 @@ elseif game.PlaceId == 9625096419 then
 	local AutoShinyLooping
 	local AutoRainbowLooping
 	local AutoRebirthLooping
-	
+
 	local SelectedEgg
-	
+
 	local EggList = {}
-	
+
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
-	
+
 	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
 		v.Name = "Event"..i
 	end
@@ -961,15 +961,15 @@ elseif game.PlaceId == 9625096419 then
 	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Functions:GetChildren()) do
 		v.Name = "Function"..i
 	end
-	
+
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
 		table.insert(EggList, v.Name)
 	end
-	
+
 	table.sort(EggList, function(a, b)
 		return a > b
 	end)
-	
+
 	local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
 
 	local Main = Window:MakeTab({
@@ -978,7 +978,11 @@ elseif game.PlaceId == 9625096419 then
 		PremiumOnly = false
 	})
 	
-	Main:AddToggle({
+	local Misc = Main:AddSection({
+		Name = "Misc Automatics"
+	})
+
+	Misc:AddToggle({
 		Name = "🖱 Auto Tap",
 		Default = false,
 		Save = true,
@@ -991,30 +995,7 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 	
-	Main:AddDropdown({
-		Name = "🥚 Egg",
-		Options = EggList,
-		Save = true,
-		Flag = "SelectedEgg",
-		Callback = function(Value)
-			SelectedEgg = Value
-		end
-	})
-	
-	Main:AddToggle({
-		Name = "🐤 Auto Hatch Egg",
-		Default = false,
-		Save = true,
-		Flag = "AutoHatch",
-		Callback = function(Value)
-			AutoHatchLooping = Value
-			while AutoHatchLooping and task.wait() do
-				Network:FireServer("OpenCapsules", SelectedEgg, 3)
-			end
-		end
-	})
-	
-	Main:AddToggle({
+	Misc:AddToggle({
 		Name = "🍀 Auto Claim Wheel",
 		Default = false,
 		Save = true,
@@ -1029,7 +1010,70 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 	
+	Misc:AddToggle({
+		Name = "🔁 Auto Rebirth (Infinite)",
+		Default = false,
+		Save = true,
+		Flag = "AutoRebirth",
+		Callback = function(Value)
+			AutoRebirthLooping = Value
+			if AutoRebirthLooping then
+				local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
+
+				Abbreviation.Abbreviate = function(e, number)
+					return tostring(number)
+				end
+			end
+			while AutoRebirthLooping and task.wait() do
+				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
+					Network:FireServer("Rebirth", math.round(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
+				end
+			end
+		end
+	})
+	
+	Misc:AddButton({
+		Name = "🏝 Auto Unlock Islands",
+		Callback = function()
+			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(v))
+				task.wait(1)
+			end
+		end    
+	})
+	
+	local Pets = Main:AddSection({
+		Name = "Pets"
+	})
+
+	Pets:AddDropdown({
+		Name = "🥚 Egg",
+		Options = EggList,
+		Save = true,
+		Flag = "SelectedEgg",
+		Callback = function(Value)
+			SelectedEgg = Value
+		end
+	})
+
+	Pets:AddToggle({
+		Name = "🐤 Auto Hatch Egg",
+		Default = false,
+		Save = true,
+		Flag = "AutoHatch",
+		Callback = function(Value)
+			AutoHatchLooping = Value
+			while AutoHatchLooping and task.wait() do
+				Network:FireServer("OpenCapsules", SelectedEgg, 3)
+			end
+		end
+	})
+
 	Credits(Window)
 end
 
 OrionLib:Init()
+
+local Player = game.Players.LocalPlayer
+
+print(math.round(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
