@@ -1006,7 +1006,7 @@ elseif game.PlaceId == 9625096419 then
 		Callback = function(Value)
 			AutoHatchLooping = Value
 			while AutoHatchLooping and task.wait() do
-				Network:FireServer("OpenCapsules", SelectedEgg)
+				Network:FireServer("OpenCapsules", SelectedEgg, 3)
 			end
 		end
 	})
