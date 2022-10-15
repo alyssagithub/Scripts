@@ -1026,7 +1026,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 			while AutoRebirthLooping and task.wait() do
 				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
-					Network:FireServer("Rebirth", math.round(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
+					Network:FireServer("Rebirth", math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
 				end
 			end
 		end
@@ -1035,7 +1035,7 @@ elseif game.PlaceId == 9625096419 then
 	Misc:AddButton({
 		Name = "🏝 Auto Unlock Islands",
 		Callback = function()
-			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
+			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-132, 2557, 351}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
 				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(v))
 				task.wait(1)
 			end
@@ -1073,7 +1073,3 @@ elseif game.PlaceId == 9625096419 then
 end
 
 OrionLib:Init()
-
-local Player = game.Players.LocalPlayer
-
-print(math.round(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
