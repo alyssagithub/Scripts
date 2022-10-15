@@ -954,7 +954,7 @@ elseif game.PlaceId == 9625096419 then
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
-	local HatchingAnimation = require(game:GetService("Players").Iceelus.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
+	local HatchingAnimation = require(Player.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
 	local PreviousFunction = Abbreviation.Abbreviate
 	local PreviousFunction2 = HatchingAnimation.HatchEgg
 
