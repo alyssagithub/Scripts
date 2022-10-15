@@ -944,9 +944,8 @@ elseif game.PlaceId == 9625096419 then
 	local AutoTapLooping
 	local AutoHatchLooping
 	local AutoWheelLooping
-	local AutoShinyLooping
-	local AutoRainbowLooping
 	local AutoRebirthLooping
+	local AutoEquipLooping
 
 	local SelectedEgg
 
@@ -979,7 +978,7 @@ elseif game.PlaceId == 9625096419 then
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	local Misc = Main:AddSection({
 		Name = "Misc Automatics"
 	})
@@ -996,7 +995,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Misc:AddToggle({
 		Name = "🍀 Auto Claim Wheel",
 		Default = false,
@@ -1012,7 +1011,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Misc:AddToggle({
 		Name = "🔁 Auto Rebirth (Infinite)",
 		Default = false,
@@ -1034,7 +1033,24 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
+	Misc:AddToggle({
+		Name = "⚔ Auto Equip Best",
+		Default = false,
+		Save = true,
+		Flag = "AutoEquip",
+		Callback = function(Value)
+			AutoEquipLooping = Value
+			if AutoEquipLooping then
+				Player.PlayerGui.ScreenGui.Menus.Pets.Menu.Storage.ChildAdded:Connect(function()
+					if AutoEquipLooping then
+						Network:FireServer("EquipBest")
+					end
+				end)
+			end
+		end
+	})
+
 	Misc:AddButton({
 		Name = "🏝 Auto Unlock Islands",
 		Callback = function()
@@ -1044,7 +1060,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end    
 	})
-	
+
 	local Pets = Main:AddSection({
 		Name = "Pets"
 	})
