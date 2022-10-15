@@ -1029,19 +1029,6 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 	
-	Main:AddToggle({
-		Name = "🔁 Auto Rebirth",
-		Default = false,
-		Save = true,
-		Flag = "AutoRebirth",
-		Callback = function(Value)
-			AutoRebirthLooping = Value
-			while AutoRebirthLooping and task.wait() do
-				Network:FireServer("Rebirth", 1)
-			end
-		end
-	})
-	
 	Credits(Window)
 end
 
