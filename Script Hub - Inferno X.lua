@@ -940,6 +940,93 @@ elseif game.PlaceId == 10925589760 then
 	})
 
 	Credits(Window)
+elseif game.PlaceId == 9625096419 then
+	local AutoTapLooping
+	local AutoHatchLooping
+	local AutoWheelLooping
+	
+	local SelectedEgg
+	
+	local EggList = {}
+	
+	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
+	
+	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
+		v.Name = "Event"..i
+	end
+
+	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Functions:GetChildren()) do
+		v.Name = "Function"..i
+	end
+	
+	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
+		table.insert(EggList, v.Name)
+	end
+	
+	table.sort(EggList, function(a, b)
+		return a > b
+	end)
+	
+	local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+
+	local Main = Window:MakeTab({
+		Name = "Main",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Main:AddToggle({
+		Name = "🖱 Auto Tap",
+		Default = false,
+		Save = true,
+		Flag = "AutoTap",
+		Callback = function(Value)
+			AutoTapLooping = Value
+			while AutoTapLooping and task.wait() do
+				Network:FireServer("ClickDetect")
+			end
+		end
+	})
+	
+	Main:AddDropdown({
+		Name = "🥚 Egg",
+		Options = EggList,
+		Save = true,
+		Flag = "SelectedEgg",
+		Callback = function(Value)
+			SelectedEgg = Value
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🐤 Auto Hatch Egg",
+		Default = false,
+		Save = true,
+		Flag = "AutoHatch",
+		Callback = function(Value)
+			AutoHatchLooping = Value
+			while AutoHatchLooping and task.wait() do
+				Network:FireServer("OpenCapsules", SelectedEgg)
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🍀 Auto Claim Wheel",
+		Default = false,
+		Save = true,
+		Flag = "AutoClaimWheel",
+		Callback = function(Value)
+			AutoWheelLooping = Value
+			while AutoWheelLooping and task.wait() do
+				for i,v in pairs({1, 2, 3, 4, 5, 6}) do
+					Network:FireServer("AttemptSpin", v)
+				end
+			end
+		end
+	})
+	
+	Credits(Window)
 end
 
 OrionLib:Init()
