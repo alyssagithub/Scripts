@@ -944,6 +944,9 @@ elseif game.PlaceId == 9625096419 then
 	local AutoTapLooping
 	local AutoHatchLooping
 	local AutoWheelLooping
+	local AutoShinyLooping
+	local AutoRainbowLooping
+	local AutoRebirthLooping
 	
 	local SelectedEgg
 	
@@ -1022,6 +1025,19 @@ elseif game.PlaceId == 9625096419 then
 				for i,v in pairs({1, 2, 3, 4, 5, 6}) do
 					Network:FireServer("AttemptSpin", v)
 				end
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🔁 Auto Rebirth",
+		Default = false,
+		Save = true,
+		Flag = "AutoRebirth",
+		Callback = function(Value)
+			AutoRebirthLooping = Value
+			while AutoRebirthLooping and task.wait() do
+				Network:FireServer("Rebirth", 1)
 			end
 		end
 	})
