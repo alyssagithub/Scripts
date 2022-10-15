@@ -953,6 +953,8 @@ elseif game.PlaceId == 9625096419 then
 	local EggList = {}
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
+	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
+	local PreviousFunction = Abbreviation.Abbreviate
 
 	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
 		v.Name = "Event"..i
@@ -1019,11 +1021,11 @@ elseif game.PlaceId == 9625096419 then
 		Callback = function(Value)
 			AutoRebirthLooping = Value
 			if AutoRebirthLooping then
-				local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
-
 				Abbreviation.Abbreviate = function(e, number)
 					return tostring(number)
 				end
+			else
+				Abbreviation.Abbreviate = PreviousFunction
 			end
 			while AutoRebirthLooping and task.wait() do
 				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
