@@ -44,43 +44,8 @@ local function Click(v)
 	print("Clicked "..v.Name)
 end
 
-if game.PlaceId == 9757510382 then
-	local Sniping
 
-	local Window = OrionLib:MakeWindow({Name = "Inferno X - Trade Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
-
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
-		Name = "📈 New Item Sniper",
-		Default = false,
-		Save = true,
-		Flag = "NewItemSniper",
-		Callback = function(Value)
-			Sniping = Value
-			game.ReplicatedStorage.show.OnClientEvent:Connect(function(e, r, t, AssetId)
-				print("new item remote called")
-				if Sniping then
-					print("sniping is true")
-					for i = 1, 5 do
-						print("buying new item")
-						game:GetService("ReplicatedStorage").event:FireServer("buy", AssetId, 0, 0)
-						print("bought new item")
-						repeat task.wait() until Player.PlayerGui.gui.Frame.Message.BackgroundColor3 == Color3.fromRGB(0, 176, 111)
-						repeat task.wait() until Player.PlayerGui.gui.Frame.Message.Text == "Purchase was successful!"
-						print("waited until banner showed successful, redoing loop, "..tostring(i))
-					end
-				end
-			end)
-		end
-	})
-
-	Credits(Window)
-elseif game.PlaceId == 9264596435 then
+if game.PlaceId == 9264596435 then
 	local Plot
 	local PlayerPlot
 
