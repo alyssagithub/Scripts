@@ -1005,6 +1005,7 @@ elseif game.PlaceId == 9625096419 then
 			while AutoWheelLooping and task.wait() do
 				for i,v in pairs({1, 2, 3, 4, 5, 6}) do
 					Network:FireServer("AttemptSpin", v)
+					task.wait(1)
 				end
 			end
 		end
