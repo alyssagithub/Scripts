@@ -691,7 +691,7 @@ elseif game.PlaceId == 10779604733 then
 					until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == false
 
 					for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
-						if v:IsA("Frame") and v.Host.Value == game.Players.LocalPlayer.Name then
+						if v:IsA("Frame") and v.Host.Value == Player.Name then
 							Click(v["Button_View"])
 
 							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name).Visible == true
@@ -774,7 +774,7 @@ elseif game.PlaceId == 10779604733 then
 					until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == false or not AutoBattleLooping
 
 					for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
-						if v:IsA("Frame") and v.Host.Value == game.Players.LocalPlayer.Name and not table.find(DoneList, v.Name) and AutoBattleLooping then
+						if v:IsA("Frame") and v.Host.Value == Player.Name and not table.find(DoneList, v.Name) and AutoBattleLooping then
 							v.Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]
 							task.wait(.5)
 							Click(v["Button_View"])
@@ -947,6 +947,8 @@ elseif game.PlaceId == 9625096419 then
 	local AutoRebirthLooping
 	local AutoEquipLooping
 	local RemoveEggAnimLooping
+	local RemoveNotifLooping
+	local RemoveTradeLooping
 
 	local SelectedEgg
 
@@ -955,8 +957,11 @@ elseif game.PlaceId == 9625096419 then
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
 	local HatchingAnimation = require(Player.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
+	local Notifications = require(Player.PlayerScripts.Client.ClientManager.PlayerController.UI.Notifications)
+	
 	local PreviousFunction = Abbreviation.Abbreviate
 	local PreviousFunction2 = HatchingAnimation.HatchEgg
+	local PreviousFunction3 = Notifications.Notify
 
 	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
 		v.Name = "Event"..i
@@ -1023,6 +1028,13 @@ elseif game.PlaceId == 9625096419 then
 		Callback = function(Value)
 			AutoRebirthLooping = Value
 			if AutoRebirthLooping then
+				OrionLib:MakeNotification({
+					Name = "Inferno X Notification",
+					Content = "In order to make Auto Rebirth work you must click once (or do anything that changes your data).",
+					Image = "rbxassetid://4483345998",
+					Time = 10
+				})
+				
 				Abbreviation.Abbreviate = function(e, number)
 					return tostring(number)
 				end
@@ -1044,12 +1056,8 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoEquip",
 		Callback = function(Value)
 			AutoEquipLooping = Value
-			if AutoEquipLooping then
-				Player.PlayerGui.ScreenGui.Menus.Pets.Menu.Storage.ChildAdded:Connect(function()
-					if AutoEquipLooping then
-						Network:FireServer("EquipBest")
-					end
-				end)
+			while AutoEquipLooping and task.wait(1) do
+				Network:FireServer("EquipBest")
 			end
 		end
 	})
@@ -1058,7 +1066,7 @@ elseif game.PlaceId == 9625096419 then
 		Name = "🏝 Auto Unlock Islands",
 		Callback = function()
 			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-132, 2557, 351}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
-				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(v))
+				Player.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(v))
 				task.wait(1)
 			end
 		end    
@@ -1091,7 +1099,11 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 	
-	Pets:AddToggle({
+	local Remove = Main:AddSection({
+		Name = "Removals"
+	})
+
+	Remove:AddToggle({
 		Name = "🐣 Remove Egg Animation",
 		Default = false,
 		Save = true,
@@ -1104,6 +1116,23 @@ elseif game.PlaceId == 9625096419 then
 				end
 			else
 				HatchingAnimation.HatchEgg = PreviousFunction2
+			end
+		end
+	})
+	
+	Remove:AddToggle({
+		Name = "❗ Remove Notifications",
+		Default = false,
+		Save = true,
+		Flag = "RemoveNotif",
+		Callback = function(Value)
+			RemoveNotifLooping = Value
+			if RemoveNotifLooping then
+				Notifications.Notify = function()
+					return
+				end
+			else
+				Notifications.Notify = PreviousFunction3
 			end
 		end
 	})
