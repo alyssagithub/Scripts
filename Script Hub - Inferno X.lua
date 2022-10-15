@@ -946,6 +946,7 @@ elseif game.PlaceId == 9625096419 then
 	local AutoWheelLooping
 	local AutoRebirthLooping
 	local AutoEquipLooping
+	local RemoveEggAnimLooping
 
 	local SelectedEgg
 
@@ -953,7 +954,9 @@ elseif game.PlaceId == 9625096419 then
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
+	local HatchingAnimation = require(game:GetService("Players").Iceelus.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
 	local PreviousFunction = Abbreviation.Abbreviate
+	local PreviousFunction2 = HatchingAnimation.HatchEgg
 
 	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
 		v.Name = "Event"..i
@@ -1084,6 +1087,23 @@ elseif game.PlaceId == 9625096419 then
 			AutoHatchLooping = Value
 			while AutoHatchLooping and task.wait() do
 				Network:FireServer("OpenCapsules", SelectedEgg, 3)
+			end
+		end
+	})
+	
+	Pets:AddToggle({
+		Name = "🐣 Remove Egg Animation",
+		Default = false,
+		Save = true,
+		Flag = "RemoveEggAnim",
+		Callback = function(Value)
+			RemoveEggAnimLooping = Value
+			if RemoveEggAnimLooping then
+				HatchingAnimation.HatchEgg = function()
+					return
+				end
+			else
+				HatchingAnimation.HatchEgg = PreviousFunction2
 			end
 		end
 	})
