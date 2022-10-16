@@ -914,9 +914,7 @@ elseif game.PlaceId == 9625096419 then
 	local AutoShinyLooping
 	local AutoRainbowLooping
 	local AutoEvolveLooping
-	local RemoveEggAnimLooping
 	local RemoveNotifLooping
-	local RemoveTradeLooping
 
 	local SelectedEgg
 	
