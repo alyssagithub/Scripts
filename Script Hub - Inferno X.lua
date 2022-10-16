@@ -919,6 +919,8 @@ elseif game.PlaceId == 9625096419 then
 	local RemoveTradeLooping
 
 	local SelectedEgg
+	
+	local EggsToOpen
 
 	local EggList = {}
 	local IslandEggs = {["Main Island"] = "Ice Egg"}
@@ -1038,6 +1040,18 @@ elseif game.PlaceId == 9625096419 then
 	local Pets = Main:AddSection({
 		Name = "Pets"
 	})
+	
+	Pets:AddSlider({
+		Name = "🥚 Eggs to Open",
+		Min = 1,
+		Max = 1000,
+		Default = 3,
+		Color = Color3.fromRGB(255,255,255),
+		Increment = 1,
+		Callback = function(Value)
+			EggsToOpen = Value
+		end    
+	})
 
 	Pets:AddDropdown({
 		Name = "🥚 Egg",
@@ -1056,8 +1070,16 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoHatch",
 		Callback = function(Value)
 			AutoHatchLooping = Value
+			if AutoHatchLooping then
+				HatchingAnimation.HatchEgg = function()
+					return
+				end
+			else
+				HatchingAnimation.HatchEgg = PreviousFunction2
+			end
+			
 			while AutoHatchLooping and task.wait() do
-				Network:FireServer("OpenCapsules", SelectedEgg, 3)
+				Network:FireServer("OpenCapsules", SelectedEgg, EggsToOpen)
 			end
 		end
 	})
@@ -1109,7 +1131,7 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoShiny",
 		Callback = function(Value)
 			AutoShinyLooping = Value
-			while AutoShinyLooping and task.wait(1) do
+			while AutoShinyLooping and task.wait() do
 				Convert("Shiny")
 			end
 		end
@@ -1122,7 +1144,7 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoRainbow",
 		Callback = function(Value)
 			AutoRainbowLooping = Value
-			while AutoRainbowLooping and task.wait(1) do
+			while AutoRainbowLooping and task.wait() do
 				Convert("Rainbow")
 			end
 		end
@@ -1152,23 +1174,6 @@ elseif game.PlaceId == 9625096419 then
 
 	local Remove = Main:AddSection({
 		Name = "Removals"
-	})
-
-	Remove:AddToggle({
-		Name = "🐣 Remove Egg Animation",
-		Default = false,
-		Save = true,
-		Flag = "RemoveEggAnim",
-		Callback = function(Value)
-			RemoveEggAnimLooping = Value
-			if RemoveEggAnimLooping then
-				HatchingAnimation.HatchEgg = function()
-					return
-				end
-			else
-				HatchingAnimation.HatchEgg = PreviousFunction2
-			end
-		end
 	})
 
 	Remove:AddToggle({
