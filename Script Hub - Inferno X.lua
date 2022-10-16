@@ -931,12 +931,6 @@ elseif game.PlaceId == 9625096419 then
 	local PreviousFunction2 = HatchingAnimation.HatchEgg
 	local PreviousFunction3 = Notifications.Notify
 
-	for i,v in pairs(getgc(true)) do 
-		if type(v) == "table" and rawget(v, "Remote") then 
-			v["Remote"].Name = v["Name"] 
-		end 
-	end
-
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
 		table.insert(EggList, v.Name)
 	end
