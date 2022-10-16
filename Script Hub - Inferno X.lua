@@ -921,6 +921,7 @@ elseif game.PlaceId == 9625096419 then
 	local SelectedEgg
 
 	local EggList = {}
+	local IslandEggs = {["Main Island"] = "Ice Egg"}
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
@@ -1123,6 +1124,28 @@ elseif game.PlaceId == 9625096419 then
 			AutoRainbowLooping = Value
 			while AutoRainbowLooping and task.wait(1) do
 				Convert("Rainbow")
+			end
+		end
+	})
+	
+	Pets:AddToggle({
+		Name = "🧬 Auto Evolve",
+		Default = false,
+		Save = true,
+		Flag = "AutoEvolve",
+		Callback = function(Value)
+			AutoEvolveLooping = Value
+			while AutoEvolveLooping and task.wait(1) do
+				for i,v in pairs({"Normal", "Shiny", "Rainbow"}) do
+					Network:FireServer("EvolvedCrafting", "Main Island", "Icy Egg", v, "Spike")
+					Network:FireServer("EvolvedCrafting", "Robotic Island", "Robotic Egg", v, "AI Sentinel")
+					Network:FireServer("EvolvedCrafting", "Spiritual Island", "Spiritual Egg", v, "Holy Sprite")
+					Network:FireServer("EvolvedCrafting", "Fantasy Island", "Fantasy Egg", v, "Onyx Block")
+					Network:FireServer("EvolvedCrafting", "Monster Island", "Monster Egg", v, "Pinch King")
+					Network:FireServer("EvolvedCrafting", "Fairytale Island", "Fairytale Egg", v, "Wind Spirit")
+					Network:FireServer("EvolvedCrafting", "Candy Island", "Candy Egg", v, "Sweet Slug")
+					task.wait(1)
+				end
 			end
 		end
 	})
