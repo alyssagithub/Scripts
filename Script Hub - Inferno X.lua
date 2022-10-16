@@ -923,7 +923,6 @@ elseif game.PlaceId == 9625096419 then
 	local EggList = {}
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
-	local PlayerData = Network:InvokeServer("RequestData", Player, true)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
 	local HatchingAnimation = require(Player.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
 	local Notifications = require(Player.PlayerScripts.Client.ClientManager.PlayerController.UI.Notifications)
