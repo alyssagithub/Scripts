@@ -913,6 +913,7 @@ elseif game.PlaceId == 9625096419 then
 	local AutoEquipLooping
 	local AutoShinyLooping
 	local AutoRainbowLooping
+	local AutoEvolveLooping
 	local RemoveEggAnimLooping
 	local RemoveNotifLooping
 	local RemoveTradeLooping
@@ -1088,13 +1089,13 @@ elseif game.PlaceId == 9625096419 then
 
 		for i,v in pairs(PlayerData.PetsInfo.PetStorage) do
 			if Convertion == "Rainbow" then
-				if table.find(MergablePets, v.Name) and v.Tier == 2 and Counter < 5 then
+				if table.find(MergablePets, v.Name) and v.Tier == 2 and Counter < 5 and v.Locked == false then
 					Counter = Counter + 1
 					Merging[i] = true
 					print("merging added")
 				end
 			else
-				if table.find(MergablePets, v.Name) and v.Tier == 1 and Counter < 5 then
+				if table.find(MergablePets, v.Name) and v.Tier == 1 and Counter < 5 and v.Locked == false then
 					Counter = Counter + 1
 					Merging[i] = true
 					print("merging added")
