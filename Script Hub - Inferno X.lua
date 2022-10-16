@@ -1026,7 +1026,7 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoEquip",
 		Callback = function(Value)
 			AutoEquipLooping = Value
-			while AutoEquipLooping and task.wait(1) do
+			while AutoEquipLooping and task.wait(2.5) do
 				Network:FireServer("EquipBest")
 			end
 		end
@@ -1082,7 +1082,6 @@ elseif game.PlaceId == 9625096419 then
 		for i,v in pairs(PlayerData.PetsInfo.AmountOfPet) do
 			if v > 5 then
 				table.insert(MergablePets, i)
-				print("inserted")
 			end
 		end
 
@@ -1091,24 +1090,19 @@ elseif game.PlaceId == 9625096419 then
 				if table.find(MergablePets, v.Name) and v.Tier == 2 and Counter < 5 and v.Locked == false then
 					Counter = Counter + 1
 					Merging[i] = true
-					print("merging added")
 				end
 			else
 				if table.find(MergablePets, v.Name) and v.Tier == 1 and Counter < 5 and v.Locked == false then
 					Counter = Counter + 1
 					Merging[i] = true
-					print("merging added")
 				end
 			end
 		end
-
-		print(Counter)
 
 		if Counter == 5 then
 			for i,v in pairs(Merging) do
 				if Counter2 < 1 then
 					Counter2 = Counter2 + 1
-					print("fired")
 					Network:FireServer(Convertion.."Crafting", i, Merging)
 				end
 			end
