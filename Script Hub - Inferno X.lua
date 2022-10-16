@@ -926,17 +926,15 @@ elseif game.PlaceId == 9625096419 then
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
 	local HatchingAnimation = require(Player.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
 	local Notifications = require(Player.PlayerScripts.Client.ClientManager.PlayerController.UI.Notifications)
-	
+
 	local PreviousFunction = Abbreviation.Abbreviate
 	local PreviousFunction2 = HatchingAnimation.HatchEgg
 	local PreviousFunction3 = Notifications.Notify
 
-	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Events:GetChildren()) do
-		v.Name = "Event"..i
-	end
-
-	for i,v in pairs(game:GetService("ReplicatedStorage").Communication.Functions:GetChildren()) do
-		v.Name = "Function"..i
+	for i,v in pairs(getgc(true)) do 
+		if type(v) == "table" and rawget(v, "Remote") then 
+			v["Remote"].Name = v["Name"] 
+		end 
 	end
 
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
@@ -1004,7 +1002,7 @@ elseif game.PlaceId == 9625096419 then
 						Time = 10
 					})
 				end
-				
+
 				Abbreviation.Abbreviate = function(e, number)
 					return tostring(number)
 				end
@@ -1068,7 +1066,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	local function Convert(Convertion)
 		local PlayerData = Network:InvokeServer("RequestData", Player, true)
 
@@ -1108,7 +1106,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	end
-	
+
 	Pets:AddToggle({
 		Name = "✨ Auto Shiny Convert",
 		Default = false,
@@ -1121,7 +1119,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Pets:AddToggle({
 		Name = "🌈 Auto Rainbow Convert",
 		Default = false,
@@ -1134,7 +1132,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	local Remove = Main:AddSection({
 		Name = "Removals"
 	})
@@ -1155,7 +1153,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Remove:AddToggle({
 		Name = "❗ Remove Notifications",
 		Default = false,
