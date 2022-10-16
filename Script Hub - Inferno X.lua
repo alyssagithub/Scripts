@@ -1046,6 +1046,8 @@ elseif game.PlaceId == 9625096419 then
 		Default = 3,
 		Color = Color3.fromRGB(255,255,255),
 		Increment = 1,
+		Save = true,
+		Flag = "EggsToOpen",
 		Callback = function(Value)
 			EggsToOpen = Value
 		end    
