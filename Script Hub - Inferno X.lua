@@ -911,6 +911,8 @@ elseif game.PlaceId == 9625096419 then
 	local AutoWheelLooping
 	local AutoRebirthLooping
 	local AutoEquipLooping
+	local AutoShinyLooping
+	local AutoRainbowLooping
 	local RemoveEggAnimLooping
 	local RemoveNotifLooping
 	local RemoveTradeLooping
@@ -920,6 +922,7 @@ elseif game.PlaceId == 9625096419 then
 	local EggList = {}
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
+	local PlayerData = Network:InvokeServer("RequestData", Player, true)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
 	local HatchingAnimation = require(Player.PlayerScripts.Client.ClientManager.PlayerController.Visualizations.Hatching)
 	local Notifications = require(Player.PlayerScripts.Client.ClientManager.PlayerController.UI.Notifications)
@@ -1062,6 +1065,78 @@ elseif game.PlaceId == 9625096419 then
 			AutoHatchLooping = Value
 			while AutoHatchLooping and task.wait() do
 				Network:FireServer("OpenCapsules", SelectedEgg, 3)
+			end
+		end
+	})
+	
+	local function Convert(Convertion)
+		local PlayerData = Network:InvokeServer("RequestData", Player, true)
+
+		local MergablePets = {}
+		local Merging = {}
+
+		local Counter = 0
+		local Counter2 = 0
+		local Counter3 = 0
+
+		for i,v in pairs(PlayerData.PetsInfo.AmountOfPet) do
+			if v > 5 then
+				table.insert(MergablePets, i)
+				print("inserted")
+			end
+		end
+
+		for i,v in pairs(PlayerData.PetsInfo.PetStorage) do
+			if Convertion == "Rainbow" then
+				if table.find(MergablePets, v.Name) and v.Tier == 2 and Counter < 5 then
+					Counter = Counter + 1
+					Merging[i] = true
+					print("merging added")
+				end
+			else
+				if table.find(MergablePets, v.Name) and v.Tier == 1 and Counter < 5 then
+					Counter = Counter + 1
+					Merging[i] = true
+					print("merging added")
+				end
+			end
+		end
+
+		print(Counter)
+
+		if Counter == 5 then
+			for i,v in pairs(Merging) do
+				if Counter2 < 1 then
+					Counter2 = Counter2 + 1
+					print("fired")
+					Network:FireServer(Convertion.."Crafting", i, Merging)
+				end
+			end
+		end
+	end
+	
+	Pets:AddToggle({
+		Name = "✨ Auto Shiny Convert",
+		Default = false,
+		Save = true,
+		Flag = "AutoShiny",
+		Callback = function(Value)
+			AutoShinyLooping = Value
+			while AutoShinyLooping and task.wait(1) do
+				Convert("Shiny")
+			end
+		end
+	})
+	
+	Pets:AddToggle({
+		Name = "🌈 Auto Rainbow Convert",
+		Default = false,
+		Save = true,
+		Flag = "AutoRainbow",
+		Callback = function(Value)
+			AutoRainbowLooping = Value
+			while AutoRainbowLooping and task.wait(1) do
+				Convert("Rainbow")
 			end
 		end
 	})
