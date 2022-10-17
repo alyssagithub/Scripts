@@ -1082,7 +1082,7 @@ elseif game.PlaceId == 9625096419 then
 				end
 			end
 
-			while AutoHatchLooping and task.wait() do
+			while AutoHatchLooping and task.wait(1) do
 				Network:FireServer("OpenCapsules", SelectedEgg, EggsToOpen)
 			end
 		end
