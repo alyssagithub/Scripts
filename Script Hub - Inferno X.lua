@@ -917,7 +917,7 @@ elseif game.PlaceId == 9625096419 then
 	local RemoveNotifLooping
 
 	local SelectedEgg
-	
+
 	local EggsToOpen
 
 	local EggList = {}
@@ -1039,10 +1039,14 @@ elseif game.PlaceId == 9625096419 then
 		Name = "Pets"
 	})
 	
+	repeat task.wait() until string.find(Player.PlayerGui.ScreenGui.Menus.Pets.Menu.TotalStorage.TextLabel.Text, "/")
+	
+	local Max = tonumber(Player.PlayerGui.ScreenGui.Menus.Pets.Menu.TotalStorage.TextLabel.Text:split("/")[2])
+
 	Pets:AddSlider({
 		Name = "🥚 Eggs to Open",
 		Min = 1,
-		Max = 1000,
+		Max = Max,
 		Default = 3,
 		Color = Color3.fromRGB(255,255,255),
 		Increment = 1,
@@ -1052,6 +1056,9 @@ elseif game.PlaceId == 9625096419 then
 			EggsToOpen = Value
 		end    
 	})
+	
+	Pets:AddLabel("Only set slider above 3 if in v1.0.5 or lower")
+	Pets:AddLabel("Current Version: "..Player.PlayerGui.ScreenGui.Updates.TextLabel.Text)
 
 	Pets:AddDropdown({
 		Name = "🥚 Egg",
@@ -1077,7 +1084,7 @@ elseif game.PlaceId == 9625096419 then
 			else
 				HatchingAnimation.HatchEgg = PreviousFunction2
 			end
-			
+
 			while AutoHatchLooping and task.wait() do
 				Network:FireServer("OpenCapsules", SelectedEgg, EggsToOpen)
 			end
@@ -1149,7 +1156,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Pets:AddToggle({
 		Name = "🧬 Auto Evolve",
 		Default = false,
