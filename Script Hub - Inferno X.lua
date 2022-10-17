@@ -1078,7 +1078,7 @@ elseif game.PlaceId == 9625096419 then
 				end
 			end
 
-			while AutoHatchLooping and task.wait(1) do
+			while AutoHatchLooping and task.wait() do
 				Network:FireServer("OpenCapsules", SelectedEgg, EggsToOpen)
 			end
 		end
@@ -1104,12 +1104,10 @@ elseif game.PlaceId == 9625096419 then
 			if table.find(MergablePets, v.Name) and v.Tier == ConvertionTable[Convertion] and Counter < 5 and v.Locked == false then
 				Counter = Counter + 1
 				Merging[i] = true
-				print(i)
 			end
 		end
 
 		if Counter == 5 then
-			print(Counter)
 			for i,v in pairs(Merging) do
 				if Counter2 < 1 then
 					Counter2 = Counter2 + 1
