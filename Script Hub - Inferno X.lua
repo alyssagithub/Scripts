@@ -1037,15 +1037,11 @@ elseif game.PlaceId == 9625096419 then
 	local Pets = Main:AddSection({
 		Name = "Pets"
 	})
-	
-	repeat task.wait() until string.find(Player.PlayerGui.ScreenGui.Menus.Pets.Menu.TotalStorage.TextLabel.Text, "/")
-	
-	local Max = tonumber(Player.PlayerGui.ScreenGui.Menus.Pets.Menu.TotalStorage.TextLabel.Text:split("/")[2])
 
 	Pets:AddSlider({
 		Name = "🥚 Eggs to Open",
 		Min = 1,
-		Max = Max,
+		Max = 1000,
 		Default = 3,
 		Color = Color3.fromRGB(255,255,255),
 		Increment = 1,
@@ -1126,6 +1122,8 @@ elseif game.PlaceId == 9625096419 then
 				end
 			end
 		end
+		
+		task.wait()
 	end
 
 	Pets:AddToggle({
