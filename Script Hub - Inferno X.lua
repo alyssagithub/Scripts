@@ -929,7 +929,6 @@ elseif game.PlaceId == 9625096419 then
 	local Notifications = require(Player.PlayerScripts.Client.ClientManager.PlayerController.UI.Notifications)
 
 	local PreviousFunction = Abbreviation.Abbreviate
-	local PreviousFunction2 = HatchingAnimation.HatchEgg
 	local PreviousFunction3 = Notifications.Notify
 
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
@@ -1081,8 +1080,6 @@ elseif game.PlaceId == 9625096419 then
 				HatchingAnimation.HatchEgg = function()
 					return
 				end
-			else
-				HatchingAnimation.HatchEgg = PreviousFunction2
 			end
 
 			while AutoHatchLooping and task.wait() do
