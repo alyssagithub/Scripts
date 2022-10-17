@@ -1095,20 +1095,20 @@ elseif game.PlaceId == 9625096419 then
 		local Counter2 = 0
 
 		for i,v in pairs(PlayerData.PetsInfo.AmountOfPet) do
-			if v > 5 then
+			if v >= 5 then
 				table.insert(MergablePets, i)
 			end
 		end
 
 		for i,v in pairs(PlayerData.PetsInfo.PetStorage) do
-			if table.find(MergablePets, v.Name) and v.Tier == ConvertionTable[Convertion] and Counter < 6 and v.Locked == false then
+			if table.find(MergablePets, v.Name) and v.Tier == ConvertionTable[Convertion] and Counter < 5 and v.Locked == false then
 				Counter = Counter + 1
 				Merging[i] = true
 				print(i)
 			end
 		end
 
-		if Counter == 6 then
+		if Counter == 5 then
 			print(Counter)
 			for i,v in pairs(Merging) do
 				if Counter2 < 1 then
