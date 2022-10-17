@@ -1078,7 +1078,7 @@ elseif game.PlaceId == 9625096419 then
 				end
 			end
 
-			while AutoHatchLooping and task.wait() do
+			while AutoHatchLooping and task.wait(1) do
 				Network:FireServer("OpenCapsules", SelectedEgg, EggsToOpen)
 			end
 		end
@@ -1126,7 +1126,7 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoShiny",
 		Callback = function(Value)
 			AutoShinyLooping = Value
-			while AutoShinyLooping and task.wait() do
+			while AutoShinyLooping and task.wait(.5) do
 				Convert("Shiny")
 			end
 		end
@@ -1139,7 +1139,7 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoRainbow",
 		Callback = function(Value)
 			AutoRainbowLooping = Value
-			while AutoRainbowLooping and task.wait() do
+			while AutoRainbowLooping and task.wait(.5) do
 				Convert("Rainbow")
 			end
 		end
