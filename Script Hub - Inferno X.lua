@@ -1089,10 +1089,10 @@ elseif game.PlaceId == 9625096419 then
 
 		local MergablePets = {}
 		local Merging = {}
+		local ConvertionTable = {["Rainbow"] = 2, ["Shiny"] = 1}
 
 		local Counter = 0
 		local Counter2 = 0
-		local Counter3 = 0
 
 		for i,v in pairs(PlayerData.PetsInfo.AmountOfPet) do
 			if v > 5 then
@@ -1101,20 +1101,15 @@ elseif game.PlaceId == 9625096419 then
 		end
 
 		for i,v in pairs(PlayerData.PetsInfo.PetStorage) do
-			if Convertion == "Rainbow" then
-				if table.find(MergablePets, v.Name) and v.Tier == 2 and Counter < 5 and v.Locked == false then
-					Counter = Counter + 1
-					Merging[i] = true
-				end
-			else
-				if table.find(MergablePets, v.Name) and v.Tier == 1 and Counter < 5 and v.Locked == false then
-					Counter = Counter + 1
-					Merging[i] = true
-				end
+			if table.find(MergablePets, v.Name) and v.Tier == ConvertionTable[Convertion] and Counter < 6 and v.Locked == false then
+				Counter = Counter + 1
+				Merging[i] = true
+				print(i)
 			end
 		end
 
-		if Counter == 5 then
+		if Counter == 6 then
+			print(Counter)
 			for i,v in pairs(Merging) do
 				if Counter2 < 1 then
 					Counter2 = Counter2 + 1
