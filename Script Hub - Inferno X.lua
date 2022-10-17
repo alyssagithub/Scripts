@@ -947,11 +947,11 @@ elseif game.PlaceId == 9625096419 then
 		PremiumOnly = false
 	})
 
-	local Misc = Main:AddSection({
-		Name = "Misc Automatics"
+	local Automatics = Main:AddSection({
+		Name = "Automatics"
 	})
 
-	Misc:AddToggle({
+	Automatics:AddToggle({
 		Name = "🖱 Auto Tap",
 		Default = false,
 		Save = true,
@@ -964,7 +964,7 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
-	Misc:AddToggle({
+	Automatics:AddToggle({
 		Name = "🍀 Auto Claim Wheel",
 		Default = false,
 		Save = true,
@@ -980,7 +980,7 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
-	Misc:AddToggle({
+	Automatics:AddToggle({
 		Name = "🔁 Auto Rebirth (Infinite)",
 		Default = false,
 		Save = true,
@@ -1011,7 +1011,7 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
-	Misc:AddToggle({
+	Automatics:AddToggle({
 		Name = "⚔ Auto Equip Best",
 		Default = false,
 		Save = true,
@@ -1024,7 +1024,7 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
-	Misc:AddButton({
+	Automatics:AddButton({
 		Name = "🏝 Auto Unlock Islands",
 		Callback = function()
 			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-132, 2557, 351}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
@@ -1037,11 +1037,19 @@ elseif game.PlaceId == 9625096419 then
 	local Pets = Main:AddSection({
 		Name = "Pets"
 	})
+	
+	local Max
+
+	if tonumber(Player.PlayerGui.ScreenGui.Updates.TextLabel.Text:split(".")[3]) >= 6 then
+		Max = 3
+	else
+		Max = 1000
+	end
 
 	Pets:AddSlider({
 		Name = "🥚 Eggs to Open",
 		Min = 1,
-		Max = 1000,
+		Max = Max,
 		Default = 3,
 		Color = Color3.fromRGB(255,255,255),
 		Increment = 1,
@@ -1051,9 +1059,6 @@ elseif game.PlaceId == 9625096419 then
 			EggsToOpen = Value
 		end    
 	})
-	
-	Pets:AddLabel("Only set slider above 3 if in v1.0.6 or above")
-	Pets:AddLabel("Current Version: "..Player.PlayerGui.ScreenGui.Updates.TextLabel.Text)
 
 	Pets:AddDropdown({
 		Name = "🥚 Egg",
@@ -1115,7 +1120,7 @@ elseif game.PlaceId == 9625096419 then
 				end
 			end
 		end
-		
+
 		task.wait()
 	end
 
@@ -1167,11 +1172,11 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
-	local Remove = Main:AddSection({
-		Name = "Removals"
+	local Misc = Main:AddSection({
+		Name = "Misc"
 	})
 
-	Remove:AddToggle({
+	Misc:AddToggle({
 		Name = "❗ Remove Notifications",
 		Default = false,
 		Save = true,
