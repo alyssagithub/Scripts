@@ -1057,7 +1057,7 @@ elseif game.PlaceId == 9625096419 then
 		end    
 	})
 	
-	Pets:AddLabel("Only set slider above 3 if in v1.0.5 or lower")
+	Pets:AddLabel("Only set slider above 3 if in v1.0.6 or above")
 	Pets:AddLabel("Current Version: "..Player.PlayerGui.ScreenGui.Updates.TextLabel.Text)
 
 	Pets:AddDropdown({
