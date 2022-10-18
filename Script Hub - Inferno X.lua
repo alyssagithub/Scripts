@@ -990,6 +990,34 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
+	
+	Automatics:AddToggle({
+		Name = "🔁 Auto Rebirth (Infinite)",
+		Default = false,
+		Save = true,
+		Flag = "AutoRebirth",
+		Callback = function(Value)
+			AutoRebirthLooping = Value
+			if AutoRebirthLooping then
+				Abbreviation.Abbreviate = function(e, number)
+					return tostring(number)
+				end
+
+				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+			else
+				Abbreviation.Abbreviate = PreviousFunction
+
+				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+			end
+
+			while AutoRebirthLooping do
+				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
+					Network:FireServer("Rebirth", math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
+				end
+				task.wait(5)
+			end
+		end
+	})
 
 	Automatics:AddToggle({
 		Name = "⚔ Auto Equip Best",
