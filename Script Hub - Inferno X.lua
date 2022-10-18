@@ -933,6 +933,8 @@ elseif game.PlaceId == 9625096419 then
 
 	local EggList = {}
 	local IslandEggs = {["Main Island"] = "Ice Egg"}
+	
+	local Max
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
 	local Abbreviation = require(game:GetService("ReplicatedStorage").Modules.Utils.Abbreviation)
@@ -990,7 +992,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Automatics:AddToggle({
 		Name = "🔁 Auto Rebirth (Infinite)",
 		Default = false,
@@ -1033,7 +1035,7 @@ elseif game.PlaceId == 9625096419 then
 	})
 
 	Automatics:AddButton({
-		Name = "🏝 Auto Unlock Islands",
+		Name = "🏝 Unlock All Islands",
 		Callback = function()
 			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-132, 2557, 351}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
 				Player.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(v))
@@ -1044,28 +1046,6 @@ elseif game.PlaceId == 9625096419 then
 
 	local Pets = Main:AddSection({
 		Name = "Pets"
-	})
-	
-	local Max
-	
-	if Player:IsInGroup(13994786) then
-		Max = 3
-	else
-		Max = 1
-	end
-
-	Pets:AddSlider({
-		Name = "🥚 Eggs to Open",
-		Min = 1,
-		Max = Max,
-		Default = 3,
-		Color = Color3.fromRGB(255,255,255),
-		Increment = 1,
-		Save = true,
-		Flag = "EggsToOpen",
-		Callback = function(Value)
-			EggsToOpen = Value
-		end    
 	})
 
 	Pets:AddDropdown({
@@ -1089,10 +1069,16 @@ elseif game.PlaceId == 9625096419 then
 				HatchingAnimation.HatchEgg = function()
 					return
 				end
+
+				if Player:IsInGroup(13994786) then
+					Max = 3
+				else
+					Max = 1
+				end
 			end
 
 			while AutoHatchLooping and task.wait(2) do
-				Network:FireServer("OpenCapsules", SelectedEgg, EggsToOpen)
+				Network:FireServer("OpenCapsules", SelectedEgg, Max)
 			end
 		end
 	})
@@ -1177,7 +1163,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-	
+
 	Misc:AddButton({
 		Name = "🔢 Check Rebirth Amount",
 		Callback = function()
