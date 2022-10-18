@@ -44,6 +44,17 @@ local function Click(v)
 	print("Clicked "..v.Name)
 end
 
+local function comma(amount)
+	local formatted = amount
+	local k
+	while true do  
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k==0) then
+			break
+		end
+	end
+	return formatted
+end
 
 if game.PlaceId == 9264596435 then
 	local Plot
@@ -981,32 +992,6 @@ elseif game.PlaceId == 9625096419 then
 	})
 
 	Automatics:AddToggle({
-		Name = "🔁 Auto Rebirth (Infinite)",
-		Default = false,
-		Save = true,
-		Flag = "AutoRebirth",
-		Callback = function(Value)
-			AutoRebirthLooping = Value
-			if AutoRebirthLooping then
-				Abbreviation.Abbreviate = function(e, number)
-					return tostring(number)
-				end
-
-				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
-			else
-				Abbreviation.Abbreviate = PreviousFunction
-
-				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
-			end
-			while AutoRebirthLooping and task.wait() do
-				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
-					Network:FireServer("Rebirth", math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
-				end
-			end
-		end
-	})
-
-	Automatics:AddToggle({
 		Name = "⚔ Auto Equip Best",
 		Default = false,
 		Save = true,
@@ -1032,13 +1017,13 @@ elseif game.PlaceId == 9625096419 then
 	local Pets = Main:AddSection({
 		Name = "Pets"
 	})
-
+	
 	local Max
-
-	if tonumber(Player.PlayerGui.ScreenGui.Updates.TextLabel.Text:split(".")[3]) >= 6 then
+	
+	if Player:IsInGroup(13994786) then
 		Max = 3
 	else
-		Max = 1000
+		Max = 1
 	end
 
 	Pets:AddSlider({
@@ -1144,28 +1129,6 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
-	Pets:AddToggle({
-		Name = "🧬 Auto Evolve",
-		Default = false,
-		Save = true,
-		Flag = "AutoEvolve",
-		Callback = function(Value)
-			AutoEvolveLooping = Value
-			while AutoEvolveLooping and task.wait(1) do
-				for i,v in pairs({"Normal", "Shiny", "Rainbow"}) do
-					Network:FireServer("EvolvedCrafting", "Main Island", "Icy Egg", v, "Spike")
-					Network:FireServer("EvolvedCrafting", "Robotic Island", "Robotic Egg", v, "AI Sentinel")
-					Network:FireServer("EvolvedCrafting", "Spiritual Island", "Spiritual Egg", v, "Holy Sprite")
-					Network:FireServer("EvolvedCrafting", "Fantasy Island", "Fantasy Egg", v, "Onyx Block")
-					Network:FireServer("EvolvedCrafting", "Monster Island", "Monster Egg", v, "Pinch King")
-					Network:FireServer("EvolvedCrafting", "Fairytale Island", "Fairytale Egg", v, "Wind Spirit")
-					Network:FireServer("EvolvedCrafting", "Candy Island", "Candy Egg", v, "Sweet Slug")
-					task.wait(1)
-				end
-			end
-		end
-	})
-
 	local Misc = Main:AddSection({
 		Name = "Misc"
 	})
@@ -1186,41 +1149,6 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
-
-	local function comma(amount)
-		local formatted = amount
-		local k
-		while true do  
-			formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-			if (k==0) then
-				break
-			end
-		end
-		return formatted
-	end
-
-	Misc:AddButton({
-		Name = "🔢 Check Rebirth Amount",
-		Callback = function()
-			Abbreviation.Abbreviate = function(e, number)
-				return tostring(number)
-			end
-
-			Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
-
-			repeat task.wait() until tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800
-
-			RebirthLabel:Set("Rebirth Amount: "..comma(math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1]))))
-
-			task.wait()
-
-			Abbreviation.Abbreviate = PreviousFunction
-
-			Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
-		end    
-	})
-
-	RebirthLabel = Misc:AddLabel("Rebirth Amount: nil")
 
 	Credits(Window)
 end
