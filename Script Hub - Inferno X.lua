@@ -1177,6 +1177,29 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end
 	})
+	
+	Misc:AddButton({
+		Name = "🔢 Check Rebirth Amount",
+		Callback = function()
+			Abbreviation.Abbreviate = function(e, number)
+				return tostring(number)
+			end
+
+			Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+
+			repeat task.wait() until tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800
+
+			RebirthLabel:Set("Rebirth Amount: "..comma(math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1]))))
+
+			task.wait()
+
+			Abbreviation.Abbreviate = PreviousFunction
+
+			Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+		end    
+	})
+
+	RebirthLabel = Misc:AddLabel("Rebirth Amount: nil")
 
 	Credits(Window)
 end
