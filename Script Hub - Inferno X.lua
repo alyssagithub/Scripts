@@ -988,20 +988,15 @@ elseif game.PlaceId == 9625096419 then
 		Callback = function(Value)
 			AutoRebirthLooping = Value
 			if AutoRebirthLooping then
-				if not AutoTapLooping then
-					OrionLib:MakeNotification({
-						Name = "Inferno X Notification",
-						Content = "In order to make Auto Rebirth work you must click once (or do anything that changes your data).",
-						Image = "rbxassetid://4483345998",
-						Time = 10
-					})
-				end
-
 				Abbreviation.Abbreviate = function(e, number)
 					return tostring(number)
 				end
+				
+				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
 			else
 				Abbreviation.Abbreviate = PreviousFunction
+				
+				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
 			end
 			while AutoRebirthLooping and task.wait() do
 				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
