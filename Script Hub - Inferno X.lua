@@ -1012,11 +1012,11 @@ elseif game.PlaceId == 9625096419 then
 				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
 			end
 
-			while AutoRebirthLooping do
+			while AutoRebirthLooping and task.wait() do
 				if tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800 then
 					Network:FireServer("Rebirth", math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1])))
+					task.wait(5)
 				end
-				task.wait(5)
 			end
 		end
 	})
