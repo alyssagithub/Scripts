@@ -6,19 +6,6 @@ local VirtualUser = game:GetService("VirtualUser")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
-repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
-
-local promptOverlay = game:GetService("CoreGui").RobloxPromptGui.promptOverlay
-
-promptOverlay.ChildAdded:connect(function(a)
-	if a.Name == "ErrorPrompt" then
-		while true do
-			game:GetService("TeleportService"):Teleport(game.PlaceId)
-			task.wait(2)
-		end
-	end
-end)
-
 Player.Idled:Connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.new())
