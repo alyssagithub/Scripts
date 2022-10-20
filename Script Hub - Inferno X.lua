@@ -912,7 +912,9 @@ elseif game.PlaceId == 9625096419 then
 	local AutoShinyLooping
 	local AutoRainbowLooping
 	local AutoEvolveLooping
+
 	local RemoveNotifLooping
+	local RemoveEggAnimLooping
 
 	local SelectedEgg
 
@@ -929,6 +931,7 @@ elseif game.PlaceId == 9625096419 then
 	local Notifications = require(Player.PlayerScripts.Client.ClientManager.PlayerController.UI.Notifications)
 
 	local PreviousFunction = Abbreviation.Abbreviate
+	local PreviousFunction2 = HatchingAnimation.HatchEgg
 	local PreviousFunction3 = Notifications.Notify
 
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
@@ -938,9 +941,9 @@ elseif game.PlaceId == 9625096419 then
 	table.sort(EggList, function(a, b)
 		return a > b
 	end)
-	
+
 	repeat task.wait() until Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v0.0.0"
-	
+
 	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" then
 		OrionLib:MakeNotification({
 			Name = "Inferno X Notification",
@@ -1064,16 +1067,10 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoHatch",
 		Callback = function(Value)
 			AutoHatchLooping = Value
-			if AutoHatchLooping then
-				HatchingAnimation.HatchEgg = function()
-					return
-				end
-
-				if Player:IsInGroup(13994786) then
-					Max = 3
-				else
-					Max = 1
-				end
+			if Player:IsInGroup(13994786) then
+				Max = 3
+			else
+				Max = 1
 			end
 
 			while AutoHatchLooping and task.wait() do
@@ -1144,6 +1141,23 @@ elseif game.PlaceId == 9625096419 then
 
 	local Misc = Main:AddSection({
 		Name = "Misc"
+	})
+
+	Misc:AddToggle({
+		Name = "🐣 Remove Egg Animation",
+		Default = false,
+		Save = true,
+		Flag = "RemoveEggAnim",
+		Callback = function(Value)
+			RemoveEggAnimLooping = Value
+			if RemoveEggAnimLooping then
+				HatchingAnimation.HatchEgg = function()
+					return
+				end
+			else
+				HatchingAnimation.HatchEgg = PreviousFunction2
+			end
+		end
 	})
 
 	Misc:AddToggle({
