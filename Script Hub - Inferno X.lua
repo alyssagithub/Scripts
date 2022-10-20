@@ -920,7 +920,7 @@ elseif game.PlaceId == 9625096419 then
 
 	local EggList = {}
 	local IslandEggs = {["Main Island"] = "Ice Egg"}
-	
+
 	local Max
 
 	local Network = require(game:GetService("ReplicatedStorage").Modules.Utils.Network)
@@ -938,6 +938,16 @@ elseif game.PlaceId == 9625096419 then
 	table.sort(EggList, function(a, b)
 		return a > b
 	end)
+	
+	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" then
+		OrionLib:MakeNotification({
+			Name = "Inferno X Notification",
+			Content = "You are on an untested version, please join an older server or wait for the current version to be tested.",
+			Image = "rbxassetid://4483345998",
+			Time = 120
+		})
+		return
+	end
 
 	local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
 
@@ -992,11 +1002,11 @@ elseif game.PlaceId == 9625096419 then
 					return tostring(number)
 				end
 
-				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+				Network:FireServer("ClickDetect")
 			else
 				Abbreviation.Abbreviate = PreviousFunction
 
-				Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+				Network:FireServer("ClickDetect")
 			end
 
 			while AutoRebirthLooping and task.wait() do
@@ -1158,17 +1168,15 @@ elseif game.PlaceId == 9625096419 then
 				return tostring(number)
 			end
 
-			Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+			Network:FireServer("ClickDetect")
 
 			repeat task.wait() until tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) and tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) >= 800
 
 			RebirthLabel:Set("Rebirth Amount: "..comma(math.floor(tonumber(Player.PlayerGui.ScreenGui.Currencies.Currency1.Amount.Text) / tonumber(Player.PlayerGui.ScreenGui.Menus.Rebirths.Menu.Holder["1"].Cost.Text:split(" ")[1]))))
 
-			task.wait()
-
 			Abbreviation.Abbreviate = PreviousFunction
 
-			Click(Player.PlayerGui.ScreenGui.Clickers.Tapper)
+			Network:FireServer("ClickDetect")
 		end    
 	})
 
