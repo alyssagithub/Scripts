@@ -939,6 +939,8 @@ elseif game.PlaceId == 9625096419 then
 		return a > b
 	end)
 	
+	repeat task.wait() until Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v0.0.0"
+	
 	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" then
 		OrionLib:MakeNotification({
 			Name = "Inferno X Notification",
