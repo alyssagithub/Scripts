@@ -921,7 +921,7 @@ elseif game.PlaceId == 9625096419 then
 	local EggsToOpen
 
 	local EggList = {}
-	local IslandEggs = {["Main Island"] = "Ice Egg"}
+	local IslandList = {}
 
 	local Max
 
@@ -936,6 +936,12 @@ elseif game.PlaceId == 9625096419 then
 
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
 		table.insert(EggList, v.Name)
+	end
+	
+	for i,v in pairs(game:GetService("Workspace").GameAssets.Portals.Spawns:GetChildren()) do
+		if v:IsA("BasePart") then
+			table.insert(IslandList, v.Name)
+		end
 	end
 
 	table.sort(EggList, function(a, b)
@@ -1039,9 +1045,11 @@ elseif game.PlaceId == 9625096419 then
 	Automatics:AddButton({
 		Name = "🏝 Unlock All Islands",
 		Callback = function()
-			for i,v in pairs({{88, 735, -91}, {116, 1379, -117}, {-132, 2557, 351}, {-8, 4391, -68}, {1, 6982, -4}, {105, 10180, 215}}) do
-				Player.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(v))
-				task.wait(1)
+			for i,v in pairs(game:GetService("Workspace").GameAssets.Portals.Spawns:GetChildren()) do
+				if v:IsA("BasePart") then
+					Player.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y + 50, v.Position.Z)
+					task.wait(1)
+				end
 			end
 		end    
 	})
@@ -1197,6 +1205,26 @@ elseif game.PlaceId == 9625096419 then
 	})
 
 	RebirthLabel = Misc:AddLabel("Rebirth Amount: nil")
+	
+	Misc:AddButton({
+		Name = "🕊 Redeem All Codes",
+		Callback = function()
+			for i,v in pairs({"1m", "tooslow", "gems plz", "launch day!"}) do
+				Network:InvokeServer("RedeemCode", v)
+			end
+		end    
+	})
+	
+	Misc:AddDropdown({
+		Name = "🏝 Teleport To Island",
+		Options = IslandList,
+		Save = true,
+		Flag = "SelectedIsland",
+		Callback = function(Value)
+			local Island = game:GetService("Workspace").GameAssets.Portals.Spawns[Value]
+			Player.Character.HumanoidRootPart.CFrame = CFrame.new(Island.Position.X, Island.Position.Y + 50, Island.Position.Z)
+		end
+	})
 
 	Credits(Window)
 end
