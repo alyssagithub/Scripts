@@ -937,7 +937,7 @@ elseif game.PlaceId == 9625096419 then
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
 		table.insert(EggList, v.Name)
 	end
-	
+
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Portals.Spawns:GetChildren()) do
 		if v:IsA("BasePart") then
 			table.insert(IslandList, v.Name)
@@ -950,7 +950,7 @@ elseif game.PlaceId == 9625096419 then
 
 	repeat task.wait() until Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v0.0.0"
 
-	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" then
+	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" and Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.1" then
 		OrionLib:MakeNotification({
 			Name = "Inferno X Notification",
 			Content = "You are on an untested version, please join an older server or wait for the current version to be tested.",
@@ -959,7 +959,7 @@ elseif game.PlaceId == 9625096419 then
 		})
 		return
 	end
-
+	
 	local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
 
 	local Main = Window:MakeTab({
@@ -1036,8 +1036,9 @@ elseif game.PlaceId == 9625096419 then
 		Flag = "AutoEquip",
 		Callback = function(Value)
 			AutoEquipLooping = Value
-			while AutoEquipLooping and task.wait(2.5) do
+			while AutoEquipLooping do
 				Network:FireServer("EquipBest")
+				task.wait(2.5)
 			end
 		end
 	})
@@ -1205,7 +1206,7 @@ elseif game.PlaceId == 9625096419 then
 	})
 
 	RebirthLabel = Misc:AddLabel("Rebirth Amount: nil")
-	
+
 	Misc:AddButton({
 		Name = "🕊 Redeem All Codes",
 		Callback = function()
@@ -1214,7 +1215,7 @@ elseif game.PlaceId == 9625096419 then
 			end
 		end    
 	})
-	
+
 	Misc:AddDropdown({
 		Name = "🏝 Teleport To Island",
 		Options = IslandList,
