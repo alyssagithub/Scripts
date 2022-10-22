@@ -921,7 +921,7 @@ elseif game.PlaceId == 9625096419 then
 	local EggsToOpen
 
 	local EggList = {}
-	local IslandList = {}
+	local IslandList = {"Main Island"}
 
 	local Max
 
@@ -959,7 +959,7 @@ elseif game.PlaceId == 9625096419 then
 		})
 		return
 	end
-	
+
 	local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
 
 	local Main = Window:MakeTab({
@@ -1088,64 +1088,59 @@ elseif game.PlaceId == 9625096419 then
 		end
 	})
 
+	local CompletedMerge = {}
+
 	local function Convert(Convertion)
-		local PlayerData = Network:InvokeServer("RequestData", Player, true)
-		local MergablePets = {}
-		local Merging = {}
+		local Data = Network:InvokeServer("RequestData", Player, true)
 		local ConvertionTable = {["Rainbow"] = 2, ["Shiny"] = 1}
+		for __,_ in pairs(Data.PetsInfo.PetStorage) do
+			if _.Tier == ConvertionTable[Convertion] and _.Locked == false then
+				local PlayerData = Network:InvokeServer("RequestData", Player, true)
+				local Merging = {}
 
-		local Counter = 0
-		local Counter2 = 0
+				local Counter = 0
+				local Counter2 = 0
 
-		for i,v in pairs(PlayerData.PetsInfo.AmountOfPet) do
-			if v >= 5 then
-				table.insert(MergablePets, i)
-			end
-		end
+				for i,v in pairs(PlayerData.PetsInfo.AmountOfPet) do
+					if v >= 5 then
+						for e,r in pairs(PlayerData.PetsInfo.PetStorage) do
+							if r.Name == i and r.Tier == ConvertionTable[Convertion] and Counter < 5 and r.Locked == false then
+								Counter = Counter + 1
+								Merging[e] = true
+							end
+						end
+					end
+				end
 
-		for i,v in pairs(PlayerData.PetsInfo.PetStorage) do
-			if table.find(MergablePets, v.Name) and v.Tier == ConvertionTable[Convertion] and Counter < 5 and v.Locked == false then
-				Counter = Counter + 1
-				Merging[i] = true
-			end
-		end
+				if Counter == 5 then
+					print(Counter)
+					for i,v in pairs(Merging) do
+						print(i,v)
+						if Counter2 < 1 and not CompletedMerge[i] then
+							Counter2 = Counter2 + 1
+							Network:FireServer(Convertion.."Crafting", i, Merging)
+						end
+						table.insert(CompletedMerge, i)
+					end
 
-		if Counter == 5 then
-			for i,v in pairs(Merging) do
-				if Counter2 < 1 then
-					Counter2 = Counter2 + 1
-					Network:FireServer(Convertion.."Crafting", i, Merging)
+					print("divider")
 				end
 			end
 		end
-
-		task.wait()
 	end
-
-	Pets:AddToggle({
-		Name = "✨ Auto Shiny Convert",
-		Default = false,
-		Save = true,
-		Flag = "AutoShiny",
-		Callback = function(Value)
-			AutoShinyLooping = Value
-			while AutoShinyLooping and task.wait(.5) do
-				Convert("Shiny")
-			end
-		end
+	
+	Pets:AddButton({
+		Name = "✨ Convert All Pets To Shiny",
+		Callback = function()
+			Convert("Shiny")
+		end    
 	})
-
-	Pets:AddToggle({
-		Name = "🌈 Auto Rainbow Convert",
-		Default = false,
-		Save = true,
-		Flag = "AutoRainbow",
-		Callback = function(Value)
-			AutoRainbowLooping = Value
-			while AutoRainbowLooping and task.wait(.5) do
-				Convert("Rainbow")
-			end
-		end
+	
+	Pets:AddButton({
+		Name = "🌈 Convert All Pets To Rainbow",
+		Callback = function()
+			Convert("Rainbow")
+		end    
 	})
 
 	local Misc = Main:AddSection({
@@ -1222,7 +1217,12 @@ elseif game.PlaceId == 9625096419 then
 		Save = true,
 		Flag = "SelectedIsland",
 		Callback = function(Value)
-			local Island = game:GetService("Workspace").GameAssets.Portals.Spawns[Value]
+			local Island
+			if Value == "Main Island" then
+				Island = game:GetService("Workspace").Spawns:FindFirstChild("SpawnLocation")
+			else
+				Island = game:GetService("Workspace").GameAssets.Portals.Spawns[Value]
+			end
 			Player.Character.HumanoidRootPart.CFrame = CFrame.new(Island.Position.X, Island.Position.Y + 50, Island.Position.Z)
 		end
 	})
