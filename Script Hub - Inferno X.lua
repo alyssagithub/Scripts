@@ -950,7 +950,7 @@ elseif game.PlaceId == 9625096419 then
 
 	repeat task.wait() until Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v0.0.0"
 
-	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" and Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.1" then
+	if Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.0" and Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.1.1" and Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v1.2.0" then
 		OrionLib:MakeNotification({
 			Name = "Inferno X Notification",
 			Content = "You are on an untested version, please join an older server or wait for the current version to be tested.",
@@ -1070,7 +1070,7 @@ elseif game.PlaceId == 9625096419 then
 	})
 
 	Pets:AddToggle({
-		Name = "🐤 Auto Hatch Egg",
+		Name = "🐤 Auto Hatch Egg (must be near)",
 		Default = false,
 		Save = true,
 		Flag = "AutoHatch",
@@ -1093,8 +1093,8 @@ elseif game.PlaceId == 9625096419 then
 	local function Convert(Convertion)
 		local Data = Network:InvokeServer("RequestData", Player, true)
 		local ConvertionTable = {["Rainbow"] = 2, ["Shiny"] = 1}
-		for __,_ in pairs(Data.PetsInfo.PetStorage) do
-			if _.Tier == ConvertionTable[Convertion] and _.Locked == false then
+		for __,t in pairs(Data.PetsInfo.PetStorage) do
+			if t.Tier == ConvertionTable[Convertion] and t.Locked == false then
 				local PlayerData = Network:InvokeServer("RequestData", Player, true)
 				local Merging = {}
 
@@ -1205,7 +1205,7 @@ elseif game.PlaceId == 9625096419 then
 	Misc:AddButton({
 		Name = "🕊 Redeem All Codes",
 		Callback = function()
-			for i,v in pairs({"1m", "tooslow", "gems plz", "launch day!"}) do
+			for i,v in pairs({"1m", "tooslow", "gems plz", "launch day!", "fire"}) do
 				Network:InvokeServer("RedeemCode", v)
 			end
 		end    
