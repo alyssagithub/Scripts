@@ -935,7 +935,9 @@ elseif game.PlaceId == 9625096419 then
 	local PreviousFunction3 = Notifications.Notify
 
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Capsules:GetChildren()) do
-		table.insert(EggList, v.Name)
+		if not string.find(v.Name, "Robux") then
+			table.insert(EggList, v.Name)
+		end
 	end
 
 	for i,v in pairs(game:GetService("Workspace").GameAssets.Portals.Spawns:GetChildren()) do
