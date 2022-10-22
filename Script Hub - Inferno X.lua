@@ -212,7 +212,7 @@ if game.PlaceId == 9264596435 then
 		Callback = function(Value)
 			ReincarnateLooping = Value
 			while ReincarnateLooping and task.wait() do
-				if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" and Player.PlayerGui.Main.Top.Level.Text == "Level 100" then
+				if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" and Player.PlayerGui.Main.Top.Level.Text == "Level 110" then
 					IsInLoopReincarnate = true
 					if IsInLoopNextLevel then
 						repeat task.wait() until not IsInLoopNextLevel
