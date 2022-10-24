@@ -20,7 +20,7 @@ local function Credits(Window)
 		PremiumOnly = false
 	})
 
-	Credits:AddLabel("🔥 Inferno X was made by alyssa#2303 🔥")
+	Credits:AddLabel("🔥 This script was made by alyssa#2303 🔥")
 
 	Credits:AddLabel("➡ discord.gg/rtgv8Jp3fM ⬅")
 end
@@ -91,7 +91,7 @@ end)
 
 repeat task.wait() until Player.PlayerGui.ScreenGui.Updates.TextLabel.Text ~= "v0.0.0"
 
-local Window = OrionLib:MakeWindow({Name = "Inferno X - Tapper Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+local Window = OrionLib:MakeWindow({Name = "Tapper Simulator GUI", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
 
 local Main = Window:MakeTab({
 	Name = "Main",
