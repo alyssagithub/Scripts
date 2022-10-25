@@ -43,7 +43,11 @@ local function comma(amount)
 	return formatted
 end
 
-if game.PlaceId == 9264596435 then
+local function CreateWindow()
+	return OrionLib:MakeWindow({Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+end
+
+if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	local Plot
 	local PlayerPlot
 
@@ -122,7 +126,7 @@ if game.PlaceId == 9264596435 then
 		end
 	end)
 
-	local Window = OrionLib:MakeWindow({Name = "Inferno X - Idle Heroes Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+	local Window = CreateWindow()
 
 	local Main = Window:MakeTab({
 		Name = "Main",
@@ -456,11 +460,11 @@ if game.PlaceId == 9264596435 then
 	})
 
 	Credits(Window)
-elseif game.PlaceId == 10779604733 then
+elseif game.PlaceId == 10779604733 then -- VBet
 	local AutoClickLooping
 	local AutoCaseLooping
 	local MouseButton2Looping
-	local AutoBattleLooping
+	local InfiniteBattleLooping
 
 	local OriginalAutoClickLooping
 
@@ -470,15 +474,18 @@ elseif game.PlaceId == 10779604733 then
 	local DoneList = {}
 
 	local SelectedCase
+	
+	local Background = Player.PlayerGui["Interact_Gui"]["Background_Frame"]
+	local BattlePrompt = Background["Games_Holder"]["Battle_Prompt"]
 
 	local function SetCaseList()
-		for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
+		for i,v in pairs(Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren()) do
 			if v:IsA("Frame") then
 				table.insert(CaseList, v.Name)
 			end
 		end
 
-		Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"].ChildAdded:Connect(function(v)
+		Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"].ChildAdded:Connect(function(v)
 			table.insert(CaseList, v.Name)
 		end)
 		table.sort(CaseList, function(a, b)
@@ -486,20 +493,20 @@ elseif game.PlaceId == 10779604733 then
 		end)
 	end
 
-	if #Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren() == 2 then
-		if Player.PlayerGui["Interact_Gui"]["Background_Frame"].Visible == false then
+	if #Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:GetChildren() == 2 then
+		if Background.Visible == false then
 			Click(Player.PlayerGui["Interact_Gui"]["Frame_Switch"])
 
 			task.wait(.25)
 		end
 
-		if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"].Visible == false then
-			Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Top_Bar"]["Holding_Frame"]["Button_Games"])
+		if Background["Game_Selection"].Visible == false then
+			Click(Background["Top_Bar"]["Holding_Frame"]["Button_Games"])
 
 			task.wait(.25)
 		end
 
-		Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"]["Game_Category_1"]["Game_Cases"]["Icon_Game"])
+		Click(Background["Game_Selection"]["Game_Category_1"]["Game_Cases"]["Icon_Game"])
 
 		task.wait(1)
 
@@ -508,22 +515,13 @@ elseif game.PlaceId == 10779604733 then
 		task.spawn(SetCaseList)
 	end
 
-	local Window = OrionLib:MakeWindow({Name = "Inferno X - VBet", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+	local Window = CreateWindow()
 
 	local Main = Window:MakeTab({
 		Name = "Main",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-
-	local function StartClicking()
-		AutoClickLooping = OriginalAutoClickLooping
-		task.spawn(function()
-			while AutoClickLooping and task.wait() do
-				Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
-			end
-		end)
-	end
 
 	Main:AddToggle({
 		Name = "🖱 Auto Clicker",
@@ -533,14 +531,39 @@ elseif game.PlaceId == 10779604733 then
 		Callback = function(Value)
 			AutoClickLooping = Value
 			OriginalAutoClickLooping = Value
-			StartClicking()
 		end
 	})
-
+	
+	task.spawn(function()
+		while task.wait() do
+			if AutoClickLooping then
+				Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
+			end
+		end
+	end)
+	
 	Main:AddLabel("Press right click once to temp disable the auto clicker.")
+	
+	Main:AddButton({
+		Name = "🎃 Auto Get Pumpkins",
+		Callback = function()
+			for i,v in pairs(workspace:GetChildren()) do
+				if v.Name == "Event_Pumpkin" then
+					Player.Character.HumanoidRootPart.CFrame = v.CFrame
+					task.wait(.1)
+				end
+			end
+		end    
+	})
+	
+	local Case = Window:MakeTab({
+		Name = "Case",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
 
 	task.spawn(function()
-		Main:AddDropdown({
+		Case:AddDropdown({
 			Name = "📃 Case",
 			Options = CaseList,
 			Save = true,
@@ -550,7 +573,7 @@ elseif game.PlaceId == 10779604733 then
 			end
 		})
 
-		Main:AddSlider({
+		Case:AddSlider({
 			Name = "Case Battles Amount",
 			Min = 1,
 			Max = 30,
@@ -564,7 +587,7 @@ elseif game.PlaceId == 10779604733 then
 			end    
 		})
 
-		Main:AddToggle({
+		Case:AddToggle({
 			Name = "💼 Auto Case Open",
 			Default = false,
 			Save = true,
@@ -573,207 +596,143 @@ elseif game.PlaceId == 10779604733 then
 				AutoCaseLooping = Value
 				if AutoCaseLooping then
 					while AutoCaseLooping and SelectedCase and task.wait() do
-						local CaseMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Title_Price").Text:gsub("%p", "")
-						local PlayerMoney = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Robux_Amount"].Text:gsub("%p", "")
+						local CaseMoney = Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Title_Price").Text:gsub("%p", "")
+						local PlayerMoney = Background["Robux_Amount"].Text:gsub("%p", "")
 						if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
 							AutoClickLooping = false
-							while not Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible do
-								Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]
+							while not Background["Games_Holder"]["Case_Prompt"].Visible do
+								Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase).Parent = Background["Games_Holder"]["Game_Cases"]
 								task.wait()
-								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase):FindFirstChild("Icon_Case"))
+								Click(Background["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase):FindFirstChild("Icon_Case"))
 								task.wait()
-								Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]
+								Background["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase).Parent = Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]
 							end
 
-							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
-								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Case_Prompt"]["Button_Buy"])
+							while Background["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
+								Click(Background["Games_Holder"]["Case_Prompt"]["Button_Buy"])
 							end
 
-							StartClicking()
-							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"].Visible == true
+							AutoClickLooping = OriginalAutoClickLooping
+							
+							repeat task.wait() until Background["Unboxing_Frame"]["Button_Claim"].Visible == true
+							
 							AutoClickLooping = false
-							while Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"].Visible and task.wait() do
-								Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Unboxing_Frame"]["Button_Claim"])
+							
+							while Background["Unboxing_Frame"].Visible and task.wait() do
+								Click(Background["Unboxing_Frame"]["Button_Claim"])
 							end
 						elseif OriginalAutoClickLooping and not AutoClickLooping and not MouseButton2Looping then
-							StartClicking()
+							AutoClickLooping = OriginalAutoClickLooping
 						end
 					end
 				elseif AutoClickLooping == false then
-					StartClicking()
+					AutoClickLooping = OriginalAutoClickLooping
 				end
 			end
 		})
 
-		Main:AddToggle({
-			Name = "🤖 Auto Case Battle",
+		Case:AddToggle({
+			Name = "♾ Infinite Case Battles",
 			Default = false,
-			Save = true,
-			Flag = "AutoCaseBattle",
 			Callback = function(Value)
-				AutoBattleLooping = Value
-				while AutoBattleLooping and task.wait() do
+				InfiniteBattleLooping = Value
+				while InfiniteBattleLooping and task.wait() do
 					AutoClickLooping = false
-					if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"].Visible == false then
-						if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"].Visible == false then
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Top_Bar"]["Holding_Frame"]["Button_Games"])
-
+					
+					if Background["Game_Selection"].Visible == false and Background["Games_Holder"]["Game_Battles"].Visible == false then
+						Click(Background["Top_Bar"]["Holding_Frame"]["Button_Games"])
+						
+						repeat task.wait() until Background["Game_Selection"].Visible == true
+						
+						Click(Background["Game_Selection"]["Game_Category_1"]["Game_Battles"]["Icon_Game"])
+					end
+					
+					repeat task.wait() until Background["Games_Holder"]["Game_Battles"].Visible == true
+					
+					Click(Background["Games_Holder"]["Game_Battles"]["Button_Create"])
+					
+					repeat task.wait() until BattlePrompt.Visible == true
+					
+					if BattlePrompt["Button_Mode"].Text ~= "1v1v1" then
+						repeat
+							Click(BattlePrompt["Button_Mode"])
 							task.wait(.25)
-						end
-
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"]["Game_Category_1"]["Game_Battles"])
-
-						repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"].Visible == true
+						until BattlePrompt["Button_Mode"].Text == "1v1v1"
 					end
-
-					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Button_Create"])
-
-					repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == true
-
-					repeat
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Add"])
-
-						repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"].Visible == true
-
-						Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]
-
-						task.wait()
-
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]:FindFirstChild(SelectedCase))
-
-						task.wait()
-
-						Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]["Scrolling_Frame_4"]					
-					until #Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Battle_Frame"]["Scrolling_Frame_4"]:GetChildren() >= CaseBattlesAmount
-
-					repeat task.wait(1) until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"].Visible == false
-
-					repeat
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Create"])
-						task.wait(1)
-					until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == false
-
-					for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
-						if v:IsA("Frame") and v.Host.Value == Player.Name then
-							Click(v["Button_View"])
-
-							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name).Visible == true
-
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name)["Player_List"]["Player_2"]["Button_Call"])
-
-							repeat task.wait() until not Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name)
-
-							Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"].Visible = true
-						end
+					
+					if BattlePrompt["Button_Crazy"].Text ~= "Crazy On" then
+						Click(BattlePrompt["Button_Crazy"])
 					end
-
-					StartClicking()
-				end
-			end
-		})
-
-		Main:AddToggle({
-			Name = "🛑 (Experimental) Infinite Battles",
-			Default = false,
-			--Save = true,
-			--Flag = "AutoCaseBattle",
-			Callback = function(Value)
-				AutoBattleLooping = Value
-				while AutoBattleLooping and task.wait() do
-					AutoClickLooping = false
-					if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"].Visible == false then
-						if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"].Visible == false then
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Top_Bar"]["Holding_Frame"]["Button_Games"])
-
-							task.wait(.25)
-						end
-
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Game_Selection"]["Game_Category_1"]["Game_Battles"])
-
-						repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"].Visible == true
-					end
-
-					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Button_Create"])
-
-					repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == true
-
-					if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Mode"].Text ~= "1v1v1" then
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Mode"])
-						task.wait(.25)
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Mode"])
-						task.wait(.25)
-					end
-					if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Crazy"].Text ~= "Crazy On" then
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Crazy"])
-					end
-
-					repeat
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Add"])
-						task.wait(1)
-					until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"].Visible == true or not AutoBattleLooping
-
-					Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]
-
+					
 					task.wait()
+					
+					local LoopAmount = 0
+					
+					if not BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase) then
+						repeat
+							LoopAmount = LoopAmount + 1
+							repeat
+								Click(BattlePrompt["Button_Add"])
+								task.wait(1)
+							until Background["Games_Holder"]["Add_Case_Prompt"].Visible == true
 
-					Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]:FindFirstChild(SelectedCase))
+							task.wait(1)
 
-					task.wait()
+							local CaseButton = Background["Games_Holder"]["Add_Case_Prompt"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
 
-					Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]:FindFirstChild(SelectedCase).Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"]["Scrolling_Frame_4"]			
+							CaseButton.Parent = Background["Games_Holder"]["Add_Case_Prompt"]
 
+							task.wait()
+
+							Click(CaseButton)
+
+							task.wait(.1)
+						until LoopAmount == CaseBattlesAmount
+					end
+					
 					repeat
-						if Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Battle_Frame"]["Scrolling_Frame_4"]:GetChildren()[2] then
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Battle_Frame"]["Scrolling_Frame_4"]:GetChildren()[2]["Button_Add"])
-						end
-						task.wait()
-					until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Rounds.Value >= CaseBattlesAmount
-
-					repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Add_Case_Prompt"].Visible == false
-
-					repeat
-						Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"]["Button_Create"])
-						task.wait(.3)
-					until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Battle_Prompt"].Visible == false or not AutoBattleLooping
-
-					for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
-						if v:IsA("Frame") and v.Host.Value == Player.Name and not table.find(DoneList, v.Name) and AutoBattleLooping then
-							v.Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]
-							task.wait(.5)
-							Click(v["Button_View"])
-							task.wait(.5)
-							v.Parent = Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]
-
-							repeat task.wait() until Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name).Visible == true
-
-							for i,v in pairs(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name)["Player_List"]:GetChildren()) do
-								if v:IsA("Frame") and v:FindFirstChild("Button_Call") then
-									Click(v["Button_Call"])
-									task.wait(.25)
-								end
-							end
-
-							Click(Player.PlayerGui["Interact_Gui"]["Background_Frame"]["Games_Holder"]:FindFirstChild(v.Name)["Button_Games_List"])
-
-							task.wait(.25)
-
+						Click(BattlePrompt["Button_Create"])
+						task.wait(1)
+					until Background["Games_Holder"]["Game_Battles"].Visible == true
+					
+					for i,v in pairs(Background["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
+						if v:IsA("Frame") and v["Title_Host"].Text:split(" - ")[2] == Player.Name and not table.find(DoneList, v.Name) then
+							local HolderFrame = Background["Games_Holder"]:FindFirstChild(v.Name)
+							local Player2 = HolderFrame["Player_List"]["Player_2"]["Button_Call"]
+							local Player3 = HolderFrame["Player_List"]["Player_3"]["Button_Call"]
 							table.insert(DoneList, v.Name)
+							
+							v.Parent = Background["Games_Holder"]["Game_Battles"]
+							
+							task.wait()
+							
+							Click(v["Button_View"])
+							
+							v.Parent = Background["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]
+							
+							repeat task.wait() until HolderFrame.Visible == true
+							
+							repeat
+								Click(Player2)
+								task.wait(.1)
+							until Player2.Visible == false or HolderFrame.Visible == false
+							
+							if HolderFrame["Player_List"]:FindFirstChild("Player_3") then
+								repeat
+									Click(Player3)
+									task.wait(.1)
+								until Player3.Visible == false or HolderFrame.Visible == false
+							end
+							
+							repeat
+								Click(Background["Games_Holder"]:FindFirstChild(v.Name)["Button_Games_List"])
+								task.wait(1)
+							until Background["Games_Holder"]["Game_Battles"].Visible == true
 						end
 					end
 				end
+				AutoClickLooping = OriginalAutoClickLooping
 			end
-		})
-
-		Main:AddButton({
-			Name = "🎃 Auto Get Pumpkins",
-			Callback = function()
-				for i,v in pairs(workspace:GetChildren()) do
-					if v.Name == "Event_Pumpkin" then
-						Player.Character.HumanoidRootPart.CFrame = v.CFrame
-						task.wait(.1)
-					end
-				end
-			end    
 		})
 	end)
 
@@ -781,14 +740,12 @@ elseif game.PlaceId == 10779604733 then
 		MouseButton2Looping = true
 		AutoClickLooping = false
 		task.wait(3)
-		if not AutoCaseLooping then
-			StartClicking()
-		end
+		AutoClickLooping = OriginalAutoClickLooping
 		MouseButton2Looping = false
 	end)
 
 	Credits(Window)
-elseif game.PlaceId == 10925589760 then
+elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	local Plot = workspace.Plots:FindFirstChild(Player.Name)
 
 	local AutoTapLooping
@@ -802,7 +759,7 @@ elseif game.PlaceId == 10925589760 then
 
 	local Blocks = {}
 
-	local Window = OrionLib:MakeWindow({Name = "Inferno X - Merge Simulator", HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+	local Window = CreateWindow()
 
 	local Main = Window:MakeTab({
 		Name = "Main",
