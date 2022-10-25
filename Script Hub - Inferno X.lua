@@ -139,18 +139,8 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			Swing2Looping = Value
 			while Swing2Looping and task.wait(0.14) do
-				if not Player.Character:FindFirstChild("HumanoidRootPart") then
-					repeat task.wait() until Player.Character:FindFirstChild("HumanoidRootPart")
-				end
-				
-				if #Plot.Enemy:GetChildren() == 0 then
-					repeat task.wait() until Plot.Enemy:GetChildren()[1]
-				end
-
-				if (Player.Character:FindFirstChild("HumanoidRootPart").Position - Plot.Enemy:GetChildren()[1].Position).Magnitude <= 13 then
-					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, nil, 1)
-					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, nil, 1)
-				end
+				VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, nil, 1)
+				VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, nil, 1)
 			end
 		end
 	})
