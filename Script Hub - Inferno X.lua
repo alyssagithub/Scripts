@@ -280,6 +280,29 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	})
+	
+	local Misc = Main:AddSection({
+		Name = "",
+	})
+
+	Misc:AddDropdown({
+		Name = "🏠 Plot",
+		Default = "Your Own Plot",
+		Options = PlotList,
+		Callback = function(Value)
+			if Value == "Your Own Plot" then
+				Plot = PlayerPlot
+			else
+				for i,v in pairs(workspace.Plots:GetChildren()) do
+					if v.Owner.Value == game.Players:FindFirstChild(Value) then
+						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(game.Players:FindFirstChild(Value))
+						Plot = v
+						print(v, Plot)
+					end
+				end
+			end
+		end
+	})
 
 	local Heroes = Window:MakeTab({
 		Name = "Heroes",
@@ -424,31 +447,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			if SelectedChest and Value then
 				while ChestLooping and task.wait(1) do
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.ChestService.RF.BuyChest:InvokeServer(SelectedChest)
-				end
-			end
-		end
-	})
-
-	local Misc = Window:MakeTab({
-		Name = "Misc",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Misc:AddDropdown({
-		Name = "🏠 Plot",
-		Default = "Your Own Plot",
-		Options = PlotList,
-		Callback = function(Value)
-			if Value == "Your Own Plot" then
-				Plot = PlayerPlot
-			else
-				for i,v in pairs(workspace.Plots:GetChildren()) do
-					if v.Owner.Value == game.Players:FindFirstChild(Value) then
-						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(game.Players:FindFirstChild(Value))
-						Plot = v
-						print(v, Plot)
-					end
 				end
 			end
 		end
