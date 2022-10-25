@@ -419,7 +419,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 			
 			while UpgradeLooping and task.wait() do
-				for i,v in pairs(Plot.Heroes:GetChildren()) do
+				for i,v in pairs(PlayerPlot.Heroes:GetChildren()) do
 					if tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) <= UpgradeLevel - 1 then
 						if not OriginalSelectedHero then
 							SelectedHero = v
