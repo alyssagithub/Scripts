@@ -168,7 +168,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					repeat task.wait() until Plot.Buttons:FindFirstChild("NextLevel"):FindFirstChild("Touch")
 
 					repeat
-						Player.Character:WaitForChild("HumanoidRootPart").CFrame = Plot.Buttons:FindFirstChild("NextLevel").Touch.CFrame
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(Plot.Buttons:FindFirstChild("NextLevel").Touch.Position)
 						task.wait()
 					until not Plot.Buttons:FindFirstChild("NextLevel") or not NextLevelLooping
 
