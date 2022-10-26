@@ -182,6 +182,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	})
 
 	local RequiredLevel = 80
+	local OtherLevel = 0
 
 	Main:AddToggle({
 		Name = "🔁 Auto Reincarnate",
@@ -191,7 +192,42 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			ReincarnateLooping = Value
 			while ReincarnateLooping and task.wait() do
-				if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] ~= "Complete!" then
+				local ReincarnationsAmount = tonumber(Player.PlayerGui.Main.Frames.Achievements.Container.Stats.Container.Reincarnations.Label.Text:split(" ")[2])
+				local ReincarnationsTable = {
+					[1] = 80,
+					[2] = 80,
+					[3] = 80,
+					[4] = 80,
+					[5] = 85,
+					[6] = 85,
+					[7] = 85,
+					[8] = 85,
+					[9] = 85,
+					[10] = 90,
+					[11] = 90,
+					[12] = 90,
+					[13] = 90,
+					[14] = 90,
+					[15] = 95,
+					[16] = 95,
+					[17] = 95,
+					[18] = 95,
+					[19] = 95,
+					[20] = 100,
+					[21] = 100,
+					[22] = 100,
+					[23] = 100,
+					[24] = 100,
+					[25] = 100
+				}
+				
+				if ReincarnationsTable[ReincarnationsAmount] and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) >= ReincarnationsTable[ReincarnationsAmount] then
+					OtherLevel = ReincarnationsTable[ReincarnationsAmount]
+				elseif ReincarnationsTable[ReincarnationsAmount] then
+					OtherLevel = 0
+				end
+				
+				if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" and (tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] ~= "Complete!") or OtherLevel ~= 0 then
 					IsInLoopReincarnate = true
 
 					if IsInLoopNextLevel then
@@ -246,7 +282,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				elseif IsInLoopAutoHire then
 					repeat task.wait() until not IsInLoopAutoHire
 				end
-				
+
 				if not Player.Character:FindFirstChild("HumanoidRootPart") then
 					repeat task.wait() until Player.Character:FindFirstChild("HumanoidRootPart") or not MobLooping
 				end
@@ -271,7 +307,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	})
-	
+
 	local Misc = Main:AddSection({
 		Name = "",
 	})
@@ -389,7 +425,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			UpgradeLevel = Value
 		end    
 	})
-	
+
 	require(Player.PlayerScripts.Client.Controllers.UIController.BuyCoins).Set = function()
 		return
 	end
