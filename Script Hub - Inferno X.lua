@@ -337,7 +337,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 						task.wait(1)
 					end
-				elseif not Plot.Heroes:FindFirstChild("The Reaper") then
+				elseif not game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") and not Plot.Heroes:FindFirstChild("The Reaper") then
 					IsInLoopAutoHire = true
 
 					if IsInLoopReincarnate then
