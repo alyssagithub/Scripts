@@ -139,8 +139,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			Swing2Looping = Value
 			while Swing2Looping do
-				VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, nil, 1)
-				VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, nil, 1)
+				Click(Player.PlayerGui.Main.Tint)
 				task.wait(0.14)
 			end
 		end
