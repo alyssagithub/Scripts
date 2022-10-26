@@ -67,6 +67,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	local ReincarnateLooping
 	local MobLooping
 	local SkillLooping
+	local RerollLooping
 
 	local IsInLoopReincarnate
 	local IsInLoopNextLevel
@@ -78,6 +79,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 	local HeroesList = {"None"}
 	local PlotList = {"Your Own Plot"}
+	local EnchantList = {"None", "Sharp I", "Hero I", "Rich I", "Sharp II", "Hero II", "Rich II", "Luck I", "Sharp III", "Hero III", "Immortal I", "Rich III", "Luck II", "Sharp IV", "Hero IV", "Immortal II", "Rich IV", "Luck III", "Team Player", "Lifeless"}
 
 	local RarityBackgrounds = {
 		["0 0.803922 0.803922 0.803922 0 1 0.803922 0.803922 0.803922 0 "] = "Common",
@@ -447,6 +449,76 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 						end
 					end
 				end
+			end
+		end
+	})
+	
+	local Passive = Window:MakeTab({
+		Name = "Passive",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+
+	local Enchant1
+	local Enchant2
+	local Enchant3
+
+	Passive:AddDropdown({
+		Name = "Enchant 1",
+		Default = "None",
+		Options = EnchantList,
+		Callback = function(Value)
+			Enchant1 = Value
+		end    
+	})
+
+	Passive:AddDropdown({
+		Name = "Enchant 2",
+		Default = "None",
+		Options = EnchantList,
+		Callback = function(Value)
+			Enchant2 = Value
+		end    
+	})
+
+	Passive:AddDropdown({
+		Name = "Enchant 3",
+		Default = "None",
+		Options = EnchantList,
+		Callback = function(Value)
+			Enchant3 = Value
+		end    
+	})
+
+	local WeaponID
+	local PreviousFunction = require(Player.PlayerScripts.Client.Controllers.UIController.Passives).UpdateCurrentWeapon
+
+	Passive:AddToggle({
+		Name = "🎲 Auto Reroll Passive (turn this on then set weapon)",
+		Save = true,
+		Flag = "AutoRerollPassive",
+		Callback = function(Value)
+			RerollLooping = Value
+			if RerollLooping then
+				require(Player.PlayerScripts.Client.Controllers.UIController.Passives).UpdateCurrentWeapon = function(e)
+					WeaponID = e._currentWeapon
+				end
+
+				repeat task.wait() until WeaponID
+
+				while RerollLooping and task.wait() do
+					if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RF.RollPassive:InvokeServer(WeaponID) then
+						Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
+							task.wait(.25)
+							if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
+								RerollLooping = false
+							end
+						end)
+						repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
+					end
+				end
+			else
+				require(Player.PlayerScripts.Client.Controllers.UIController.Passives).UpdateCurrentWeapon = PreviousFunction
 			end
 		end
 	})
