@@ -497,21 +497,23 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Flag = "AutoRerollPassive",
 		Callback = function(Value)
 			RerollLooping = Value
-			UpdateCurrentWeapon = function(e)
-				WeaponID = e._currentWeapon
-			end
+			if RerollLooping then
+				UpdateCurrentWeapon = function(e)
+					WeaponID = e._currentWeapon
+				end
 
-			repeat task.wait() until WeaponID
+				repeat task.wait() until WeaponID
 
-			while RerollLooping and task.wait() do
-				if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RF.RollPassive:InvokeServer(WeaponID) then
-					Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
-						repeat task.wait() until child.ItemName.Text ~= "OP Sword"
-						if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
-							RerollLooping = false
-						end
-					end)
-					repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
+				while RerollLooping and task.wait() do
+					if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RF.RollPassive:InvokeServer(WeaponID) then
+						Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
+							repeat task.wait() until child.ItemName.Text ~= "OP Sword"
+							if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
+								RerollLooping = false
+							end
+						end)
+						repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
+					end
 				end
 			end
 		end
