@@ -385,7 +385,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToMain:FireServer()
 
-					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero")
+					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") and not Plot.Heroes:FindFirstChild("The Reaper")
 
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
 
