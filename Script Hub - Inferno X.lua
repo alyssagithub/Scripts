@@ -288,6 +288,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(Enemy.Position.X, Enemy.Position.Y, Enemy.Position.Z + 5)
 			end
+			Player.Character:FindFirstChild("HumanoidRootPart").CFrame = Plot.Teleport.CFrame
 		end
 	})
 
