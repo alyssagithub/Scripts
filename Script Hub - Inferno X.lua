@@ -220,13 +220,13 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					[24] = 100,
 					[25] = 100
 				}
-				
+
 				if ReincarnationsTable[ReincarnationsAmount] and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) >= ReincarnationsTable[ReincarnationsAmount] then
 					OtherLevel = ReincarnationsTable[ReincarnationsAmount]
 				elseif ReincarnationsTable[ReincarnationsAmount] then
 					OtherLevel = 0
 				end
-				
+
 				if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" and (tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] ~= "Complete!") or OtherLevel ~= 0 then
 					IsInLoopReincarnate = true
 
@@ -385,7 +385,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToMain:FireServer()
 
-					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") and not Plot.Heroes:FindFirstChild("The Reaper")
+					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") or Plot.Heroes:FindFirstChild("The Reaper")
 
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
 
@@ -452,7 +452,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	})
-	
+
 	local Passive = Window:MakeTab({
 		Name = "Passive",
 		Icon = "rbxassetid://4483345998",
