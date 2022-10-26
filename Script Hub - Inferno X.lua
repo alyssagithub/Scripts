@@ -309,26 +309,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			HireLooping = Value
 			while HireLooping and task.wait() do
-				if not game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") and not Plot.Heroes:FindFirstChild("The Reaper") then
-					IsInLoopAutoHire = true
-
-					if IsInLoopReincarnate then
-						repeat task.wait() until not IsInLoopReincarnate
-					elseif IsInLoopNextLevel then
-						repeat task.wait() until not IsInLoopNextLevel
-					end
-
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToMain:FireServer()
-
-					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero")
-
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
-
-					IsInLoopAutoHire = false
-					
-					task.wait(1)
-				end
-
 				if game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") then
 					if tostring(game:GetService("Workspace").Main.Hire["_displayHero"].Highlight.OutlineColor) == "0.215686, 1, 0.266667" then
 						IsInLoopAutoHire = true
@@ -357,6 +337,22 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 						task.wait(1)
 					end
+				elseif not Plot.Heroes:FindFirstChild("The Reaper") then
+					IsInLoopAutoHire = true
+
+					if IsInLoopReincarnate then
+						repeat task.wait() until not IsInLoopReincarnate
+					elseif IsInLoopNextLevel then
+						repeat task.wait() until not IsInLoopNextLevel
+					end
+
+					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToMain:FireServer()
+
+					repeat task.wait() until game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero")
+
+					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(Plot.Owner.Value)
+
+					IsInLoopAutoHire = false
 				end
 			end
 			IsInLoopAutoHire = false
