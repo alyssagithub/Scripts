@@ -531,7 +531,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 	Chest:AddDropdown({
 		Name = "📦 Chest to Purchase",
-		Options = {"Wooden", "Silver", "Golden", "Legendary"},
+		Options = {"Wooden", "Silver", "Golden", "Legendary", "Divine"},
 		Save = true,
 		Flag = "SelectedChest",
 		Callback = function(Value)
