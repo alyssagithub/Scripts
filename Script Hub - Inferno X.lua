@@ -546,7 +546,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			ChestLooping = Value
 			if SelectedChest and Value then
 				while ChestLooping and task.wait(1) do
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.ChestService.RF.BuyChest:InvokeServer(SelectedChest)
+					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.ChestService.RF.BuyChest:InvokeServer(SelectedChest, "single")
 				end
 			end
 		end
