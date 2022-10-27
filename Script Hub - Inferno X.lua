@@ -494,7 +494,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Flag = "AutoRerollPassive",
 		Callback = function(Value)
 			RerollLooping = Value
-			while RerollLooping and task.wait() do
+			while RerollLooping and task.wait(.25) do
 				if Player.PlayerGui.Main.Frames.Passives.Visible == true and Player.PlayerGui.Main.ChestOpening.Visible == false then
 					Click(Player.PlayerGui.Main.Frames.Passives.CoreReroll.Button)
 					
