@@ -463,8 +463,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Name = "Enchant(s) to Stop at (multiple choice)",
 		Default = "None",
 		Options = EnchantList,
-		Save = true,
-		Flag = "Enchant1",
 		Callback = function(Value)
 			if not table.find(SelectedEnchants, Value) and Value ~= "None" then
 				table.insert(SelectedEnchants, Value)
