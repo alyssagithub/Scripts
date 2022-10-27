@@ -468,13 +468,13 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				table.insert(SelectedEnchants, Value)
 				task.spawn(function()
 					repeat task.wait() until EnchantLabel
-					EnchantLabel:Set("Selected Enchants: "..table.concat(SelectedEnchants, ", "))
+					EnchantLabel:Set(table.concat(SelectedEnchants, ", "))
 				end)
 			end
 		end
 	})
 	
-	EnchantLabel = Passive:AddLabel("Selected Enchants: None")
+	EnchantLabel = Passive:AddParagraph("Selected Enchants","None")
 	
 	Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
 		repeat task.wait() until child.ItemName.Text ~= "OP Sword"
