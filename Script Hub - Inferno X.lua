@@ -346,7 +346,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			HireLooping = Value
 			while HireLooping and task.wait() do
-				if game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") then
+				if game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") and not Plot.Heroes:FindFirstChild("The Reaper") then
 					if tostring(game:GetService("Workspace").Main.Hire["_displayHero"].Highlight.OutlineColor) == "0.215686, 1, 0.266667" then
 						IsInLoopAutoHire = true
 
