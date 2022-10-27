@@ -456,50 +456,34 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-
-	local Enchant1
-	local Enchant2
-	local Enchant3
+	
+	local SelectedEnchants = {}
 
 	Passive:AddDropdown({
-		Name = "Enchant 1",
+		Name = "Enchant(s) to Stop at (multiple choice)",
 		Default = "None",
 		Options = EnchantList,
 		Save = true,
 		Flag = "Enchant1",
 		Callback = function(Value)
-			Enchant1 = Value
-		end    
+			if not table.find(SelectedEnchants, Value) and Value ~= "None" then
+				table.insert(SelectedEnchants, Value)
+				task.spawn(function()
+					repeat task.wait() until EnchantLabel
+					EnchantLabel:Set("Selected Enchants: "..table.concat(SelectedEnchants, ", "))
+				end)
+			end
+		end
 	})
-
-	Passive:AddDropdown({
-		Name = "Enchant 2",
-		Default = "None",
-		Options = EnchantList,
-		Save = true,
-		Flag = "Enchant2",
-		Callback = function(Value)
-			Enchant2 = Value
-		end    
-	})
-
-	Passive:AddDropdown({
-		Name = "Enchant 3",
-		Default = "None",
-		Options = EnchantList,
-		Save = true,
-		Flag = "Enchant3",
-		Callback = function(Value)
-			Enchant3 = Value
-		end    
-	})
+	
+	EnchantLabel = Passive:AddLabel("Selected Enchants: None")
 	
 	Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
 		repeat task.wait() until child.ItemName.Text ~= "OP Sword"
 
 		print(child.ItemName.Text)
 
-		if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
+		if table.find(SelectedEnchants, child.ItemName.Text) then
 			RerollLooping = false
 		end
 	end)
