@@ -510,9 +510,9 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 							repeat task.wait() until child.ItemName.Text ~= "OP Sword"
 							if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
 								RerollLooping = false
+								repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
 							end
 						end)
-						repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
 					end
 				end
 			end
