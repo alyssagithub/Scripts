@@ -465,6 +465,8 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Name = "Enchant 1",
 		Default = "None",
 		Options = EnchantList,
+		Save = true,
+		Flag = "Enchant1",
 		Callback = function(Value)
 			Enchant1 = Value
 		end    
@@ -474,6 +476,8 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Name = "Enchant 2",
 		Default = "None",
 		Options = EnchantList,
+		Save = true,
+		Flag = "Enchant2",
 		Callback = function(Value)
 			Enchant2 = Value
 		end    
@@ -483,6 +487,8 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Name = "Enchant 3",
 		Default = "None",
 		Options = EnchantList,
+		Save = true,
+		Flag = "Enchant3",
 		Callback = function(Value)
 			Enchant3 = Value
 		end    
