@@ -487,6 +487,16 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			Enchant3 = Value
 		end    
 	})
+	
+	Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
+		repeat task.wait() until child.ItemName.Text ~= "OP Sword"
+
+		print(child.ItemName.Text)
+
+		if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
+			RerollLooping = false
+		end
+	end)
 
 	Passive:AddToggle({
 		Name = "🎲 Auto Reroll Passive (must have ui open)",
@@ -501,16 +511,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
 				end
 			end
-			
-			Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
-				repeat task.wait() until child.ItemName.Text ~= "OP Sword"
-
-				print(child.ItemName.Text)
-
-				if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
-					RerollLooping = false
-				end
-			end)
 		end
 	})
 
