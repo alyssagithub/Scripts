@@ -489,7 +489,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	})
 
 	Passive:AddToggle({
-		Name = "🎲 Auto Reroll Passive (must have ui open & weapon selected)",
+		Name = "🎲 Auto Reroll Passive (must have ui open)",
 		Save = true,
 		Flag = "AutoRerollPassive",
 		Callback = function(Value)
