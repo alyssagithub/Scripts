@@ -487,34 +487,29 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			Enchant3 = Value
 		end    
 	})
-	
-	local UpdateCurrentWeapon = require(Player.PlayerScripts.Client.Controllers.UIController.Passives).UpdateCurrentWeapon
-	local WeaponID
 
 	Passive:AddToggle({
-		Name = "🎲 Auto Reroll Passive (turn this on then set weapon)",
+		Name = "🎲 Auto Reroll Passive (must have ui open & weapon selected)",
 		Save = true,
 		Flag = "AutoRerollPassive",
 		Callback = function(Value)
 			RerollLooping = Value
-			if RerollLooping then
-				UpdateCurrentWeapon = function(e)
-					WeaponID = e._currentWeapon
-				end
+			while RerollLooping and task.wait() do
+				repeat
+					Click(Player.PlayerGui.Main.Frames.Passives.CoreReroll.Button)
+					task.wait(.25)
+				until Player.PlayerGui.Main.ChestOpening.Visible == true
 
-				repeat task.wait() until WeaponID
+				Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
+					repeat task.wait() until child.ItemName.Text ~= "OP Sword"
 
-				while RerollLooping and task.wait() do
-					if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RF.RollPassive:InvokeServer(WeaponID) then
-						Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
-							repeat task.wait() until child.ItemName.Text ~= "OP Sword"
-							if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
-								RerollLooping = false
-								repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
-							end
-						end)
+					print(child.ItemName.Text)
+
+					if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
+						RerollLooping = false
+						repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
 					end
-				end
+				end)
 			end
 		end
 	})
