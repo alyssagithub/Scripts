@@ -495,22 +495,22 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			RerollLooping = Value
 			while RerollLooping and task.wait() do
-				repeat
+				if Player.PlayerGui.Main.Frames.Passives.Visible == true and Player.PlayerGui.Main.ChestOpening.Visible == false then
 					Click(Player.PlayerGui.Main.Frames.Passives.CoreReroll.Button)
-					task.wait(.25)
-				until Player.PlayerGui.Main.ChestOpening.Visible == true
-
-				Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
-					repeat task.wait() until child.ItemName.Text ~= "OP Sword"
-
-					print(child.ItemName.Text)
-
-					if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
-						RerollLooping = false
-						repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
-					end
-				end)
+					
+					repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
+				end
 			end
+			
+			Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
+				repeat task.wait() until child.ItemName.Text ~= "OP Sword"
+
+				print(child.ItemName.Text)
+
+				if child.ItemName.Text == Enchant1 or child.ItemName.Text == Enchant2 or child.ItemName.Text == Enchant3 then
+					RerollLooping = false
+				end
+			end)
 		end
 	})
 
