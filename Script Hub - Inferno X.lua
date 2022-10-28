@@ -359,12 +359,14 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 						SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").Position
 
 						task.wait()
-
-						repeat
-							Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-1886, 61, -92)
-							task.wait()
-							game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.HireHero:FireServer(game:GetService("Workspace").Main.Hire["_displayHero"].Head.Nametag.Subject.Text)
-						until tostring(game:GetService("Workspace").Main.Hire["_displayHero"].Highlight.OutlineColor) ~= "0.215686, 1, 0.266667" or not HireLooping or not game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") or Plot.Heroes:FindFirstChild("The Reaper")
+						
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-1886, 61, -92)
+						
+						task.wait()
+						
+						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.HireHero:FireServer(game:GetService("Workspace").Main.Hire["_displayHero"].Head.Nametag.Subject.Text)
+						
+						task.wait()
 
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
 
