@@ -191,7 +191,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Flag = "AutoReincarnate",
 		Callback = function(Value)
 			ReincarnateLooping = Value
-			while ReincarnateLooping and task.wait() do
+			while ReincarnateLooping and task.wait(.25) do
 				local ReincarnationsAmount = tonumber(Player.PlayerGui.Main.Frames.Achievements.Container.Stats.Container.Reincarnations.Label.Text:split(" ")[2])
 				local ReincarnationsTable = {
 					[1] = 80,
@@ -562,6 +562,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"].ChildAdded:Connect(function(v)
 			table.insert(CaseList, v.Name)
 		end)
+		
 		table.sort(CaseList, function(a, b)
 			return a < b
 		end)
@@ -583,11 +584,9 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		Click(Background["Game_Selection"]["Game_Category_1"]["Game_Cases"]["Icon_Game"])
 
 		task.wait(1)
-
-		task.spawn(SetCaseList)
-	else
-		task.spawn(SetCaseList)
 	end
+	
+	task.spawn(SetCaseList)
 
 	local Window = CreateWindow()
 
