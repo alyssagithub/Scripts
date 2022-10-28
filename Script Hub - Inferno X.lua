@@ -131,9 +131,30 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-
+	
 	Main:AddToggle({
 		Name = "🤺 Auto Swing",
+		Default = false,
+		Save = true,
+		Flag = "AutoSwing",
+		Callback = function(Value)
+			SwingLooping = Value
+			while SwingLooping do
+				if #Plot.Enemy:GetChildren() == 0 then
+					repeat task.wait() until Plot.Enemy:GetChildren()[1]
+				end
+
+				local Enemy = Plot.Enemy:GetChildren()[1]
+				
+				game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.Swing:FireServer(Enemy)
+				
+				task.wait(0.14)
+			end
+		end
+	})
+
+	Main:AddToggle({
+		Name = "🤺 Auto Swing 2",
 		Default = false,
 		Save = true,
 		Flag = "AutoSwing2",
@@ -303,7 +324,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			while SkillLooping and task.wait() do
 				for i,v in pairs({"Enraged", "Eruption", "Misfortune", "Golden Rain", "Gold Potion", "Cold Runes", "Insight", "Enlightenment", "Replenish"}) do
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.UseSkill:FireServer(v)
-					task.wait(.5)
+					task.wait()
 				end
 			end
 		end
