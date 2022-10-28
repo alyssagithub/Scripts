@@ -359,7 +359,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 						SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").Position
 
 						task.wait()
-						
+
 						repeat
 							Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-1886, 61, -92)
 							task.wait()
@@ -456,7 +456,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	local SelectedEnchants = {}
 
 	Passive:AddDropdown({
@@ -473,9 +473,9 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	})
-	
+
 	EnchantLabel = Passive:AddParagraph("Selected Enchants","None")
-	
+
 	Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
 		repeat task.wait() until child.ItemName.Text ~= "OP Sword"
 
@@ -495,7 +495,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			while RerollLooping and task.wait(.25) do
 				if Player.PlayerGui.Main.Frames.Passives.Visible == true and Player.PlayerGui.Main.ChestOpening.Visible == false then
 					Click(Player.PlayerGui.Main.Frames.Passives.CoreReroll.Button)
-					
+
 					repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
 				end
 			end
@@ -933,6 +933,115 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 		end
 	})
 
+	Credits(Window)
+elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
+	local CollectLooping
+	local RebirthLooping
+	local ClaimLooping
+	local CapsuleLooping
+	local OpenLooping
+	
+	local SelectedCapsule
+	
+	local CapsuleList = {"standardCapsule","midCapsule", "epicCapsule", "ufoCapsule", "poisonCapsule", "basicBuffCapsule"}
+	
+	local Window = CreateWindow()
+
+	local Main = Window:MakeTab({
+		Name = "Main",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Main:AddToggle({
+		Name = "🍃 Auto Collect",
+		Default = false,
+		Save = true,
+		Flag = "AutoCollect",
+		Callback = function(Value)
+			CollectLooping = Value
+			while CollectLooping and task.wait() do
+				for i,v in pairs(game:GetService("Workspace").gardenStage.physicsProps:GetChildren()) do
+					if CollectLooping and Player.Character:FindFirstChild("HumanoidRootPart") and v:IsA("Model") and v:FindFirstChild("destructable") and v.destructable.Value == true and v.destructable:FindFirstChildOfClass("MeshPart") then
+						Player.Character.HumanoidRootPart.CFrame = CFrame.new(v.destructable:FindFirstChildOfClass("MeshPart").Position)
+						task.wait()
+					end
+				end
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🔁 Auto Rebirth",
+		Default = false,
+		Save = true,
+		Flag = "AutoRebirth",
+		Callback = function(Value)
+			RebirthLooping = Value
+			while RebirthLooping and task.wait(1) do
+				game:GetService("ReplicatedStorage").functions.requestRebirth:FireServer()
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🎁 Auto Claim Rewards",
+		Default = false,
+		Save = true,
+		Flag = "AutoClaim",
+		Callback = function(Value)
+			ClaimLooping = Value
+			while ClaimLooping and task.wait(1) do
+				for i,v in pairs(Player.playerStats.rewards:GetChildren()) do
+					game:GetService("ReplicatedStorage").functions.claimReward:InvokeServer(v)
+					task.wait()
+				end
+			end
+		end
+	})
+	
+	local Capsule = Window:MakeTab({
+		Name = "Capsule",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Capsule:AddDropdown({
+		Name = "💊 Capsule",
+		Options = CapsuleList,
+		Save = true,
+		Flag = "SelectedCapsule",
+		Callback = function(Value)
+			SelectedCapsule = Value
+		end
+	})
+	
+	Capsule:AddToggle({
+		Name = "💵 Auto Buy Capsule",
+		Default = false,
+		Save = true,
+		Flag = "AutoBuyCapsule",
+		Callback = function(Value)
+			CapsuleLooping = Value
+			while CapsuleLooping and task.wait(1) do
+				game:GetService("ReplicatedStorage").functions.buyCapsule:InvokeServer(SelectedCapsule)
+			end
+		end
+	})
+	
+	Capsule:AddToggle({
+		Name = "📭 Auto Open Capsule",
+		Default = false,
+		Save = true,
+		Flag = "AutoBuyCapsule",
+		Callback = function(Value)
+			OpenLooping = Value
+			while OpenLooping and task.wait(.25) do
+				Click(Player.PlayerGui.menus.menuHandler.selection)
+			end
+		end
+	})
+	
 	Credits(Window)
 end
 
