@@ -223,7 +223,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 				if ReincarnationsTable[ReincarnationsAmount] and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) >= ReincarnationsTable[ReincarnationsAmount] then
 					OtherLevel = ReincarnationsTable[ReincarnationsAmount]
-				elseif ReincarnationsTable[ReincarnationsAmount] then
+				else
 					OtherLevel = 0
 				end
 
@@ -252,7 +252,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
 
 					IsInLoopReincarnate = false
-				elseif tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) > RequiredLevel or tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] == "Complete!" then
+				elseif tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) > RequiredLevel or (tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] == "Complete!") then
 					RequiredLevel = RequiredLevel + 10
 					print("Set RequiredLevel to "..RequiredLevel)
 				end
@@ -359,13 +359,13 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 						SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").Position
 
 						task.wait()
-						
+
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-1886, 61, -92)
-						
+
 						task.wait(.25)
-						
+
 						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.HireHero:FireServer(game:GetService("Workspace").Main.Hire["_displayHero"].Head.Nametag.Subject.Text)
-						
+
 						task.wait(.25)
 
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
@@ -468,11 +468,14 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			if not table.find(SelectedEnchants, Value) and Value ~= "None" then
 				table.insert(SelectedEnchants, Value)
-				task.spawn(function()
-					repeat task.wait() until EnchantLabel
-					EnchantLabel:Set(table.concat(SelectedEnchants, ", "))
-				end)
+			elseif Value ~= "None" then
+				table.remove(SelectedEnchants, Value)
 			end
+
+			task.spawn(function()
+				repeat task.wait() until EnchantLabel
+				EnchantLabel:Set(table.concat(SelectedEnchants, ", "))
+			end)
 		end
 	})
 
@@ -562,7 +565,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"].ChildAdded:Connect(function(v)
 			table.insert(CaseList, v.Name)
 		end)
-		
+
 		table.sort(CaseList, function(a, b)
 			return a < b
 		end)
@@ -585,7 +588,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 		task.wait(1)
 	end
-	
+
 	task.spawn(SetCaseList)
 
 	local Window = CreateWindow()
@@ -941,11 +944,11 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	local ClaimLooping
 	local CapsuleLooping
 	local OpenLooping
-	
+
 	local SelectedCapsule
-	
+
 	local CapsuleList = {"standardCapsule","midCapsule", "epicCapsule", "ufoCapsule", "poisonCapsule", "basicBuffCapsule"}
-	
+
 	local Window = CreateWindow()
 
 	local Main = Window:MakeTab({
@@ -953,7 +956,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Main:AddToggle({
 		Name = "🍃 Auto Collect",
 		Default = false,
@@ -971,7 +974,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "🔁 Auto Rebirth",
 		Default = false,
@@ -984,7 +987,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "🎁 Auto Claim Rewards",
 		Default = false,
@@ -1000,13 +1003,13 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	})
-	
+
 	local Capsule = Window:MakeTab({
 		Name = "Capsule",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Capsule:AddDropdown({
 		Name = "💊 Capsule",
 		Options = CapsuleList,
@@ -1016,7 +1019,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			SelectedCapsule = Value
 		end
 	})
-	
+
 	Capsule:AddToggle({
 		Name = "💵 Auto Buy Capsule",
 		Default = false,
@@ -1029,7 +1032,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	})
-	
+
 	Capsule:AddToggle({
 		Name = "📭 Auto Open Capsule",
 		Default = false,
@@ -1042,7 +1045,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	})
-	
+
 	Credits(Window)
 end
 
