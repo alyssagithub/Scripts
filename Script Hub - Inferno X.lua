@@ -223,7 +223,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 				if ReincarnationsTable[ReincarnationsAmount] and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) >= ReincarnationsTable[ReincarnationsAmount] then
 					OtherLevel = ReincarnationsTable[ReincarnationsAmount]
-				else
+				elseif ReincarnationsTable[ReincarnationsAmount] then
 					OtherLevel = 0
 				end
 
@@ -246,7 +246,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 					repeat
 						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.Reincarnate:FireServer()
-						task.wait(.1)
+						task.wait()
 					until Player.PlayerGui.Main.ChestOpening.Visible == true
 
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
