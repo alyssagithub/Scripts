@@ -685,50 +685,6 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		})
 
 		Case:AddToggle({
-			Name = "💼 Auto Case Open",
-			Default = false,
-			Save = true,
-			Flag = "AutoCaseOpen",
-			Callback = function(Value)
-				AutoCaseLooping = Value
-				if AutoCaseLooping then
-					while AutoCaseLooping and SelectedCase and task.wait() do
-						local CaseMoney = Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase):FindFirstChild("Title_Price").Text:gsub("%p", "")
-						local PlayerMoney = Background["Robux_Amount"].Text:gsub("%p", "")
-						if tonumber(CaseMoney) <= tonumber(PlayerMoney) then
-							AutoClickLooping = false
-							while not Background["Games_Holder"]["Case_Prompt"].Visible do
-								Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]:FindFirstChild(SelectedCase).Parent = Background["Games_Holder"]["Game_Cases"]
-								task.wait()
-								Click(Background["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase):FindFirstChild("Icon_Case"))
-								task.wait()
-								Background["Games_Holder"]["Game_Cases"]:FindFirstChild(SelectedCase).Parent = Background["Games_Holder"]["Game_Cases"]["Scrolling_Frame_1"]
-							end
-
-							while Background["Games_Holder"]["Case_Prompt"].Visible and task.wait() do
-								Click(Background["Games_Holder"]["Case_Prompt"]["Button_Buy"])
-							end
-
-							AutoClickLooping = OriginalAutoClickLooping
-
-							repeat task.wait() until Background["Unboxing_Frame"]["Button_Claim"].Visible == true
-
-							AutoClickLooping = false
-
-							while Background["Unboxing_Frame"].Visible and task.wait() do
-								Click(Background["Unboxing_Frame"]["Button_Claim"])
-							end
-						elseif OriginalAutoClickLooping and not AutoClickLooping and not MouseButton2Looping then
-							AutoClickLooping = OriginalAutoClickLooping
-						end
-					end
-				elseif AutoClickLooping == false then
-					AutoClickLooping = OriginalAutoClickLooping
-				end
-			end
-		})
-
-		Case:AddToggle({
 			Name = "♾ Infinite Case Battles",
 			Default = false,
 			Callback = function(Value)
