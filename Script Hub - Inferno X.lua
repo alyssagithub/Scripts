@@ -238,8 +238,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					[21] = 100,
 					[22] = 100,
 					[23] = 100,
-					[24] = 100,
-					[25] = 100
+					[24] = 100
 				}
 
 				if ReincarnationsTable[ReincarnationsAmount] and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) >= ReincarnationsTable[ReincarnationsAmount] then
