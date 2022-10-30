@@ -950,12 +950,9 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 		Flag = "AutoCollect",
 		Callback = function(Value)
 			CollectLooping = Value
-			if CollectLooping and Player.Character:FindFirstChild("HumanoidRootPart") then
-				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(game:GetService("Workspace").gardenStage.triggers.hubTrigger.Position)
-				task.wait(.5)
-			end
-			
 			while CollectLooping and task.wait() do
+				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(game:GetService("Workspace").gardenStage.triggers.hubTrigger.Position)
+				task.wait(.1)
 				for i,v in pairs(game:GetService("Workspace").gardenStage.physicsProps:GetChildren()) do
 					if CollectLooping and Player.Character:FindFirstChild("HumanoidRootPart") and v:IsA("Model") and v:FindFirstChild("destructable") and v.destructable.Value == true and v.destructable:FindFirstChildOfClass("MeshPart") then
 						Player.Character.HumanoidRootPart.CFrame = CFrame.new(v.destructable:FindFirstChildOfClass("MeshPart").Position)
