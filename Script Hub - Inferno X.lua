@@ -248,30 +248,32 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				end
 
 				if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" and (tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] ~= "Complete!") or OtherLevel ~= 0 then
-					IsInLoopReincarnate = true
+					if Player.PlayerGui.Main.Top.Wave.Wave.Text == "1/1" then
+						IsInLoopReincarnate = true
 
-					if IsInLoopNextLevel then
-						repeat task.wait() until not IsInLoopNextLevel
-					elseif IsInLoopAutoHire then
-						repeat task.wait() until not IsInLoopAutoHire
-					end
+						if IsInLoopNextLevel then
+							repeat task.wait() until not IsInLoopNextLevel
+						elseif IsInLoopAutoHire then
+							repeat task.wait() until not IsInLoopAutoHire
+						end
 
-					SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").Position
+						SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").Position
 
-					task.wait()
-
-					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2041, 59, -26)
-
-					repeat task.wait() until Player.PlayerGui.Main.Frames.Reincarnate.Visible == true
-
-					repeat
-						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.Reincarnate:FireServer()
 						task.wait()
-					until Player.PlayerGui.Main.ChestOpening.Visible == true
 
-					Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2041, 59, -26)
 
-					IsInLoopReincarnate = false
+						repeat task.wait() until Player.PlayerGui.Main.Frames.Reincarnate.Visible == true
+
+						repeat
+							game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.Reincarnate:FireServer()
+							task.wait()
+						until Player.PlayerGui.Main.ChestOpening.Visible == true
+
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
+
+						IsInLoopReincarnate = false
+					end
 				elseif tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) > RequiredLevel or (tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] == "Complete!") then
 					RequiredLevel = RequiredLevel + 10
 					print("Set RequiredLevel to "..RequiredLevel)
@@ -1043,17 +1045,17 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	local UpgradeLooping
 	local RebirthLooping
 	local FrenzyLooping
-	
+
 	local Plot = game:GetService("Workspace").Plots:FindFirstChild(Player.Name)
-	
+
 	local Window = CreateWindow()
-	
+
 	local Main = Window:MakeTab({
 		Name = "Main",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Main:AddToggle({
 		Name = "🖱 Auto Tap",
 		Default = false,
@@ -1068,7 +1070,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "🤝 Auto Merge",
 		Default = false,
@@ -1086,7 +1088,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "📈 Auto Upgrade",
 		Default = false,
@@ -1101,7 +1103,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "🔁 Auto Rebirth",
 		Default = false,
@@ -1116,7 +1118,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "♾ Infinite 2x Frenzy",
 		Default = false,
@@ -1130,7 +1132,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	})
-	
+
 	Credits(Window)
 end
 
