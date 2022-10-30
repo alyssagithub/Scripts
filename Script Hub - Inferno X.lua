@@ -131,7 +131,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Main:AddToggle({
 		Name = "🤺 Auto Swing",
 		Default = false,
@@ -145,9 +145,9 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				end
 
 				local Enemy = Plot.Enemy:GetChildren()[1]
-				
+
 				game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.Swing:FireServer(Enemy)
-				
+
 				task.wait(0.14)
 			end
 		end
@@ -923,7 +923,17 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 
 	local SelectedCapsule
 
-	local CapsuleList = {"standardCapsule","midCapsule", "epicCapsule", "ufoCapsule", "poisonCapsule", "basicBuffCapsule"}
+	local CapsuleList = {"standardCapsule", "midCapsule", "epicCapsule", "basicBuffCapsule"}
+	
+	for i,v in pairs(game:GetService("ReplicatedStorage").availableCapsules:GetChildren()) do
+		if not table.find(CapsuleList, v.Name) and v.Name ~= "timer" then
+			if v.Name == "highlightedCapsule" then
+				table.insert(CapsuleList, v.Value)
+			else
+				table.insert(CapsuleList, v.Name)
+			end
+		end
+	end
 
 	local Window = CreateWindow()
 
@@ -940,6 +950,11 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 		Flag = "AutoCollect",
 		Callback = function(Value)
 			CollectLooping = Value
+			if CollectLooping and Player.Character:FindFirstChild("HumanoidRootPart") then
+				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(game:GetService("Workspace").gardenStage.triggers.hubTrigger.Position)
+				task.wait(.5)
+			end
+			
 			while CollectLooping and task.wait() do
 				for i,v in pairs(game:GetService("Workspace").gardenStage.physicsProps:GetChildren()) do
 					if CollectLooping and Player.Character:FindFirstChild("HumanoidRootPart") and v:IsA("Model") and v:FindFirstChild("destructable") and v.destructable.Value == true and v.destructable:FindFirstChildOfClass("MeshPart") then
@@ -1017,7 +1032,9 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 		Callback = function(Value)
 			OpenLooping = Value
 			while OpenLooping and task.wait(.25) do
-				Click(Player.PlayerGui.menus.menuHandler.selection)
+				if Player.PlayerGui:FindFirstChild("activeCapsule") then
+					Click(Player.PlayerGui.menus.menuHandler.selection)
+				end
 			end
 		end
 	})
