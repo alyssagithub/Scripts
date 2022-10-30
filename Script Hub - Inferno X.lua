@@ -11,7 +11,7 @@ Player.Idled:Connect(function()
 	VirtualUser:ClickButton2(Vector2.new())
 end)
 
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
 local function Credits(Window)
 	local Credits = Window:MakeTab({
