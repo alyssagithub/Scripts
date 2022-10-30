@@ -1118,7 +1118,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	})
 	
 	Main:AddToggle({
-		Name = "🔁 Infinite 2x Frenzy",
+		Name = "♾ Infinite 2x Frenzy",
 		Default = false,
 		Save = true,
 		Flag = "InfiniteFrenzy",
