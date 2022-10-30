@@ -924,7 +924,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	local SelectedCapsule
 
 	local CapsuleList = {"standardCapsule", "midCapsule", "epicCapsule", "basicBuffCapsule"}
-	
+
 	for i,v in pairs(game:GetService("ReplicatedStorage").availableCapsules:GetChildren()) do
 		if not table.find(CapsuleList, v.Name) and v.Name ~= "timer" then
 			if v.Name == "highlightedCapsule" then
@@ -1036,6 +1036,101 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 		end
 	})
 
+	Credits(Window)
+elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
+	local TapLooping
+	local MergeLooping
+	local UpgradeLooping
+	local RebirthLooping
+	local FrenzyLooping
+	
+	local Plot = game:GetService("Workspace").Plots:FindFirstChild(Player.Name)
+	
+	local Window = CreateWindow()
+	
+	local Main = Window:MakeTab({
+		Name = "Main",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Main:AddToggle({
+		Name = "🖱 Auto Tap",
+		Default = false,
+		Save = true,
+		Flag = "AutoTap",
+		Callback = function(Value)
+			TapLooping = Value
+			while TapLooping and task.wait() do
+				for i,v in pairs(Plot.Blocks:GetChildren()) do
+					game:GetService("ReplicatedStorage").Functions.Tap:FireServer(v)
+				end
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🤝 Auto Merge",
+		Default = false,
+		Save = true,
+		Flag = "AutoMerge",
+		Callback = function(Value)
+			MergeLooping = Value
+			while MergeLooping and task.wait() do
+				for i,v in pairs(Plot.Blocks:GetChildren()) do
+					for e,r in pairs(Plot.Blocks:GetChildren()) do
+						firetouchinterest(v, r, 0)
+						firetouchinterest(v, r, 1)
+					end
+				end
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "📈 Auto Upgrade",
+		Default = false,
+		Save = true,
+		Flag = "AutoUpgrade",
+		Callback = function(Value)
+			UpgradeLooping = Value
+			while UpgradeLooping and task.wait(.25) do
+				firesignal(Player.PlayerGui.World.Wall.Upgrades.Top.SpawnTier.Buy.Activated)
+				firesignal(Player.PlayerGui.World.Wall.Upgrades.Top.MaxBlocks.Buy.Activated)
+				firesignal(Player.PlayerGui.World.Wall.Upgrades.Bot.Cooldown.Buy.Activated)
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🔁 Auto Rebirth",
+		Default = false,
+		Save = true,
+		Flag = "AutoRebirth",
+		Callback = function(Value)
+			RebirthLooping = Value
+			while RebirthLooping and task.wait() do
+				if Player.PlayerGui.World.Wall.Rebirths.Rebirth.Buy.BackgroundColor3 ~= Color3.fromRGB(76, 76, 76)  then
+					game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
+				end
+			end
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🔁 Infinite 2x Frenzy",
+		Default = false,
+		Save = true,
+		Flag = "InfiniteFrenzy",
+		Callback = function(Value)
+			FrenzyLooping = Value
+			while FrenzyLooping and task.wait(1) do
+				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Obby.Finish, 0)
+				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Obby.Finish, 1)
+			end
+		end
+	})
+	
 	Credits(Window)
 end
 
