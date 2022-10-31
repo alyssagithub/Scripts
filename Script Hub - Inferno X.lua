@@ -1134,6 +1134,155 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	})
 
 	Credits(Window)
+elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
+	local FoodLooping
+	local CoinLooping
+	local EggLooping
+	
+	local EnemiesLooping
+	
+	local EquipLooping
+	local FeedLooping
+	local OpenLooping
+	local TierLooping
+	
+	local SelectedEnemy
+	
+	local EnemiesList = {}
+	
+	for i,v in pairs(game:GetService("Workspace").EnemyCache:GetChildren()) do
+		if not table.find(EnemiesList, v.Name) then
+			table.insert(EnemiesList, v.Name)
+		end
+	end
+	
+	local Window = CreateWindow()
+	
+	local Main = Window:MakeTab({
+		Name = "Main",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Main:AddToggle({
+		Name = "🍓 Auto Collect Food",
+		Default = false,
+		Save = true,
+		Flag = "AutoCollectFood",
+		Callback = function(Value)
+			FoodLooping = Value
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "💰 Auto Collect Coins",
+		Default = false,
+		Save = true,
+		Flag = "AutoCollectCoins",
+		Callback = function(Value)
+			CoinLooping = Value
+		end
+	})
+	
+	Main:AddToggle({
+		Name = "🥚 Auto Collect Eggs",
+		Default = false,
+		Save = true,
+		Flag = "AutoCollectEggs",
+		Callback = function(Value)
+			EggLooping = Value
+		end
+	})
+	
+	local Pets = Window:MakeTab({
+		Name = "Pets",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Pets:AddToggle({
+		Name = "🥇 Auto Equip Best",
+		Default = false,
+		Save = true,
+		Flag = "AutoEquipBest",
+		Callback = function(Value)
+			EquipLooping = Value
+		end
+	})
+	
+	Pets:AddToggle({
+		Name = "😋 Auto Feed",
+		Default = false,
+		Save = true,
+		Flag = "AutoFeed",
+		Callback = function(Value)
+			FeedLooping = Value
+		end
+	})
+	
+	Pets:AddToggle({
+		Name = "📈 Auto Upgrade Tier",
+		Default = false,
+		Save = true,
+		Flag = "AutoUpgradeTier",
+		Callback = function(Value)
+			TierLooping = Value
+		end
+	})
+	
+	Credits(Window)
+	
+	task.spawn(function()
+		while true do
+			if FoodLooping then
+				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+					if v:GetAttribute("Type") == "Food" then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectDrop:InvokeServer("Food")
+						v:Destroy()
+					end
+				end
+			end
+
+			if CoinLooping then
+				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+					if v:GetAttribute("Type") == "Coins" then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectDrop:InvokeServer("Coins")
+						v:Destroy()
+					end
+				end
+			end
+
+			if EquipLooping then
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.EquipBest:InvokeServer()
+			end
+
+			if FeedLooping then
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.Feed:InvokeServer()
+			end
+
+			if EggLooping then
+				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+					if v:GetAttribute("IsEgg") then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectEgg:InvokeServer({["isShiny"] = v:GetAttribute("isShiny"), ["Type"] = v:GetAttribute("Type")})
+						v:Destroy()
+					end
+				end
+			end
+			
+			if TierLooping then
+				for i,v in pairs(Player.PlayerGui.Main.backpack.ScrollingFrame:GetChildren()) do
+					if v:IsA("ImageButton") then
+						print(v.Name)
+						pcall(function()
+							game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.TierPet:InvokeServer(v.Name)
+						end)
+					end
+				end
+			end
+
+			task.wait()
+		end
+	end)
 end
 
 OrionLib:Init()
