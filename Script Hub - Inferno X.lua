@@ -1295,7 +1295,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 				end
 			end
 			
-			if AttackLooping then
+			if AttackLooping and SelectedEnemy then
 				task.spawn(function()
 					if not IsInLoopAttack then
 						IsInLoopAttack = true
