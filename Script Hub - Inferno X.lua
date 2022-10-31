@@ -1145,7 +1145,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local FeedLooping
 	local OpenLooping
 	local TierLooping
-	
+
 	local IsInLoopAttack
 
 	local SelectedEnemy
@@ -1196,13 +1196,13 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			EggLooping = Value
 		end
 	})
-	
+
 	local Enemies = Window:MakeTab({
 		Name = "Enemies",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	local EnemyDropdown = Enemies:AddDropdown({
 		Name = "👾 Enemy",
 		Options = EnemiesList,
@@ -1212,7 +1212,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			SelectedEnemy = Value
 		end
 	})
-	
+
 	Enemies:AddToggle({
 		Name = "⚔ Auto Attack",
 		Default = false,
@@ -1222,7 +1222,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			AttackLooping = Value
 		end
 	})
-	
+
 	Enemies:AddButton({
 		Name = "🔂 Refresh Enemy List",
 		Callback = function()
@@ -1232,7 +1232,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					table.insert(NewTable, v.Name)
 				end
 			end
-			
+
 			EnemyDropdown:Refresh(NewTable, true)
 		end    
 	})
@@ -1294,28 +1294,26 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					end
 				end
 			end
-			
-			if AttackLooping and SelectedEnemy then
+
+			if AttackLooping and SelectedEnemy and not IsInLoopAttack then
 				task.spawn(function()
-					if not IsInLoopAttack then
-						IsInLoopAttack = true
-						
-						local CurrentNumber1 = math.huge
-						local SelectedEnemy1
+					IsInLoopAttack = true
 
-						for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
-							if v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
-								CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
-								SelectedEnemy1 = v
-							end
+					local CurrentNumber1 = math.huge
+					local SelectedEnemy1
+
+					for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
+						if v and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
+							CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
+							SelectedEnemy1 = v
 						end
-
-						game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
-
-						repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
-						
-						IsInLoopAttack = false
 					end
+
+					game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
+
+					repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
+
+					IsInLoopAttack = false
 				end)
 			end
 
