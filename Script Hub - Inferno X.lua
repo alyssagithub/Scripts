@@ -1146,6 +1146,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local FeedLooping
 	local TierLooping
 	local OpenLooping
+	local PlaceLooping
 
 	local SelectedEnemy
 	local SelectedQuest
@@ -1371,7 +1372,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-	
+
 	Pets:AddToggle({
 		Name = "🐣 Auto Open Eggs",
 		Default = false,
@@ -1381,13 +1382,35 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			OpenLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if OpenLooping then
 				for i,v in pairs(game:GetService("Workspace").Nests:FindFirstChild(Player.Name).Stands:GetChildren()) do
 					if v:GetAttribute("Id") then
 						game:GetService("ReplicatedStorage").Packages.Knit.Services.EggService.RF.OpenEgg:InvokeServer(v:GetAttribute("Id"))
+					end
+				end
+			end
+		end
+	end)
+	
+	Pets:AddToggle({
+		Name = "🥚 Auto Place",
+		Default = false,
+		Save = true,
+		Flag = "AutoPlace",
+		Callback = function(Value)
+			PlaceLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if PlaceLooping then
+				for i,v in pairs(game:GetService("Workspace").Nests:FindFirstChild(Player.Name).Stands:GetChildren()) do
+					if not v:GetAttribute("Egg") then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.PlaceEgg:InvokeServer(v, {["isShiny"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").shinyIcon.Visible, ["Type"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").Name})
 					end
 				end
 			end
