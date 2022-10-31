@@ -1211,16 +1211,6 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	})
 	
-	Enemies:AddDropdown({
-		Name = "🔢 Mode",
-		Options = {"Full", "Split"},
-		Save = true,
-		Flag = "SelectedMode",
-		Callback = function(Value)
-			SelectedMode = Value
-		end
-	})
-	
 	Enemies:AddToggle({
 		Name = "⚔ Auto Attack",
 		Default = false,
