@@ -1181,6 +1181,19 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	})
 
+	task.spawn(function()
+		while task.wait() do
+			if FoodLooping then
+				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+					if v:GetAttribute("Type") == "Food" then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectDrop:InvokeServer("Food")
+						v:Destroy()
+					end
+				end
+			end
+		end
+	end)
+
 	Main:AddToggle({
 		Name = "💰 Auto Collect Coins",
 		Default = false,
@@ -1191,6 +1204,19 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	})
 
+	task.spawn(function()
+		while task.wait() do
+			if CoinLooping then
+				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+					if v:GetAttribute("Type") == "Coins" then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectDrop:InvokeServer("Coins")
+						v:Destroy()
+					end
+				end
+			end
+		end
+	end)
+
 	Main:AddToggle({
 		Name = "🥚 Auto Collect Eggs",
 		Default = false,
@@ -1200,6 +1226,19 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			EggLooping = Value
 		end
 	})
+
+	task.spawn(function()
+		while task.wait() do
+			if EggLooping then
+				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+					if v:GetAttribute("IsEgg") then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectEgg:InvokeServer({["isShiny"] = v:GetAttribute("isShiny"), ["Type"] = v:GetAttribute("Type")})
+						v:Destroy()
+					end
+				end
+			end
+		end
+	end)
 
 	local Enemies = Window:MakeTab({
 		Name = "Enemies",
@@ -1226,6 +1265,28 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			AttackLooping = Value
 		end
 	})
+
+	task.spawn(function()
+		while task.wait() do
+			if AttackLooping and SelectedEnemy then
+				local CurrentNumber1 = math.huge
+				local SelectedEnemy1
+
+				for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
+					if v.Adornee and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
+						CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
+						SelectedEnemy1 = v
+					end
+				end
+
+				if SelectedEnemy1 then
+					game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
+
+					repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health") or not AttackLooping
+				end
+			end
+		end
+	end)
 
 	Enemies:AddButton({
 		Name = "🔂 Refresh Enemy List",
@@ -1257,6 +1318,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	})
 
+	task.spawn(function()
+		while task.wait() do
+			if EquipLooping then
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.EquipBest:InvokeServer()
+			end
+		end
+	end)
+
 	Pets:AddToggle({
 		Name = "😋 Auto Feed",
 		Default = false,
@@ -1266,6 +1335,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			FeedLooping = Value
 		end
 	})
+
+	task.spawn(function()
+		while task.wait() do
+			if FeedLooping then
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.Feed:InvokeServer()
+			end
+		end
+	end)
 
 	Pets:AddToggle({
 		Name = "📈 Auto Upgrade Tier",
@@ -1277,68 +1354,8 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	})
 
-	Credits(Window)
-
 	task.spawn(function()
-		while true do
-			if FoodLooping then
-				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
-					if v:GetAttribute("Type") == "Food" then
-						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectDrop:InvokeServer("Food")
-						v:Destroy()
-					end
-				end
-			end
-
-			if CoinLooping then
-				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
-					if v:GetAttribute("Type") == "Coins" then
-						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectDrop:InvokeServer("Coins")
-						v:Destroy()
-					end
-				end
-			end
-
-			if AttackLooping and SelectedEnemy and not IsInLoopAttack then
-				task.spawn(function()
-					IsInLoopAttack = true
-
-					local CurrentNumber1 = math.huge
-					local SelectedEnemy1
-
-					for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
-						if v.Adornee and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
-							CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
-							SelectedEnemy1 = v
-						end
-					end
-
-					if SelectedEnemy1 then
-						game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
-
-						repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health") or not AttackLooping
-					end
-					IsInLoopAttack = false
-				end)
-			end
-
-			if EquipLooping then
-				game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.EquipBest:InvokeServer()
-			end
-
-			if FeedLooping then
-				game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.Feed:InvokeServer()
-			end
-
-			if EggLooping then
-				for i,v in pairs(game:GetService("Workspace").Drops:GetChildren()) do
-					if v:GetAttribute("IsEgg") then
-						game:GetService("ReplicatedStorage").Packages.Knit.Services.DropService.RF.CollectEgg:InvokeServer({["isShiny"] = v:GetAttribute("isShiny"), ["Type"] = v:GetAttribute("Type")})
-						v:Destroy()
-					end
-				end
-			end
-
+		while task.wait() do
 			if TierLooping then
 				for i,v in pairs(Player.PlayerGui.Main.backpack.ScrollingFrame:GetChildren()) do
 					if v:IsA("ImageButton") then
@@ -1348,10 +1365,10 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					end
 				end
 			end
-
-			task.wait()
 		end
 	end)
+
+	Credits(Window)
 end
 
 OrionLib:Init()
