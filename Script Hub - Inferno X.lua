@@ -1203,7 +1203,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		PremiumOnly = false
 	})
 	
-	Enemies:AddDropdown({
+	local EnemyDropdown = Enemies:AddDropdown({
 		Name = "👾 Enemy",
 		Options = EnemiesList,
 		Save = true,
@@ -1221,6 +1221,20 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		Callback = function(Value)
 			AttackLooping = Value
 		end
+	})
+	
+	Enemies:AddButton({
+		Name = "🔂 Refresh Enemy List",
+		Callback = function()
+			local NewTable = {}
+			for i,v in pairs(game:GetService("Workspace").EnemyCache:GetChildren()) do
+				if not table.find(NewTable, v.Name) then
+					table.insert(NewTable, v.Name)
+				end
+			end
+			
+			EnemyDropdown:Refresh(NewTable, true)
+		end    
 	})
 
 	local Pets = Window:MakeTab({
