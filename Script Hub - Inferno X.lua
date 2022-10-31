@@ -1138,16 +1138,19 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local FoodLooping
 	local CoinLooping
 	local EggLooping
+	local QuestLooping
 
 	local AttackLooping
-	
+
 	local EquipLooping
 	local FeedLooping
 	local TierLooping
 
 	local SelectedEnemy
+	local SelectedQuest
 
 	local EnemiesList = {}
+	local QuestsList = {}
 
 	table.sort(EnemiesList, function(a, b)
 		return a > b
@@ -1157,6 +1160,10 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		if not table.find(EnemiesList, v.Name) then
 			table.insert(EnemiesList, v.Name)
 		end
+	end
+	
+	for i,v in pairs(game:GetService("ReplicatedStorage").Assets.Models.Npcs:GetChildren()) do
+		table.insert(QuestsList, v.Name)
 	end
 
 	local Window = CreateWindow()
@@ -1267,7 +1274,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			if AttackLooping and SelectedEnemy then
 				local CurrentNumber1 = math.huge
 				local SelectedEnemy1
-				
+
 				for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
 					if v.Adornee and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
 						CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
@@ -1361,6 +1368,40 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					end
 				end
 			end
+		end
+	end)
+	
+	local Quest = Window:MakeTab({
+		Name = "Quest",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Quest:AddDropdown({
+		Name = "📜 Quest",
+		Options = QuestsList,
+		Save = true,
+		Flag = "SelectedEnemy",
+		Callback = function(Value)
+			SelectedQuest = Value
+		end
+	})
+
+	Quest:AddToggle({
+		Name = "📝 Auto Quest",
+		Default = false,
+		Save = true,
+		Flag = "AutoQuest",
+		Callback = function(Value)
+			QuestLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while true do
+			game:GetService("ReplicatedStorage").Packages.Knit.Services.QuestService.RF.GiveQuest:InvokeServer(SelectedQuest)
+			task.wait(1)
+			game:GetService("ReplicatedStorage").Packages.Knit.Services.QuestService.RF.RedeemQuest:InvokeServer(SelectedQuest)
 		end
 	end)
 
