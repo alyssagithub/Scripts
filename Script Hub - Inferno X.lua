@@ -1145,6 +1145,8 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local FeedLooping
 	local OpenLooping
 	local TierLooping
+	
+	local IsInLoopAttack
 
 	local SelectedEnemy
 	local SelectedMode
@@ -1281,19 +1283,25 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			
 			if AttackLooping then
 				task.spawn(function()
-					local CurrentNumber1 = math.huge
-					local SelectedEnemy1
+					if not IsInLoopAttack then
+						IsInLoopAttack = true
+						
+						local CurrentNumber1 = math.huge
+						local SelectedEnemy1
 
-					for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
-						if v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
-							CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
-							SelectedEnemy1 = v
+						for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
+							if v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
+								CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
+								SelectedEnemy1 = v
+							end
 						end
+
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
+
+						repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
+						
+						IsInLoopAttack = false
 					end
-
-					game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
-
-					repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
 				end)
 			end
 
