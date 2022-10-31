@@ -1153,6 +1153,10 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 
 	local EnemiesList = {}
 
+	table.sort(EnemiesList, function(a, b)
+		return a > b
+	end)
+
 	for i,v in pairs(game:GetService("Workspace").EnemyCache:GetChildren()) do
 		if not table.find(EnemiesList, v.Name) then
 			table.insert(EnemiesList, v.Name)
@@ -1303,16 +1307,17 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					local SelectedEnemy1
 
 					for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
-						if v and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
+						if v.Adornee and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
 							CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
 							SelectedEnemy1 = v
 						end
 					end
 
-					game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
+					if SelectedEnemy1 then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
 
-					repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
-
+						repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health") or not AttackLooping
+					end
 					IsInLoopAttack = false
 				end)
 			end
@@ -1337,7 +1342,6 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			if TierLooping then
 				for i,v in pairs(Player.PlayerGui.Main.backpack.ScrollingFrame:GetChildren()) do
 					if v:IsA("ImageButton") then
-						print(v.Name)
 						pcall(function()
 							game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.TierPet:InvokeServer(v.Name)
 						end)
