@@ -1138,32 +1138,33 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local FoodLooping
 	local CoinLooping
 	local EggLooping
-	
-	local EnemiesLooping
-	
+
+	local AttackLooping
+
 	local EquipLooping
 	local FeedLooping
 	local OpenLooping
 	local TierLooping
-	
+
 	local SelectedEnemy
-	
+	local SelectedMode
+
 	local EnemiesList = {}
-	
+
 	for i,v in pairs(game:GetService("Workspace").EnemyCache:GetChildren()) do
 		if not table.find(EnemiesList, v.Name) then
 			table.insert(EnemiesList, v.Name)
 		end
 	end
-	
+
 	local Window = CreateWindow()
-	
+
 	local Main = Window:MakeTab({
 		Name = "Main",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Main:AddToggle({
 		Name = "🍓 Auto Collect Food",
 		Default = false,
@@ -1173,7 +1174,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			FoodLooping = Value
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "💰 Auto Collect Coins",
 		Default = false,
@@ -1183,7 +1184,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			CoinLooping = Value
 		end
 	})
-	
+
 	Main:AddToggle({
 		Name = "🥚 Auto Collect Eggs",
 		Default = false,
@@ -1194,12 +1195,48 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	})
 	
+	local Enemies = Window:MakeTab({
+		Name = "Enemies",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+	
+	Enemies:AddDropdown({
+		Name = "👾 Enemy",
+		Options = EnemiesList,
+		Save = true,
+		Flag = "SelectedEnemy",
+		Callback = function(Value)
+			SelectedEnemy = Value
+		end
+	})
+	
+	Enemies:AddDropdown({
+		Name = "🔢 Mode",
+		Options = {"Full", "Split"},
+		Save = true,
+		Flag = "SelectedMode",
+		Callback = function(Value)
+			SelectedMode = Value
+		end
+	})
+	
+	Enemies:AddToggle({
+		Name = "⚔ Auto Attack",
+		Default = false,
+		Save = true,
+		Flag = "AutoAttack",
+		Callback = function(Value)
+			AttackLooping = Value
+		end
+	})
+
 	local Pets = Window:MakeTab({
 		Name = "Pets",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Pets:AddToggle({
 		Name = "🥇 Auto Equip Best",
 		Default = false,
@@ -1209,7 +1246,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			EquipLooping = Value
 		end
 	})
-	
+
 	Pets:AddToggle({
 		Name = "😋 Auto Feed",
 		Default = false,
@@ -1219,7 +1256,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			FeedLooping = Value
 		end
 	})
-	
+
 	Pets:AddToggle({
 		Name = "📈 Auto Upgrade Tier",
 		Default = false,
@@ -1229,9 +1266,9 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			TierLooping = Value
 		end
 	})
-	
+
 	Credits(Window)
-	
+
 	task.spawn(function()
 		while true do
 			if FoodLooping then
@@ -1251,6 +1288,22 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					end
 				end
 			end
+			
+			if AttackLooping then
+				local CurrentNumber1 = math.huge
+				local SelectedEnemy1
+
+				for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
+					if v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
+						CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
+						SelectedEnemy1 = v
+					end
+				end
+
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
+
+				repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
+			end
 
 			if EquipLooping then
 				game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.EquipBest:InvokeServer()
@@ -1268,7 +1321,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 					end
 				end
 			end
-			
+
 			if TierLooping then
 				for i,v in pairs(Player.PlayerGui.Main.backpack.ScrollingFrame:GetChildren()) do
 					if v:IsA("ImageButton") then
