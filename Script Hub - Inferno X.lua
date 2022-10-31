@@ -1145,6 +1145,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local EquipLooping
 	local FeedLooping
 	local TierLooping
+	local OpenLooping
 
 	local SelectedEnemy
 	local SelectedQuest
@@ -1161,7 +1162,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			table.insert(EnemiesList, v.Name)
 		end
 	end
-	
+
 	for i,v in pairs(game:GetService("ReplicatedStorage").Assets.Models.Npcs:GetChildren()) do
 		table.insert(QuestsList, v.Name)
 	end
@@ -1371,12 +1372,34 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	end)
 	
+	Pets:AddToggle({
+		Name = "🐣 Auto Open Eggs",
+		Default = false,
+		Save = true,
+		Flag = "AutoOpenEggs",
+		Callback = function(Value)
+			OpenLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if OpenLooping then
+				for i,v in pairs(game:GetService("Workspace").Nests:FindFirstChild(Player.Name).Stands:GetChildren()) do
+					if v:GetAttribute("Id") then
+						game:GetService("ReplicatedStorage").Packages.Knit.Services.EggService.RF.OpenEgg:InvokeServer(v:GetAttribute("Id"))
+					end
+				end
+			end
+		end
+	end)
+
 	local Quest = Window:MakeTab({
 		Name = "Quest",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Quest:AddDropdown({
 		Name = "📜 Quest",
 		Options = QuestsList,
@@ -1396,12 +1419,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			QuestLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
-		while true do
-			game:GetService("ReplicatedStorage").Packages.Knit.Services.QuestService.RF.GiveQuest:InvokeServer(SelectedQuest)
-			task.wait(1)
-			game:GetService("ReplicatedStorage").Packages.Knit.Services.QuestService.RF.RedeemQuest:InvokeServer(SelectedQuest)
+		while task.wait() do
+			if QuestLooping and SelectedQuest then
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.QuestService.RF.GiveQuest:InvokeServer(SelectedQuest)
+				task.wait(1)
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.QuestService.RF.RedeemQuest:InvokeServer(SelectedQuest)
+			end
 		end
 	end)
 
