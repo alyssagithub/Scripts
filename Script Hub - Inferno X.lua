@@ -1280,19 +1280,21 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 			
 			if AttackLooping then
-				local CurrentNumber1 = math.huge
-				local SelectedEnemy1
+				task.spawn(function()
+					local CurrentNumber1 = math.huge
+					local SelectedEnemy1
 
-				for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
-					if v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
-						CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
-						SelectedEnemy1 = v
+					for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
+						if v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
+							CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
+							SelectedEnemy1 = v
+						end
 					end
-				end
 
-				game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
+					game:GetService("ReplicatedStorage").Packages.Knit.Services.PetService.RF.Attack:InvokeServer(SelectedEnemy1.Adornee.Spawn.Value)
 
-				repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
+					repeat task.wait() until not SelectedEnemy1:FindFirstChild("Health")
+				end)
 			end
 
 			if EquipLooping then
