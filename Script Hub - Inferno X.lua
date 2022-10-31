@@ -1140,16 +1140,12 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local EggLooping
 
 	local AttackLooping
-
+	
 	local EquipLooping
 	local FeedLooping
-	local OpenLooping
 	local TierLooping
 
-	local IsInLoopAttack
-
 	local SelectedEnemy
-	local SelectedMode
 
 	local EnemiesList = {}
 
@@ -1271,7 +1267,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			if AttackLooping and SelectedEnemy then
 				local CurrentNumber1 = math.huge
 				local SelectedEnemy1
-
+				
 				for i,v in pairs(Player.PlayerGui.Billboards:GetChildren()) do
 					if v.Adornee and v.Name == SelectedEnemy.." Health Tag" and v.Adornee:FindFirstChild("Spawn") and (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude < CurrentNumber1 then
 						CurrentNumber1 = (Player.Character.HumanoidRootPart.Position - v.Adornee:FindFirstChildOfClass("MeshPart").Position).Magnitude
