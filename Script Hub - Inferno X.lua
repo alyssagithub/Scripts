@@ -1409,8 +1409,10 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		while task.wait() do
 			if PlaceLooping then
 				for i,v in pairs(game:GetService("Workspace").Nests:FindFirstChild(Player.Name).Stands:GetChildren()) do
-					if v and not v:GetAttribute("Egg") then
-						game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.PlaceEgg:InvokeServer(v, {["isShiny"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").shinyIcon.Visible, ["Type"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").Name})
+					if not v:GetAttribute("Egg") then
+					    if Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton") then
+					        game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.PlaceEgg:InvokeServer(v, {["isShiny"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").shinyIcon.Visible, ["Type"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").Name})
+					    end
 					end
 				end
 			end
