@@ -1394,7 +1394,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-	
+
 	Pets:AddToggle({
 		Name = "🥚 Auto Place",
 		Default = false,
@@ -1404,15 +1404,16 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			PlaceLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if PlaceLooping then
 				for i,v in pairs(game:GetService("Workspace").Nests:FindFirstChild(Player.Name).Stands:GetChildren()) do
 					if not v:GetAttribute("Egg") and not v:FindFirstChild("Lock") then
-					    if Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton") then
-					        game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.PlaceEgg:InvokeServer(v, {["isShiny"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").shinyIcon.Visible, ["Type"] = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton").Name})
-					    end
+						local Button = Player.PlayerGui.Main.EggSelect.ScrollingFrame:FindFirstChildOfClass("ImageButton")
+						if Button then
+							game:GetService("ReplicatedStorage").Packages.Knit.Services.NestService.RF.PlaceEgg:InvokeServer(v, {["isShiny"] = Button.shinyIcon.Visible, ["Type"] = Button.Name:split("Shiny")[1]})
+						end
 					end
 				end
 			end
