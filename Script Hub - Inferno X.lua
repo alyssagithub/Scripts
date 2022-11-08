@@ -41,7 +41,44 @@ local function CreateWindow()
 
 		Credits:AddLabel("🔥 Inferno X was made by alyssa#2303 🔥")
 
-		Credits:AddLabel("➡ discord.gg/rtgv8Jp3fM ⬅")
+		Credits:AddButton({
+			Name = "➡ Join Discord ⬅",
+			Callback = function()
+				local HttpService = game:GetService("HttpService")
+				local http_req = (syn and syn.request) or (http and http.request) or http_request
+				if http_req then
+					http_req({
+						Url = 'http://127.0.0.1:6463/rpc?v=1',
+						Method = 'POST',
+						Headers = {
+							['Content-Type'] = 'application/json',
+							Origin = 'https://discord.com'
+						},
+						Body = HttpService:JSONEncode({
+							cmd = 'INVITE_BROWSER',
+							nonce = HttpService:GenerateGUID(false),
+							args = {code = 'rtgv8Jp3fM'}
+						})
+					})
+				elseif setclipboard then
+					setclipboard("https://discord.gg/rtgv8Jp3fM")
+					OrionLib:MakeNotification({
+						Name = "Inferno X",
+						Content = "Link Copied to clipboard",
+						Image = "rbxassetid://4483345998",
+						Time = 5
+					})
+				else
+					print("https://discord.gg/rtgv8Jp3fM")
+					OrionLib:MakeNotification({
+						Name = "Inferno X",
+						Content = "Press F9 or type /console to see the invite link",
+						Image = "rbxassetid://4483345998",
+						Time = 5
+					})
+				end
+			end    
+		})
 	end)
 	return Window
 end
