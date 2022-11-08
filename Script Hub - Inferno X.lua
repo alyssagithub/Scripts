@@ -1457,6 +1457,246 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	end)
 
 	Credits(Window)
+elseif game.PlaceId == 10404327868 then
+	local AttackLooping
+	local OrbLooping
+	local ChestLooping
+	
+	local CraftLooping
+	local BestLooping
+
+	local SelectedArea
+	local SelectedLevel
+
+	local BestDelay = 5
+
+	local Areas = {}
+	local Levels = {}
+
+	repeat task.wait() until Player.Character:FindFirstChild("IS_GAME_AXE")
+
+	local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+	local TreeService = Knit.GetService("TreeService")
+	local PetService = Knit.GetService("PetService")
+	local DamageRemote = TreeService.Damage._re
+	local DataController = Knit.GetController("DataController")
+
+	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
+		table.insert(Areas, v.Name)
+	end
+
+	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(Areas[1]):GetChildren()) do
+		table.insert(Levels, v.Name)
+	end
+
+	local Window = CreateWindow()
+
+	local Main = Window:MakeTab({
+		Name = "Main",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+
+	Main:AddDropdown({
+		Name = "🏝 Area",
+		Options = Areas,
+		Save = true,
+		Flag = "SelectedArea",
+		Callback = function(Value)
+			SelectedArea = Value
+		end
+	})
+
+	Main:AddDropdown({
+		Name = "🔢 Level",
+		Options = Levels,
+		Save = true,
+		Flag = "SelectedLevel",
+		Callback = function(Value)
+			SelectedLevel = Value
+		end
+	})
+
+	Main:AddToggle({
+		Name = "🌲 Auto Attack Tree",
+		Default = false,
+		Save = true,
+		Flag = "AutoAttack",
+		Callback = function(Value)
+			AttackLooping = Value
+		end
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if AttackLooping and SelectedArea and SelectedLevel then
+				local CurrentTree = game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:GetChildren()[1]
+				local SectionLooping = true
+
+				while task.wait() and SectionLooping and AttackLooping do
+					DamageRemote:FireServer(CurrentTree.Name)
+					task.wait()
+					pcall(function()
+						if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:FindFirstChild(CurrentTree.Name) then
+							SectionLooping = false
+							print("gone")
+						end
+					end)
+				end
+			end
+		end
+	end)
+
+	Main:AddToggle({
+		Name = "🔮 Auto Collect Orbs",
+		Default = false,
+		Save = true,
+		Flag = "AutoCollect",
+		Callback = function(Value)
+			OrbLooping = Value
+		end
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if OrbLooping then
+				for i,v in pairs(game:GetService("Workspace").Scripts.Orbs.Storage:GetChildren()) do
+					if v then
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(v.Position)
+						task.wait()
+					end
+				end
+			end
+		end
+	end)
+	
+	Main:AddToggle({
+		Name = "🧰 Auto Collect Chests",
+		Default = false,
+		Save = true,
+		Flag = "AutoChest",
+		Callback = function(Value)
+			ChestLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if ChestLooping and Player:IsInGroup(5522949) then
+				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Spawn.Spawn.Touch, 0)
+				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Spawn.Spawn.Touch, 1)
+				
+				if game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest:FindFirstChild("Touch") then
+					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest.Touch, 0)
+					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest.Touch, 1)
+				end
+				
+				if game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest:FindFirstChild("Touch") then
+					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest.Touch, 0)
+					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest.Touch, 1)
+				end
+			end
+		end
+	end)
+
+	local Pets = Window:MakeTab({
+		Name = "Pets",
+		Icon = "rbxassetid://4483345998",
+		PremiumOnly = false
+	})
+
+	Pets:AddToggle({
+		Name = "⚒ Auto Craft Pets",
+		Default = false,
+		Save = true,
+		Flag = "AutoCraft",
+		Callback = function(Value)
+			CraftLooping = Value
+		end
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if CraftLooping then
+				PetService:CraftAll()
+			end
+		end
+	end)
+
+	Pets:AddToggle({
+		Name = "🥇 Auto Equip Best",
+		Default = false,
+		Save = true,
+		Flag = "AutoEquipBest",
+		Callback = function(Value)
+			BestLooping = Value
+		end
+	})
+
+	task.spawn(function()
+		while true do
+			if BestLooping then
+				local CurrentNumber1 = 0
+				local CurrentNumber2 = 0
+				local CurrentNumber3 = 0
+				local CurrentPet1
+				local CurrentPet2
+				local CurrentPet3
+
+				local PetData = DataController.data.Pets
+
+				for i,v in pairs(PetData) do
+					if v.multiplier > CurrentNumber1 then
+						CurrentNumber1 = v.multiplier
+						CurrentPet1 = i
+					end
+				end
+
+				for i,v in pairs(PetData) do
+					if v.multiplier > CurrentNumber2 and i ~= CurrentPet1 then
+						CurrentNumber2 = v.multiplier
+						CurrentPet2 = i
+					end
+				end
+
+				for i,v in pairs(PetData) do
+					if v.multiplier > CurrentNumber3 and i ~= CurrentPet1 and  i ~= CurrentPet2 then
+						CurrentNumber3 = v.multiplier
+						CurrentPet3 = i
+					end
+				end
+
+				for i,v in pairs(PetData) do
+					if v.equipped == true then
+						PetService:Unequip(i)
+					end
+				end
+
+				pcall(function()
+					PetService:Equip(CurrentPet1)
+					PetService:Equip(CurrentPet2)
+					PetService:Equip(CurrentPet3)
+				end)
+			end
+			task.wait(BestDelay)
+		end
+	end)
+
+	Pets:AddSlider({
+		Name = "🐌 Auto Equip Best Delay",
+		Min = 0,
+		Max = 60,
+		Default = 5,
+		Color = Color3.fromRGB(255,255,255),
+		Increment = 1,
+		Save = true,
+		Flag = "Delay",
+		Callback = function(Value)
+			BestDelay = Value
+		end    
+	})
+
+	Credits(Window)
 end
 
 OrionLib:Init()
