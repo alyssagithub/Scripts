@@ -1445,7 +1445,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-elseif game.PlaceId == 10404327868 then
+elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local AttackLooping
 	local OrbLooping
 	local ChestLooping
