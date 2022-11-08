@@ -1462,16 +1462,22 @@ elseif game.PlaceId == 10404327868 then
 	local OrbLooping
 	local ChestLooping
 	
+	local HatchLooping
 	local CraftLooping
 	local BestLooping
+	
+	local TripleHatch
 
 	local SelectedArea
 	local SelectedLevel
+	
+	local SelectedEgg
 
 	local BestDelay = 5
 
 	local Areas = {}
 	local Levels = {}
+	local Eggs = {}
 
 	repeat task.wait() until Player.Character:FindFirstChild("IS_GAME_AXE")
 
@@ -1480,6 +1486,8 @@ elseif game.PlaceId == 10404327868 then
 	local PetService = Knit.GetService("PetService")
 	local DamageRemote = TreeService.Damage._re
 	local DataController = Knit.GetController("DataController")
+	local EggService = Knit.GetService("EggService")
+	local OrbService = Knit.GetService("OrbService")
 
 	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
 		table.insert(Areas, v.Name)
@@ -1487,6 +1495,12 @@ elseif game.PlaceId == 10404327868 then
 
 	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(Areas[1]):GetChildren()) do
 		table.insert(Levels, v.Name)
+	end
+	
+	for i,v in pairs(game:GetService("Workspace").Scripts.Eggs:GetChildren()) do
+		if not string.find(v.Name:lower(), "robux") then
+			table.insert(Eggs, v.Name)
+		end
 	end
 
 	local Window = CreateWindow()
@@ -1530,18 +1544,19 @@ elseif game.PlaceId == 10404327868 then
 	task.spawn(function()
 		while task.wait() do
 			if AttackLooping and SelectedArea and SelectedLevel then
-				local CurrentTree = game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:GetChildren()[1]
-				local SectionLooping = true
+				for i,v in pairs( game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:GetChildren()) do
+					local SectionLooping = true
 
-				while task.wait() and SectionLooping and AttackLooping do
-					pcall(function()
-						if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:FindFirstChild(CurrentTree.Name) then
-							SectionLooping = false
-							print("gone")
-						else
-						    DamageRemote:FireServer(CurrentTree.Name)
-						end
-					end)
+					while task.wait() and SectionLooping and AttackLooping do
+						pcall(function()
+							if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:FindFirstChild(v.Name) then
+								SectionLooping = false
+								print("gone")
+							else
+								DamageRemote:FireServer(v.Name)
+							end
+						end)
+					end
 				end
 			end
 		end
@@ -1561,15 +1576,13 @@ elseif game.PlaceId == 10404327868 then
 		while task.wait() do
 			if OrbLooping then
 				for i,v in pairs(game:GetService("Workspace").Scripts.Orbs.Storage:GetChildren()) do
-					if v then
-						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(v.Position)
-						task.wait()
-					end
+					OrbService.CollectOrbs:Fire({v.Name})
+					v:Destroy()
 				end
 			end
 		end
 	end)
-	
+
 	Main:AddToggle({
 		Name = "🧰 Auto Collect Chests",
 		Default = false,
@@ -1579,22 +1592,28 @@ elseif game.PlaceId == 10404327868 then
 			ChestLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if ChestLooping and Player:IsInGroup(5522949) then
 				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Spawn.Spawn.Touch, 0)
 				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Spawn.Spawn.Touch, 1)
 				
+				task.wait(5)
+
 				if game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest:FindFirstChild("Touch") then
 					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest.Touch, 0)
 					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest.Touch, 1)
 				end
 				
+				task.wait(5)
+
 				if game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest:FindFirstChild("Touch") then
 					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest.Touch, 0)
 					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest.Touch, 1)
 				end
+				
+				task.wait(5)
 			end
 		end
 	end)
@@ -1603,6 +1622,50 @@ elseif game.PlaceId == 10404327868 then
 		Name = "Pets",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
+	})
+	
+	Pets:AddDropdown({
+		Name = "🥚 Egg",
+		Options = Eggs,
+		Save = true,
+		Flag = "SelectedEgg",
+		Callback = function(Value)
+			SelectedEgg = Value
+		end
+	})
+	
+	Pets:AddToggle({
+		Name = "🐣 Auto Hatch Egg",
+		Default = false,
+		Save = true,
+		Flag = "AutoHatch",
+		Callback = function(Value)
+			HatchLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if HatchLooping and SelectedEgg then
+				pcall(function()
+					EggService:Unbox(SelectedEgg, TripleHatch)
+				end)
+			end
+		end
+	end)
+	
+	Pets:AddToggle({
+		Name = "🐥 Triple Hatch",
+		Default = false,
+		Save = true,
+		Flag = "TripleHatch",
+		Callback = function(Value)
+			if Value then
+				TripleHatch = "triple"
+			else
+				TripleHatch = "single"
+			end
+		end
 	})
 
 	Pets:AddToggle({
