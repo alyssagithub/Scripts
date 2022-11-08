@@ -13,18 +13,6 @@ end)
 
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
-local function Credits(Window)
-	local Credits = Window:MakeTab({
-		Name = "Credits",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Credits:AddLabel("🔥 Inferno X was made by alyssa#2303 🔥")
-
-	Credits:AddLabel("➡ discord.gg/rtgv8Jp3fM ⬅")
-end
-
 local function Click(v)
 	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
 	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,false,v,1)
@@ -43,7 +31,19 @@ local function comma(amount)
 end
 
 local function CreateWindow()
-	return OrionLib:MakeWindow({Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+	local Window = OrionLib:MakeWindow({Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
+	task.defer(function()
+		local Credits = Window:MakeTab({
+			Name = "Credits",
+			Icon = "rbxassetid://4483345998",
+			PremiumOnly = false
+		})
+
+		Credits:AddLabel("🔥 Inferno X was made by alyssa#2303 🔥")
+
+		Credits:AddLabel("➡ discord.gg/rtgv8Jp3fM ⬅")
+	end)
+	return Window
 end
 
 if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
@@ -557,8 +557,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	})
-
-	Credits(Window)
 elseif game.PlaceId == 10779604733 then -- VBet
 	local AutoClickLooping
 	local AutoCaseLooping
@@ -797,8 +795,6 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		AutoClickLooping = OriginalAutoClickLooping
 		MouseButton2Looping = false
 	end)
-
-	Credits(Window)
 elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	local Plot = workspace.Plots:FindFirstChild(Player.Name)
 
@@ -914,8 +910,6 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 			end
 		end
 	})
-
-	Credits(Window)
 elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	local CollectLooping
 	local RebirthLooping
@@ -1037,8 +1031,6 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	})
-
-	Credits(Window)
 elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	local TapLooping
 	local MergeLooping
@@ -1132,8 +1124,6 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	})
-
-	Credits(Window)
 elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	local FoodLooping
 	local CoinLooping
@@ -1455,22 +1445,20 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Credits(Window)
 elseif game.PlaceId == 10404327868 then
 	local AttackLooping
 	local OrbLooping
 	local ChestLooping
-	
+
 	local HatchLooping
 	local CraftLooping
 	local BestLooping
-	
+
 	local TripleHatch
 
 	local SelectedArea
 	local SelectedLevel
-	
+
 	local SelectedEgg
 
 	local BestDelay = 5
@@ -1496,7 +1484,7 @@ elseif game.PlaceId == 10404327868 then
 	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(Areas[1]):GetChildren()) do
 		table.insert(Levels, v.Name)
 	end
-	
+
 	for i,v in pairs(game:GetService("Workspace").Scripts.Eggs:GetChildren()) do
 		if not string.find(v.Name:lower(), "robux") then
 			table.insert(Eggs, v.Name)
@@ -1583,47 +1571,12 @@ elseif game.PlaceId == 10404327868 then
 		end
 	end)
 
-	Main:AddToggle({
-		Name = "🧰 Auto Collect Chests",
-		Default = false,
-		Save = true,
-		Flag = "AutoChest",
-		Callback = function(Value)
-			ChestLooping = Value
-		end
-	})
-
-	task.spawn(function()
-		while task.wait() do
-			if ChestLooping and Player:IsInGroup(5522949) then
-				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Spawn.Spawn.Touch, 0)
-				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Spawn.Spawn.Touch, 1)
-				
-				task.wait(5)
-
-				if game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest:FindFirstChild("Touch") then
-					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest.Touch, 0)
-					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Atlantis.AtlantisChest.Touch, 1)
-				end
-				
-				task.wait(5)
-
-				if game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest:FindFirstChild("Touch") then
-					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest.Touch, 0)
-					firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Scripts.Areas.Pixel.PixelChest.Touch, 1)
-				end
-				
-				task.wait(5)
-			end
-		end
-	end)
-
 	local Pets = Window:MakeTab({
 		Name = "Pets",
 		Icon = "rbxassetid://4483345998",
 		PremiumOnly = false
 	})
-	
+
 	Pets:AddDropdown({
 		Name = "🥚 Egg",
 		Options = Eggs,
@@ -1633,7 +1586,7 @@ elseif game.PlaceId == 10404327868 then
 			SelectedEgg = Value
 		end
 	})
-	
+
 	Pets:AddToggle({
 		Name = "🐣 Auto Hatch Egg",
 		Default = false,
@@ -1643,7 +1596,7 @@ elseif game.PlaceId == 10404327868 then
 			HatchLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if HatchLooping and SelectedEgg then
@@ -1653,7 +1606,7 @@ elseif game.PlaceId == 10404327868 then
 			end
 		end
 	end)
-	
+
 	Pets:AddToggle({
 		Name = "🐥 Triple Hatch",
 		Default = false,
@@ -1758,8 +1711,6 @@ elseif game.PlaceId == 10404327868 then
 			BestDelay = Value
 		end    
 	})
-
-	Credits(Window)
 end
 
 OrionLib:Init()
