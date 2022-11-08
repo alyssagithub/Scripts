@@ -1501,7 +1501,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local BestDelay = 5
 
 	local Areas = {}
-	local Levels = {}
+	local Levels = {"All"}
 	local Eggs = {}
 
 	repeat task.wait() until Player.Character:FindFirstChild("IS_GAME_AXE")
@@ -1569,18 +1569,22 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	task.spawn(function()
 		while task.wait() do
 			if AttackLooping and SelectedArea and SelectedLevel then
-				for i,v in pairs( game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:GetChildren()) do
-					local SectionLooping = true
+				for i = 2, #Levels, 1 do
+					if Levels[i] == SelectedLevel or SelectedLevel == "All" and game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]) then
+						for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]).Storage:GetChildren()) do
+							local SectionLooping = true
 
-					while task.wait() and SectionLooping and AttackLooping do
-						pcall(function()
-							if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:FindFirstChild(v.Name) then
-								SectionLooping = false
-								print("gone")
-							else
-								DamageRemote:FireServer(v.Name)
+							while task.wait() and SectionLooping and AttackLooping do
+								pcall(function()
+									if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
+										SectionLooping = false
+										print("Tree Destroyed")
+									else
+										DamageRemote:FireServer(v.Name)
+									end
+								end)
 							end
-						end)
+						end
 					end
 				end
 			end
