@@ -1534,12 +1534,12 @@ elseif game.PlaceId == 10404327868 then
 				local SectionLooping = true
 
 				while task.wait() and SectionLooping and AttackLooping do
-					DamageRemote:FireServer(CurrentTree.Name)
-					task.wait()
 					pcall(function()
 						if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(SelectedLevel).Storage:FindFirstChild(CurrentTree.Name) then
 							SectionLooping = false
 							print("gone")
+						else
+						    DamageRemote:FireServer(CurrentTree.Name)
 						end
 					end)
 				end
@@ -1634,7 +1634,7 @@ elseif game.PlaceId == 10404327868 then
 	})
 
 	task.spawn(function()
-		while true do
+		while task.wait() do
 			if BestLooping then
 				local CurrentNumber1 = 0
 				local CurrentNumber2 = 0
@@ -1677,8 +1677,8 @@ elseif game.PlaceId == 10404327868 then
 					PetService:Equip(CurrentPet2)
 					PetService:Equip(CurrentPet3)
 				end)
+				task.wait(BestDelay)
 			end
-			task.wait(BestDelay)
 		end
 	end)
 
