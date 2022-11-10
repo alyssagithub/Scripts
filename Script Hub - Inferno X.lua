@@ -1563,6 +1563,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 	end)
 elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local AttackLooping
+	local BossLooping
 	local OrbLooping
 	local ChestLooping
 
@@ -1594,6 +1595,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local EggService = Knit.GetService("EggService")
 	local OrbService = Knit.GetService("OrbService")
 	local RewardService = Knit.GetService("RewardService")
+	local BossService = Knit.GetService("BossService")
 
 	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
 		table.insert(Areas, v.Name)
@@ -1673,6 +1675,30 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 									end
 								end)
 							end
+						end
+					end
+				end
+			end
+		end
+	end)
+	
+	Main:AddToggle({
+		Name = "🐍 Auto Attack Bosses",
+		Default = false,
+		Save = true,
+		Flag = "AutoBoss",
+		Callback = function(Value)
+			BossLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if BossLooping then
+				for i,v in pairs(game:GetService("Workspace").Scripts.Areas:GetDescendants()) do
+					if v:IsA("Folder") and v.Name == "Boss" then
+						if #v.Model:GetChildren() > 0 then
+							BossService.Damage:Fire(v.ID.Value)
 						end
 					end
 				end
