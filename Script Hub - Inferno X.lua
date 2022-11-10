@@ -1,4 +1,6 @@
---if syn then else loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))() end
+if not syn then
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))()
+end
 
 if not game:IsLoaded() then
 	game.Loaded:Wait()
@@ -84,7 +86,9 @@ local function CreateWindow()
 			Save = true,
 			Flag = "Universal-WalkSpeed",
 			Callback = function(Value)
-				if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				if syn then
+					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				end
 				Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
 				Player.Character.Humanoid.WalkSpeed = Value
 			end    
@@ -100,7 +104,9 @@ local function CreateWindow()
 			Save = true,
 			Flag = "Universal-JumpPower",
 			Callback = function(Value)
-				if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				if syn then
+					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				end
 				Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
 				Player.Character.Humanoid.JumpPower = Value
 			end    
@@ -1576,6 +1582,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local Areas = {}
 	local Levels = {"All"}
 	local Eggs = {}
+	local Chests = {}
 
 	repeat task.wait() until Player.Character:FindFirstChild("IS_GAME_AXE")
 
@@ -1586,6 +1593,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local DataController = Knit.GetController("DataController")
 	local EggService = Knit.GetService("EggService")
 	local OrbService = Knit.GetService("OrbService")
+	local RewardService = Knit.GetService("RewardService")
 
 	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
 		table.insert(Areas, v.Name)
@@ -1598,6 +1606,14 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	for i,v in pairs(game:GetService("Workspace").Scripts.Eggs:GetChildren()) do
 		if not string.find(v.Name:lower(), "robux") then
 			table.insert(Eggs, v.Name)
+		end
+	end
+	
+	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Chests)) do
+		if type(v) == "table" then
+			for e,r in pairs(v) do
+				table.insert(Chests, e)
+			end
 		end
 	end
 
@@ -1680,6 +1696,26 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 				for i,v in pairs(game:GetService("Workspace").Scripts.Orbs.Storage:GetChildren()) do
 					OrbService.CollectOrbs:Fire({v.Name})
 					v:Destroy()
+				end
+			end
+		end
+	end)
+	
+	Main:AddToggle({
+		Name = "💼 Auto Collect Chests",
+		Default = false,
+		Save = true,
+		Flag = "AutoChest",
+		Callback = function(Value)
+			ChestLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if ChestLooping then
+				for i,v in pairs(Chests) do
+					RewardService:ClaimChest(v)
 				end
 			end
 		end
