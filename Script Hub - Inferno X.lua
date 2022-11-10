@@ -1,7 +1,3 @@
-if KRNL_LOADED then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/SynapseToKrnl.lua"))()
-end
-
 if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
