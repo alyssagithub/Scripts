@@ -1,7 +1,4 @@
-if syn then
-else
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))()
-end
+--if syn then else loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))() end
 
 if not game:IsLoaded() then
 	game.Loaded:Wait()
