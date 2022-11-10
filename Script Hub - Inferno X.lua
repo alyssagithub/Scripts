@@ -1,4 +1,4 @@
-if not syn then
+if KRNL_LOADED then
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/zzerexx/scripts/main/SynapseToKrnl.lua"))()
 end
 
