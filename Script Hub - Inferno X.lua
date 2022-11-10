@@ -1,4 +1,7 @@
-if syn then else loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))() end
+if syn then
+else
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))()
+end
 
 if not game:IsLoaded() then
 	game.Loaded:Wait()
@@ -34,42 +37,46 @@ local function CreateWindow()
 			Icon = "rbxassetid://4483345998",
 			PremiumOnly = false
 		})
-		
+
 		Universal:AddToggle({
 			Name = "🚫 Anti-AFK 🚫",
 			Default = false,
 			Save = true,
 			Flag = "Universal-AntiAFK",
 			Callback = function(Value)
-				local VirtualUser = game:GetService("VirtualUser")
-				Player.Idled:Connect(function()
-					VirtualUser:CaptureController()
-					VirtualUser:ClickButton2(Vector2.new())
-				end)
+				if Value then
+					local VirtualUser = game:GetService("VirtualUser")
+					Player.Idled:Connect(function()
+						VirtualUser:CaptureController()
+						VirtualUser:ClickButton2(Vector2.new())
+					end)
+				end
 			end
 		})
-		
+
 		Universal:AddToggle({
 			Name = "🔁 Auto Rejoin When Disconnected 🔁",
 			Default = false,
 			Save = true,
 			Flag = "Universal-AutoRejoin",
 			Callback = function(Value)
-				repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
+				if Value then
+					repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
 
-				local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
+					local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
 
-				po.ChildAdded:connect(function(a)
-					if a.Name == 'ErrorPrompt' then
-						while true do
-							ts:Teleport(game.PlaceId)
-							task.wait(2)
+					po.ChildAdded:connect(function(a)
+						if a.Name == 'ErrorPrompt' then
+							while true do
+								ts:Teleport(game.PlaceId)
+								task.wait(2)
+							end
 						end
-					end
-				end)
+					end)
+				end
 			end
 		})
-		
+
 		Universal:AddSlider({
 			Name = "💨 WalkSpeed 💨",
 			Min = 1,
@@ -85,7 +92,7 @@ local function CreateWindow()
 				Player.Character.Humanoid.WalkSpeed = Value
 			end    
 		})
-		
+
 		Universal:AddSlider({
 			Name = "⬆ JumpPower ⬆",
 			Min = 1,
@@ -101,7 +108,7 @@ local function CreateWindow()
 				Player.Character.Humanoid.JumpPower = Value
 			end    
 		})
-		
+
 		local Credits = Window:MakeTab({
 			Name = "Credits",
 			Icon = "rbxassetid://4483345998",
