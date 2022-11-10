@@ -1,15 +1,11 @@
+if syn then else loadstring(game:HttpGet('https://raw.githubusercontent.com/2dgeneralspam1/lua-releases/main/iris-compat.lua'))() end
+
 if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 
-local VirtualUser = game:GetService("VirtualUser")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
-
-Player.Idled:Connect(function()
-	VirtualUser:CaptureController()
-	VirtualUser:ClickButton2(Vector2.new())
-end)
 
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
@@ -33,6 +29,79 @@ end
 local function CreateWindow()
 	local Window = OrionLib:MakeWindow({Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
 	task.defer(function()
+		local Universal = Window:MakeTab({
+			Name = "Universal",
+			Icon = "rbxassetid://4483345998",
+			PremiumOnly = false
+		})
+		
+		Universal:AddToggle({
+			Name = "🚫 Anti-AFK 🚫",
+			Default = false,
+			Save = true,
+			Flag = "Universal-AntiAFK",
+			Callback = function(Value)
+				local VirtualUser = game:GetService("VirtualUser")
+				Player.Idled:Connect(function()
+					VirtualUser:CaptureController()
+					VirtualUser:ClickButton2(Vector2.new())
+				end)
+			end
+		})
+		
+		Universal:AddToggle({
+			Name = "🔁 Auto Rejoin When Disconnected 🔁",
+			Default = false,
+			Save = true,
+			Flag = "Universal-AutoRejoin",
+			Callback = function(Value)
+				repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
+
+				local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
+
+				po.ChildAdded:connect(function(a)
+					if a.Name == 'ErrorPrompt' then
+						while true do
+							ts:Teleport(game.PlaceId)
+							task.wait(2)
+						end
+					end
+				end)
+			end
+		})
+		
+		Universal:AddSlider({
+			Name = "💨 WalkSpeed 💨",
+			Min = 1,
+			Max = 500,
+			Default = Player.Character.Humanoid.WalkSpeed,
+			Color = Color3.fromRGB(255,255,255),
+			Increment = 1,
+			Save = true,
+			Flag = "Universal-WalkSpeed",
+			Callback = function(Value)
+				if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
+				Player.Character.Humanoid.WalkSpeed = Value
+			end    
+		})
+		
+		Universal:AddSlider({
+			Name = "⬆ JumpPower ⬆",
+			Min = 1,
+			Max = 500,
+			Default = Player.Character.Humanoid.JumpPower,
+			Color = Color3.fromRGB(255,255,255),
+			Increment = 1,
+			Save = true,
+			Flag = "Universal-JumpPower",
+			Callback = function(Value)
+				if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
+				Player.Character.Humanoid.JumpPower = Value
+			end    
+		})
+		
 		local Credits = Window:MakeTab({
 			Name = "Credits",
 			Icon = "rbxassetid://4483345998",
