@@ -1617,30 +1617,10 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			end
 		end
 	end
-	
-	local CurrentAxe
-	
-	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
-		if type(v) == "table" then
-			for e,r in pairs(v) do
-				for t,y in pairs(r) do
-					if AxeService:Equip(1, y.index) == "success" then
-						CurrentAxe = y.index
-					end
-				end
-			end
-		end
-	end
-	
-	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
-		if type(v) == "table" then
-			for e,r in pairs(v) do
-				for t,y in pairs(r) do
-					if y.index > CurrentAxe then
-						table.insert(BuyableAxes, y.index)
-					end
-				end
-			end
+
+	for i,v in pairs(DataController.data.Axes) do
+		if v > DataController.data.EquippedAxe then
+			table.insert(BuyableAxes, v)
 		end
 	end
 
@@ -1771,7 +1751,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			end
 		end
 	end)
-	
+
 	Main:AddToggle({
 		Name = "🪓 Auto Buy Axes",
 		Default = false,
@@ -1781,7 +1761,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			AxeLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if AxeLooping then
