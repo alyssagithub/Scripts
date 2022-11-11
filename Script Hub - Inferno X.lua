@@ -1935,22 +1935,3 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 end
 
 OrionLib:Init()
-
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
-local AxeService = Knit.GetService("AxeService")
-
-local CurrentAxe
-
-for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
-	if type(v) == "table" then
-		for e,r in pairs(v) do
-			for t,y in pairs(r) do
-				if AxeService:Equip(1, y.index) == "success" then
-					CurrentAxe = y.index
-				end
-			end
-		end
-	end
-end
-
-print(CurrentAxe)
