@@ -1562,6 +1562,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local BossLooping
 	local OrbLooping
 	local ChestLooping
+	local AxeLooping
 
 	local HatchLooping
 	local CraftLooping
@@ -1580,6 +1581,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local Levels = {"All"}
 	local Eggs = {}
 	local Chests = {}
+	local BuyableAxes = {}
 
 	repeat task.wait() until Player.Character:FindFirstChild("IS_GAME_AXE")
 
@@ -1592,6 +1594,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local OrbService = Knit.GetService("OrbService")
 	local RewardService = Knit.GetService("RewardService")
 	local BossService = Knit.GetService("BossService")
+	local AxeService = Knit.GetService("AxeService")
 
 	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
 		table.insert(Areas, v.Name)
@@ -1606,11 +1609,37 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			table.insert(Eggs, v.Name)
 		end
 	end
-	
+
 	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Chests)) do
 		if type(v) == "table" then
 			for e,r in pairs(v) do
 				table.insert(Chests, e)
+			end
+		end
+	end
+	
+	local CurrentAxe
+	
+	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
+		if type(v) == "table" then
+			for e,r in pairs(v) do
+				for t,y in pairs(r) do
+					if AxeService:Equip(1, y.index) == "success" then
+						CurrentAxe = y.index
+					end
+				end
+			end
+		end
+	end
+	
+	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
+		if type(v) == "table" then
+			for e,r in pairs(v) do
+				for t,y in pairs(r) do
+					if y.index > CurrentAxe then
+						table.insert(BuyableAxes, y.index)
+					end
+				end
 			end
 		end
 	end
@@ -1677,7 +1706,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			end
 		end
 	end)
-	
+
 	Main:AddToggle({
 		Name = "🐍 Auto Attack Bosses",
 		Default = false,
@@ -1687,7 +1716,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			BossLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if BossLooping then
@@ -1722,7 +1751,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			end
 		end
 	end)
-	
+
 	Main:AddToggle({
 		Name = "💼 Auto Collect Chests",
 		Default = false,
@@ -1732,12 +1761,32 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			ChestLooping = Value
 		end
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if ChestLooping then
 				for i,v in pairs(Chests) do
 					RewardService:ClaimChest(v)
+				end
+			end
+		end
+	end)
+	
+	Main:AddToggle({
+		Name = "🪓 Auto Buy Axes",
+		Default = false,
+		Save = true,
+		Flag = "AutoAxe",
+		Callback = function(Value)
+			AxeLooping = Value
+		end
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if AxeLooping then
+				for i,v in pairs(BuyableAxes) do
+					AxeService:Buy(1, v)
 				end
 			end
 		end
@@ -1886,3 +1935,22 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 end
 
 OrionLib:Init()
+
+local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local AxeService = Knit.GetService("AxeService")
+
+local CurrentAxe
+
+for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
+	if type(v) == "table" then
+		for e,r in pairs(v) do
+			for t,y in pairs(r) do
+				if AxeService:Equip(1, y.index) == "success" then
+					CurrentAxe = y.index
+				end
+			end
+		end
+	end
+end
+
+print(CurrentAxe)
