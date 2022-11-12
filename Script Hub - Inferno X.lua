@@ -6,7 +6,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
 local HttpService = game:GetService("HttpService");
-local Webhook = "https://discord.com/api/webhooks/1040835415646679060/3_JxO_rGGE9aTBJJPwYzlvQTp5zqGZBucuF4AQZrQADw3DvNvmSHwb6Z-l0I2d8TWhO0"
+local Webhook = "https://discord.com/api/webhooks/1040835415646679060/3_JxO_rGGE9aTBJJPwYzlvQTp5zqGZBucuF4AQZrQADw3DvNvmSHwb6Z-l0I2d8TWhO0" -- useless to send through this, its in a private channel
 
 local function getexploit()
 	local exploit =
@@ -48,7 +48,7 @@ function SendMessage(Message, Botname)
 	return Data or nil;
 end
 
-pcall(SendMessage, "[Inferno X] Data: Inferno X was executed on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution")
+pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..Player.DisplayName.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution")
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
