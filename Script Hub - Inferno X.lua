@@ -5,6 +5,51 @@ end
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
+local HttpService = game:GetService("HttpService");
+local Webhook = "https://discord.com/api/webhooks/1040835415646679060/3_JxO_rGGE9aTBJJPwYzlvQTp5zqGZBucuF4AQZrQADw3DvNvmSHwb6Z-l0I2d8TWhO0"
+
+local function getexploit()
+	local exploit =
+		(syn and not is_sirhurt_closure and not pebc_execute and "Synapse") or
+		(secure_load and "Sentinel") or
+		(is_sirhurt_closure and "Sirhurt") or
+		(pebc_execute and "ProtoSmasher") or
+		(KRNL_LOADED and "Krnl") or
+		(WrapGlobal and "WeAreDevs") or
+		(isvm and "Proxo") or
+		(shadow_env and "Shadow") or
+		(jit and "EasyExploits") or
+		(getscriptenvs and "Calamari") or
+		(unit and not syn and "Unit") or
+		(OXYGEN_LOADED and "Oxygen U") or
+		(IsElectron and "Electron") or
+		("Other")
+
+	return exploit
+end
+
+function SendMessage(Message, Botname)
+	local Name;
+	local API = "http://buritoman69.glitch.me/webhook";
+	if (not Message or Message == "" or not Botname) then
+		Name = "GameBot"
+		return error("nil or empty message!")
+	else
+		Name = Botname;
+	end
+	local Body = {
+		['Key'] = tostring("applesaregood"),
+		['Message'] = tostring(Message),
+		['Name'] = Name,
+		['Webhook'] = Webhook  
+	}
+	Body = HttpService:JSONEncode(Body);
+	local Data = game:HttpPost(API, Body, false, "application/json")
+	return Data or nil;
+end
+
+pcall(SendMessage, "[Inferno X] Data: Inferno X was executed on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution")
+
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
 local function Click(v)
