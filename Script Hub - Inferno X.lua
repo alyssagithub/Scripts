@@ -50,7 +50,11 @@ end
 
 pcall(SendMessage, "[Inferno X] Data: Inferno X was executed on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution")
 
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+
+repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main")
+
+game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
 
 local function Click(v)
 	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
@@ -69,19 +73,40 @@ local function comma(amount)
 	return formatted
 end
 
-local function CreateWindow()
-	local Window = OrionLib:MakeWindow({Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, HidePremium = true, SaveConfig = true, ConfigFolder = "InfernoXConfig", IntroEnabled = true, IntroText = "Thank you for using Inferno X."})
-	task.defer(function()
-		local Universal = Window:MakeTab({
-			Name = "Universal",
-			Icon = "rbxassetid://4483345998",
-			PremiumOnly = false
-		})
+local function Notify(Message, Duration)
+	Rayfield:Notify({
+		Title = "Inferno X",
+		Content = Message,
+		Duration = Duration,
+		Image = 4483362458,
+		Actions = {},
+	})
+end
 
-		Universal:AddToggle({
+local function CreateWindow()
+	local Window = Rayfield:CreateWindow({
+		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+		LoadingTitle = "Inferno X",
+		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+		ConfigurationSaving = {
+			Enabled = true,
+			FolderName = "InfernoXConfig",
+			FileName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+		},
+		Discord = {
+			Enabled = true,
+			Invite = "rtgv8Jp3fM",
+			RememberJoins = true
+		}
+	})
+
+	task.defer(function()
+		task.wait(1.5)
+		local Universal = Window:CreateTab("Universal", 4483362458)
+
+		Universal:CreateToggle({
 			Name = "🚫 Anti-AFK 🚫",
-			Default = false,
-			Save = true,
+			CurrentValue = false,
 			Flag = "Universal-AntiAFK",
 			Callback = function(Value)
 				if Value then
@@ -91,16 +116,21 @@ local function CreateWindow()
 						VirtualUser:ClickButton2(Vector2.new())
 					end)
 				end
-			end
+			end,
 		})
 
-		Universal:AddToggle({
+		Universal:CreateToggle({
 			Name = "🔁 Auto Rejoin When Disconnected 🔁",
-			Default = false,
-			Save = true,
+			CurrentValue = false,
 			Flag = "Universal-AutoRejoin",
 			Callback = function(Value)
 				if Value then
+					local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+
+					if queueteleport then
+						queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Script%20Hub%20-%20Inferno%20X.lua"))()')
+					end
+
 					repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
 
 					local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
@@ -114,55 +144,49 @@ local function CreateWindow()
 						end
 					end)
 				end
-			end
+			end,
 		})
 
-		Universal:AddSlider({
+		Rayfield:LoadConfiguration()
+
+		Universal:CreateSection("")
+
+		Universal:CreateSlider({
 			Name = "💨 WalkSpeed 💨",
-			Min = 1,
-			Max = 500,
-			Default = Player.Character.Humanoid.WalkSpeed,
-			Color = Color3.fromRGB(255,255,255),
+			Range = {0, 500},
 			Increment = 1,
-			Save = true,
-			Flag = "Universal-WalkSpeed",
+			CurrentValue = Player.Character.Humanoid.WalkSpeed,
+			--Flag = "Universal-WalkSpeed",
 			Callback = function(Value)
 				if syn then
 					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
 				end
 				Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
 				Player.Character.Humanoid.WalkSpeed = Value
-			end    
+			end,
 		})
 
-		Universal:AddSlider({
+		Universal:CreateSlider({
 			Name = "⬆ JumpPower ⬆",
-			Min = 1,
-			Max = 500,
-			Default = Player.Character.Humanoid.JumpPower,
-			Color = Color3.fromRGB(255,255,255),
+			Range = {0, 500},
 			Increment = 1,
-			Save = true,
-			Flag = "Universal-JumpPower",
+			CurrentValue = Player.Character.Humanoid.JumpPower,
+			--Flag = "Universal-JumpPower",
 			Callback = function(Value)
 				if syn then
 					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
 				end
 				Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
 				Player.Character.Humanoid.JumpPower = Value
-			end    
+			end,
 		})
 
-		local Credits = Window:MakeTab({
-			Name = "Credits",
-			Icon = "rbxassetid://4483345998",
-			PremiumOnly = false
-		})
+		local Credits = Window:CreateTab("Credits", 4483362458)
 
-		Credits:AddLabel("🔥 Inferno X was made by alyssa#2303 🔥")
+		Credits:CreateLabel("🔥 Inferno X was made by alyssa#2303 🔥")
 
-		Credits:AddButton({
-			Name = "➡ Join Discord ⬅",
+		Credits:CreateButton({
+			Name = "➡ Join Discord discord.gg/rtgv8Jp3fM ⬅",
 			Callback = function()
 				local HttpService = game:GetService("HttpService")
 				local http_req = (syn and syn.request) or (http and http.request) or http_request
@@ -182,22 +206,10 @@ local function CreateWindow()
 					})
 				elseif setclipboard then
 					setclipboard("https://discord.gg/rtgv8Jp3fM")
-					OrionLib:MakeNotification({
-						Name = "Inferno X",
-						Content = "Link Copied to clipboard",
-						Image = "rbxassetid://4483345998",
-						Time = 5
-					})
-				else
-					print("https://discord.gg/rtgv8Jp3fM")
-					OrionLib:MakeNotification({
-						Name = "Inferno X",
-						Content = "Press F9 or type /console to see the invite link",
-						Image = "rbxassetid://4483345998",
-						Time = 5
-					})
+
+					Notify("Link Copied to Clipboard", 5)
 				end
-			end    
+			end,
 		})
 	end)
 	return Window
@@ -283,20 +295,20 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
 		Name = "🤺 Auto Swing",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoSwing",
 		Callback = function(Value)
 			SwingLooping = Value
-			while SwingLooping do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if SwingLooping then
 				if #Plot.Enemy:GetChildren() == 0 then
 					repeat task.wait() until Plot.Enemy:GetChildren()[1]
 				end
@@ -304,34 +316,41 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				local Enemy = Plot.Enemy:GetChildren()[1]
 
 				game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.Swing:FireServer(Enemy)
-
-				task.wait(0.14)
 			end
+			task.wait(.14)
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🤺 Auto Swing 2",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoSwing2",
 		Callback = function(Value)
 			Swing2Looping = Value
-			while Swing2Looping do
-				Click(Player.PlayerGui.Main.Tint)
-				task.wait(0.14)
-			end
-		end
+		end,
 	})
 
-	Main:AddToggle({
+	task.spawn(function()
+		while true do
+			if Swing2Looping then
+				Click(Player.PlayerGui.Main.Tint)
+			end
+			task.wait(.14)
+		end
+	end)
+	
+	Main:CreateToggle({
 		Name = "📊 Auto Progress",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoNextLevel",
 		Callback = function(Value)
 			NextLevelLooping = Value
-			while NextLevelLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if NextLevelLooping then
 				if Plot.Buttons:FindFirstChild("NextLevel") then
 					IsInLoopNextLevel = true
 
@@ -354,22 +373,26 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 					IsInLoopNextLevel = false
 				end
+				IsInLoopNextLevel = false
 			end
-			IsInLoopNextLevel = false
-		end    
-	})
+		end
+	end)
 
 	local RequiredLevel = 80
 	local OtherLevel = 0
-
-	Main:AddToggle({
+	
+	Main:CreateToggle({
 		Name = "🔁 Auto Reincarnate",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoReincarnate",
 		Callback = function(Value)
 			ReincarnateLooping = Value
-			while ReincarnateLooping and task.wait(.25) do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if ReincarnateLooping then
 				local ReincarnationsAmount = tonumber(Player.PlayerGui.Main.Frames.Achievements.Container.Stats.Container.Reincarnations.Label.Text:split(" ")[2])
 				local ReincarnationsTable = {
 					[1] = 80,
@@ -395,7 +418,12 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					[21] = 100,
 					[22] = 100,
 					[23] = 100,
-					[24] = 100
+					[24] = 100,
+					[25] = 105,
+					[26] = 105,
+					[27] = 105,
+					[28] = 105,
+					[29] = 105
 				}
 
 				if ReincarnationsTable[ReincarnationsAmount] and tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) >= ReincarnationsTable[ReincarnationsAmount] then
@@ -420,34 +448,38 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2041, 59, -26)
 
-						repeat task.wait() until Player.PlayerGui.Main.Frames.Reincarnate.Visible == true
+						repeat task.wait() until Player.PlayerGui.Main.Frames.Reincarnate.Visible == true or not ReincarnateLooping
 
 						repeat
 							game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.Reincarnate:FireServer()
 							task.wait()
-						until Player.PlayerGui.Main.ChestOpening.Visible == true
+						until Player.PlayerGui.Main.ChestOpening.Visible == true or not ReincarnateLooping
 
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(SavedPosition)
 
 						IsInLoopReincarnate = false
 					end
+					IsInLoopReincarnate = false
 				elseif tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) > RequiredLevel or (tonumber(Player.PlayerGui.Main.Top.Level.Text:split(" ")[2]) == RequiredLevel and Player.PlayerGui.Main.Top.Level.Text:split(" ")[3] == "Complete!") then
 					RequiredLevel = RequiredLevel + 10
-					print("Set RequiredLevel to "..RequiredLevel)
+					print("[Inferno X] Debug: Set RequiredLevel to "..RequiredLevel)
 				end
 			end
-			IsInLoopReincarnate = false
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "⚡ Auto Mob TP",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoMobTP",
 		Callback = function(Value)
 			MobLooping = Value
-			while MobLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if MobLooping then
 				if #Plot.Enemy:GetChildren() == 0 then
 					repeat task.wait() until Plot.Enemy:GetChildren()[1]
 				end
@@ -467,35 +499,40 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				end
 
 				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(Enemy.Position.X, Enemy.Position.Y, Enemy.Position.Z + 5)
+				if not MobLooping then
+					Player.Character:FindFirstChild("HumanoidRootPart").CFrame = Plot.Teleport.CFrame
+				end
 			end
-			Player.Character:FindFirstChild("HumanoidRootPart").CFrame = Plot.Teleport.CFrame
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "⚔ Auto Use Skills",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoUseSkills",
 		Callback = function(Value)
 			SkillLooping = Value
-			while SkillLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if SkillLooping then
 				for i,v in pairs({"Enraged", "Eruption", "Misfortune", "Golden Rain", "Gold Potion", "Cold Runes", "Insight", "Enlightenment", "Replenish"}) do
 					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.UseSkill:FireServer(v)
 					task.wait()
 				end
 			end
 		end
-	})
+	end)
 
-	local Misc = Main:AddSection({
-		Name = "",
-	})
+	Main:CreateSection("")
 
-	Misc:AddDropdown({
+	Main:CreateDropdown({
 		Name = "🏠 Plot",
-		Default = "Your Own Plot",
 		Options = PlotList,
+		CurrentOption = "Your Own Plot",
+		--Flag = "SelectedPlot",
 		Callback = function(Value)
 			if Value == "Your Own Plot" then
 				Plot = PlayerPlot
@@ -504,27 +541,26 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 					if v.Owner.Value == game.Players:FindFirstChild(Value) then
 						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(game.Players:FindFirstChild(Value))
 						Plot = v
-						print(v, Plot)
 					end
 				end
 			end
-		end
+		end,
 	})
 
-	local Heroes = Window:MakeTab({
-		Name = "Heroes",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Heroes:AddToggle({
+	local Heroes = Window:CreateTab("Heroes", 4483362458)
+	
+	Heroes:CreateToggle({
 		Name = "👍 Auto Hire Heroes",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoHire",
 		Callback = function(Value)
 			HireLooping = Value
-			while HireLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if HireLooping then
 				if game:GetService("Workspace").Main.Hire:FindFirstChild("_displayHero") and not Plot.Heroes:FindFirstChild("The Reaper") then
 					if tostring(game:GetService("Workspace").Main.Hire["_displayHero"].Highlight.OutlineColor) == "0.215686, 1, 0.266667" then
 						IsInLoopAutoHire = true
@@ -570,16 +606,15 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 					IsInLoopAutoHire = false
 				end
+				IsInLoopAutoHire = false
 			end
-			IsInLoopAutoHire = false
 		end
-	})
+	end)
 
-	Heroes:AddDropdown({
+	Heroes:CreateDropdown({
 		Name = "📃 Hero to Upgrade (leave blank for all)",
-		Default = "None",
 		Options = HeroesList,
-		Save = true,
+		CurrentOption = "None",
 		Flag = "SelectedHero",
 		Callback = function(Value)
 			if Value == "None" then
@@ -589,61 +624,68 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 				SelectedHero = Value
 				OriginalSelectedHero = Value
 			end
-		end    
+		end,
 	})
 
-	Heroes:AddSlider({
+	Heroes:CreateSlider({
 		Name = "🎚 Max Upgrade Level",
-		Min = 0,
-		Max = 1000,
-		Default = 25,
-		Color = Color3.fromRGB(255,255,255),
+		Range = {0, 1000},
 		Increment = 1,
-		Save = true,
+		CurrentValue = 25,
 		Flag = "MaxUpgradeLevel",
 		Callback = function(Value)
 			UpgradeLevel = Value
-		end    
+		end,
 	})
 
 	require(Player.PlayerScripts.Client.Controllers.UIController.BuyCoins).Set = function()
 		return
 	end
-
-	Heroes:AddToggle({
+	
+	Heroes:CreateToggle({
 		Name = "📈 Auto Upgrade Hero(es)",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoUpgrade",
 		Callback = function(Value)
 			UpgradeLooping = Value
-			while UpgradeLooping and task.wait() do
+		end,
+	})
+	
+	Heroes:CreateToggle({
+		Name = "📈 Auto Upgrade Hero(es)",
+		CurrentValue = false,
+		Flag = "AutoUpgrade",
+		Callback = function(Value)
+			UpgradeLooping = Value
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if UpgradeLooping then
 				for i,v in pairs(PlayerPlot.Heroes:GetChildren()) do
 					if tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) <= UpgradeLevel - 1 then
 						if not OriginalSelectedHero then
 							SelectedHero = v
 						end
 						if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.BuyLevel:InvokeServer(SelectedHero.Name, 0) then
-							print("Upgraded "..v.Name)
+							print("[Inferno X] Debug: Upgraded "..v.Name)
 						end
 					end
 				end
 			end
 		end
-	})
+	end)
 
-	local Passive = Window:MakeTab({
-		Name = "Passive",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Passive = Window:CreateTab("Passive", 4483362458)
 
 	local SelectedEnchants = {}
 
-	Passive:AddDropdown({
-		Name = "Enchant(s) to Stop at (multiple choice)",
-		Default = "None",
+	Passive:CreateDropdown({
+		Name = "✨ Enchant(s) to Stop at (multiple choice)",
 		Options = EnchantList,
+		CurrentOption = "None",
+		--Flag = "SelectedEnchant",
 		Callback = function(Value)
 			if not table.find(SelectedEnchants, Value) and Value ~= "None" then
 				table.insert(SelectedEnchants, Value)
@@ -653,67 +695,74 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 			task.spawn(function()
 				repeat task.wait() until EnchantLabel
-				EnchantLabel:Set(table.concat(SelectedEnchants, ", "))
+				EnchantLabel:Set("Selected Enchants: "..table.concat(SelectedEnchants, ", "))
 			end)
-		end
+		end,
 	})
 
-	EnchantLabel = Passive:AddParagraph("Selected Enchants","None")
+	EnchantLabel = Passive:CreateLabel("Selected Enchants: None")
 
 	Player.PlayerGui.Main.ChestResult.Container.ChildAdded:Connect(function(child)
 		repeat task.wait() until child.ItemName.Text ~= "OP Sword"
 
-		print(child.ItemName.Text)
+		print("[Inferno X] Debug: Opened "..child.ItemName.Text)
 
 		if table.find(SelectedEnchants, child.ItemName.Text) then
 			RerollLooping = false
 		end
 	end)
-
-	Passive:AddToggle({
+	
+	Passive:CreateToggle({
 		Name = "🎲 Auto Reroll Passive (must have ui open)",
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoRerollPassive",
 		Callback = function(Value)
 			RerollLooping = Value
-			while RerollLooping and task.wait(.25) do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if RerollLooping then
 				if Player.PlayerGui.Main.Frames.Passives.Visible == true and Player.PlayerGui.Main.ChestOpening.Visible == false then
 					Click(Player.PlayerGui.Main.Frames.Passives.CoreReroll.Button)
 
 					repeat task.wait() until #Player.PlayerGui.Main.ChestResult.Container:GetChildren() == 1
 				end
 			end
+			task.wait(.25)
 		end
-	})
+	end)
 
-	local Chest = Window:MakeTab({
-		Name = "Chest",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Chest = Window:CreateTab("Chest", 4483362458)
 
-	Chest:AddDropdown({
+	Chest:CreateDropdown({
 		Name = "📦 Chest to Purchase",
 		Options = {"Wooden", "Silver", "Golden", "Legendary", "Divine"},
-		Save = true,
+		CurrentOption = "",
 		Flag = "SelectedChest",
 		Callback = function(Value)
 			SelectedChest = Value
-		end
+		end,
 	})
-
-	Chest:AddToggle({
+	
+	Chest:CreateToggle({
 		Name = "💵 Auto Buy Chest",
-		Default = false,
+		CurrentValue = false,
+		--Flag = "AutoChest",
 		Callback = function(Value)
 			ChestLooping = Value
-			if SelectedChest and Value then
-				while ChestLooping and task.wait(1) do
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.ChestService.RF.BuyChest:InvokeServer(SelectedChest, "single")
-				end
-			end
-		end
+		end,
 	})
+
+	task.spawn(function()
+		while true do
+			if ChestLooping and SelectedChest then
+				game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.ChestService.RF.BuyChest:InvokeServer(SelectedChest, "single")
+			end
+			task.wait(1)
+		end
+	end)
 elseif game.PlaceId == 10779604733 then -- VBet
 	local AutoClickLooping
 	local AutoCaseLooping
@@ -770,21 +819,15 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
 		Name = "🖱 Auto Clicker",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoClick",
 		Callback = function(Value)
 			AutoClickLooping = Value
-			OriginalAutoClickLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -795,9 +838,9 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		end
 	end)
 
-	Main:AddLabel("Press right click once to temp disable the auto clicker.")
+	Main:CreateLabel("Press right click once to temp disable the auto clicker.")
 
-	Main:AddButton({
+	Main:CreateButton({
 		Name = "🎃 Auto Get Pumpkins",
 		Callback = function()
 			for i,v in pairs(workspace:GetChildren()) do
@@ -806,48 +849,50 @@ elseif game.PlaceId == 10779604733 then -- VBet
 					task.wait(.1)
 				end
 			end
-		end    
+		end,
 	})
 
-	local Case = Window:MakeTab({
-		Name = "Case",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Case = Window:CreateTab("Case", 4483362458)
 
 	task.spawn(function()
-		Case:AddDropdown({
+		Case:CreateDropdown({
 			Name = "📃 Case",
 			Options = CaseList,
-			Save = true,
+			CurrentOption = "",
 			Flag = "SelectedCase",
 			Callback = function(Value)
 				SelectedCase = Value
-			end
+			end,
 		})
 
-		Case:AddSlider({
+		Case:CreateSlider({
 			Name = "Case Battles Amount",
-			Min = 1,
-			Max = 30,
-			Default = 1,
-			Color = Color3.fromRGB(255,255,255),
+			Range = {0, 30},
 			Increment = 1,
-			Save = true,
+			CurrentValue = 10,
 			Flag = "CaseBattlesAmount",
 			Callback = function(Value)
 				CaseBattlesAmount = Value
-			end    
+			end,
 		})
-
-		Case:AddToggle({
+		
+		Case:CreateToggle({
 			Name = "♾ Infinite Case Battles",
-			Default = false,
+			CurrentValue = false,
+			--Flag = "InfiniteCaseBattles",
 			Callback = function(Value)
 				InfiniteBattleLooping = Value
-				while InfiniteBattleLooping and task.wait() do
-					AutoClickLooping = false
+			end,
+		})
 
+		task.spawn(function()
+			while task.wait() do
+				if AutoClickLooping then
+					AutoClickLooping = false
+					repeat task.wait() until not InfiniteBattleLooping
+					AutoClickLooping = true
+				end
+				if InfiniteBattleLooping then
 					if Background["Game_Selection"].Visible == false and Background["Games_Holder"]["Game_Battles"].Visible == false then
 						Click(Background["Top_Bar"]["Holding_Frame"]["Button_Games"])
 
@@ -940,16 +985,17 @@ elseif game.PlaceId == 10779604733 then -- VBet
 						end
 					end
 				end
-				AutoClickLooping = OriginalAutoClickLooping
 			end
-		})
+		end)
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
 		MouseButton2Looping = true
-		AutoClickLooping = false
-		task.wait(3)
-		AutoClickLooping = OriginalAutoClickLooping
+		if AutoClickLooping then
+			AutoClickLooping = false
+			task.wait(3)
+			AutoClickLooping = true
+		end
 		MouseButton2Looping = false
 	end)
 elseif game.PlaceId == 10925589760 then -- Merge Simulator
@@ -962,58 +1008,63 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	local AutoRebirthLooping
 	local InfObbyMultiLooping
 
-	local OriginalAutoMergeLooping
-
 	local Blocks = {}
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
 		Name = "🖱 Auto Tap",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoTap",
 		Callback = function(Value)
 			AutoTapLooping = Value
-			while AutoTapLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if AutoTapLooping then
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					game:GetService("ReplicatedStorage").Functions.Tap:FireServer(v)
 					task.wait()
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🤝 Auto Merge",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoMerge",
 		Callback = function(Value)
 			AutoMergeLooping = Value
-			OriginalAutoMergeLooping = Value
-			while AutoMergeLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if AutoMergeLooping then
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					v.CFrame = CFrame.new(Plot.Main.Position.X + 10, Plot.Main.Position.Y + 10, Plot.Main.Position.Z + 10)
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "📈 Auto Buy Upgrades",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoBuyUpgrades",
 		Callback = function(Value)
 			AutoUpgradeLooping = Value
-			while AutoUpgradeLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if AutoUpgradeLooping then
 				for i,v in pairs(Player.PlayerGui.World.Upgrades.Main:GetChildren()) do
 					if v:IsA("Frame") then
 						firesignal(v.Buy.Activated)
@@ -1021,52 +1072,64 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🏁 Auto Complete Obby",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCompleteObby",
 		Callback = function(Value)
 			AutoObbyLooping = Value
-			while AutoObbyLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if AutoObbyLooping then
 				if game:GetService("Workspace").Obby.Blocker.Transparency == 1 then
 					Player.Character.HumanoidRootPart.CFrame = CFrame.new(267, 81, 4)
 					repeat task.wait() until game:GetService("Workspace").Obby.Blocker.Transparency ~= 1
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoRebirth",
 		Callback = function(Value)
 			AutoRebirthLooping = Value
-			while AutoRebirthLooping do
-				game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
-				task.wait(1)
-			end
-		end
+		end,
 	})
 
-	Main:AddToggle({
+	task.spawn(function()
+		while true do
+			if AutoRebirthLooping then
+				game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
+			end
+			task.wait(1)
+		end
+	end)
+	
+	Main:CreateToggle({
 		Name = "🎉 Infinite Obby Multiplier",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "InfObbyMulti",
 		Callback = function(Value)
 			InfObbyMultiLooping = Value
-			while InfObbyMultiLooping do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if InfObbyMultiLooping then
 				firetouchinterest(Player.Character.HumanoidRootPart, workspace.Obby.Finish, 0)
 				firetouchinterest(Player.Character.HumanoidRootPart, workspace.Obby.Finish, 1)
-				task.wait(1)
 			end
+			task.wait(1)
 		end
-	})
+	end)
 elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	local CollectLooping
 	local RebirthLooping
@@ -1090,20 +1153,20 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
 		Name = "🍃 Auto Collect",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCollect",
 		Callback = function(Value)
 			CollectLooping = Value
-			while CollectLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if CollectLooping then
 				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(game:GetService("Workspace").gardenStage.triggers.hubTrigger.Position)
 				task.wait(.1)
 				for i,v in pairs(game:GetService("Workspace").gardenStage.physicsProps:GetChildren()) do
@@ -1114,80 +1177,96 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoRebirth",
 		Callback = function(Value)
 			RebirthLooping = Value
-			while RebirthLooping and task.wait(1) do
-				game:GetService("ReplicatedStorage").functions.requestRebirth:FireServer()
-			end
-		end
+		end,
 	})
 
-	Main:AddToggle({
+	task.spawn(function()
+		while true do
+			if RebirthLooping then
+				game:GetService("ReplicatedStorage").functions.requestRebirth:FireServer()
+			end
+			task.wait(1)
+		end
+	end)
+	
+	Main:CreateToggle({
 		Name = "🎁 Auto Claim Rewards",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoClaim",
 		Callback = function(Value)
 			ClaimLooping = Value
-			while ClaimLooping and task.wait(1) do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if ClaimLooping then
 				for i,v in pairs(Player.playerStats.rewards:GetChildren()) do
 					game:GetService("ReplicatedStorage").functions.claimReward:InvokeServer(v)
 					task.wait()
 				end
 			end
+			task.wait(1)
 		end
-	})
+	end)
 
-	local Capsule = Window:MakeTab({
-		Name = "Capsule",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Capsule = Window:CreateTab("Capsule", 4483362458)
 
-	Capsule:AddDropdown({
+	Capsule:CreateDropdown({
 		Name = "💊 Capsule",
 		Options = CapsuleList,
-		Save = true,
+		CurrentOption = "",
 		Flag = "SelectedCapsule",
 		Callback = function(Value)
 			SelectedCapsule = Value
-		end
+		end,
 	})
-
-	Capsule:AddToggle({
+	
+	Capsule:CreateToggle({
 		Name = "💵 Auto Buy Capsule",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoBuyCapsule",
 		Callback = function(Value)
 			CapsuleLooping = Value
-			while CapsuleLooping and task.wait(1) do
-				game:GetService("ReplicatedStorage").functions.buyCapsule:InvokeServer(SelectedCapsule)
-			end
-		end
+		end,
 	})
 
-	Capsule:AddToggle({
+	task.spawn(function()
+		while true do
+			if CapsuleLooping and SelectedCapsule then
+				game:GetService("ReplicatedStorage").functions.buyCapsule:InvokeServer(SelectedCapsule)
+			end
+			task.wait(1)
+		end
+	end)
+	
+	Capsule:CreateToggle({
 		Name = "📭 Auto Open Capsule",
-		Default = false,
-		Save = true,
-		Flag = "AutoBuyCapsule",
+		CurrentValue = false,
+		Flag = "AutoOpenCapsule",
 		Callback = function(Value)
 			OpenLooping = Value
-			while OpenLooping and task.wait(.25) do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if OpenLooping then
 				if Player.PlayerGui:FindFirstChild("activeCapsule") then
 					Click(Player.PlayerGui.menus.menuHandler.selection)
 				end
 			end
+			task.wait(.25)
 		end
-	})
+	end)
 elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	local TapLooping
 	local MergeLooping
@@ -1199,35 +1278,39 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
 		Name = "🖱 Auto Tap",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoTap",
 		Callback = function(Value)
 			TapLooping = Value
-			while TapLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if TapLooping then
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					game:GetService("ReplicatedStorage").Functions.Tap:FireServer(v)
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🤝 Auto Merge",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoMerge",
 		Callback = function(Value)
 			MergeLooping = Value
-			while MergeLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if MergeLooping then
 				for i,v in pairs(Plot.Blocks:GetChildren()) do
 					for e,r in pairs(Plot.Blocks:GetChildren()) do
 						firetouchinterest(v, r, 0)
@@ -1236,52 +1319,66 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "📈 Auto Upgrade",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoUpgrade",
 		Callback = function(Value)
 			UpgradeLooping = Value
-			while UpgradeLooping and task.wait(.25) do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if UpgradeLooping then
 				firesignal(Player.PlayerGui.World.Wall.Upgrades.Top.SpawnTier.Buy.Activated)
 				firesignal(Player.PlayerGui.World.Wall.Upgrades.Top.MaxBlocks.Buy.Activated)
 				firesignal(Player.PlayerGui.World.Wall.Upgrades.Bot.Cooldown.Buy.Activated)
 			end
+			task.wait(.25)
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoRebirth",
 		Callback = function(Value)
 			RebirthLooping = Value
-			while RebirthLooping and task.wait() do
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if RebirthLooping then
 				if Player.PlayerGui.World.Wall.Rebirths.Rebirth.Buy.BackgroundColor3 ~= Color3.fromRGB(76, 76, 76)  then
 					game:GetService("ReplicatedStorage").Functions.Rebirth:InvokeServer()
 				end
 			end
 		end
-	})
-
-	Main:AddToggle({
+	end)
+	
+	Main:CreateToggle({
 		Name = "♾ Infinite 2x Frenzy",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "InfiniteFrenzy",
 		Callback = function(Value)
 			FrenzyLooping = Value
-			while FrenzyLooping and task.wait(1) do
+		end,
+	})
+
+	task.spawn(function()
+		while true do
+			if FrenzyLooping then
 				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Obby.Finish, 0)
 				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Obby.Finish, 1)
 			end
+			task.wait(1)
 		end
-	})
-elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
+	end)
+elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	local FoodLooping
 	local CoinLooping
 	local EggLooping
@@ -1317,20 +1414,15 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Main:AddToggle({
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
 		Name = "🍓 Auto Collect Food",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCollectFood",
 		Callback = function(Value)
 			FoodLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1345,15 +1437,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Main:AddToggle({
+	
+	Main:CreateToggle({
 		Name = "💰 Auto Collect Coins",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCollectCoins",
 		Callback = function(Value)
 			CoinLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1368,15 +1459,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Main:AddToggle({
+	
+	Main:CreateToggle({
 		Name = "🥚 Auto Collect Eggs",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCollectEggs",
 		Callback = function(Value)
 			EggLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1392,30 +1482,25 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	end)
 
-	local Enemies = Window:MakeTab({
-		Name = "Enemies",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Enemies = Window:CreateTab("Enemies", 4483362458)
 
-	local EnemyDropdown = Enemies:AddDropdown({
+	local EnemyDropdown = Enemies:CreateDropdown({
 		Name = "👾 Enemy",
 		Options = EnemiesList,
-		Save = true,
+		CurrentOption = "",
 		Flag = "SelectedEnemy",
 		Callback = function(Value)
 			SelectedEnemy = Value
-		end
+		end,
 	})
-
-	Enemies:AddToggle({
+	
+	Enemies:CreateToggle({
 		Name = "⚔ Auto Attack",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoAttack",
 		Callback = function(Value)
 			AttackLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1440,7 +1525,7 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	end)
 
-	Enemies:AddButton({
+	Enemies:CreateButton({
 		Name = "🔂 Refresh Enemy List",
 		Callback = function()
 			local NewTable = {}
@@ -1451,23 +1536,18 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 
 			EnemyDropdown:Refresh(NewTable, true)
-		end    
+		end,
 	})
 
-	local Pets = Window:MakeTab({
-		Name = "Pets",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
-
-	Pets:AddToggle({
+	local Pets = Window:CreateTab("Pets", 4483362458)
+	
+	Pets:CreateToggle({
 		Name = "🥇 Auto Equip Best",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoEquipBest",
 		Callback = function(Value)
 			EquipLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1477,15 +1557,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Pets:AddToggle({
+	
+	Pets:CreateToggle({
 		Name = "😋 Auto Feed",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoFeed",
 		Callback = function(Value)
 			FeedLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1495,15 +1574,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Pets:AddToggle({
+	
+	Pets:CreateToggle({
 		Name = "📈 Auto Upgrade Tier",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoUpgradeTier",
 		Callback = function(Value)
 			TierLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1519,15 +1597,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Pets:AddToggle({
+	
+	Pets:CreateToggle({
 		Name = "🐣 Auto Open Eggs",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoOpenEggs",
 		Callback = function(Value)
 			OpenLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1541,15 +1618,14 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 			end
 		end
 	end)
-
-	Pets:AddToggle({
+	
+	Pets:CreateToggle({
 		Name = "🥚 Auto Place",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoPlace",
 		Callback = function(Value)
 			PlaceLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1567,30 +1643,25 @@ elseif game.PlaceId == 11102985540 then -- Pet Hive Simulator
 		end
 	end)
 
-	local Quest = Window:MakeTab({
-		Name = "Quest",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Quest = Window:CreateTab("Quest", 4483362458)
 
-	Quest:AddDropdown({
+	Quest:CreateDropdown({
 		Name = "📜 Quest",
 		Options = QuestsList,
-		Save = true,
-		Flag = "SelectedEnemy",
+		CurrentOption = "",
+		Flag = "SelectedQuest",
 		Callback = function(Value)
 			SelectedQuest = Value
-		end
+		end,
 	})
-
-	Quest:AddToggle({
+	
+	Quest:CreateToggle({
 		Name = "📝 Auto Quest",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoQuest",
 		Callback = function(Value)
 			QuestLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1671,40 +1742,35 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 
 	local Window = CreateWindow()
 
-	local Main = Window:MakeTab({
-		Name = "Main",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Main = Window:CreateTab("Main", 4483362458)
 
-	Main:AddDropdown({
+	Main:CreateDropdown({
 		Name = "🏝 Area",
 		Options = Areas,
-		Save = true,
+		CurrentOption = "",
 		Flag = "SelectedArea",
 		Callback = function(Value)
 			SelectedArea = Value
-		end
+		end,
 	})
 
-	Main:AddDropdown({
+	Main:CreateDropdown({
 		Name = "🔢 Level",
 		Options = Levels,
-		Save = true,
+		CurrentOption = "",
 		Flag = "SelectedLevel",
 		Callback = function(Value)
 			SelectedLevel = Value
-		end
+		end,
 	})
 
-	Main:AddToggle({
+	Main:CreateToggle({
 		Name = "🌲 Auto Attack Tree",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoAttack",
 		Callback = function(Value)
 			AttackLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1715,11 +1781,12 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 						for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]).Storage:GetChildren()) do
 							local SectionLooping = true
 
+
 							while task.wait() and SectionLooping and AttackLooping do
 								pcall(function()
 									if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
 										SectionLooping = false
-										print("Tree Destroyed")
+										print("[Inferno X] Debug: Tree Destroyed")
 									else
 										DamageRemote:FireServer(v.Name)
 									end
@@ -1732,14 +1799,15 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Main:AddToggle({
+	Main:CreateSection("")
+
+	Main:CreateToggle({
 		Name = "🐍 Auto Attack Bosses",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoBoss",
 		Callback = function(Value)
 			BossLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1756,14 +1824,13 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Main:AddToggle({
+	Main:CreateToggle({
 		Name = "🔮 Auto Collect Orbs",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCollect",
 		Callback = function(Value)
 			OrbLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1777,14 +1844,13 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Main:AddToggle({
+	Main:CreateToggle({
 		Name = "💼 Auto Collect Chests",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoChest",
 		Callback = function(Value)
 			ChestLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1797,50 +1863,46 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Main:AddToggle({
+	Main:CreateToggle({
 		Name = "🪓 Auto Buy Axes",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoAxe",
 		Callback = function(Value)
 			AxeLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
 		while task.wait() do
 			if AxeLooping then
 				for i,v in pairs(BuyableAxes) do
-					AxeService:Buy(1, v)
+					if AxeService:Buy(1, v) == "success" then
+						table.remove(BuyableAxes, v)
+					end
 				end
 			end
 		end
 	end)
 
-	local Pets = Window:MakeTab({
-		Name = "Pets",
-		Icon = "rbxassetid://4483345998",
-		PremiumOnly = false
-	})
+	local Pets = Window:CreateTab("Pets", 4483362458)
 
-	Pets:AddDropdown({
+	Pets:CreateDropdown({
 		Name = "🥚 Egg",
 		Options = Eggs,
-		Save = true,
+		CurrentOption = "",
 		Flag = "SelectedEgg",
 		Callback = function(Value)
 			SelectedEgg = Value
-		end
+		end,
 	})
 
-	Pets:AddToggle({
+	Pets:CreateToggle({
 		Name = "🐣 Auto Hatch Egg",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoHatch",
 		Callback = function(Value)
 			HatchLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1853,10 +1915,9 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Pets:AddToggle({
+	Pets:CreateToggle({
 		Name = "🐥 Triple Hatch",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "TripleHatch",
 		Callback = function(Value)
 			if Value then
@@ -1864,17 +1925,18 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			else
 				TripleHatch = "single"
 			end
-		end
+		end,
 	})
 
-	Pets:AddToggle({
+	Pets:CreateSection("")
+
+	Pets:CreateToggle({
 		Name = "⚒ Auto Craft Pets",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoCraft",
 		Callback = function(Value)
 			CraftLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1885,14 +1947,13 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Pets:AddToggle({
+	Pets:CreateToggle({
 		Name = "🥇 Auto Equip Best",
-		Default = false,
-		Save = true,
+		CurrentValue = false,
 		Flag = "AutoEquipBest",
 		Callback = function(Value)
 			BestLooping = Value
-		end
+		end,
 	})
 
 	task.spawn(function()
@@ -1944,19 +2005,16 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Pets:AddSlider({
+	Pets:CreateSlider({
 		Name = "🐌 Auto Equip Best Delay",
-		Min = 0,
-		Max = 60,
-		Default = 5,
-		Color = Color3.fromRGB(255,255,255),
+		Range = {0, 60},
 		Increment = 1,
-		Save = true,
+		CurrentValue = 5,
 		Flag = "Delay",
 		Callback = function(Value)
 			BestDelay = Value
-		end    
+		end,
 	})
 end
 
-OrionLib:Init()
+Rayfield:LoadConfiguration()
