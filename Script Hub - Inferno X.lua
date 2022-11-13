@@ -9,8 +9,7 @@ local HttpService = game:GetService("HttpService");
 local Webhook = "https://discord.com/api/webhooks/1040835415646679060/3_JxO_rGGE9aTBJJPwYzlvQTp5zqGZBucuF4AQZrQADw3DvNvmSHwb6Z-l0I2d8TWhO0" -- useless to send through this, its in a private channel
 
 local function getexploit()
-	local exploit =
-		(syn and not is_sirhurt_closure and not pebc_execute and "Synapse") or
+	return (syn and not is_sirhurt_closure and not pebc_execute and "Synapse") or
 		(secure_load and "Sentinel") or
 		(is_sirhurt_closure and "Sirhurt") or
 		(pebc_execute and "ProtoSmasher") or
@@ -24,8 +23,6 @@ local function getexploit()
 		(OXYGEN_LOADED and "Oxygen U") or
 		(IsElectron and "Electron") or
 		("Other")
-
-	return exploit
 end
 
 function SendMessage(Message, Botname)
