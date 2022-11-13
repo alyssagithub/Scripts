@@ -48,13 +48,15 @@ function SendMessage(Message, Botname)
 	return Data or nil;
 end
 
-task.spawn(function() pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution") end)
+pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution")
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
-repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main")
+repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main") or task.wait(5)
 
-game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
+if game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main") then
+	game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
+end
 
 local function Click(v)
 	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
@@ -296,7 +298,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "🤺 Auto Swing",
 		CurrentValue = false,
@@ -320,7 +322,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			task.wait(.14)
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🤺 Auto Swing 2",
 		CurrentValue = false,
@@ -338,7 +340,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			task.wait(.14)
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "📊 Auto Progress",
 		CurrentValue = false,
@@ -380,7 +382,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 	local RequiredLevel = 80
 	local OtherLevel = 0
-	
+
 	Main:CreateToggle({
 		Name = "🔁 Auto Reincarnate",
 		CurrentValue = false,
@@ -467,7 +469,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "⚡ Auto Mob TP",
 		CurrentValue = false,
@@ -505,7 +507,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "⚔ Auto Use Skills",
 		CurrentValue = false,
@@ -548,7 +550,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	})
 
 	local Heroes = Window:CreateTab("Heroes", 4483362458)
-	
+
 	Heroes:CreateToggle({
 		Name = "👍 Auto Hire Heroes",
 		CurrentValue = false,
@@ -641,7 +643,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	require(Player.PlayerScripts.Client.Controllers.UIController.BuyCoins).Set = function()
 		return
 	end
-	
+
 	Heroes:CreateToggle({
 		Name = "📈 Auto Upgrade Hero(es)",
 		CurrentValue = false,
@@ -650,7 +652,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			UpgradeLooping = Value
 		end,
 	})
-	
+
 	Heroes:CreateToggle({
 		Name = "📈 Auto Upgrade Hero(es)",
 		CurrentValue = false,
@@ -711,7 +713,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			RerollLooping = false
 		end
 	end)
-	
+
 	Passive:CreateToggle({
 		Name = "🎲 Auto Reroll Passive (must have ui open)",
 		CurrentValue = false,
@@ -745,7 +747,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 			SelectedChest = Value
 		end,
 	})
-	
+
 	Chest:CreateToggle({
 		Name = "💵 Auto Buy Chest",
 		CurrentValue = false,
@@ -820,7 +822,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "🖱 Auto Clicker",
 		CurrentValue = false,
@@ -875,7 +877,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 				CaseBattlesAmount = Value
 			end,
 		})
-		
+
 		Case:CreateToggle({
 			Name = "♾ Infinite Case Battles",
 			CurrentValue = false,
@@ -1013,7 +1015,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "🖱 Auto Tap",
 		CurrentValue = false,
@@ -1033,7 +1035,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🤝 Auto Merge",
 		CurrentValue = false,
@@ -1052,7 +1054,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "📈 Auto Buy Upgrades",
 		CurrentValue = false,
@@ -1073,7 +1075,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🏁 Auto Complete Obby",
 		CurrentValue = false,
@@ -1093,7 +1095,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
 		CurrentValue = false,
@@ -1111,7 +1113,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 			task.wait(1)
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🎉 Infinite Obby Multiplier",
 		CurrentValue = false,
@@ -1154,7 +1156,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "🍃 Auto Collect",
 		CurrentValue = false,
@@ -1178,7 +1180,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
 		CurrentValue = false,
@@ -1196,7 +1198,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			task.wait(1)
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🎁 Auto Claim Rewards",
 		CurrentValue = false,
@@ -1229,7 +1231,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			SelectedCapsule = Value
 		end,
 	})
-	
+
 	Capsule:CreateToggle({
 		Name = "💵 Auto Buy Capsule",
 		CurrentValue = false,
@@ -1247,7 +1249,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 			task.wait(1)
 		end
 	end)
-	
+
 	Capsule:CreateToggle({
 		Name = "📭 Auto Open Capsule",
 		CurrentValue = false,
@@ -1279,7 +1281,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "🖱 Auto Tap",
 		CurrentValue = false,
@@ -1298,7 +1300,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🤝 Auto Merge",
 		CurrentValue = false,
@@ -1320,7 +1322,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "📈 Auto Upgrade",
 		CurrentValue = false,
@@ -1340,7 +1342,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			task.wait(.25)
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
 		CurrentValue = false,
@@ -1359,7 +1361,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "♾ Infinite 2x Frenzy",
 		CurrentValue = false,
@@ -1415,7 +1417,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "🍓 Auto Collect Food",
 		CurrentValue = false,
@@ -1437,7 +1439,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "💰 Auto Collect Coins",
 		CurrentValue = false,
@@ -1459,7 +1461,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "🥚 Auto Collect Eggs",
 		CurrentValue = false,
@@ -1493,7 +1495,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			SelectedEnemy = Value
 		end,
 	})
-	
+
 	Enemies:CreateToggle({
 		Name = "⚔ Auto Attack",
 		CurrentValue = false,
@@ -1540,7 +1542,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	})
 
 	local Pets = Window:CreateTab("Pets", 4483362458)
-	
+
 	Pets:CreateToggle({
 		Name = "🥇 Auto Equip Best",
 		CurrentValue = false,
@@ -1557,7 +1559,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			end
 		end
 	end)
-	
+
 	Pets:CreateToggle({
 		Name = "😋 Auto Feed",
 		CurrentValue = false,
@@ -1574,7 +1576,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			end
 		end
 	end)
-	
+
 	Pets:CreateToggle({
 		Name = "📈 Auto Upgrade Tier",
 		CurrentValue = false,
@@ -1597,7 +1599,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			end
 		end
 	end)
-	
+
 	Pets:CreateToggle({
 		Name = "🐣 Auto Open Eggs",
 		CurrentValue = false,
@@ -1618,7 +1620,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			end
 		end
 	end)
-	
+
 	Pets:CreateToggle({
 		Name = "🥚 Auto Place",
 		CurrentValue = false,
@@ -1654,7 +1656,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 			SelectedQuest = Value
 		end,
 	})
-	
+
 	Quest:CreateToggle({
 		Name = "📝 Auto Quest",
 		CurrentValue = false,
