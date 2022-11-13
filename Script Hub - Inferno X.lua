@@ -771,7 +771,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 elseif game.PlaceId == 10779604733 then -- VBet
 	local AutoClickLooping
 	local AutoClickLooping2
-	
+
 	local AutoCaseLooping
 	local InfiniteBattleLooping
 
@@ -926,7 +926,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 						repeat
 							Click(BattlePrompt["Button_Add"])
 							task.wait(1)
-						until Background["Games_Holder"]["Add_Case_Prompt"].Visible == true
+						until Background["Games_Holder"]["Add_Case_Prompt"].Visible == true or not InfiniteBattleLooping
 
 						task.wait(1)
 
@@ -942,14 +942,16 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 						task.wait(.1)
 					end
-					
+
 					repeat task.wait() until BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
 					
-					repeat
-						Click(BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)["Button_Add"])
-						task.wait(.1)
-					until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) == CaseBattlesAmount or not InfiniteBattleLooping
-
+					if tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) ~= CaseBattlesAmount then
+						repeat
+							Click(BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)["Button_Add"])
+							task.wait(.1)
+						until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) == CaseBattlesAmount or not InfiniteBattleLooping
+					end
+					
 					repeat
 						Click(BattlePrompt["Button_Create"])
 						task.wait(1)
