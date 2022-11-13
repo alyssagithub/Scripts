@@ -52,9 +52,13 @@ pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
-repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield")
-repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main")
-game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
+task.spawn(function()
+	pcall(function()
+		repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main")
+
+		game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
+	end)
+end)
 
 local function Click(v)
 	VirtualInputManager:SendMouseButtonEvent(v.AbsolutePosition.X+v.AbsoluteSize.X/2,v.AbsolutePosition.Y+50,0,true,v,1)
