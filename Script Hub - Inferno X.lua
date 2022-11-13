@@ -943,6 +943,8 @@ elseif game.PlaceId == 10779604733 then -- VBet
 						task.wait(.1)
 					end
 					
+					repeat task.wait() until BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
+					
 					repeat
 						Click(BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)["Button_Add"])
 						task.wait(.1)
