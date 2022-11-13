@@ -22,8 +22,12 @@ local function getexploit()
 		(unit and not syn and "Unit") or
 		(OXYGEN_LOADED and "Oxygen U") or
 		(IsElectron and "Electron") or
+		(IS_COCO_LOADED and "Coco") or
+		(IS_VIVA_LOADED and "Viva") or
 		("Other")
 end
+
+print("Detected Executor: "..getexploit())
 
 function SendMessage(Message, Botname)
 	local Name;
@@ -766,8 +770,9 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	end)
 elseif game.PlaceId == 10779604733 then -- VBet
 	local AutoClickLooping
+	local AutoClickLooping2
+	
 	local AutoCaseLooping
-	local MouseButton2Looping
 	local InfiniteBattleLooping
 
 	local OriginalAutoClickLooping
@@ -828,12 +833,13 @@ elseif game.PlaceId == 10779604733 then -- VBet
 		Flag = "AutoClick",
 		Callback = function(Value)
 			AutoClickLooping = Value
+			AutoClickLooping2 = Value
 		end,
 	})
 
 	task.spawn(function()
 		while task.wait() do
-			if AutoClickLooping then
+			if AutoClickLooping and not InfiniteBattleLooping then
 				Click(Player.PlayerGui["Interact_Gui"].Cash["Icon_Click"])
 			end
 		end
@@ -868,7 +874,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 		Case:CreateSlider({
 			Name = "Case Battles Amount",
-			Range = {0, 30},
+			Range = {1, 30},
 			Increment = 1,
 			CurrentValue = 10,
 			Flag = "CaseBattlesAmount",
@@ -888,11 +894,6 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 		task.spawn(function()
 			while task.wait() do
-				if AutoClickLooping then
-					AutoClickLooping = false
-					repeat task.wait() until not InfiniteBattleLooping
-					AutoClickLooping = true
-				end
 				if InfiniteBattleLooping then
 					if Background["Game_Selection"].Visible == false and Background["Games_Holder"]["Game_Battles"].Visible == false then
 						Click(Background["Top_Bar"]["Holding_Frame"]["Button_Games"])
@@ -921,34 +922,36 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 					task.wait()
 
-					local LoopAmount = 0
-
 					if not BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase) then
 						repeat
-							LoopAmount = LoopAmount + 1
-							repeat
-								Click(BattlePrompt["Button_Add"])
-								task.wait(1)
-							until Background["Games_Holder"]["Add_Case_Prompt"].Visible == true
-
+							Click(BattlePrompt["Button_Add"])
 							task.wait(1)
+						until Background["Games_Holder"]["Add_Case_Prompt"].Visible == true
 
-							local CaseButton = Background["Games_Holder"]["Add_Case_Prompt"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
+						task.wait(1)
 
-							CaseButton.Parent = Background["Games_Holder"]["Add_Case_Prompt"]
+						local AddCasePrompt = Background["Games_Holder"]["Add_Case_Prompt"]
 
-							task.wait()
+						local CaseButton = AddCasePrompt["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
 
-							Click(CaseButton)
+						CaseButton.Parent = AddCasePrompt
 
-							task.wait(.1)
-						until LoopAmount == CaseBattlesAmount
+						task.wait()
+
+						Click(CaseButton)
+
+						task.wait(.1)
 					end
+					
+					repeat
+						Click(BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)["Button_Add"])
+						task.wait(.1)
+					until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) == CaseBattlesAmount or not InfiniteBattleLooping
 
 					repeat
 						Click(BattlePrompt["Button_Create"])
 						task.wait(1)
-					until Background["Games_Holder"]["Game_Battles"].Visible == true
+					until Background["Games_Holder"]["Game_Battles"].Visible == true or not InfiniteBattleLooping
 
 					for i,v in pairs(Background["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
 						if v:IsA("Frame") and v["Title_Host"].Text:split(" - ")[2] == Player.Name and not table.find(DoneList, v.Name) then
@@ -991,13 +994,11 @@ elseif game.PlaceId == 10779604733 then -- VBet
 	end)
 
 	Player:GetMouse().Button2Down:Connect(function()
-		MouseButton2Looping = true
 		if AutoClickLooping then
 			AutoClickLooping = false
 			task.wait(3)
-			AutoClickLooping = true
+			AutoClickLooping = AutoClickLooping2
 		end
-		MouseButton2Looping = false
 	end)
 elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	local Plot = workspace.Plots:FindFirstChild(Player.Name)
