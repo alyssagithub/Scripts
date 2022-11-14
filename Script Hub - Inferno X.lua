@@ -656,15 +656,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		end,
 	})
 
-	Heroes:CreateToggle({
-		Name = "📈 Auto Upgrade Hero(es)",
-		CurrentValue = false,
-		Flag = "AutoUpgrade",
-		Callback = function(Value)
-			UpgradeLooping = Value
-		end,
-	})
-
 	task.spawn(function()
 		while task.wait() do
 			if UpgradeLooping then
