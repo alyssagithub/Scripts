@@ -228,7 +228,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 	local SelectedHero
 	local SelectedChest
-	
+
 	local SelectedHero2
 
 	local UpgradeLevel = 25
@@ -524,9 +524,9 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		while task.wait() do
 			if SkillLooping then
 				for i,v in pairs(Player.PlayerGui.Main.Bottom.Skills.Container:GetChildren()) do
-				    if v:IsA("Frame") then
-					    game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.UseSkill:FireServer(v.Name)
-					    task.wait()
+					if v:IsA("Frame") then
+						game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.UseSkill:FireServer(v.Name)
+						task.wait()
 					end
 				end
 			end
@@ -666,11 +666,11 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 						if not SelectedHero then
 							SelectedHero = v.Name
 						end
-						
+
 						if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.BuyLevel:InvokeServer(SelectedHero, 0) then
 							print("[Inferno X] Debug: Upgraded "..SelectedHero)
 						end
-						
+
 						SelectedHero = SelectedHero2
 					end
 				end
@@ -1736,11 +1736,21 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end
 
-	for i,v in pairs(DataController.data.Axes) do
-		if v > DataController.data.EquippedAxe then
-			table.insert(BuyableAxes, v)
+	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
+		if type(v) == "table" then
+			for e,r in pairs(v) do
+				if type(r) == "table" then
+					for t,y in pairs(r) do
+						if y.index > DataController.data.EquippedAxe then
+							table.insert(BuyableAxes, y.index)
+						end
+					end
+				end
+			end
 		end
 	end
+	
+	print("Purchasable Axes: "..table.concat(BuyableAxes, ", "))
 
 	local Window = CreateWindow()
 
@@ -1757,15 +1767,15 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			elseif not table.find(SelectedAreas, Value) then
 				table.insert(SelectedAreas, Value)
 			end
-			
+
 			if not AreaLabel then
 				repeat task.wait() until AreaLabel
 			end
-			
+
 			AreaLabel:Set("Selected Areas: "..table.concat(SelectedAreas, ", "))
 		end,
 	})
-	
+
 	AreaLabel = Main:CreateLabel("Selected Areas: None")
 
 	Main:CreateDropdown({
@@ -1779,7 +1789,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			elseif not table.find(SelectedLevels, Value) then
 				table.insert(SelectedLevels, Value)
 			end
-			
+
 			if not LevelLabel then
 				repeat task.wait() until LevelLabel
 			end
@@ -1787,7 +1797,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			LevelLabel:Set("Selected Levels: "..table.concat(SelectedLevels, ", "))
 		end,
 	})
-	
+
 	LevelLabel = Main:CreateLabel("Selected Areas: None")
 
 	Main:CreateToggle({
@@ -1803,20 +1813,23 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		while task.wait() do
 			if AttackLooping and #SelectedAreas > 0 and #SelectedLevels > 0 then
 				for i = 2, #Levels, 1 do
-					for _,w in pairs(SelectedAreas) do
-						for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:GetChildren()) do
-							local SectionLooping = true
+					if table.find(SelectedLevels, Levels[i]) then
+						for _,w in pairs(SelectedAreas) do
+							if game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]) then
+								for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:GetChildren()) do
+									local SectionLooping = true
 
-							while task.wait() and SectionLooping and AttackLooping do
-								pcall(function()
-									if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
-										SectionLooping = false
-										print("[Inferno X] Debug: Tree Destroyed")
-									else
-										DamageRemote:FireServer(v.Name)
-										print('remote fired')
+									while task.wait() and SectionLooping and AttackLooping do
+										pcall(function()
+											if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
+												SectionLooping = false
+												print("[Inferno X] Debug: Tree Destroyed")
+											else
+												DamageRemote:FireServer(v.Name)
+											end
+										end)
 									end
-								end)
+								end
 							end
 						end
 					end
@@ -1901,9 +1914,14 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	task.spawn(function()
 		while task.wait() do
 			if AxeLooping then
-				for i,v in pairs(BuyableAxes) do
-					if AxeService:Buy(1, v) == "success" then
-						table.remove(BuyableAxes, v)
+				local LoopAmount = 1
+
+				for i = 6, #BuyableAxes, 3 do
+					LoopAmount = LoopAmount + 1
+					for e = 1, 3 do
+						if AxeService:Buy(LoopAmount, e) == "success" then
+							print("[Inferno X] Debug: Bought Axe of Area "..LoopAmount.." Axe "..e)
+						end
 					end
 				end
 			end
