@@ -523,9 +523,11 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	task.spawn(function()
 		while task.wait() do
 			if SkillLooping then
-				for i,v in pairs({"Enraged", "Eruption", "Misfortune", "Golden Rain", "Gold Potion", "Cold Runes", "Insight", "Enlightenment", "Replenish"}) do
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.UseSkill:FireServer(v)
-					task.wait()
+				for i,v in pairs(Player.PlayerGui.Main.Bottom.Skills.Container:GetChildren()) do
+				    if v:IsA("Frame") then
+					    game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RE.UseSkill:FireServer(v)
+					    task.wait()
+					end
 				end
 			end
 		end
