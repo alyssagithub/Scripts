@@ -9,7 +9,7 @@ local HttpService = game:GetService("HttpService");
 local Webhook = "https://discord.com/api/webhooks/1040835415646679060/3_JxO_rGGE9aTBJJPwYzlvQTp5zqGZBucuF4AQZrQADw3DvNvmSHwb6Z-l0I2d8TWhO0" -- useless to send through this, its in a private channel
 
 local function getexploit()
-	return (syn and not is_sirhurt_closure and not pebc_execute and "Synapse") or
+	return (syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
 		(secure_load and "Sentinel") or
 		(is_sirhurt_closure and "Sirhurt") or
 		(pebc_execute and "ProtoSmasher") or
@@ -228,10 +228,10 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 
 	local SelectedHero
 	local SelectedChest
+	
+	local SelectedHero2
 
-	local OriginalSelectedHero
-
-	local UpgradeLevel
+	local UpgradeLevel = 25
 	local SwingLooping
 	local Swing2Looping
 	local NextLevelLooping
@@ -624,10 +624,10 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Callback = function(Value)
 			if Value == "None" then
 				SelectedHero = nil
-				OriginalSelectedHero = nil
+				SelectedHero2 = nil
 			else
 				SelectedHero = Value
-				OriginalSelectedHero = Value
+				SelectedHero2 = Value
 			end
 		end,
 	})
@@ -660,13 +660,16 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		while task.wait() do
 			if UpgradeLooping then
 				for i,v in pairs(PlayerPlot.Heroes:GetChildren()) do
-					if tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) <= UpgradeLevel - 1 then
-						if not OriginalSelectedHero then
-							SelectedHero = v
+					if tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) and tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) <= (UpgradeLevel - 1) then
+						if not SelectedHero then
+							SelectedHero = v.Name
 						end
-						if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.BuyLevel:InvokeServer(SelectedHero.Name, 0) then
-							print("[Inferno X] Debug: Upgraded "..v.Name)
+						
+						if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.BuyLevel:InvokeServer(SelectedHero, 0) then
+							print("[Inferno X] Debug: Upgraded "..SelectedHero)
 						end
+						
+						SelectedHero = SelectedHero2
 					end
 				end
 			end
@@ -935,14 +938,14 @@ elseif game.PlaceId == 10779604733 then -- VBet
 					end
 
 					repeat task.wait() until BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
-					
+
 					if tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) ~= CaseBattlesAmount then
 						repeat
 							Click(BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)["Button_Add"])
 							task.wait(.1)
 						until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) == CaseBattlesAmount or not InfiniteBattleLooping
 					end
-					
+
 					repeat
 						Click(BattlePrompt["Button_Create"])
 						task.wait(1)
@@ -1683,15 +1686,15 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 
 	local TripleHatch
 
-	local SelectedArea
-	local SelectedLevel
+	local SelectedAreas = {}
+	local SelectedLevels = {}
 
 	local SelectedEgg
 
 	local BestDelay = 5
 
-	local Areas = {}
-	local Levels = {"All"}
+	local Areas = {"Clear List"}
+	local Levels = {"Clear List"}
 	local Eggs = {}
 	local Chests = {}
 	local BuyableAxes = {}
@@ -1713,7 +1716,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		table.insert(Areas, v.Name)
 	end
 
-	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(Areas[1]):GetChildren()) do
+	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(Areas[2]):GetChildren()) do
 		table.insert(Levels, v.Name)
 	end
 
@@ -1747,9 +1750,21 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		CurrentOption = "",
 		Flag = "SelectedArea",
 		Callback = function(Value)
-			SelectedArea = Value
+			if Value == "Clear List" then
+				table.clear(SelectedAreas)
+			elseif not table.find(SelectedAreas, Value) then
+				table.insert(SelectedAreas, Value)
+			end
+			
+			if not AreaLabel then
+				repeat task.wait() until AreaLabel
+			end
+			
+			AreaLabel:Set("Selected Areas: "..table.concat(SelectedAreas, ", "))
 		end,
 	})
+	
+	AreaLabel = Main:CreateLabel("Selected Areas: None")
 
 	Main:CreateDropdown({
 		Name = "🔢 Level",
@@ -1757,9 +1772,21 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		CurrentOption = "",
 		Flag = "SelectedLevel",
 		Callback = function(Value)
-			SelectedLevel = Value
+			if Value == "Clear List" then
+				table.clear(SelectedLevels)
+			elseif not table.find(SelectedLevels, Value) then
+				table.insert(SelectedLevels, Value)
+			end
+			
+			if not LevelLabel then
+				repeat task.wait() until LevelLabel
+			end
+
+			LevelLabel:Set("Selected Levels: "..table.concat(SelectedLevels, ", "))
 		end,
 	})
+	
+	LevelLabel = Main:CreateLabel("Selected Areas: None")
 
 	Main:CreateToggle({
 		Name = "🌲 Auto Attack Tree",
@@ -1772,20 +1799,20 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 
 	task.spawn(function()
 		while task.wait() do
-			if AttackLooping and SelectedArea and SelectedLevel then
+			if AttackLooping and #SelectedAreas > 0 and #SelectedLevels > 0 then
 				for i = 2, #Levels, 1 do
-					if Levels[i] == SelectedLevel or SelectedLevel == "All" and game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]) then
-						for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]).Storage:GetChildren()) do
+					for _,w in pairs(SelectedAreas) do
+						for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:GetChildren()) do
 							local SectionLooping = true
-
 
 							while task.wait() and SectionLooping and AttackLooping do
 								pcall(function()
-									if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(SelectedArea):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
+									if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
 										SectionLooping = false
 										print("[Inferno X] Debug: Tree Destroyed")
 									else
 										DamageRemote:FireServer(v.Name)
+										print('remote fired')
 									end
 								end)
 							end
