@@ -857,7 +857,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 		Case:CreateSlider({
 			Name = "Case Battles Amount",
-			Range = {1, 30},
+			Range = {1, 25},
 			Increment = 1,
 			CurrentValue = 1,
 			Flag = "CaseBattlesAmount",
