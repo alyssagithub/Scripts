@@ -776,7 +776,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 	local SelectedCase
 	local SelectedMode
-	
+
 	repeat task.wait() until Player:WaitForChild("PlayerGui"):WaitForChild("Interact_Gui"):WaitForChild("Frame_Switch")
 
 	local Background = Player.PlayerGui["Interact_Gui"]["Background_Frame"]
@@ -865,7 +865,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 				CaseBattlesAmount = Value
 			end,
 		})
-		
+
 		Case:CreateDropdown({
 			Name = "🔢 Mode",
 			Options = {"1v1 ", "1v1v1 ", "1v1 Crazy On", "1v1v1 Crazy On"},
@@ -917,7 +917,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 					if not BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase) then
 						local AddCasePrompt = Background["Games_Holder"]["Add_Case_Prompt"]
-						
+
 						repeat
 							Click(BattlePrompt["Button_Add"])
 							if AddCasePrompt.Visible == false then
@@ -946,7 +946,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 							task.wait(.1)
 						until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) >= CaseBattlesAmount or not InfiniteBattleLooping
 					end
-					
+
 					if tonumber(Background["Robux_Amount"].Text:gsub("%p", ""):split(" ")[1]) < tonumber(BattlePrompt["Battle_Frame"]["Title_Price"].Text:gsub("%p", ""):split(" ")[1]) then
 						repeat task.wait() until tonumber(Background["Robux_Amount"].Text:gsub("%p", ""):split(" ")[1]) >= tonumber(BattlePrompt["Battle_Frame"]["Title_Price"].Text:gsub("%p", ""):split(" ")[1])
 					end
@@ -1180,11 +1180,15 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	task.spawn(function()
 		while task.wait() do
 			if CollectLooping then
-				Player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(game:GetService("Workspace").gardenStage.triggers.hubTrigger.Position)
-				task.wait(.1)
 				for i,v in pairs(game:GetService("Workspace").gardenStage.physicsProps:GetChildren()) do
-					if CollectLooping and Player.Character:FindFirstChild("HumanoidRootPart") and v:IsA("Model") and v:FindFirstChild("destructable") and v.destructable.Value == true and v.destructable:FindFirstChildOfClass("MeshPart") then
-						Player.Character.HumanoidRootPart.CFrame = CFrame.new(v.destructable:FindFirstChildOfClass("MeshPart").Position)
+					if CollectLooping and v:IsA("Model") and v:FindFirstChild("destructable") and v.destructable.Value == true and v.destructable:FindFirstChildOfClass("MeshPart") then
+						if not Player.Character:FindFirstChild("HumanoidRootPart") then
+							repeat task.wait() until Player.Character:FindFirstChild("HumanoidRootPart")
+						end
+						
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.destructable:FindFirstChildOfClass("MeshPart").CFrame
+						task.wait()
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(game:GetService("Workspace").gardenStage.triggers.hubTrigger.Position)
 						task.wait()
 					end
 				end
@@ -1760,7 +1764,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 			end
 		end
 	end
-	
+
 	print("Purchasable Axes: "..table.concat(BuyableAxes, ", "))
 
 	local Window = CreateWindow()
