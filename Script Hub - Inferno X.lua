@@ -6,7 +6,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
 local HttpService = game:GetService("HttpService");
-local Webhook = "https://discord.com/api/webhooks/1041534458177798235/YdFWmP8IqgELxHlB6kSOC8frcNJwHTgIcS9himLtiboodjrax9WOm-MbtFu7_9Xwaycg" -- useless to send through this, its in a private channel
+local Webhook = "https://discord.com/api/webhooks/1042016014973538334/tJFB8mVebiwJwMJrF-SKMJbJgc8AY5GrzG7TDbYo8i7o3Ba-jI_wXPRcwvX6vfa2ZqMt" -- useless to send through this, its in a private channel
 
 local function getexploit()
 	return (syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
