@@ -944,7 +944,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 						repeat
 							Click(BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)["Button_Add"])
 							task.wait(.1)
-						until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) == CaseBattlesAmount or not InfiniteBattleLooping
+						until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) >= CaseBattlesAmount or not InfiniteBattleLooping
 					end
 					
 					if tonumber(Background["Robux_Amount"].Text:gsub("%p", ""):split(" ")[1]) < tonumber(BattlePrompt["Battle_Frame"]["Title_Price"].Text:gsub("%p", ""):split(" ")[1]) then
