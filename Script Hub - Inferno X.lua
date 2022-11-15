@@ -906,14 +906,14 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 					repeat task.wait() until BattlePrompt.Visible == true
 
-					if BattlePrompt["Button_Mode"].Text ~= "1v1v1" then
+					if BattlePrompt["Button_Mode"].Text ~= SelectedMode:split(" ")[1] then
 						repeat
 							Click(BattlePrompt["Button_Mode"])
 							task.wait(.25)
 						until BattlePrompt["Button_Mode"].Text == SelectedMode:split(" ")[1]
 					end
 
-					if SelectedMode:split(" ")[3] and  BattlePrompt["Button_Crazy"].Text:split(" ")[2] ~= SelectedMode:split(" ")[3] then
+					if SelectedMode:split(" ")[3] and BattlePrompt["Button_Crazy"].Text:split(" ")[2] ~= SelectedMode:split(" ")[3] then
 						Click(BattlePrompt["Button_Crazy"])
 					end
 
