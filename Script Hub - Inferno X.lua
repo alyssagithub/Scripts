@@ -96,7 +96,7 @@ local function CreateWindow()
 		ConfigurationSaving = {
 			Enabled = true,
 			FolderName = "InfernoXConfig",
-			FileName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+			FileName = "InfernoXConfig"
 		},
 		Discord = {
 			Enabled = true,
