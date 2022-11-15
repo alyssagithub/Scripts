@@ -1304,6 +1304,9 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	local UpgradeLooping
 	local RebirthLooping
 	local FrenzyLooping
+	local MultiplierLooping
+	
+	local SelectedMultiplier
 
 	local Plot = game:GetService("Workspace").Plots:FindFirstChild(Player.Name)
 
@@ -1409,6 +1412,33 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 				firetouchinterest(Player.Character.HumanoidRootPart, game:GetService("Workspace").Obby.Finish, 1)
 			end
 			task.wait(1)
+		end
+	end)
+	
+	Main:CreateDropdown({
+		Name = "💎 Multiplier",
+		Options = {"CashMultiplier", "GemsMultiplier"},
+		CurrentOption = "",
+		Flag = game.PlaceId.."SelectedMultiplier",
+		Callback = function(Value)
+			SelectedMultiplier = Value
+		end,
+	})
+	
+	Main:CreateToggle({
+		Name = "💰 Auto Upgrade Multiplier",
+		CurrentValue = false,
+		Flag = game.PlaceId.."AutoUpgradeMultiplier",
+		Callback = function(Value)
+			MultiplierLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if MultiplierLooping and SelectedMultiplier then
+				game:GetService("ReplicatedStorage").Functions.GemUpgrade:FireServer(SelectedMultiplier)
+			end
 		end
 	end)
 elseif game.PlaceId == 11102985540 then -- Swarm Simulator
