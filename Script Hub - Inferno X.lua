@@ -1332,7 +1332,9 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 					for e,r in pairs(Plot.Blocks:GetChildren()) do
 						firetouchinterest(v, r, 0)
 						firetouchinterest(v, r, 1)
+						task.wait()
 					end
+					task.wait()
 				end
 			end
 		end
