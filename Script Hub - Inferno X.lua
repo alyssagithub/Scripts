@@ -773,12 +773,15 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 	local OriginalAutoClickLooping
 
-	local CaseBattlesAmount
+	local CaseBattlesAmount = 1
 
 	local CaseList = {}
 	local DoneList = {}
 
 	local SelectedCase
+	local SelectedMode
+	
+	repeat task.wait() until Player:WaitForChild("PlayerGui"):WaitForChild("Interact_Gui"):WaitForChild("Frame_Switch")
 
 	local Background = Player.PlayerGui["Interact_Gui"]["Background_Frame"]
 	local BattlePrompt = Background["Games_Holder"]["Battle_Prompt"]
@@ -843,18 +846,6 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 	Main:CreateLabel("Press right click once to temp disable the auto clicker.")
 
-	Main:CreateButton({
-		Name = "🎃 Auto Get Pumpkins",
-		Callback = function()
-			for i,v in pairs(workspace:GetChildren()) do
-				if v.Name == "Event_Pumpkin" then
-					Player.Character.HumanoidRootPart.CFrame = v.CFrame
-					task.wait(.1)
-				end
-			end
-		end,
-	})
-
 	local Case = Window:CreateTab("Case", 4483362458)
 
 	task.spawn(function()
@@ -872,10 +863,20 @@ elseif game.PlaceId == 10779604733 then -- VBet
 			Name = "Case Battles Amount",
 			Range = {1, 30},
 			Increment = 1,
-			CurrentValue = 10,
+			CurrentValue = 1,
 			Flag = "CaseBattlesAmount",
 			Callback = function(Value)
 				CaseBattlesAmount = Value
+			end,
+		})
+		
+		Case:CreateDropdown({
+			Name = "🔢 Mode",
+			Options = {"1v1 ", "1v1v1 ", "1v1 Crazy On", "1v1v1 Crazy On"},
+			CurrentOption = "",
+			Flag = "SelectedMode",
+			Callback = function(Value)
+				SelectedMode = Value
 			end,
 		})
 
@@ -909,24 +910,26 @@ elseif game.PlaceId == 10779604733 then -- VBet
 						repeat
 							Click(BattlePrompt["Button_Mode"])
 							task.wait(.25)
-						until BattlePrompt["Button_Mode"].Text == "1v1v1"
+						until BattlePrompt["Button_Mode"].Text == SelectedMode:split(" ")[1]
 					end
 
-					if BattlePrompt["Button_Crazy"].Text ~= "Crazy On" then
+					if SelectedMode:split(" ")[3] and  BattlePrompt["Button_Crazy"].Text:split(" ")[2] ~= SelectedMode:split(" ")[3] then
 						Click(BattlePrompt["Button_Crazy"])
 					end
 
 					task.wait()
 
 					if not BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase) then
+						local AddCasePrompt = Background["Games_Holder"]["Add_Case_Prompt"]
+						
 						repeat
 							Click(BattlePrompt["Button_Add"])
-							task.wait(1)
-						until Background["Games_Holder"]["Add_Case_Prompt"].Visible == true or not InfiniteBattleLooping
-
-						task.wait(1)
-
-						local AddCasePrompt = Background["Games_Holder"]["Add_Case_Prompt"]
+							if AddCasePrompt.Visible == false then
+								task.wait(1)
+							else
+								task.wait()
+							end
+						until AddCasePrompt.Visible == true or not InfiniteBattleLooping
 
 						local CaseButton = AddCasePrompt["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
 
@@ -936,7 +939,7 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 						Click(CaseButton)
 
-						task.wait(.1)
+						repeat task.wait() until AddCasePrompt.Visible == false
 					end
 
 					repeat task.wait() until BattlePrompt["Battle_Frame"]["Scrolling_Frame_4"]:FindFirstChild(SelectedCase)
@@ -947,10 +950,18 @@ elseif game.PlaceId == 10779604733 then -- VBet
 							task.wait(.1)
 						until tonumber(BattlePrompt["Battle_Frame"]["Title_Rounds"].Text:split(" ")[1]) == CaseBattlesAmount or not InfiniteBattleLooping
 					end
+					
+					if tonumber(Background["Robux_Amount"].Text:gsub("%p", ""):split(" ")[1]) < tonumber(BattlePrompt["Battle_Frame"]["Title_Price"].Text:gsub("%p", ""):split(" ")[1]) then
+						repeat task.wait() until tonumber(Background["Robux_Amount"].Text:gsub("%p", ""):split(" ")[1]) >= tonumber(BattlePrompt["Battle_Frame"]["Title_Price"].Text:gsub("%p", ""):split(" ")[1])
+					end
 
 					repeat
 						Click(BattlePrompt["Button_Create"])
-						task.wait(1)
+						if Background["Games_Holder"]["Game_Battles"].Visible == false then
+							task.wait(1)
+						else
+							task.wait()
+						end
 					until Background["Games_Holder"]["Game_Battles"].Visible == true or not InfiniteBattleLooping
 
 					for i,v in pairs(Background["Games_Holder"]["Game_Battles"]["Scrolling_Frame_4"]:GetChildren()) do
@@ -984,7 +995,11 @@ elseif game.PlaceId == 10779604733 then -- VBet
 
 							repeat
 								Click(Background["Games_Holder"]:FindFirstChild(v.Name)["Button_Games_List"])
-								task.wait(1)
+								if Background["Games_Holder"]["Game_Battles"].Visible == false then
+									task.wait(1)
+								else
+									task.wait()
+								end
 							until Background["Games_Holder"]["Game_Battles"].Visible == true
 						end
 					end
