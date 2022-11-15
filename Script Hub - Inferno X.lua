@@ -247,10 +247,6 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	local IsInLoopNextLevel
 	local IsInLoopAutoHire
 
-	local HeadPosition
-
-	local CurrentPage
-
 	local HeroesList = {"None"}
 	local PlotList = {"Your Own Plot"}
 	local EnchantList = {"None", "Sharp I", "Hero I", "Rich I", "Sharp II", "Hero II", "Rich II", "Luck I", "Sharp III", "Hero III", "Immortal I", "Rich III", "Luck II", "Sharp IV", "Hero IV", "Immortal II", "Rich IV", "Luck III", "Team Player", "Lifeless"}
