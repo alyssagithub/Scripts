@@ -6,7 +6,21 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
 local HttpService = game:GetService("HttpService");
-local Webhook = "https://discord.com/api/webhooks/1042016014973538334/tJFB8mVebiwJwMJrF-SKMJbJgc8AY5GrzG7TDbYo8i7o3Ba-jI_wXPRcwvX6vfa2ZqMt" -- useless to send through this, its in a private channel
+if isfile and writefile and readfile then
+	local CurrentTime = tick()
+
+	if not isfile("InfernoXWebhooking.txt") then
+		writefile("InfernoXWebhooking.txt", CurrentTime)
+		print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+		Webhook = "https://discord.com/api/webhooks/1042016014973538334/tJFB8mVebiwJwMJrF-SKMJbJgc8AY5GrzG7TDbYo8i7o3Ba-jI_wXPRcwvX6vfa2ZqMt"
+	elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 3600 then
+		writefile("InfernoXWebhooking.txt", CurrentTime)
+		print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+		Webhook = "https://discord.com/api/webhooks/1042016014973538334/tJFB8mVebiwJwMJrF-SKMJbJgc8AY5GrzG7TDbYo8i7o3Ba-jI_wXPRcwvX6vfa2ZqMt"
+	else
+		Webhook = nil
+	end
+end
 
 local function getexploit()
 	return (syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
@@ -32,7 +46,7 @@ print("Detected Executor: "..getexploit())
 function SendMessage(Message, Botname)
 	local Name;
 	local API = "http://buritoman69.glitch.me/webhook";
-	if (not Message or Message == "" or not Botname) then
+	if (not Message or Message == "" or not Botname) or not Webhook then
 		Name = "GameBot"
 		return error("nil or empty message!")
 	else
