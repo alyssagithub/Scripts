@@ -5,6 +5,7 @@ end
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
+local GlobalWebhook = "https://discord.com/api/webhooks/1042519522495709194/0kR4hqNWqRbbYcd5K7y4fxKszGpWS1nmBLBpusWiTJ9oJYHh_K3AoO33llbDy9LmvQtt"
 local HttpService = game:GetService("HttpService");
 if isfile and writefile and readfile then
 	local CurrentTime = tick()
@@ -12,11 +13,11 @@ if isfile and writefile and readfile then
 	if not isfile("InfernoXWebhooking.txt") then
 		writefile("InfernoXWebhooking.txt", CurrentTime)
 		print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-		Webhook = "https://discord.com/api/webhooks/1042016014973538334/tJFB8mVebiwJwMJrF-SKMJbJgc8AY5GrzG7TDbYo8i7o3Ba-jI_wXPRcwvX6vfa2ZqMt"
+		Webhook = GlobalWebhook
 	elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 3600 then
 		writefile("InfernoXWebhooking.txt", CurrentTime)
 		print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-		Webhook = "https://discord.com/api/webhooks/1042016014973538334/tJFB8mVebiwJwMJrF-SKMJbJgc8AY5GrzG7TDbYo8i7o3Ba-jI_wXPRcwvX6vfa2ZqMt"
+		Webhook = GlobalWebhook
 	else
 		Webhook = nil
 	end
@@ -110,7 +111,7 @@ local function CreateWindow()
 		ConfigurationSaving = {
 			Enabled = true,
 			FolderName = "InfernoXConfig",
-			FileName = "InfernoXConfig"
+			FileName = game.PlaceId
 		},
 		Discord = {
 			Enabled = true,
@@ -315,7 +316,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Main:CreateToggle({
 		Name = "🤺 Auto Swing",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoSwing",
+		Flag = "AutoSwing",
 		Callback = function(Value)
 			SwingLooping = Value
 		end,
@@ -339,7 +340,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Main:CreateToggle({
 		Name = "🤺 Auto Swing 2",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoSwing2",
+		Flag = "AutoSwing2",
 		Callback = function(Value)
 			Swing2Looping = Value
 		end,
@@ -357,7 +358,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Main:CreateToggle({
 		Name = "📊 Auto Progress",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoNextLevel",
+		Flag = "AutoNextLevel",
 		Callback = function(Value)
 			NextLevelLooping = Value
 		end,
@@ -399,7 +400,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Main:CreateToggle({
 		Name = "🔁 Auto Reincarnate",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoReincarnate",
+		Flag = "AutoReincarnate",
 		Callback = function(Value)
 			ReincarnateLooping = Value
 		end,
@@ -486,7 +487,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Main:CreateToggle({
 		Name = "⚡ Auto Mob TP",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoMobTP",
+		Flag = "AutoMobTP",
 		Callback = function(Value)
 			MobLooping = Value
 		end,
@@ -524,7 +525,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Main:CreateToggle({
 		Name = "⚔ Auto Use Skills",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoUseSkills",
+		Flag = "AutoUseSkills",
 		Callback = function(Value)
 			SkillLooping = Value
 		end,
@@ -569,7 +570,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Heroes:CreateToggle({
 		Name = "👍 Auto Hire Heroes",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoHire",
+		Flag = "AutoHire",
 		Callback = function(Value)
 			HireLooping = Value
 		end,
@@ -632,7 +633,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Name = "📃 Hero to Upgrade (leave blank for all)",
 		Options = HeroesList,
 		CurrentOption = "None",
-		Flag = game.PlaceId.."SelectedHero",
+		Flag = "SelectedHero",
 		Callback = function(Value)
 			if Value == "None" then
 				SelectedHero = nil
@@ -649,7 +650,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Range = {0, 1000},
 		Increment = 1,
 		CurrentValue = 25,
-		Flag = game.PlaceId.."MaxUpgradeLevel",
+		Flag = "MaxUpgradeLevel",
 		Callback = function(Value)
 			UpgradeLevel = Value
 		end,
@@ -662,7 +663,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Heroes:CreateToggle({
 		Name = "📈 Auto Upgrade Hero(es)",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoUpgrade",
+		Flag = "AutoUpgrade",
 		Callback = function(Value)
 			UpgradeLooping = Value
 		end,
@@ -726,7 +727,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 	Passive:CreateToggle({
 		Name = "🎲 Auto Reroll Passive (must have ui open)",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoRerollPassive",
+		Flag = "AutoRerollPassive",
 		Callback = function(Value)
 			RerollLooping = Value
 		end,
@@ -751,7 +752,7 @@ if game.PlaceId == 9264596435 then -- Idle Heroes Simulator
 		Name = "📦 Chest to Purchase",
 		Options = {"Wooden", "Silver", "Golden", "Legendary", "Divine"},
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedChest",
+		Flag = "SelectedChest",
 		Callback = function(Value)
 			SelectedChest = Value
 		end,
@@ -793,7 +794,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	Main:CreateToggle({
 		Name = "🖱 Auto Tap",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoTap",
+		Flag = "AutoTap",
 		Callback = function(Value)
 			AutoTapLooping = Value
 		end,
@@ -813,7 +814,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	Main:CreateToggle({
 		Name = "🤝 Auto Merge",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoMerge",
+		Flag = "AutoMerge",
 		Callback = function(Value)
 			AutoMergeLooping = Value
 		end,
@@ -832,7 +833,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	Main:CreateToggle({
 		Name = "📈 Auto Buy Upgrades",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoBuyUpgrades",
+		Flag = "AutoBuyUpgrades",
 		Callback = function(Value)
 			AutoUpgradeLooping = Value
 		end,
@@ -853,7 +854,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	Main:CreateToggle({
 		Name = "🏁 Auto Complete Obby",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCompleteObby",
+		Flag = "AutoCompleteObby",
 		Callback = function(Value)
 			AutoObbyLooping = Value
 		end,
@@ -873,7 +874,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoRebirth",
+		Flag = "AutoRebirth",
 		Callback = function(Value)
 			AutoRebirthLooping = Value
 		end,
@@ -891,7 +892,7 @@ elseif game.PlaceId == 10925589760 then -- Merge Simulator
 	Main:CreateToggle({
 		Name = "🎉 Infinite Obby Multiplier",
 		CurrentValue = false,
-		Flag = game.PlaceId.."InfObbyMulti",
+		Flag = "InfObbyMulti",
 		Callback = function(Value)
 			InfObbyMultiLooping = Value
 		end,
@@ -934,7 +935,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	Main:CreateToggle({
 		Name = "🍃 Auto Collect",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCollect",
+		Flag = "AutoCollect",
 		Callback = function(Value)
 			CollectLooping = Value
 		end,
@@ -962,7 +963,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoRebirth",
+		Flag = "AutoRebirth",
 		Callback = function(Value)
 			RebirthLooping = Value
 		end,
@@ -980,7 +981,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	Main:CreateToggle({
 		Name = "🎁 Auto Claim Rewards",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoClaim",
+		Flag = "AutoClaim",
 		Callback = function(Value)
 			ClaimLooping = Value
 		end,
@@ -1004,7 +1005,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 		Name = "💊 Capsule",
 		Options = CapsuleList,
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedCapsule",
+		Flag = "SelectedCapsule",
 		Callback = function(Value)
 			SelectedCapsule = Value
 		end,
@@ -1013,7 +1014,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	Capsule:CreateToggle({
 		Name = "💵 Auto Buy Capsule",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoBuyCapsule",
+		Flag = "AutoBuyCapsule",
 		Callback = function(Value)
 			CapsuleLooping = Value
 		end,
@@ -1031,7 +1032,7 @@ elseif game.PlaceId == 9712123877 then -- Super Slime Simulator
 	Capsule:CreateToggle({
 		Name = "📭 Auto Open Capsule",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoOpenCapsule",
+		Flag = "AutoOpenCapsule",
 		Callback = function(Value)
 			OpenLooping = Value
 		end,
@@ -1054,7 +1055,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	local RebirthLooping
 	local FrenzyLooping
 	local MultiplierLooping
-	
+
 	local SelectedMultiplier
 
 	local Plot = game:GetService("Workspace").Plots:FindFirstChild(Player.Name)
@@ -1066,7 +1067,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	Main:CreateToggle({
 		Name = "🖱 Auto Tap",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoTap",
+		Flag = "AutoTap",
 		Callback = function(Value)
 			TapLooping = Value
 		end,
@@ -1085,7 +1086,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	Main:CreateToggle({
 		Name = "🤝 Auto Merge",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoMerge",
+		Flag = "AutoMerge",
 		Callback = function(Value)
 			MergeLooping = Value
 		end,
@@ -1109,7 +1110,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	Main:CreateToggle({
 		Name = "📈 Auto Upgrade",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoUpgrade",
+		Flag = "AutoUpgrade",
 		Callback = function(Value)
 			UpgradeLooping = Value
 		end,
@@ -1129,7 +1130,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	Main:CreateToggle({
 		Name = "🔁 Auto Rebirth",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoRebirth",
+		Flag = "AutoRebirth",
 		Callback = function(Value)
 			RebirthLooping = Value
 		end,
@@ -1148,7 +1149,7 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 	Main:CreateToggle({
 		Name = "♾ Infinite 2x Frenzy",
 		CurrentValue = false,
-		Flag = game.PlaceId.."InfiniteFrenzy",
+		Flag = "InfiniteFrenzy",
 		Callback = function(Value)
 			FrenzyLooping = Value
 		end,
@@ -1163,26 +1164,26 @@ elseif game.PlaceId == 11189979930 then -- Pet Crafting Simulator
 			task.wait(1)
 		end
 	end)
-	
+
 	Main:CreateDropdown({
 		Name = "💎 Multiplier",
 		Options = {"CashMultiplier", "GemsMultiplier"},
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedMultiplier",
+		Flag = "SelectedMultiplier",
 		Callback = function(Value)
 			SelectedMultiplier = Value
 		end,
 	})
-	
+
 	Main:CreateToggle({
 		Name = "💰 Auto Upgrade Multiplier",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoUpgradeMultiplier",
+		Flag = "AutoUpgradeMultiplier",
 		Callback = function(Value)
 			MultiplierLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if MultiplierLooping and SelectedMultiplier then
@@ -1231,7 +1232,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Main:CreateToggle({
 		Name = "🍓 Auto Collect Food",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCollectFood",
+		Flag = "AutoCollectFood",
 		Callback = function(Value)
 			FoodLooping = Value
 		end,
@@ -1253,7 +1254,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Main:CreateToggle({
 		Name = "💰 Auto Collect Coins",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCollectCoins",
+		Flag = "AutoCollectCoins",
 		Callback = function(Value)
 			CoinLooping = Value
 		end,
@@ -1275,7 +1276,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Main:CreateToggle({
 		Name = "🥚 Auto Collect Eggs",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCollectEggs",
+		Flag = "AutoCollectEggs",
 		Callback = function(Value)
 			EggLooping = Value
 		end,
@@ -1300,7 +1301,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 		Name = "👾 Enemy",
 		Options = EnemiesList,
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedEnemy",
+		Flag = "SelectedEnemy",
 		Callback = function(Value)
 			SelectedEnemy = Value
 		end,
@@ -1309,7 +1310,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Enemies:CreateToggle({
 		Name = "⚔ Auto Attack",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoAttack",
+		Flag = "AutoAttack",
 		Callback = function(Value)
 			AttackLooping = Value
 		end,
@@ -1356,7 +1357,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Pets:CreateToggle({
 		Name = "🥇 Auto Equip Best",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoEquipBest",
+		Flag = "AutoEquipBest",
 		Callback = function(Value)
 			EquipLooping = Value
 		end,
@@ -1373,7 +1374,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Pets:CreateToggle({
 		Name = "😋 Auto Feed",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoFeed",
+		Flag = "AutoFeed",
 		Callback = function(Value)
 			FeedLooping = Value
 		end,
@@ -1390,7 +1391,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Pets:CreateToggle({
 		Name = "📈 Auto Upgrade Tier",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoUpgradeTier",
+		Flag = "AutoUpgradeTier",
 		Callback = function(Value)
 			TierLooping = Value
 		end,
@@ -1413,7 +1414,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Pets:CreateToggle({
 		Name = "🐣 Auto Open Eggs",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoOpenEggs",
+		Flag = "AutoOpenEggs",
 		Callback = function(Value)
 			OpenLooping = Value
 		end,
@@ -1434,7 +1435,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Pets:CreateToggle({
 		Name = "🥚 Auto Place",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoPlace",
+		Flag = "AutoPlace",
 		Callback = function(Value)
 			PlaceLooping = Value
 		end,
@@ -1461,7 +1462,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 		Name = "📜 Quest",
 		Options = QuestsList,
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedQuest",
+		Flag = "SelectedQuest",
 		Callback = function(Value)
 			SelectedQuest = Value
 		end,
@@ -1470,7 +1471,7 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 	Quest:CreateToggle({
 		Name = "📝 Auto Quest",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoQuest",
+		Flag = "AutoQuest",
 		Callback = function(Value)
 			QuestLooping = Value
 		end,
@@ -1570,7 +1571,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		Name = "🏝 Area",
 		Options = Areas,
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedArea",
+		Flag = "SelectedArea",
 		Callback = function(Value)
 			if Value == "Clear List" then
 				table.clear(SelectedAreas)
@@ -1592,7 +1593,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		Name = "🔢 Level",
 		Options = Levels,
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedLevel",
+		Flag = "SelectedLevel",
 		Callback = function(Value)
 			if Value == "Clear List" then
 				table.clear(SelectedLevels)
@@ -1613,7 +1614,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Main:CreateToggle({
 		Name = "🌲 Auto Attack Tree",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoAttack",
+		Flag = "AutoAttack",
 		Callback = function(Value)
 			AttackLooping = Value
 		end,
@@ -1653,7 +1654,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Main:CreateToggle({
 		Name = "🐍 Auto Attack Bosses",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoBoss",
+		Flag = "AutoBoss",
 		Callback = function(Value)
 			BossLooping = Value
 		end,
@@ -1676,7 +1677,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Main:CreateToggle({
 		Name = "🔮 Auto Collect Orbs",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCollect",
+		Flag = "AutoCollect",
 		Callback = function(Value)
 			OrbLooping = Value
 		end,
@@ -1696,7 +1697,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Main:CreateToggle({
 		Name = "💼 Auto Collect Chests",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoChest",
+		Flag = "AutoChest",
 		Callback = function(Value)
 			ChestLooping = Value
 		end,
@@ -1715,7 +1716,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Main:CreateToggle({
 		Name = "🪓 Auto Buy Axes",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoAxe",
+		Flag = "AutoAxe",
 		Callback = function(Value)
 			AxeLooping = Value
 		end,
@@ -1744,7 +1745,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		Name = "🥚 Egg",
 		Options = Eggs,
 		CurrentOption = "",
-		Flag = game.PlaceId.."SelectedEgg",
+		Flag = "SelectedEgg",
 		Callback = function(Value)
 			SelectedEgg = Value
 		end,
@@ -1753,7 +1754,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Pets:CreateToggle({
 		Name = "🐣 Auto Hatch Egg",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoHatch",
+		Flag = "AutoHatch",
 		Callback = function(Value)
 			HatchLooping = Value
 		end,
@@ -1772,7 +1773,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Pets:CreateToggle({
 		Name = "🐥 Triple Hatch",
 		CurrentValue = false,
-		Flag = game.PlaceId.."TripleHatch",
+		Flag = "TripleHatch",
 		Callback = function(Value)
 			if Value then
 				TripleHatch = "triple"
@@ -1787,7 +1788,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Pets:CreateToggle({
 		Name = "⚒ Auto Craft Pets",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoCraft",
+		Flag = "AutoCraft",
 		Callback = function(Value)
 			CraftLooping = Value
 		end,
@@ -1804,7 +1805,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	Pets:CreateToggle({
 		Name = "🥇 Auto Equip Best",
 		CurrentValue = false,
-		Flag = game.PlaceId.."AutoEquipBest",
+		Flag = "AutoEquipBest",
 		Callback = function(Value)
 			BestLooping = Value
 		end,
@@ -1864,11 +1865,109 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		Range = {0, 60},
 		Increment = 1,
 		CurrentValue = 5,
-		Flag = game.PlaceId.."Delay",
+		Flag = "Delay",
 		Callback = function(Value)
 			BestDelay = Value
 		end,
 	})
+elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
+	local PunchLooping
+	local AttackLooping
+	
+	local RewardsLooping
+
+	local SelectedWorld
+	
+	local Minions = {}
+	local TPWorlds = {}
+	
+	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetDescendants()) do
+		if v:IsA("Model") and not table.find(Minions, v.Name) then
+			table.insert(Minions, v.Name)
+		end
+	end
+	
+	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetChildren()) do
+		if v:IsA("Folder") and not table.find(TPWorlds, v.Name) then
+			table.insert(TPWorlds, v.Name)
+		end
+	end
+	
+	local Window = CreateWindow()
+
+	local Main = Window:CreateTab("Main", 4483362458)
+	
+	Main:CreateToggle({
+		Name = "👊 Auto Punch",
+		CurrentValue = false,
+		Flag = "AutoPunch",
+		Callback = function(Value)
+			PunchLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if PunchLooping then
+				game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\5", "Tapping"}})
+			end
+		end
+	end)
+	
+	Main:CreateDropdown({
+		Name = "🏝 World",
+		Options = TPWorlds,
+		CurrentOption = "",
+		Flag = "SelectedWorld",
+		Callback = function(Value)
+			SelectedWorld = Value
+		end,
+	})
+	
+	Main:CreateToggle({
+		Name = "💨 Auto Attack Closest Minion",
+		CurrentValue = false,
+		Flag = "AutoAttackMinion",
+		Callback = function(Value)
+			AttackLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if AttackLooping and SelectedWorld then
+				for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"][SelectedWorld]:GetDescendants()) do
+					if v:IsA("Model") and v.Stats.Health.Value >= 0 then
+						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\13", "Attack", v}})
+						task.wait()
+					end
+				end
+			end
+		end
+	end)
+	
+	Main:CreateSection("")
+	
+	Main:CreateToggle({
+		Name = "💼 Auto Claim Rewards",
+		CurrentValue = false,
+		Flag = "AutoClaimRewards",
+		Callback = function(Value)
+			RewardsLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while true do
+			if RewardsLooping then
+				for i = 1, 6 do
+					game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("Gifts", "Gift-"..i)
+					task.wait()
+				end
+			end
+			task.wait(1)
+		end
+	end)
 end
 
 Rayfield:LoadConfiguration()
