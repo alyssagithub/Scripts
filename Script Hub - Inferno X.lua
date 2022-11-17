@@ -7,21 +7,23 @@ local Player = game:GetService("Players").LocalPlayer or game:GetService("Player
 
 local GlobalWebhook = "https://discord.com/api/webhooks/1042519522495709194/0kR4hqNWqRbbYcd5K7y4fxKszGpWS1nmBLBpusWiTJ9oJYHh_K3AoO33llbDy9LmvQtt"
 local HttpService = game:GetService("HttpService");
-if isfile and writefile and readfile then
-	local CurrentTime = tick()
+pcall(function()
+	if isfile and writefile and readfile then
+		local CurrentTime = tick()
 
-	if not isfile("InfernoXWebhooking.txt") then
-		writefile("InfernoXWebhooking.txt", CurrentTime)
-		print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-		Webhook = GlobalWebhook
-	elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 3600 then
-		writefile("InfernoXWebhooking.txt", CurrentTime)
-		print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-		Webhook = GlobalWebhook
-	else
-		Webhook = nil
+		if not isfile("InfernoXWebhooking.txt") then
+			writefile("InfernoXWebhooking.txt", CurrentTime)
+			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+			Webhook = GlobalWebhook
+		elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 3600 then
+			writefile("InfernoXWebhooking.txt", CurrentTime)
+			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+			Webhook = GlobalWebhook
+		else
+			Webhook = nil
+		end
 	end
-end
+end)
 
 local function getexploit()
 	return (syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
@@ -1873,30 +1875,30 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 	local PunchLooping
 	local AttackLooping
-	
+
 	local RewardsLooping
 
 	local SelectedWorld
-	
+
 	local Minions = {}
 	local TPWorlds = {}
-	
+
 	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetDescendants()) do
 		if v:IsA("Model") and not table.find(Minions, v.Name) then
 			table.insert(Minions, v.Name)
 		end
 	end
-	
+
 	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetChildren()) do
 		if v:IsA("Folder") and not table.find(TPWorlds, v.Name) then
 			table.insert(TPWorlds, v.Name)
 		end
 	end
-	
+
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-	
+
 	Main:CreateToggle({
 		Name = "👊 Auto Punch",
 		CurrentValue = false,
@@ -1905,7 +1907,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			PunchLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if PunchLooping then
@@ -1913,7 +1915,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateDropdown({
 		Name = "🏝 World",
 		Options = TPWorlds,
@@ -1923,7 +1925,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			SelectedWorld = Value
 		end,
 	})
-	
+
 	Main:CreateToggle({
 		Name = "💨 Auto Attack Closest Minion",
 		CurrentValue = false,
@@ -1932,7 +1934,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			AttackLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if AttackLooping and SelectedWorld then
@@ -1945,9 +1947,9 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateSection("")
-	
+
 	Main:CreateToggle({
 		Name = "💼 Auto Claim Rewards",
 		CurrentValue = false,
@@ -1956,7 +1958,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			RewardsLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while true do
 			if RewardsLooping then
@@ -1966,6 +1968,111 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 				end
 			end
 			task.wait(1)
+		end
+	end)
+elseif game.PlaceId == 9737855826 then -- Trade Simulator
+	local NewLooping
+	local ItemLooping
+
+	local SelectedPrice = 100
+
+	local GetItems
+	local Buy
+
+	local Items = {}
+	local Items2 = {}
+
+	task.spawn(function()
+		while task.wait(Random.new():NextNumber(2, 5)) do
+			pcall(function()
+				local GetItems2 = game:GetService("ReplicatedStorage").Remotes.GetItems:InvokeServer()
+				repeat task.wait() until GetItems2
+				GetItems = GetItems2
+			end)
+		end
+	end)
+
+	local Window = CreateWindow()
+
+	local Main = Window:CreateTab("Main", 4483362458)
+
+	Main:CreateToggle({
+		Name = "🔍 New Item Sniper",
+		CurrentValue = false,
+		Flag = "NewItemSniper",
+		Callback = function(Value)
+			NewLooping = Value
+		end,
+	})
+
+	if GetItems then
+		for i,v in pairs(GetItems) do
+			if not table.find(Items, v.name) then
+				table.insert(Items, v.name)
+			end
+		end
+	end
+
+	task.spawn(function()
+		while task.wait() do
+			if NewLooping then
+				if GetItems then
+					for i,v in pairs(GetItems) do
+						if v.status == "new" and not table.find(Items, v.name) then
+							repeat
+								pcall(function()
+									Buy = game:GetService("ReplicatedStorage").Remotes.Purchase:InvokeServer(v.name)
+									if Buy[1] and Buy[1] == "Success" then
+										print("[Inferno X] Debug: (New Item Sniper) Bought item: "..v.name)
+									end
+									task.wait(math.random(1, 5))
+								end)
+							until Buy and Buy.error and Buy.error == "You have max amount of this item"
+						end
+					end
+				end
+			end
+		end
+	end)
+
+	Main:CreateSlider({
+		Name = "🔢 Item Sniping Price",
+		Range = {0, 1000},
+		Increment = 1,
+		CurrentValue = 100,
+		Flag = "SelectedPrice",
+		Callback = function(Value)
+			SelectedPrice = Value
+		end,
+	})
+
+	Main:CreateToggle({
+		Name = "🔎 Item Sniper",
+		CurrentValue = false,
+		Flag = "ItemSniper",
+		Callback = function(Value)
+			ItemLooping = Value
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if ItemLooping then
+				if GetItems then
+					for i,v in pairs(GetItems) do
+						if v.status == "limited" and v.price and v.price <= SelectedPrice then
+							local GetItemInfo = game:GetService("ReplicatedStorage").Remotes.GetItemInfo:InvokeServer(v.name)
+							local Id = game:GetService("ReplicatedStorage").Remotes.GetItemInfo:InvokeServer(v.name).listings[1].id
+
+							if not table.find(Items2, Id) then
+								local Buy2 = game:GetService("ReplicatedStorage").Remotes.PurchaseL:InvokeServer(v.name, Id)
+								print("[Inferno X] Debug: (Item Sniper) Bought item: "..v.name.." for "..v.price.." with id "..Id)
+								table.insert(Items2, Id)
+							end
+						end
+					end
+				end
+			end
 		end
 	end)
 end
