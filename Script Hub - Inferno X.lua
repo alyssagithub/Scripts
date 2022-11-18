@@ -2027,6 +2027,25 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			Player.Character.HumanoidRootPart.CFrame = CFrame.new(CurrentZone.Position.X, CurrentZone.Position.Y, CurrentZone.Position.Z - 5)
 		end,
 	})
+	
+	Teleports:CreateButton({
+		Name = "💨 Teleport to Your Best Area",
+		Callback = function()
+			local BestNumber = 0
+			local CurrentArea
+
+			for i,v in pairs(game:GetService("Workspace")["_GAME"]["_WORLDS"]:GetDescendants()) do
+				if v:FindFirstChild("GateBlock") and v:FindFirstChild("GateBlock").Transparency == 1 and i > BestNumber then
+					BestNumber = i
+					CurrentArea = v.GateBlock
+				end
+			end
+			
+			if CurrentArea then
+				Player.Character.HumanoidRootPart.CFrame = CFrame.new(CurrentArea.Position.X, CurrentArea.Position.Y, CurrentArea.Position.Z)
+			end
+		end,
+	})
 elseif game.PlaceId == 9737855826 then -- Trade Simulator
 	local NewLooping
 	local ItemLooping
