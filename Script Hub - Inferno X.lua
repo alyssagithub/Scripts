@@ -2128,7 +2128,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 					Notify("Your executor does not support 'getconnections'", 5)
 				end
 			end
-			task.wait(1)
+			task.wait(5)
 		end
 	end)
 elseif game.PlaceId == 9737855826 then -- Trade Simulator
