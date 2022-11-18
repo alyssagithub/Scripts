@@ -2150,7 +2150,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 		Name = "🔼 Teleport to Interactable",
 		Options = Pads,
 		CurrentOption = "",
-		Flag = "SelectedInteractable",
+		--Flag = "SelectedInteractable",
 		Callback = function(Value)
 			local Part = game:GetService("Workspace")["_GAME"]["_INTERACTIONS"]:FindFirstChild(Value)
 			Player.Character.HumanoidRootPart.CFrame = CFrame.new(Part.Position.X, Part.Position.Y + 5, Part.Position.Z)
@@ -2161,7 +2161,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 		Name = "🏝 Teleport to World",
 		Options = Worlds,
 		CurrentOption = "",
-		Flag = "SelectedWorld",
+		--Flag = "SelectedWorld",
 		Callback = function(Value)
 			Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_TPs"]:FindFirstChild(Value:split("-")[2]).Position)
 		end,
