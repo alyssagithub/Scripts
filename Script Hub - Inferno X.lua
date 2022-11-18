@@ -1951,7 +1951,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 				end
 
 				if TPLooping then
-					Player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(CurrentMinion.HumanoidRootPart.Position.X, CurrentMinion.HumanoidRootPart.Position.Y, CurrentMinion.HumanoidRootPart.Position.Z + 2.5))
+					Player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(CurrentMinion.HumanoidRootPart.Position.X + 2.5, CurrentMinion.HumanoidRootPart.Position.Y, CurrentMinion.HumanoidRootPart.Position.Z))
 				end
 
 				game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\13", "Attack", CurrentMinion}})
@@ -2170,6 +2170,23 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 				Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_TPs"]:FindFirstChild(Value:split("-")[2]).Position)
 				World:Set("")
 			end
+		end,
+	})
+	
+	Teleports:CreateButton({
+		Name = "🌺 Teleport to Your Best Training Zone",
+		Callback = function()
+			local BestNumber = 0
+			local CurrentZone
+
+			for i,v in pairs(game:GetService("Workspace")["_GAME"]["_WORKSPACE"]:GetDescendants()) do
+				if v:FindFirstChild("UID") and tonumber(v.UID.Gui.Multiplier.Text:split(" ")[3]) >= BestNumber and tonumber(Player.PlayerGui.Interface.StatsFrame.Rank.UID.Text:split(" ")[2]) >= tonumber(v.UID.Gui.Multiplier.Text:split(" ")[3]) then
+					BestNumber = tonumber(v.UID.Gui.Multiplier.Text:split(" ")[3])
+					CurrentZone = v.UID
+				end
+			end
+
+			Player.Character.HumanoidRootPart.CFrame = CFrame.new(CurrentZone.Position.X, CurrentZone.Position.Y, CurrentZone.Position.Z - 5)
 		end,
 	})
 elseif game.PlaceId == 9737855826 then -- Trade Simulator
