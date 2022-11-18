@@ -2152,7 +2152,8 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 		CurrentOption = "",
 		Flag = "SelectedInteractable",
 		Callback = function(Value)
-			Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_PADS"]:FindFirstChild(Value).Position)
+			local Part = game:GetService("Workspace")["_GAME"]["_INTERACTIONS"]:FindFirstChild(Value)
+			Player.Character.HumanoidRootPart.CFrame = CFrame.new(Part.Position.X, Part.Position.Y + 5, Part.Position.Z)
 		end,
 	})
 	
