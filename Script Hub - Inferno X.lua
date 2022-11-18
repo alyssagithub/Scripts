@@ -2084,6 +2084,27 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			game:GetService("Lighting").Blur.Size = 1
 		end
 	end)
+	
+	Main:CreateToggle({
+		Name = "✅ Free Premium Boost",
+		CurrentValue = false,
+		Flag = "FreePremiumBoosst",
+		Callback = function(Value)
+			if hookmetamethod then
+				local CreateHookIndex
+
+				CreateHookIndex = hookmetamethod(game.Players.LocalPlayer, "__index", function(self, method)
+					if method == "MembershipType" then
+						return Enum.MembershipType.Premium
+					end
+
+					return CreateHookIndex(self, method)
+				end)
+			else
+				Notify("Your executor does not support 'hookmetamethod'", 5)
+			end
+		end,
+	})
 
 	local Pets = Window:CreateTab("Pets", 4483362458)
 
