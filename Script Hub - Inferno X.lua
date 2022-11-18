@@ -2146,24 +2146,30 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 	
 	local Teleports = Window:CreateTab("Teleports", 4483362458)
 	
-	Teleports:CreateDropdown({
+	Interactable = Teleports:CreateDropdown({
 		Name = "🔼 Teleport to Interactable",
 		Options = Pads,
 		CurrentOption = "",
 		--Flag = "SelectedInteractable",
 		Callback = function(Value)
-			local Part = game:GetService("Workspace")["_GAME"]["_INTERACTIONS"]:FindFirstChild(Value)
-			Player.Character.HumanoidRootPart.CFrame = CFrame.new(Part.Position.X, Part.Position.Y + 5, Part.Position.Z)
+			if Value ~= "" then
+				local Part = game:GetService("Workspace")["_GAME"]["_INTERACTIONS"]:FindFirstChild(Value)
+				Player.Character.HumanoidRootPart.CFrame = CFrame.new(Part.Position.X, Part.Position.Y + 5, Part.Position.Z)
+				Interactable:Set("")
+			end
 		end,
 	})
 	
-	Teleports:CreateDropdown({
+	World = Teleports:CreateDropdown({
 		Name = "🏝 Teleport to World",
 		Options = Worlds,
 		CurrentOption = "",
 		--Flag = "SelectedWorld",
 		Callback = function(Value)
-			Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_TPs"]:FindFirstChild(Value:split("-")[2]).Position)
+			if Value ~= "" then
+				Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_TPs"]:FindFirstChild(Value:split("-")[2]).Position)
+				World:Set("")
+			end
 		end,
 	})
 elseif game.PlaceId == 9737855826 then -- Trade Simulator
