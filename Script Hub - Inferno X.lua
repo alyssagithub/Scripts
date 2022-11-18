@@ -1888,11 +1888,23 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 	local EquipLooping
 
 	local Minions = {}
+	local Pads = {}
+	local Worlds = {"Spawn Area, World-1"}
 
 	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetDescendants()) do
 		if v:IsA("Model") and not table.find(Minions, v.Name) then
 			table.insert(Minions, v.Name)
 		end
+	end
+	
+	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_INTERACTIONS"]:GetChildren()) do
+		if not table.find(Pads, v.Name) then
+			table.insert(Pads, v.Name)
+		end
+	end
+	
+	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_AREAS"]:GetChildren()) do
+		table.insert(Worlds, v.Data.Zone.Value..", "..v.Data.World.Value)
 	end
 
 	local Window = CreateWindow()
@@ -2131,6 +2143,28 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			task.wait(5)
 		end
 	end)
+	
+	local Teleports = Window:CreateTab("Teleports", 4483362458)
+	
+	Teleports:CreateDropdown({
+		Name = "🔼 Teleport to Interactable",
+		Options = Pads,
+		CurrentOption = "",
+		Flag = "SelectedInteractable",
+		Callback = function(Value)
+			Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_PADS"]:FindFirstChild(Value).Position)
+		end,
+	})
+	
+	Teleports:CreateDropdown({
+		Name = "🏝 Teleport to World",
+		Options = Worlds,
+		CurrentOption = "",
+		Flag = "SelectedWorld",
+		Callback = function(Value)
+			Player.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace")["_GAME"]["_TPs"]:FindFirstChild(Value:split("-")[2]).Position)
+		end,
+	})
 elseif game.PlaceId == 9737855826 then -- Trade Simulator
 	local NewLooping
 	local ItemLooping
