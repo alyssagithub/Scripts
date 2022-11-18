@@ -1513,8 +1513,16 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local Eggs = {}
 	local Chests = {}
 	local BuyableAxes = {}
-
-	repeat task.wait() until Player.Character:FindFirstChild("IS_GAME_AXE")
+	
+	local Loading = true
+	
+	while Loading and task.wait() do
+	    for i,v in pairs(Player.Character:GetChildren()) do
+	        if v.Name:match("gameAxe") then
+	            Loading = false
+	        end
+	    end
+	end
 
 	local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 	local TreeService = Knit.GetService("TreeService")
