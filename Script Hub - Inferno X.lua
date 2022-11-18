@@ -2090,9 +2090,8 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 		CurrentValue = false,
 		Flag = "FreePremiumBoosst",
 		Callback = function(Value)
-			if hookmetamethod then
-				local CreateHookIndex
-
+			local CreateHookIndex
+			if Value and hookmetamethod then
 				CreateHookIndex = hookmetamethod(game.Players.LocalPlayer, "__index", function(self, method)
 					if method == "MembershipType" then
 						return Enum.MembershipType.Premium
@@ -2100,8 +2099,16 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 
 					return CreateHookIndex(self, method)
 				end)
-			else
+			elseif Value then
 				Notify("Your executor does not support 'hookmetamethod'", 5)
+			else
+				CreateHookIndex = hookmetamethod(game.Players.LocalPlayer, "__index", function(self, method)
+					if method == "MembershipType" then
+						return Enum.MembershipType.None
+					end
+
+					return CreateHookIndex(self, method)
+				end)
 			end
 		end,
 	})
