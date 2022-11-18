@@ -1875,23 +1875,23 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 	local PunchLooping
 	local AttackLooping
+	local TPLooping
 
 	local RewardsLooping
+	local RankupLooping
+	local AreaLooping
+	local UpgradeLooping
+	
+	local EggLooping
 
-	local SelectedWorld
+	local HatchLooping
+	local EquipLooping
 
 	local Minions = {}
-	local TPWorlds = {}
 
 	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetDescendants()) do
 		if v:IsA("Model") and not table.find(Minions, v.Name) then
 			table.insert(Minions, v.Name)
-		end
-	end
-
-	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetChildren()) do
-		if v:IsA("Folder") and not table.find(TPWorlds, v.Name) then
-			table.insert(TPWorlds, v.Name)
 		end
 	end
 
@@ -1916,18 +1916,8 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 		end
 	end)
 
-	Main:CreateDropdown({
-		Name = "🏝 World",
-		Options = TPWorlds,
-		CurrentOption = "",
-		Flag = "SelectedWorld",
-		Callback = function(Value)
-			SelectedWorld = Value
-		end,
-	})
-
 	Main:CreateToggle({
-		Name = "💨 Auto Attack Closest Minion",
+		Name = "⚔ Auto Attack Closest Minion",
 		CurrentValue = false,
 		Flag = "AutoAttackMinion",
 		Callback = function(Value)
@@ -1937,16 +1927,34 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 
 	task.spawn(function()
 		while task.wait() do
-			if AttackLooping and SelectedWorld then
-				for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"][SelectedWorld]:GetDescendants()) do
-					if v:IsA("Model") and v.Stats.Health.Value >= 0 then
-						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\13", "Attack", v}})
-						task.wait()
+			if AttackLooping then
+				local CurrentMinion
+				local CurrentNumber = math.huge
+
+				for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetDescendants()) do
+					if v:IsA("Model") and v:FindFirstChild("IsMob") and v:FindFirstChild("IsMob").Value == true and v.Stats.Health.Value >= 0 and (Player.Character:WaitForChild("HumanoidRootPart").Position - v.HumanoidRootPart.Position).Magnitude < CurrentNumber then
+						CurrentNumber = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+						CurrentMinion = v
 					end
 				end
+
+				if TPLooping then
+					Player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(CurrentMinion.HumanoidRootPart.Position.X, CurrentMinion.HumanoidRootPart.Position.Y, CurrentMinion.HumanoidRootPart.Position.Z + 2.5))
+				end
+
+				game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\13", "Attack", CurrentMinion}})
 			end
 		end
 	end)
+
+	Main:CreateToggle({
+		Name = "👾 Auto TP to Minion",
+		CurrentValue = false,
+		Flag = "AutoAttackMinion",
+		Callback = function(Value)
+			TPLooping = Value
+		end,
+	})
 
 	Main:CreateSection("")
 
@@ -1970,6 +1978,151 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			task.wait(1)
 		end
 	end)
+
+	Main:CreateToggle({
+		Name = "🔁 Auto Rankup",
+		CurrentValue = false,
+		Flag = "AutoRankup",
+		Callback = function(Value)
+			RankupLooping = Value
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if RankupLooping and Player.PlayerGui.Interface.CenterFrame.RankUp.Rank.Visible == true then
+				game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("RankUp")
+			end
+		end
+	end)
+	
+	Main:CreateToggle({
+		Name = "💵 Auto Buy Areas",
+		CurrentValue = false,
+		Flag = "AutoBuyAreas",
+		Callback = function(Value)
+			AreaLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if AreaLooping then
+				for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetChildren()) do
+					game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("Area", {true, v.Name, v.Name})
+					task.wait()
+				end
+			end
+		end
+	end)
+	
+	Main:CreateToggle({
+		Name = "📈 Auto Buy Upgrades",
+		CurrentValue = false,
+		Flag = "AutoBuyUpgrades",
+		Callback = function(Value)
+			UpgradeLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while task.wait() do
+			if UpgradeLooping then
+				for i,v in pairs(Player.PlayerGui.Interface.CenterFrame.Upgrades.MainFrame.List:GetChildren()) do
+					if v:IsA("ImageLabel") then
+						game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("Upgrade", v.Name)
+						task.wait()
+					end
+				end
+			end
+		end
+	end)
+	
+	Main:CreateSection("")
+	
+	Main:CreateToggle({
+		Name = "❗ Remove Notifications",
+		CurrentValue = false,
+		Flag = "RemoveNotifications",
+		Callback = function(Value)
+			Player.PlayerGui.Interface.ErrorFrame.Visible = not Value
+		end,
+	})
+	
+	Main:CreateToggle({
+		Name = "🎴 Remove Card Animation",
+		CurrentValue = false,
+		Flag = "RemoveCardAnimation",
+		Callback = function(Value)
+			EggLooping = Value
+			Player.PlayerGui.EggAnimation.Enabled = not EggLooping
+		end,
+	})
+	
+	Player.PlayerGui.Interface:GetPropertyChangedSignal("Enabled"):Connect(function()
+		if EggLooping and not Player.PlayerGui.Interface.Enabled then
+			Player.PlayerGui.Interface.Enabled = true
+		end
+	end)
+	
+	game:GetService("Lighting").Blur:GetPropertyChangedSignal("Size"):Connect(function()
+		if EggLooping and game:GetService("Lighting").Blur.Size ~= 1 then
+			game:GetService("Lighting").Blur.Size = 1
+		end
+	end)
+
+	local Pets = Window:CreateTab("Pets", 4483362458)
+
+	Pets:CreateToggle({
+		Name = "🃏 Auto Open Closest Card",
+		CurrentValue = false,
+		Flag = "AutoHatch",
+		Callback = function(Value)
+			HatchLooping = Value
+		end,
+	})
+
+	task.spawn(function()
+		while task.wait() do
+			if HatchLooping then
+				local ClosestCard
+				local CurrentNumber = math.huge
+
+				for i,v in pairs(game:GetService("Workspace")["_GAME"]["_CARDS"]:GetChildren()) do
+					if v.Name:match("Normal") and (Player.Character.HumanoidRootPart.Position - v.Main.Position).Magnitude < CurrentNumber then
+						CurrentNumber = (Player.Character.HumanoidRootPart.Position - v.Main.Position).Magnitude
+						ClosestCard = v
+					end
+				end
+
+				game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("BuyEgg", {["Egg"] = "NormalEgg", ["Type"] = "Single", ["World"] = ClosestCard.Name:split(" Normal")[1]:gsub(" ", "-"):split(" ")[1]})
+			end
+		end
+	end)
+	
+	Pets:CreateToggle({
+		Name = "👍 Auto Equip Best",
+		CurrentValue = false,
+		Flag = "AutoEquip",
+		Callback = function(Value)
+			EquipLooping = Value
+		end,
+	})
+	
+	task.spawn(function()
+		while true do
+			if EquipLooping then
+				if getconnections then
+					for i,v in next, getconnections(Player.PlayerGui.Interface.CenterFrame.Pets.Buttons.EquipBest.MouseButton1Click) do
+						v.Function()
+					end
+				else
+					Notify("Your executor does not support 'getconnections'", 5)
+				end
+			end
+			task.wait(1)
+		end
+	end)
 elseif game.PlaceId == 9737855826 then -- Trade Simulator
 	local NewLooping
 	local ItemLooping
@@ -1982,12 +2135,16 @@ elseif game.PlaceId == 9737855826 then -- Trade Simulator
 	local Items = {}
 	local Items2 = {}
 
+	local GetItemLooping = false
+
 	task.spawn(function()
 		while task.wait(Random.new():NextNumber(2, 5)) do
 			pcall(function()
-				local GetItems2 = game:GetService("ReplicatedStorage").Remotes.GetItems:InvokeServer()
-				repeat task.wait() until GetItems2
-				GetItems = GetItems2
+				if GetItemLooping then
+					local GetItems2 = game:GetService("ReplicatedStorage").Remotes.GetItems:InvokeServer()
+					repeat task.wait() until GetItems2
+					GetItems = GetItems2
+				end
 			end)
 		end
 	end)
@@ -2062,12 +2219,19 @@ elseif game.PlaceId == 9737855826 then -- Trade Simulator
 					for i,v in pairs(GetItems) do
 						if v.status == "limited" and v.price and v.price <= SelectedPrice then
 							local GetItemInfo = game:GetService("ReplicatedStorage").Remotes.GetItemInfo:InvokeServer(v.name)
-							local Id = game:GetService("ReplicatedStorage").Remotes.GetItemInfo:InvokeServer(v.name).listings[1].id
+							if not GetItemInfo.listings or not GetItemInfo.listings[1] then
+								repeat task.wait() until GetItemInfo.listings and GetItemInfo.listings[1]
+							end
+							local Id = GetItemInfo.listings[1].id
 
-							if not table.find(Items2, Id) then
+							if not table.find(Items2, Id) and GetItemInfo.listings[1].price and GetItemInfo.listings[1].price <= v.price then
+								GetItemLooping = false
 								local Buy2 = game:GetService("ReplicatedStorage").Remotes.PurchaseL:InvokeServer(v.name, Id)
-								print("[Inferno X] Debug: (Item Sniper) Bought item: "..v.name.." for "..v.price.." with id "..Id)
+								print(Buy2)
+								print("[Inferno X] Debug: (Item Sniper) Bought item: "..v.name.." for "..v.price.." or "..GetItemInfo.listings[1].price.." with id "..Id)
 								table.insert(Items2, Id)
+								task.wait(2)
+								GetItemLooping = true
 							end
 						end
 					end
