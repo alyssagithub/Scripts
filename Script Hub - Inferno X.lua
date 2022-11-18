@@ -1489,39 +1489,25 @@ elseif game.PlaceId == 11102985540 then -- Swarm Simulator
 		end
 	end)
 elseif game.PlaceId == 10404327868 then -- Timber Champions
-	local AttackLooping
 	local BossLooping
 	local OrbLooping
 	local ChestLooping
-	local AxeLooping
 
-	local HatchLooping
 	local CraftLooping
 	local BestLooping
 
-	local TripleHatch
-
-	local SelectedAreas = {}
-	local SelectedLevels = {}
-
-	local SelectedEgg
-
 	local BestDelay = 5
 
-	local Areas = {"Clear List"}
-	local Levels = {"Clear List"}
-	local Eggs = {}
 	local Chests = {}
-	local BuyableAxes = {}
-	
+
 	local Loading = true
-	
+
 	while Loading and task.wait() do
-	    for i,v in pairs(Player.Character:GetChildren()) do
-	        if v.Name:match("gameAxe") then
-	            Loading = false
-	        end
-	    end
+		for i,v in pairs(Player.Character:GetChildren()) do
+			if v.Name:match("gameAxe") then
+				Loading = false
+			end
+		end
 	end
 
 	local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
@@ -1535,20 +1521,6 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 	local BossService = Knit.GetService("BossService")
 	local AxeService = Knit.GetService("AxeService")
 
-	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
-		table.insert(Areas, v.Name)
-	end
-
-	for i,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(Areas[2]):GetChildren()) do
-		table.insert(Levels, v.Name)
-	end
-
-	for i,v in pairs(game:GetService("Workspace").Scripts.Eggs:GetChildren()) do
-		if not string.find(v.Name:lower(), "robux") then
-			table.insert(Eggs, v.Name)
-		end
-	end
-
 	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Chests)) do
 		if type(v) == "table" then
 			for e,r in pairs(v) do
@@ -1557,109 +1529,9 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end
 
-	for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Axes)) do
-		if type(v) == "table" then
-			for e,r in pairs(v) do
-				if type(r) == "table" then
-					for t,y in pairs(r) do
-						if y.index > DataController.data.EquippedAxe then
-							table.insert(BuyableAxes, y.index)
-						end
-					end
-				end
-			end
-		end
-	end
-
-	print("Purchasable Axes: "..table.concat(BuyableAxes, ", "))
-
 	local Window = CreateWindow()
 
 	local Main = Window:CreateTab("Main", 4483362458)
-
-	Main:CreateDropdown({
-		Name = "🏝 Area",
-		Options = Areas,
-		CurrentOption = "",
-		Flag = "SelectedArea",
-		Callback = function(Value)
-			if Value == "Clear List" then
-				table.clear(SelectedAreas)
-			elseif not table.find(SelectedAreas, Value) then
-				table.insert(SelectedAreas, Value)
-			end
-
-			if not AreaLabel then
-				repeat task.wait() until AreaLabel
-			end
-
-			AreaLabel:Set("Selected Areas: "..table.concat(SelectedAreas, ", "))
-		end,
-	})
-
-	AreaLabel = Main:CreateLabel("Selected Areas: None")
-
-	Main:CreateDropdown({
-		Name = "🔢 Level",
-		Options = Levels,
-		CurrentOption = "",
-		Flag = "SelectedLevel",
-		Callback = function(Value)
-			if Value == "Clear List" then
-				table.clear(SelectedLevels)
-			elseif not table.find(SelectedLevels, Value) then
-				table.insert(SelectedLevels, Value)
-			end
-
-			if not LevelLabel then
-				repeat task.wait() until LevelLabel
-			end
-
-			LevelLabel:Set("Selected Levels: "..table.concat(SelectedLevels, ", "))
-		end,
-	})
-
-	LevelLabel = Main:CreateLabel("Selected Areas: None")
-
-	Main:CreateToggle({
-		Name = "🌲 Auto Attack Tree",
-		CurrentValue = false,
-		Flag = "AutoAttack",
-		Callback = function(Value)
-			AttackLooping = Value
-		end,
-	})
-
-	task.spawn(function()
-		while task.wait() do
-			if AttackLooping and #SelectedAreas > 0 and #SelectedLevels > 0 then
-				for i = 2, #Levels, 1 do
-					if table.find(SelectedLevels, Levels[i]) then
-						for _,w in pairs(SelectedAreas) do
-							if game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]) then
-								for _,v in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:GetChildren()) do
-									local SectionLooping = true
-
-									while task.wait() and SectionLooping and AttackLooping do
-										pcall(function()
-											if not game:GetService("Workspace").Scripts.Trees:FindFirstChild(w):FindFirstChild(Levels[i]).Storage:FindFirstChild(v.Name) then
-												SectionLooping = false
-												print("[Inferno X] Debug: Tree Destroyed")
-											else
-												DamageRemote:FireServer(v.Name)
-											end
-										end)
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end)
-
-	Main:CreateSection("")
 
 	Main:CreateToggle({
 		Name = "🐍 Auto Attack Bosses",
@@ -1723,77 +1595,7 @@ elseif game.PlaceId == 10404327868 then -- Timber Champions
 		end
 	end)
 
-	Main:CreateToggle({
-		Name = "🪓 Auto Buy Axes",
-		CurrentValue = false,
-		Flag = "AutoAxe",
-		Callback = function(Value)
-			AxeLooping = Value
-		end,
-	})
-
-	task.spawn(function()
-		while task.wait() do
-			if AxeLooping then
-				local LoopAmount = 1
-
-				for i = 6, #BuyableAxes, 3 do
-					LoopAmount = LoopAmount + 1
-					for e = 1, 3 do
-						if AxeService:Buy(LoopAmount, e) == "success" then
-							print("[Inferno X] Debug: Bought Axe of Area "..LoopAmount.." Axe "..e)
-						end
-					end
-				end
-			end
-		end
-	end)
-
 	local Pets = Window:CreateTab("Pets", 4483362458)
-
-	Pets:CreateDropdown({
-		Name = "🥚 Egg",
-		Options = Eggs,
-		CurrentOption = "",
-		Flag = "SelectedEgg",
-		Callback = function(Value)
-			SelectedEgg = Value
-		end,
-	})
-
-	Pets:CreateToggle({
-		Name = "🐣 Auto Hatch Egg",
-		CurrentValue = false,
-		Flag = "AutoHatch",
-		Callback = function(Value)
-			HatchLooping = Value
-		end,
-	})
-
-	task.spawn(function()
-		while task.wait() do
-			if HatchLooping and SelectedEgg then
-				pcall(function()
-					EggService:Unbox(SelectedEgg, TripleHatch)
-				end)
-			end
-		end
-	end)
-
-	Pets:CreateToggle({
-		Name = "🐥 Triple Hatch",
-		CurrentValue = false,
-		Flag = "TripleHatch",
-		Callback = function(Value)
-			if Value then
-				TripleHatch = "triple"
-			else
-				TripleHatch = "single"
-			end
-		end,
-	})
-
-	Pets:CreateSection("")
 
 	Pets:CreateToggle({
 		Name = "⚒ Auto Craft Pets",
@@ -1889,7 +1691,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 	local RankupLooping
 	local AreaLooping
 	local UpgradeLooping
-	
+
 	local EggLooping
 
 	local HatchLooping
@@ -1904,13 +1706,13 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			table.insert(Minions, v.Name)
 		end
 	end
-	
+
 	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_INTERACTIONS"]:GetChildren()) do
 		if not table.find(Pads, v.Name) then
 			table.insert(Pads, v.Name)
 		end
 	end
-	
+
 	for i,v in pairs(game:GetService("Workspace")["_GAME"]["_AREAS"]:GetChildren()) do
 		table.insert(Worlds, v.Data.Zone.Value..", "..v.Data.World.Value)
 	end
@@ -2015,7 +1817,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "💵 Auto Buy Areas",
 		CurrentValue = false,
@@ -2024,7 +1826,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			AreaLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if AreaLooping then
@@ -2037,7 +1839,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "📈 Auto Buy Upgrades",
 		CurrentValue = false,
@@ -2046,7 +1848,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			UpgradeLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while task.wait() do
 			if UpgradeLooping then
@@ -2059,9 +1861,9 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end
 	end)
-	
+
 	Main:CreateSection("")
-	
+
 	Main:CreateToggle({
 		Name = "❗ Remove Notifications",
 		CurrentValue = false,
@@ -2070,7 +1872,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			Player.PlayerGui.Interface.ErrorFrame.Visible = not Value
 		end,
 	})
-	
+
 	Main:CreateToggle({
 		Name = "🎴 Remove Card Animation",
 		CurrentValue = false,
@@ -2080,19 +1882,19 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			Player.PlayerGui.EggAnimation.Enabled = not EggLooping
 		end,
 	})
-	
+
 	Player.PlayerGui.Interface:GetPropertyChangedSignal("Enabled"):Connect(function()
 		if EggLooping and not Player.PlayerGui.Interface.Enabled then
 			Player.PlayerGui.Interface.Enabled = true
 		end
 	end)
-	
+
 	game:GetService("Lighting").Blur:GetPropertyChangedSignal("Size"):Connect(function()
 		if EggLooping and game:GetService("Lighting").Blur.Size ~= 1 then
 			game:GetService("Lighting").Blur.Size = 1
 		end
 	end)
-	
+
 	Main:CreateToggle({
 		Name = "✅ Free Premium Boost",
 		CurrentValue = false,
@@ -2144,9 +1946,9 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 						ClosestCard = v
 					end
 				end
-				
+
 				local World = ClosestCard.Name:split(" Normal")[1]:gsub(" ", "-"):split(" ")[1]
-				
+
 				if tonumber(World:split("-")[2]) >= 14 then
 					World = "World-"..tostring(tonumber(World:split("-")[2]) + 1)
 				end
@@ -2155,7 +1957,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end
 	end)
-	
+
 	Pets:CreateToggle({
 		Name = "👍 Auto Equip Best",
 		CurrentValue = false,
@@ -2164,7 +1966,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			EquipLooping = Value
 		end,
 	})
-	
+
 	task.spawn(function()
 		while true do
 			if EquipLooping then
@@ -2179,9 +1981,9 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			task.wait(5)
 		end
 	end)
-	
+
 	local Teleports = Window:CreateTab("Teleports", 4483362458)
-	
+
 	Interactable = Teleports:CreateDropdown({
 		Name = "🔼 Teleport to Interactable",
 		Options = Pads,
@@ -2195,7 +1997,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end,
 	})
-	
+
 	World = Teleports:CreateDropdown({
 		Name = "🏝 Teleport to World",
 		Options = Worlds,
@@ -2208,7 +2010,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			end
 		end,
 	})
-	
+
 	Teleports:CreateButton({
 		Name = "🌺 Teleport to Your Best Training Zone",
 		Callback = function()
