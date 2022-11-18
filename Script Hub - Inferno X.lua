@@ -2009,8 +2009,10 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 		while task.wait() do
 			if AreaLooping then
 				for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetChildren()) do
-					game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("Area", {true, v.Name, v.Name})
-					task.wait()
+					if v.Name ~= "World-1" and game:GetService("Workspace")["_GAME"]["_WORLDS"]:FindFirstChild(v.Name:gsub("World", "WORLD")).Gate.GateBlock.Transparency ~= 1 then
+						game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("Area", {true, v.Name, v.Name})
+						task.wait()
+					end
 				end
 			end
 		end
