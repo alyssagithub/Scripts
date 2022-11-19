@@ -1949,8 +1949,12 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 
 				local World = ClosestCard.Name:split(" Normal")[1]:gsub(" ", "-"):split(" ")[1]
 
-				if tonumber(World:split("-")[2]) >= 14 then
+				if tonumber(World:split("-")[2]) == 14 or tonumber(World:split("-")[2]) == 15 then
 					World = "World-"..tostring(tonumber(World:split("-")[2]) + 1)
+				end
+				
+				if tonumber(World:split("-")[2]) >= 19 then
+					World = "World-"..tostring(tonumber(World:split("-")[2]) - 1)
 				end
 
 				game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("BuyEgg", {["Egg"] = "NormalEgg", ["Type"] = "Single", ["World"] = World})
