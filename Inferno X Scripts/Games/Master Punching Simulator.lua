@@ -148,7 +148,7 @@ task.spawn(function()
 	while task.wait() do
 		if AreaLooping then
 			for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetChildren()) do
-				if v.Name ~= "World-1" and game:GetService("Workspace")["_GAME"]["_WORLDS"]:FindFirstChild(v.Name:gsub("World", "WORLD")).Gate.GateBlock.Transparency ~= 1 then
+				if v.Name ~= "World-1" and game:GetService("Workspace")["_GAME"]["_WORLDS"]:FindFirstChild(v.Name:gsub("World", "WORLD")) and game:GetService("Workspace")["_GAME"]["_WORLDS"]:FindFirstChild(v.Name:gsub("World", "WORLD")).Gate.GateBlock.Transparency ~= 1 then
 					game:GetService("ReplicatedStorage").Remotes.Function:InvokeServer("Area", {true, v.Name, v.Name})
 					task.wait()
 				end
