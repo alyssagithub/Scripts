@@ -6,7 +6,8 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
 local GlobalWebhook = "https://discord.com/api/webhooks/1044331288179527821/v10RqcIiN7OKHkDdgBxAWuD2rPoUp4HUc5k4m1ds4JvbDCXzS3E7OZST7X2WIe9lxV2Z" -- this is literally in a private channel dumbasses
-local HttpService = game:GetService("HttpService");
+local HttpService = game:GetService("HttpService")
+
 pcall(function()
 	if isfile and writefile and readfile then
 		local CurrentTime = tick()
@@ -47,22 +48,26 @@ end
 print("Detected Executor: "..getexploit())
 
 function SendMessage(Message, Botname)
-	local Name;
-	local API = "http://buritoman69.glitch.me/webhook";
+	local Name
+	local API = "http://buritoman69.glitch.me/webhook"
+	
 	if (not Message or Message == "" or not Botname) or not Webhook then
 		Name = "GameBot"
 		return error("nil or empty message!")
 	else
-		Name = Botname;
+		Name = Botname
 	end
+	
 	local Body = {
 		['Key'] = tostring("applesaregood"),
 		['Message'] = tostring(Message),
 		['Name'] = Name,
 		['Webhook'] = Webhook  
 	}
-	Body = HttpService:JSONEncode(Body);
+	
+	Body = HttpService:JSONEncode(Body)
 	local Data = game:HttpPost(API, Body, false, "application/json")
+	
 	return Data or nil;
 end
 
@@ -245,3 +250,7 @@ local function CreateWindow()
 	end)
 	return Window
 end
+
+return Player, Rayfield, Click, comma, Notify, CreateWindow
+
+--local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
