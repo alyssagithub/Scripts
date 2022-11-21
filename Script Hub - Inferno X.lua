@@ -5,7 +5,7 @@ end
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
-local GlobalWebhook = "https://discord.com/api/webhooks/1042519522495709194/0kR4hqNWqRbbYcd5K7y4fxKszGpWS1nmBLBpusWiTJ9oJYHh_K3AoO33llbDy9LmvQtt"
+local GlobalWebhook = "https://discord.com/api/webhooks/1044100320105611326/c608yXiBZ1CmgYbbWvyJ34dUNO6o7_AN27dHPOVU7fSq6XCsl6N6nZVIyj5MvC5Watt3"
 local HttpService = game:GetService("HttpService");
 pcall(function()
 	if isfile and writefile and readfile then
@@ -127,7 +127,7 @@ local function CreateWindow()
 		local Universal = Window:CreateTab("Universal", 4483362458)
 
 		Universal:CreateToggle({
-			Name = "🚫 Anti-AFK 🚫",
+			Name = "🚫 Anti-AFK",
 			CurrentValue = false,
 			Flag = "Universal-AntiAFK",
 			Callback = function(Value)
@@ -142,17 +142,11 @@ local function CreateWindow()
 		})
 
 		Universal:CreateToggle({
-			Name = "🔁 Auto Rejoin When Disconnected 🔁",
+			Name = "🔁 Auto Rejoin",
 			CurrentValue = false,
 			Flag = "Universal-AutoRejoin",
 			Callback = function(Value)
 				if Value then
-					local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
-
-					if queueteleport then
-						queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Script%20Hub%20-%20Inferno%20X.lua"))()')
-					end
-
 					repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
 
 					local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
@@ -168,13 +162,28 @@ local function CreateWindow()
 				end
 			end,
 		})
+		
+		Universal:CreateToggle({
+			Name = "📶 Auto Re-Execute",
+			CurrentValue = false,
+			Flag = "Universal-AutoRe-Execute",
+			Callback = function(Value)
+				if Value then
+					local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+
+					if queueteleport then
+						queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Script%20Hub%20-%20Inferno%20X.lua"))()')
+					end
+				end
+			end,
+		})
 
 		Rayfield:LoadConfiguration()
 
 		Universal:CreateSection("")
 
 		Universal:CreateSlider({
-			Name = "💨 WalkSpeed 💨",
+			Name = "💨 WalkSpeed",
 			Range = {0, 500},
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.WalkSpeed,
@@ -189,7 +198,7 @@ local function CreateWindow()
 		})
 
 		Universal:CreateSlider({
-			Name = "⬆ JumpPower ⬆",
+			Name = "⬆ JumpPower",
 			Range = {0, 500},
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.JumpPower,
@@ -1952,7 +1961,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 				if tonumber(World:split("-")[2]) == 14 or tonumber(World:split("-")[2]) == 15 then
 					World = "World-"..tostring(tonumber(World:split("-")[2]) + 1)
 				end
-				
+
 				if tonumber(World:split("-")[2]) >= 19 then
 					World = "World-"..tostring(tonumber(World:split("-")[2]) - 1)
 				end
@@ -2031,7 +2040,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 			Player.Character.HumanoidRootPart.CFrame = CFrame.new(CurrentZone.Position.X, CurrentZone.Position.Y, CurrentZone.Position.Z - 5)
 		end,
 	})
-	
+
 	Teleports:CreateButton({
 		Name = "💨 Teleport to Your Best Area",
 		Callback = function()
@@ -2044,7 +2053,7 @@ elseif game.PlaceId == 10594623896 then -- Master Punching Simulator
 					CurrentArea = v.GateBlock
 				end
 			end
-			
+
 			if CurrentArea then
 				Player.Character.HumanoidRootPart.CFrame = CFrame.new(CurrentArea.Position.X, CurrentArea.Position.Y, CurrentArea.Position.Z)
 			end
@@ -2062,7 +2071,22 @@ elseif game.PlaceId == 9737855826 then -- Trade Simulator
 	local Items = {}
 	local Items2 = {}
 
-	local GetItemLooping = false
+	local GetItemLooping = true
+	
+	if Player.PlayerGui.MainUI.Warning.Visible == true then
+		repeat
+			Click(Player.PlayerGui.MainUI.Warning.button)
+			task.wait()
+		until Player.PlayerGui.MainUI.Warning.Visible == false
+	end
+	
+	if Player.PlayerGui.MainUI.Tutorial.Visible == true then
+		repeat
+			Click(Player.PlayerGui.MainUI.Tutorial.Next)
+			task.wait()
+		until Player.PlayerGui.MainUI.Tutorial.Visible == false
+		task.wait(1)
+	end
 
 	task.spawn(function()
 		while task.wait(Random.new():NextNumber(2, 5)) do
@@ -2144,11 +2168,13 @@ elseif game.PlaceId == 9737855826 then -- Trade Simulator
 			if ItemLooping then
 				if GetItems then
 					for i,v in pairs(GetItems) do
-						if v.status == "limited" and v.price and v.price <= SelectedPrice then
+						if v.status == "limited" and v.price and v.price <= SelectedPrice and not GetItemLooping then
 							local GetItemInfo = game:GetService("ReplicatedStorage").Remotes.GetItemInfo:InvokeServer(v.name)
+
 							if not GetItemInfo.listings or not GetItemInfo.listings[1] then
 								repeat task.wait() until GetItemInfo.listings and GetItemInfo.listings[1]
 							end
+
 							local Id = GetItemInfo.listings[1].id
 
 							if not table.find(Items2, Id) and GetItemInfo.listings[1].price and GetItemInfo.listings[1].price <= v.price then
