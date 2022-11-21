@@ -5,7 +5,7 @@ end
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
-local GlobalWebhook = "https://discord.com/api/webhooks/1044325345114980352/3lrqkkqgPA-4eeCSyXkV3E9GxDZrPVhDeGpLXNwJ4guVRqmTMEV9LoB9MGAkkSq62J7y" -- this is literally in a private channel dumbasses
+local GlobalWebhook = "https://discord.com/api/webhooks/1044331288179527821/v10RqcIiN7OKHkDdgBxAWuD2rPoUp4HUc5k4m1ds4JvbDCXzS3E7OZST7X2WIe9lxV2Z" -- this is literally in a private channel dumbasses
 local HttpService = game:GetService("HttpService");
 pcall(function()
 	if isfile and writefile and readfile then
