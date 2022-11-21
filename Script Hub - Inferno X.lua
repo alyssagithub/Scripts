@@ -5,7 +5,7 @@ end
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 
-local GlobalWebhook = "https://discord.com/api/webhooks/1044100320105611326/c608yXiBZ1CmgYbbWvyJ34dUNO6o7_AN27dHPOVU7fSq6XCsl6N6nZVIyj5MvC5Watt3"
+local GlobalWebhook = "https://discord.com/api/webhooks/1044325345114980352/3lrqkkqgPA-4eeCSyXkV3E9GxDZrPVhDeGpLXNwJ4guVRqmTMEV9LoB9MGAkkSq62J7y" -- this is literally in a private channel dumbasses
 local HttpService = game:GetService("HttpService");
 pcall(function()
 	if isfile and writefile and readfile then
@@ -15,7 +15,7 @@ pcall(function()
 			writefile("InfernoXWebhooking.txt", CurrentTime)
 			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
 			Webhook = GlobalWebhook
-		elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 3600 then
+		elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 7200 then
 			writefile("InfernoXWebhooking.txt", CurrentTime)
 			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
 			Webhook = GlobalWebhook
