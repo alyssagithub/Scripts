@@ -51,12 +51,6 @@ end
 for i,v in pairs(workspace.Plots:GetChildren()) do
 	if v.Owner.Value and v.Owner.Value ~= Player then
 		table.insert(PlotList, v.Owner.Value.Name)
-	else
-		v.Owner.Changed:Connect(function()
-			if v.Owner.Value then
-				table.insert(PlotList, v.Owner.Value.Name)
-			end
-		end)
 	end
 end
 
