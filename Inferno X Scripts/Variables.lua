@@ -182,6 +182,8 @@ local function CreateWindow()
 				end
 			end,
 		})
+			
+		Rayfield:LoadConfiguration()
 
 		Universal:CreateSection("")
 
@@ -246,8 +248,6 @@ local function CreateWindow()
 			end,
 		})
 	end)
-	
-	Rayfield:LoadConfiguration()
 	
 	return Window
 end
