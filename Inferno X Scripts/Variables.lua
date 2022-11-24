@@ -183,8 +183,6 @@ local function CreateWindow()
 			end,
 		})
 
-		Rayfield:LoadConfiguration()
-
 		Universal:CreateSection("")
 
 		Universal:CreateSlider({
@@ -248,6 +246,9 @@ local function CreateWindow()
 			end,
 		})
 	end)
+	
+	Rayfield:LoadConfiguration()
+	
 	return Window
 end
 
