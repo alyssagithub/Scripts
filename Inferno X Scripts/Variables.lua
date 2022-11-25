@@ -45,7 +45,7 @@ local function getexploit()
 		("Other")
 end
 
-print("Detected Executor: "..getexploit())
+print("[Inferno X] Debug: Detected Executor: "..getexploit())
 
 function SendMessage(Message, Botname)
 	local Name
