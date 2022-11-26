@@ -126,10 +126,8 @@ task.spawn(function()
 			for i,v in pairs(SelectedAreas) do
 				for e,r in pairs(SelectedLevels) do
 					if game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r) then
-						for t,y in pairs(game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r).Storage:GetChildren()) do
-							if ChopLooping then
-								Damage:Fire(v.Name)
-							end
+						if game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model") then
+							Damage:Fire(game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model").Name)
 						end
 					end
 				end
