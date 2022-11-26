@@ -69,9 +69,9 @@ task.spawn(function()
 		if AttackLooping then
 			local CurrentMinion
 			local CurrentNumber = math.huge
-
+			
 			for i,v in pairs(game:GetService("Workspace")["_GAME"]["_MINIONS"]:GetDescendants()) do
-				if v:IsA("Model") and v:FindFirstChild("IsMob") and v:FindFirstChild("IsMob").Value == true and v.Stats.Health.Value >= 0 and (Player.Character:WaitForChild("HumanoidRootPart").Position - v.HumanoidRootPart.Position).Magnitude < CurrentNumber then
+				if v:IsA("Model") and (v:FindFirstChild("IsMob") and v:FindFirstChild("IsMob").Value == true) or (v:FindFirstChild("Dungeon") and v:FindFirstChild("Dungeon").Value == true) and v.Stats.Health.Value >= 0 and (Player.Character:WaitForChild("HumanoidRootPart").Position - v.HumanoidRootPart.Position).Magnitude < CurrentNumber then
 					CurrentNumber = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 					CurrentMinion = v
 				end
