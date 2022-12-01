@@ -112,7 +112,7 @@ end
 
 local function CreateWindow(v)
 	local Window = Rayfield:CreateWindow({
-		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(v or "v1.0.0"),
+		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..v,
 		LoadingTitle = "Inferno X",
 		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
 		ConfigurationSaving = {
