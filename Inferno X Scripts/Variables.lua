@@ -110,26 +110,22 @@ local function Notify(Message, Duration)
 	})
 end
 
-local function CreateWindow()
-	local Window
-	
-	function SetVersion(v)
-		Window = Rayfield:CreateWindow({
-			Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..v,
-			LoadingTitle = "Inferno X",
-			LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-			ConfigurationSaving = {
-				Enabled = true,
-				FolderName = "InfernoXConfig",
-				FileName = game.PlaceId
-			},
-			Discord = {
-				Enabled = true,
-				Invite = "rtgv8Jp3fM",
-				RememberJoins = true
-			}
-		})
-	end
+local function CreateWindow(v)
+	local Window = Rayfield:CreateWindow({
+		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..v,
+		LoadingTitle = "Inferno X",
+		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+		ConfigurationSaving = {
+			Enabled = true,
+			FolderName = "InfernoXConfig",
+			FileName = game.PlaceId
+		},
+		Discord = {
+			Enabled = true,
+			Invite = "rtgv8Jp3fM",
+			RememberJoins = true
+		}
+	})
 	
 	repeat task.wait() until Window
 
@@ -258,6 +254,6 @@ local function CreateWindow()
 	return Window
 end
 
-return Player, Rayfield, Click, comma, Notify, CreateWindow, SetVersion
+return Player, Rayfield, Click, comma, Notify, CreateWindow
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow, SetVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow("v1.0.0") = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
