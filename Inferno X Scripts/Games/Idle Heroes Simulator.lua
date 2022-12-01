@@ -1,5 +1,7 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
+local virtualInput = game:GetService("VirtualInputManager")
+
 local Plot
 local PlayerPlot
 
@@ -14,12 +16,17 @@ local UpgradeLevel = 25
 local SwingLooping
 local Swing2Looping
 local NextLevelLooping
+
 local HireLooping
+local BuyLooping
 local UpgradeLooping
+
 local ChestLooping
+
 local ReincarnateLooping
 local MobLooping
 local SkillLooping
+
 local RerollLooping
 
 local IsInLoopReincarnate
@@ -29,6 +36,7 @@ local IsInLoopAutoHire
 local HeroesList = {"None"}
 local PlotList = {"Your Own Plot"}
 local EnchantList = {"None", "Sharp I", "Hero I", "Rich I", "Sharp II", "Hero II", "Rich II", "Luck I", "Sharp III", "Hero III", "Immortal I", "Rich III", "Luck II", "Sharp IV", "Hero IV", "Immortal II", "Rich IV", "Luck III", "Team Player", "Lifeless"}
+local SkillsList = {}
 
 local RarityBackgrounds = {
 	["0 0.803922 0.803922 0.803922 0 1 0.803922 0.803922 0.803922 0 "] = "Common",
@@ -54,8 +62,7 @@ for i,v in pairs(workspace.Plots:GetChildren()) do
 	end
 end
 
-repeat task.wait() until Plot
-repeat task.wait() until Plot:FindFirstChild("Heroes")
+repeat task.wait() until Plot and Plot:FindFirstChild("Heroes")
 
 for i,v in pairs(Plot.Heroes:GetChildren()) do
 	table.insert(HeroesList, v.Name)
@@ -387,6 +394,8 @@ task.spawn(function()
 	end
 end)
 
+Heroes:CreateSection("")
+
 Heroes:CreateDropdown({
 	Name = "📃 Hero to Upgrade (leave blank for all)",
 	Options = HeroesList,
@@ -446,6 +455,68 @@ task.spawn(function()
 		end
 	end
 end)
+
+Heroes:CreateSection("")
+
+Heroes:CreateToggle({
+	Name = "💨 Auto Buy Skills",
+	CurrentValue = false,
+	Flag = "AutoSkills",
+	Callback = function(Value)
+		BuyLooping = Value
+		game:GetService("Players").LocalPlayer.PlayerGui.Main.Alerts.Visible = not BuyLooping
+	end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if BuyLooping then
+			for i,v in pairs(SkillsList) do
+				if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.LearnSkill:InvokeServer(v, i) then
+					print("[Inferno X] Debug: Bought "..v.."'s skill "..i)
+					table.remove(SkillsList, table.find(SkillsList, v))
+				end
+			end
+		end
+	end
+end)
+
+Heroes:CreateButton({
+	Name = "🔁 Refresh Skills",
+	Interact = "Click Me!",
+	Callback = function()
+		for i,v in pairs(Plot.Heroes:GetChildren()) do
+			local Looping = true
+
+			local connection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.UpgradeHero.HeroName:GetPropertyChangedSignal("Text"):Connect(function()
+				Looping = false
+			end)
+
+			repeat
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+				virtualInput:SendKeyEvent(true, "E", false, nil)
+				virtualInput:SendKeyEvent(false, "E", false, nil)
+				task.wait()
+			until not Looping
+
+			connection:Disconnect()
+
+			for e,r in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.UpgradeHero.Frames.Skills.Container:GetChildren()) do
+				if r:IsA("Frame") and not SkillsList[r.Name] then
+					SkillsList[r.Name] = v.Name
+				end
+			end
+		end
+		
+		local Number = 0
+		
+		for i,v in pairs(SkillsList) do
+			Number = Number + 1
+		end
+		
+		print("[Inferno X] Debug: Collected "..Number.." Skills")
+	end,
+})
 
 local Passive = Window:CreateTab("Passive", 4483362458)
 
