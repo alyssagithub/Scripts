@@ -4,6 +4,7 @@ end
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
+local CurrentVersion = "v0.0.0"
 
 local GlobalWebhook = "https://discord.com/api/webhooks/1044331288179527821/v10RqcIiN7OKHkDdgBxAWuD2rPoUp4HUc5k4m1ds4JvbDCXzS3E7OZST7X2WIe9lxV2Z" -- this is literally in a private channel dumbasses
 local HttpService = game:GetService("HttpService")
@@ -111,8 +112,8 @@ local function Notify(Message, Duration)
 	})
 end
 
-local function CreateWindow(v)
-	if not v then return end
+local function CreateWindow()
+	repeat task.wait() until CurrentVersion ~= "v.0.0"
 	
 	local Window = Rayfield:CreateWindow({
 		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(v or "v1.0.0"),
@@ -257,6 +258,6 @@ local function CreateWindow(v)
 	return Window
 end
 
-return Player, Rayfield, Click, comma, Notify, CreateWindow
+return Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
