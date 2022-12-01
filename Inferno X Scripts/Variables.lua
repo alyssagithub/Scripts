@@ -6,6 +6,12 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
 local CurrentVersion = "v0.0.0"
 
+local function SetCurrentVersion(v)
+	if v then
+		CurrentVersion = v
+	end
+end
+
 local GlobalWebhook = "https://discord.com/api/webhooks/1044331288179527821/v10RqcIiN7OKHkDdgBxAWuD2rPoUp4HUc5k4m1ds4JvbDCXzS3E7OZST7X2WIe9lxV2Z" -- this is literally in a private channel dumbasses
 local HttpService = game:GetService("HttpService")
 
@@ -258,6 +264,6 @@ local function CreateWindow()
 	return Window
 end
 
-return Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion
+return Player, Rayfield, Click, comma, Notify, CreateWindow, SetCurrentVersion
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow, SetCurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
