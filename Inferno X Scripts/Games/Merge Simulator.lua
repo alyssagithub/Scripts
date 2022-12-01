@@ -1,5 +1,7 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
+CreateWindow("v1.0.0")
+
 local Plot = workspace.Plots:FindFirstChild(Player.Name)
 
 local AutoTapLooping
