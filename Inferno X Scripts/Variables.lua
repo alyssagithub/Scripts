@@ -27,7 +27,7 @@ pcall(function()
 end)
 
 local function getexploit()
-	return (syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
+	return
 		(secure_load and "Sentinel") or
 		(is_sirhurt_closure and "Sirhurt") or
 		(pebc_execute and "ProtoSmasher") or
@@ -42,6 +42,7 @@ local function getexploit()
 		(IsElectron and "Electron") or
 		(IS_COCO_LOADED and "Coco") or
 		(IS_VIVA_LOADED and "Viva") or
+		(syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
 		("Other")
 end
 
@@ -112,7 +113,7 @@ end
 
 local function CreateWindow(v)
 	local Window = Rayfield:CreateWindow({
-		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..v,
+		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(v or "v1.0.0"),
 		LoadingTitle = "Inferno X",
 		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
 		ConfigurationSaving = {
