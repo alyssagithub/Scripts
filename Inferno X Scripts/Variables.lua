@@ -4,7 +4,7 @@ end
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
-local CurrentVersion = "v0.0.0"
+local CurrentVersion
 
 local function SetCurrentVersion(v)
 	if v then
@@ -120,7 +120,9 @@ local function Notify(Message, Duration)
 end
 
 local function CreateWindow()
-	repeat task.wait() until CurrentVersion ~= "v.0.0"
+	repeat task.wait() until CurrentVersion
+	
+	print("Current version: "..CurrentVersion)
 	
 	local Window = Rayfield:CreateWindow({
 		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(v or "v1.0.0"),
