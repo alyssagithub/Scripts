@@ -4,12 +4,11 @@ end
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
-local CurrentVersion
+local VCurrentVersion
 
-local function SetCurrentVersion(v)
+local function CurrentVersion(v)
 	if v then
-		CurrentVersion = v
-		print(v, CurrentVersion)
+		VCurrentVersion = v
 	end
 end
 
@@ -120,12 +119,12 @@ local function Notify(Message, Duration)
 end
 
 local function CreateWindow()
-	repeat task.wait() until CurrentVersion
+	repeat task.wait() until VCurrentVersion
 	
-	print("Current version: "..CurrentVersion)
+	print("Current version: "..VCurrentVersion)
 	
 	local Window = Rayfield:CreateWindow({
-		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..CurrentVersion,
+		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..VCurrentVersion,
 		LoadingTitle = "Inferno X",
 		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
 		ConfigurationSaving = {
@@ -267,6 +266,6 @@ local function CreateWindow()
 	return Window
 end
 
-return Player, Rayfield, Click, comma, Notify, CreateWindow, SetCurrentVersion
+return Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow, SetCurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
