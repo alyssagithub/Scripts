@@ -50,24 +50,24 @@ print("[Inferno X] Debug: Detected Executor: "..getexploit())
 function SendMessage(Message, Botname)
 	local Name
 	local API = "http://buritoman69.glitch.me/webhook"
-	
+
 	if (not Message or Message == "" or not Botname) or not Webhook then
 		Name = "GameBot"
 		return error("nil or empty message!")
 	else
 		Name = Botname
 	end
-	
+
 	local Body = {
 		['Key'] = tostring("applesaregood"),
 		['Message'] = tostring(Message),
 		['Name'] = Name,
 		['Webhook'] = Webhook  
 	}
-	
+
 	Body = HttpService:JSONEncode(Body)
 	local Data = game:HttpPost(API, Body, false, "application/json")
-	
+
 	return Data or nil;
 end
 
@@ -111,21 +111,27 @@ local function Notify(Message, Duration)
 end
 
 local function CreateWindow()
-	local Window = Rayfield:CreateWindow({
-		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-		LoadingTitle = "Inferno X",
-		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-		ConfigurationSaving = {
-			Enabled = true,
-			FolderName = "InfernoXConfig",
-			FileName = game.PlaceId
-		},
-		Discord = {
-			Enabled = true,
-			Invite = "rtgv8Jp3fM",
-			RememberJoins = true
-		}
-	})
+	local Window
+	
+	function SetVersion(v)
+		Window = Rayfield:CreateWindow({
+			Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..v,
+			LoadingTitle = "Inferno X",
+			LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+			ConfigurationSaving = {
+				Enabled = true,
+				FolderName = "InfernoXConfig",
+				FileName = game.PlaceId
+			},
+			Discord = {
+				Enabled = true,
+				Invite = "rtgv8Jp3fM",
+				RememberJoins = true
+			}
+		})
+	end
+	
+	repeat task.wait() until Window
 
 	task.defer(function()
 		task.wait(1.5)
@@ -182,7 +188,7 @@ local function CreateWindow()
 				end
 			end,
 		})
-			
+
 		Rayfield:LoadConfiguration()
 
 		Universal:CreateSection("")
@@ -248,10 +254,10 @@ local function CreateWindow()
 			end,
 		})
 	end)
-	
+
 	return Window
 end
 
-return Player, Rayfield, Click, comma, Notify, CreateWindow
+return Player, Rayfield, Click, comma, Notify, CreateWindow, SetVersion
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow, SetVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
