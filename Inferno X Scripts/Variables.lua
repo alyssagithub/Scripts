@@ -112,7 +112,7 @@ end
 
 local function CreateWindow(v)
 	local Window = Rayfield:CreateWindow({
-		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..v,
+		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(v or "v1.0.0"),
 		LoadingTitle = "Inferno X",
 		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
 		ConfigurationSaving = {
@@ -256,4 +256,4 @@ end
 
 return Player, Rayfield, Click, comma, Notify, CreateWindow
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow("v1.0.0") = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
