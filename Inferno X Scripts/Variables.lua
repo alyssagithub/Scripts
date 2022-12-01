@@ -112,6 +112,8 @@ local function Notify(Message, Duration)
 end
 
 local function CreateWindow(v)
+	if not v then return end
+	
 	local Window = Rayfield:CreateWindow({
 		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(v or "v1.0.0"),
 		LoadingTitle = "Inferno X",
