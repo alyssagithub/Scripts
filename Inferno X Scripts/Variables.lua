@@ -9,6 +9,7 @@ local CurrentVersion = "v0.0.0"
 local function SetCurrentVersion(v)
 	if v then
 		CurrentVersion = v
+		print(v, CurrentVersion)
 	end
 end
 
