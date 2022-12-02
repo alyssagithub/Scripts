@@ -278,7 +278,7 @@ local function CreateWindow()
 
 						if not isfile("InfernoXWebhooking2.txt") then
 							Webhook = SuggestionsWebhook
-							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
 							if success then
 								Notify("Successfully Sent Suggestion", 5)
 								writefile("InfernoXWebhooking2.txt", CurrentTime)
@@ -288,7 +288,7 @@ local function CreateWindow()
 							end
 						elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
 							Webhook = SuggestionsWebhook
-							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
 							if success then
 								Notify("Successfully Sent Suggestion", 5)
 								writefile("InfernoXWebhooking2.txt", CurrentTime)
