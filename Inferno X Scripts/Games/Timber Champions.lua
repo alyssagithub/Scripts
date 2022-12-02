@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.0.0")
+CurrentVersion("v1.0.1")
 
 local ChopLooping
 local BossLooping
@@ -50,8 +50,10 @@ for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
 	table.insert(Areas, v.Name)
 end
 
-for i,v in pairs(game:GetService("Workspace").Scripts.Trees.Spawn:GetChildren()) do
-	table.insert(Levels, v.Name)
+for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetDescendants()) do
+	if v.Name:match("level") and not table.find(Levels, v.Name) then
+		table.insert(Levels, v.Name)
+	end
 end
 
 for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Chests)) do
