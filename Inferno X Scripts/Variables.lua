@@ -231,7 +231,7 @@ local function CreateWindow()
 			end,
 		})
 
-		local Credits = Window:CreateTab("Credits", 4483362458)
+		local Credits = Window:CreateTab("Credits/Suggestions", 4483362458)
 
 		Credits:CreateLabel("🔥 Inferno X was made by alyssa#2303 🔥")
 
