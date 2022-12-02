@@ -281,17 +281,21 @@ local function CreateWindow()
 							writefile("InfernoXWebhooking2.txt", CurrentTime)
 							print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
 							Webhook2 = SuggestionsWebhook
-							local success, result = pcall(SendMessage, "[Inferno X] Debug: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
 							if success then
 								Notify("Successfully Sent Suggestion", 5)
+							else
+								Notify("Unsuccessful Sending Suggestion", 5)
 							end
 						elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
 							writefile("InfernoXWebhooking2.txt", CurrentTime)
 							print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
 							Webhook2 = SuggestionsWebhook
-							local success, result = pcall(SendMessage, "[Inferno X] Debug: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
 							if success then
 								Notify("Successfully Sent Suggestion", 5)
+							else
+								Notify("Unsuccessful Sending Suggestion", 5)
 							end
 						else
 							Webhook2 = nil
