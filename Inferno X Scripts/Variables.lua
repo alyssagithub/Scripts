@@ -120,9 +120,9 @@ end
 
 local function CreateWindow()
 	repeat task.wait() until VCurrentVersion
-	
+
 	print("Current version: "..VCurrentVersion)
-	
+
 	local Window = Rayfield:CreateWindow({
 		Name = "Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..VCurrentVersion,
 		LoadingTitle = "Inferno X",
@@ -138,7 +138,7 @@ local function CreateWindow()
 			RememberJoins = true
 		}
 	})
-	
+
 	repeat task.wait() until Window
 
 	task.defer(function()
@@ -259,6 +259,43 @@ local function CreateWindow()
 
 					Notify("Link Copied to Clipboard", 5)
 				end
+			end,
+		})
+		
+		local SuggestionsWebhook = "https://discord.com/api/webhooks/1048123695828308029/el9jhGI84yCnvNeRtaw6WTjgzMlEDENdbo4Bdz6RkUL1N7vYwbVo1Wy_Za9y_PumRpju"
+		local Webhook2
+		
+		Credits:CreateInput({
+			Name = "Suggestion",
+			PlaceholderText = "Insert Suggestion Here",
+			NumbersOnly = false,
+			CharacterLimit = 300,
+			Enter = true,
+			RemoveTextAfterFocusLost = false,
+			Callback = function(Text)
+				pcall(function()
+					if isfile and writefile and readfile then
+						local CurrentTime = tick()
+
+						if not isfile("InfernoXWebhooking2.txt") then
+							writefile("InfernoXWebhooking2.txt", CurrentTime)
+							print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+							Webhook2 = SuggestionsWebhook
+							Notify("Successfully Sent Suggestion", 5)
+						elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
+							writefile("InfernoXWebhooking2.txt", CurrentTime)
+							print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+							Webhook2 = SuggestionsWebhook
+							pcall(SendMessage, "[Inferno X] Debug: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+							Notify("Successfully Sent Suggestion", 5)
+						else
+							Webhook2 = nil
+							Notify("You are on a 24 Hour Cooldown", 5)
+						end
+					else
+						Notify("Your Executor does not support this feature")
+					end
+				end)
 			end,
 		})
 	end)
