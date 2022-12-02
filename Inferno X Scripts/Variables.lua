@@ -263,7 +263,6 @@ local function CreateWindow()
 		})
 		
 		local SuggestionsWebhook = "https://discord.com/api/webhooks/1048123695828308029/el9jhGI84yCnvNeRtaw6WTjgzMlEDENdbo4Bdz6RkUL1N7vYwbVo1Wy_Za9y_PumRpju"
-		local Webhook2
 		
 		Credits:CreateInput({
 			Name = "Suggestion",
@@ -278,27 +277,27 @@ local function CreateWindow()
 						local CurrentTime = tick()
 
 						if not isfile("InfernoXWebhooking2.txt") then
+							Webhook = SuggestionsWebhook
 							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
 							if success then
 								Notify("Successfully Sent Suggestion", 5)
 								writefile("InfernoXWebhooking2.txt", CurrentTime)
 								print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-								Webhook2 = SuggestionsWebhook
 							else
 								Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
 							end
 						elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
+							Webhook = SuggestionsWebhook
 							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." Suggested "..Text.." On "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
 							if success then
 								Notify("Successfully Sent Suggestion", 5)
 								writefile("InfernoXWebhooking2.txt", CurrentTime)
 								print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-								Webhook2 = SuggestionsWebhook
 							else
 								Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
 							end
 						else
-							Webhook2 = nil
+							Webhook = nil
 							Notify("You are on a 24 Hour Cooldown", 5)
 						end
 					else
