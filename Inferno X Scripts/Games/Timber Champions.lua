@@ -46,11 +46,13 @@ local RewardService = Knit.GetService("RewardService")
 local BossService = Knit.GetService("BossService")
 local AxeService = Knit.GetService("AxeService")
 
-for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetChildren()) do
+local Trees = game:GetService("Workspace").Scripts.Trees
+
+for i,v in pairs(Trees:GetChildren()) do
 	table.insert(Areas, v.Name)
 end
 
-for i,v in pairs(game:GetService("Workspace").Scripts.Trees:GetDescendants()) do
+for i,v in pairs(Trees:GetDescendants()) do
 	if v.Name:match("level") and not table.find(Levels, v.Name) then
 		table.insert(Levels, v.Name)
 	end
@@ -129,9 +131,9 @@ task.spawn(function()
 		if ChopLooping and #SelectedAreas > 0 and #SelectedLevels > 0 then
 			for i,v in pairs(SelectedAreas) do
 				for e,r in pairs(SelectedLevels) do
-					if game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r) then
-						if game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model") then
-							Damage:Fire(game:GetService("Workspace").Scripts.Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model").Name)
+					if Trees:FindFirstChild(v):FindFirstChild(r) then
+						if Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model") then
+							Damage:Fire(Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model").Name)
 						end
 					end
 				end
@@ -155,10 +157,8 @@ task.spawn(function()
 	while task.wait() do
 		if BossLooping then
 			for i,v in pairs(game:GetService("Workspace").Scripts.Areas:GetDescendants()) do
-				if v:IsA("Folder") and v.Name == "Boss" then
-					if #v.Model:GetChildren() > 0 then
-						BossService.Damage:Fire(v.ID.Value)
-					end
+				if v:IsA("Folder") and v.Name:match("Boss") then
+					BossService.Damage:Fire(v.ID.Value)
 				end
 			end
 		end
