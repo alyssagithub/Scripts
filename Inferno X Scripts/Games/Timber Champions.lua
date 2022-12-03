@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.0.1")
+CurrentVersion("v1.0.2")
 
 local ChopLooping
 local BossLooping
@@ -277,47 +277,7 @@ Pets:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if BestLooping then
-			local CurrentNumber1 = 0
-			local CurrentNumber2 = 0
-			local CurrentNumber3 = 0
-			local CurrentPet1
-			local CurrentPet2
-			local CurrentPet3
-
-			local PetData = DataController.data.Pets
-
-			for i,v in pairs(PetData) do
-				if v.multiplier > CurrentNumber1 then
-					CurrentNumber1 = v.multiplier
-					CurrentPet1 = i
-				end
-			end
-
-			for i,v in pairs(PetData) do
-				if v.multiplier > CurrentNumber2 and i ~= CurrentPet1 then
-					CurrentNumber2 = v.multiplier
-					CurrentPet2 = i
-				end
-			end
-
-			for i,v in pairs(PetData) do
-				if v.multiplier > CurrentNumber3 and i ~= CurrentPet1 and  i ~= CurrentPet2 then
-					CurrentNumber3 = v.multiplier
-					CurrentPet3 = i
-				end
-			end
-
-			for i,v in pairs(PetData) do
-				if v.equipped == true then
-					PetService:Unequip(i)
-				end
-			end
-
-			pcall(function()
-				PetService:Equip(CurrentPet1)
-				PetService:Equip(CurrentPet2)
-				PetService:Equip(CurrentPet3)
-			end)
+			firesignal(Player.PlayerGui.MainUI.PetsFrame.Additional.EquipBest.Click.MouseButton1Up)
 			task.wait(BestDelay)
 		end
 	end
