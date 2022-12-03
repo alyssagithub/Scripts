@@ -1,11 +1,13 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.0.2")
+CurrentVersion("v1.1.2")
 
 local ChopLooping
+
 local BossLooping
 local OrbLooping
 local ChestLooping
+local ClaimLooping
 
 local HatchLooping
 
@@ -199,6 +201,27 @@ task.spawn(function()
 		if ChestLooping then
 			for i,v in pairs(Chests) do
 				RewardService:ClaimChest(v)
+			end
+		end
+	end
+end)
+
+Main:CreateToggle({
+	Name = "🎁 Auto Claim Rewards",
+	CurrentValue = false,
+	Flag = "AutoClaim",
+	Callback = function(Value)
+		ClaimLooping = Value
+	end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if ClaimLooping then
+			for i,v in pairs(Player.PlayerGui.MainUI.RewardsFrame.Main.Holder:GetChildren()) do
+				if v:IsA("Frame") and v.Claim.Visible == true then
+					firesignal(v.Click.MouseButton1Up)
+				end
 			end
 		end
 	end
