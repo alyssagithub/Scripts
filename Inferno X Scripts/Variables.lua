@@ -222,7 +222,7 @@ local function CreateWindow()
 
 		task.spawn(function()
 			while task.wait() do
-				if Speed then
+				if Speed and Player.Character.Humanoid.WalkSpeed ~= Speed then
 					Player.Character.Humanoid.WalkSpeed = Speed
 				end
 			end
@@ -247,8 +247,8 @@ local function CreateWindow()
 		
 		task.spawn(function()
 			while task.wait() do
-				if Jump then
-					Player.Character.Humanoid.WalkSpeed = Jump
+				if Jump and Player.Character.Humanoid.JumpPower ~= Jump then
+					Player.Character.Humanoid.JumpPower = Jump
 				end
 			end
 		end)
