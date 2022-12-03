@@ -201,6 +201,8 @@ local function CreateWindow()
 
 		Universal:CreateSection("")
 
+		local Speed
+
 		Universal:CreateSlider({
 			Name = "💨 WalkSpeed",
 			Range = {0, 500},
@@ -208,13 +210,25 @@ local function CreateWindow()
 			CurrentValue = Player.Character.Humanoid.WalkSpeed,
 			--Flag = "Universal-WalkSpeed",
 			Callback = function(Value)
-				if syn then
-					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+				Speed = Value
+				if Speed then
+					if syn then
+						if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
+					end
+					Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
 				end
-				Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
-				Player.Character.Humanoid.WalkSpeed = Value
 			end,
 		})
+
+		task.spawn(function()
+			while task.wait() do
+				if Speed then
+					Player.Character.Humanoid.WalkSpeed = Speed
+				end
+			end
+		end)
+		
+		local Jump
 
 		Universal:CreateSlider({
 			Name = "⬆ JumpPower",
@@ -223,13 +237,21 @@ local function CreateWindow()
 			CurrentValue = Player.Character.Humanoid.JumpPower,
 			--Flag = "Universal-JumpPower",
 			Callback = function(Value)
+				Jump = Value
 				if syn then
 					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
 				end
 				Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
-				Player.Character.Humanoid.JumpPower = Value
 			end,
 		})
+		
+		task.spawn(function()
+			while task.wait() do
+				if Jump then
+					Player.Character.Humanoid.WalkSpeed = Jump
+				end
+			end
+		end)
 
 		local Credits = Window:CreateTab("Credits/Suggestions", 4483362458)
 
@@ -261,9 +283,9 @@ local function CreateWindow()
 				end
 			end,
 		})
-		
+
 		local SuggestionsWebhook = "https://discord.com/api/webhooks/1048123695828308029/el9jhGI84yCnvNeRtaw6WTjgzMlEDENdbo4Bdz6RkUL1N7vYwbVo1Wy_Za9y_PumRpju"
-		
+
 		Credits:CreateInput({
 			Name = "Suggestion",
 			PlaceholderText = "Insert Suggestion Here",
