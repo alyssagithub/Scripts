@@ -121,8 +121,6 @@ end
 local function CreateWindow()
 	repeat task.wait() until VCurrentVersion
 
-	print("Current version: "..VCurrentVersion)
-
 	local Window = Rayfield:CreateWindow({
 		Name = "🔥 Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..VCurrentVersion,
 		LoadingTitle = "🔥 Inferno X",
