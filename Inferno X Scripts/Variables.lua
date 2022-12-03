@@ -225,7 +225,7 @@ local function CreateWindow()
 				end
 			end
 		end)
-		
+
 		local Jump
 
 		Universal:CreateSlider({
@@ -242,7 +242,7 @@ local function CreateWindow()
 				Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
 			end,
 		})
-		
+
 		task.spawn(function()
 			while task.wait() do
 				if Jump and Player.Character.Humanoid.JumpPower ~= Jump then
@@ -292,38 +292,40 @@ local function CreateWindow()
 			Enter = true,
 			RemoveTextAfterFocusLost = false,
 			Callback = function(Text)
-				pcall(function()
-					if isfile and writefile and readfile then
-						local CurrentTime = tick()
+				if Text ~= "" and Text ~= " " then
+					pcall(function()
+						if isfile and writefile and readfile then
+							local CurrentTime = tick()
 
-						if not isfile("InfernoXWebhooking2.txt") then
-							Webhook = SuggestionsWebhook
-							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
-							if success then
-								Notify("Successfully Sent Suggestion", 5)
-								writefile("InfernoXWebhooking2.txt", CurrentTime)
-								print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+							if not isfile("InfernoXWebhooking2.txt") then
+								Webhook = SuggestionsWebhook
+								local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+								if success then
+									Notify("Successfully Sent Suggestion", 5)
+									writefile("InfernoXWebhooking2.txt", CurrentTime)
+									print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+								else
+									Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
+								end
+							elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
+								Webhook = SuggestionsWebhook
+								local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+								if success then
+									Notify("Successfully Sent Suggestion", 5)
+									writefile("InfernoXWebhooking2.txt", CurrentTime)
+									print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+								else
+									Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
+								end
 							else
-								Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
-							end
-						elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
-							Webhook = SuggestionsWebhook
-							local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
-							if success then
-								Notify("Successfully Sent Suggestion", 5)
-								writefile("InfernoXWebhooking2.txt", CurrentTime)
-								print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-							else
-								Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
+								Webhook = nil
+								Notify("You are on a 24 Hour Cooldown", 5)
 							end
 						else
-							Webhook = nil
-							Notify("You are on a 24 Hour Cooldown", 5)
+							Notify("Your Executor does not support this feature")
 						end
-					else
-						Notify("Your Executor does not support this feature")
-					end
-				end)
+					end)
+				end
 			end,
 		})
 	end)
