@@ -70,12 +70,6 @@ for i,v in pairs(Plot.Heroes:GetChildren()) do
 	table.insert(HeroesList, v.Name)
 end
 
-Plot.Heroes.ChildAdded:Connect(function(child)
-	if not table.find(HeroesList, child.Name) then
-		table.insert(HeroesList, child.Name)
-	end
-end)
-
 local Window = CreateWindow()
 
 local Main = Window:CreateTab("Main", 4483362458)
@@ -398,7 +392,7 @@ end)
 
 Heroes:CreateSection("")
 
-Heroes:CreateDropdown({
+local HeroUpgrade = Heroes:CreateDropdown({
 	Name = "📃 Hero to Upgrade (leave blank for all)",
 	Options = HeroesList,
 	CurrentOption = "None",
@@ -413,6 +407,20 @@ Heroes:CreateDropdown({
 		end
 	end,
 })
+
+PlayerPlot.Heroes.ChildAdded:Connect(function(child)
+	if not table.find(HeroesList, child.Name) then
+		table.insert(HeroesList, child.Name)
+		HeroUpgrade:Add(child.Name)
+	end
+end)
+
+PlayerPlot.Heroes.ChildRemoved:Connect(function(child)
+	if table.find(HeroesList, child.Name) then
+		table.remove(HeroesList, child.Name)
+		HeroUpgrade:Remove(child.Name)
+	end
+end)
 
 Heroes:CreateSlider({
 	Name = "🎚 Max Upgrade Level",
