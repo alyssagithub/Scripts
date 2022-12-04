@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.1.0")
+CurrentVersion("v1.1.1")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -440,20 +440,22 @@ Heroes:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if UpgradeLooping then
-			for i,v in pairs(PlayerPlot.Heroes:GetChildren()) do
-				if tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) and tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) <= (UpgradeLevel - 1) then
-					if not SelectedHero then
-						SelectedHero = v.Name
-					end
+		if UpgradeLooping and #PlayerPlot.Heroes:GetChildren() > 0 then
+			pcall(function()
+				for i,v in pairs(PlayerPlot.Heroes:GetChildren()) do
+					if tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) and tonumber(v:WaitForChild("Head").Nametag.Level.Text:split(" ")[2]) <= (UpgradeLevel - 1) then
+						if not SelectedHero then
+							SelectedHero = v.Name
+						end
 
-					if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.BuyLevel:InvokeServer(SelectedHero, 0) then
-						print("[Inferno X] Debug: Upgraded "..SelectedHero)
-					end
+						if game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.HeroService.RF.BuyLevel:InvokeServer(SelectedHero, 0) then
+							print("[Inferno X] Debug: Upgraded "..SelectedHero)
+						end
 
-					SelectedHero = SelectedHero2
+						SelectedHero = SelectedHero2
+					end
 				end
-			end
+			end)
 		end
 	end
 end)
@@ -509,13 +511,13 @@ Heroes:CreateButton({
 				end
 			end
 		end
-		
+
 		local Number = 0
-		
+
 		for i,v in pairs(SkillsList) do
 			Number = Number + 1
 		end
-		
+
 		print("[Inferno X] Debug: Collected "..Number.." Skills")
 	end,
 })
