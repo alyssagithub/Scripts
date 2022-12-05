@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.0.0")
+CurrentVersion("v1.0.1")
 
 local SkateLooping
 local RampLooping
@@ -44,12 +44,12 @@ task.spawn(function()
 					BestSkateboard = v
 				end
 			end
-			
+
 			Player.Character.HumanoidRootPart.CFrame = CFrame.new(BestSkateboard.Parent.Position)
 			repeat
 				fireproximityprompt(BestSkateboard.Parent.Prompt)
 				task.wait()
-			until Player.serverstats.onboard.Value == true
+			until Player.serverstats.onboard.Value == true or not SkateLooping
 		end
 	end
 end)
@@ -67,26 +67,24 @@ task.spawn(function()
 	while task.wait() do
 		if RampLooping and Player.serverstats.onramp.Value == false then
 			local CurrentNumber = 0
-			local BestRamp
-
-			for i,v in pairs(game:GetService("Workspace").Ramps:GetChildren()) do
-				for e,r in pairs(v:GetChildren()) do
-					if r.Name == "Text" and r.BillboardInfo.BillboardText.Text:split("x")[2] and tonumber(r.BillboardInfo.BillboardText.Text:split("x")[2]:split(" ")[1]) > CurrentNumber then
-						CurrentNumber = tonumber(r.BillboardInfo.BillboardText.Text:split("x")[2]:split(" ")[1])
-						BestRamp = v
-					end
+			local BestWorld = "Spawn"
+			
+			for i,v in pairs(game:GetService("Workspace").Doors:GetChildren()) do
+				if v.Transparency == 1 and v.Price.Value > CurrentNumber then
+					CurrentNumber = v.Price.Value
+					BestWorld = v.Name
 				end
 			end
 
-			for i,v in pairs(BestRamp:GetChildren()) do
+			for i,v in pairs(game:GetService("Workspace").Ramps:FindFirstChild(BestWorld):GetChildren()) do
 				if v.Name:match("Ramp") and v.IsRampInUse.Value == false then
 					Player.Character.HumanoidRootPart.CFrame = CFrame.new(v.floor.Position.X + 10, v.floor.Position.Y, v.floor.Position.Z)
-					
+
 					repeat
 						fireproximityprompt(v.Attachment.Prompt)
 						task.wait()
-					until Player.serverstats.onramp.Value == true
-					
+					until Player.serverstats.onramp.Value == true or not RampLooping
+
 					break
 				end
 			end
