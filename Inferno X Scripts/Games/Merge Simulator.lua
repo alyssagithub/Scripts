@@ -10,8 +10,17 @@ local AutoUpgradeLooping
 local AutoObbyLooping
 local AutoRebirthLooping
 local InfObbyMultiLooping
+local HatchLooping
 
-local Blocks = {}
+local SelectedEgg
+
+local Eggs = {}
+
+for i,v in pairs(game:GetService("Workspace").Plot.Eggs:GetChildren()) do
+	if not v.Name:match("Robux") then
+		table.insert(Eggs, v.Name)
+	end
+end
 
 local Window = CreateWindow()
 
@@ -131,5 +140,34 @@ task.spawn(function()
 			firetouchinterest(Player.Character.HumanoidRootPart, workspace.Obby.Finish, 1)
 		end
 		task.wait(1)
+	end
+end)
+
+local Pets = Window:CreateTab("Pets", 4483362458)
+
+Pets:CreateDropdown({
+	Name = "🥚 Egg",
+	Options = Eggs,
+	CurrentOption = "",
+	Flag = "SelectedEgg",
+	Callback = function(Option)
+		SelectedEgg = Option
+	end,
+})
+
+Pets:CreateToggle({
+	Name = "🐣 Auto Hatch Egg",
+	CurrentValue = false,
+	Flag = "AutoHatch",
+	Callback = function(Value)
+		HatchLooping = Value
+	end,
+})
+
+task.spawn(function()
+	while task.wait(1) do
+		if HatchLooping and SelectedEgg then
+			game:GetService("ReplicatedStorage").Functions.Minions.BuyEgg:InvokeServer(SelectedEgg)
+		end
 	end
 end)
