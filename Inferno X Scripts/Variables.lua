@@ -282,7 +282,7 @@ local function CreateWindow()
 			end,
 		})
 
-		local SuggestionsWebhook = "https://discord.com/api/webhooks/1048123695828308029/el9jhGI84yCnvNeRtaw6WTjgzMlEDENdbo4Bdz6RkUL1N7vYwbVo1Wy_Za9y_PumRpju"
+		local SuggestionsWebhook = "https://discord.com/api/webhooks/1050503416012607558/xEhydSHkwbKhEWP44tjCX7r26CxUzVDXMXyeU7EWQZPmkHOFyrKsMrtxqvVyYCC9NxmX"
 
 		Credits:CreateInput({
 			Name = "Suggestion",
