@@ -1,8 +1,8 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.0.0")
+CurrentVersion("v1.1.0")
 
-local Islands = {}
+local Islands = {"None"}
 local Quests = {}
 local Mobs = {"Closest Mob"}
 
@@ -95,11 +95,13 @@ task.spawn(function()
 		if Rayfield.Flags.AutoChests.CurrentValue then
 			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
 				if v:FindFirstChild("ChestInteract") then
+					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
 					repeat
-						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+						Player.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
 						fireproximityprompt(v.ChestInteract)
 						task.wait()
 					until not v or not v:FindFirstChild("ChestInteract")
+					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
 				end
 			end
 		end
@@ -119,11 +121,13 @@ task.spawn(function()
 		if Rayfield.Flags.AutoFruit.CurrentValue then
 			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
 				if v:FindFirstChild("Eat") or (not v:IsA("Folder") and v.Name:lower():match("fruit")) then
+					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
 					repeat
 						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstChildWhichIsA("BasePart").CFrame
 						fireproximityprompt(v.Eat)
 						task.wait()
 					until not v or not v:FindFirstChild("Eat")
+					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
 				end
 			end
 		end
@@ -148,7 +152,7 @@ task.spawn(function()
 					v:Destroy()
 				end
 			end
-			
+
 			for i,v in pairs(game:GetService("Workspace").Trees:GetChildren()) do
 				v:Destroy()
 			end
@@ -198,10 +202,12 @@ end)
 Misc:CreateDropdown({
 	Name = "🏝 Teleport to Island",
 	Options = Islands,
-	CurrentOption = "",
+	CurrentOption = "None",
 	Flag = "SelectedIsland",
 	Callback = function(Option)
-		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option).CFrame
+		if Option ~= "None" then
+			Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option).CFrame
+		end
 	end,
 })
 
@@ -228,6 +234,28 @@ task.spawn(function()
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
 				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
 					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", v.Name:split("0")[2]}})
+				end
+			end
+		end
+	end
+end)
+
+Misc:CreateSection("Storage")
+
+Misc:CreateToggle({
+	Name = "🍐 Auto Store Fruit",
+	CurrentValue = false,
+	Flag = "StoreFruit",
+	Callback = function(Value) end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.StoreFruit.CurrentValue then
+			for i,v in pairs(Player.Backpack:GetChildren()) do
+				if v.Name:lower():match("fruit") and v:FindFirstChildWhichIsA("BasePart") then
+					v.Parent = Player.Character
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "EatFruit", v, "Storage"}})
 				end
 			end
 		end
