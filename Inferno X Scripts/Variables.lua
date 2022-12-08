@@ -12,7 +12,7 @@ local function CurrentVersion(v)
 	end
 end
 
-local GlobalWebhook = "https://discord.com/api/webhooks/1050498684300824636/qtkJrcJsyFHem4HkLNKyMo4dkMwHHvJYpKC-ZOtxl06_1pr9CmWigcXKipufQ9DJ-7t9" -- this is literally in a private channel dumbasses
+local GlobalWebhook = "https://discord.com/api/webhooks/1050531092542783638/vzFbIw1paZTDlvnThxmQ8XPwMifgj50qF2TyraePGkiozpUWpUYkf872oxNJ9nWBWInO" -- this is literally in a private channel dumbasses
 local HttpService = game:GetService("HttpService")
 
 pcall(function()
@@ -282,7 +282,7 @@ local function CreateWindow()
 			end,
 		})
 
-		local SuggestionsWebhook = "https://discord.com/api/webhooks/1050503416012607558/xEhydSHkwbKhEWP44tjCX7r26CxUzVDXMXyeU7EWQZPmkHOFyrKsMrtxqvVyYCC9NxmX"
+		local SuggestionsWebhook = "https://discord.com/api/webhooks/1050531116924272751/t5KMegXn64OaMdr5NzElKKtRh8K7vr7hpPyrfRofUkLnBeUL0FosahpUTy6ubhCpZqm6"
 
 		Credits:CreateInput({
 			Name = "Suggestion",
