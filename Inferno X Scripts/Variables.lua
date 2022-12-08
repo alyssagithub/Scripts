@@ -12,7 +12,7 @@ local function CurrentVersion(v)
 	end
 end
 
-local GlobalWebhook = "https://discord.com/api/webhooks/1050492831120248852/FiS0XkMRirrlHqmFGsms3ZWoDKiXbJB59tl2kckdAUjpH222rJIcKp2JknBxZhlhfMxM" -- this is literally in a private channel dumbasses
+local GlobalWebhook = "https://discord.com/api/webhooks/1050497062879363213/5wk_mslt-wkXIQbFFDfA-TSQGgrlwBLr3RWuH1Qu9-r4W6LtCz9MvcHXQTgBzVdaPyEc" -- this is literally in a private channel dumbasses
 local HttpService = game:GetService("HttpService")
 
 pcall(function()
