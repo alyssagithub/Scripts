@@ -4,7 +4,8 @@ local Games = {
 	[9712123877] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/Super%20Slime%20Simulator.lua", -- Super Slime Simulator
 	[11189979930] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/Pet%20Crafting%20Simulator.lua", -- Pet Crafting Simulator
 	[10404327868] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/Timber%20Champions.lua", -- Timber Champions
-	[10594623896] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/Master%20Punching%20Simulator.lua" -- Master Punching Simulator
+	[10594623896] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/Master%20Punching%20Simulator.lua", -- Master Punching Simulator
+	[11445923563] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/One%20Fruit%20Simulator.lua" -- One Fruit Simulator
 }
 
 if Games[game.PlaceId] then
