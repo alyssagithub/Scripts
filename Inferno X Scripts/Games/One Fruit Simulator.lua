@@ -235,7 +235,7 @@ task.spawn(function()
 		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" then
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
 				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
-					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", (not v.Name:split("Quest")[2]:split("0")[2] and tonumber(v.Name:split("Quest")[2]) or tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1]))}})
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", (v.Name:split("Quest")[2]:split("0")[2] == "" and tonumber(v.Name:split("Quest")[2])) or tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1])}})
 				end
 			end
 		end
