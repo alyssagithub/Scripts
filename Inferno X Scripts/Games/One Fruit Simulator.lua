@@ -67,12 +67,14 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.AutoSkills.CurrentValue and Player.Character:FindFirstChild("HumanoidRootPart") then
+		if Rayfield.Flags.AutoSkills.CurrentValue then
 			for _,r in pairs(Player.Character:GetChildren()) do
 				if r:IsA("Tool") then
 					for i,v in pairs({"Z", "X", "C", "V", "B"}) do
-						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
-						task.wait()
+						if Player.Character:FindFirstChild("HumanoidRootPart") then
+							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
+							task.wait()
+						end
 					end
 				end
 			end
@@ -233,7 +235,7 @@ task.spawn(function()
 		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" then
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
 				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
-					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1])}})
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", (not v.Name:split("Quest")[2]:split("0")[2] and tonumber(v.Name:split("Quest")[2]) or tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1]))}})
 				end
 			end
 		end
