@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.2.2")
+CurrentVersion("v1.3.2")
 
 local good = false
 
@@ -297,7 +297,7 @@ task.spawn(function()
 	end
 end)
 
-Misc:CreateSection("Storage")
+Misc:CreateSection("Other")
 
 Misc:CreateToggle({
 	Name = "🍐 Auto Store Fruit",
@@ -315,6 +315,21 @@ task.spawn(function()
 					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "EatFruit", v, "Storage"}})
 				end
 			end
+		end
+	end
+end)
+
+Misc:CreateToggle({
+	Name = "🔥 Auto Enable Haki",
+	CurrentValue = false,
+	Flag = "Haki",
+	Callback = function(Value) end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Haki.CurrentValue and (not Player.Character:FindFirstChild("BusoH") or Player.Character:FindFirstChild("BusoH"):FindFirstChildWhichIsA("BasePart").Transparency ~= 0) then
+			game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "BusoHaki"}})
 		end
 	end
 end)
