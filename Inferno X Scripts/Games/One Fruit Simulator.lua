@@ -283,7 +283,7 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" then
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
-				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == "Lv. 10" then
+				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
 					local PreviousPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
 					repeat
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.HumanoidRootPart.CFrame
