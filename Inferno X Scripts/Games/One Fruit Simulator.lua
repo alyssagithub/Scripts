@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.3.3")
+CurrentVersion("v1.3.4")
 
 local good = false
 
@@ -17,8 +17,8 @@ for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren(
 end
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
-	if v:IsA("Model") and not table.find(Mobs, v.Name:gsub("%d", ""):split(" ")[1]) then
-		table.insert(Mobs, v.Name:gsub("%d", ""):split(" ")[1])
+	if v:IsA("Model") and v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
+		table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
 	end
 end
 
