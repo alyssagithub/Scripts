@@ -24,7 +24,7 @@ local SelectedEgg
 local TripleHatch
 
 local Areas = {}
-local Levels = {}
+local Levels = {"Closest Trees"}
 local Chests = {}
 local Eggs = {}
 
@@ -131,12 +131,24 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if ChopLooping and #SelectedAreas > 0 and #SelectedLevels > 0 then
-			for i,v in pairs(SelectedAreas) do
-				for e,r in pairs(SelectedLevels) do
-					if Trees:FindFirstChild(v):FindFirstChild(r) then
-						if Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model") then
-							Damage:Fire(Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model").Name)
+		if ChopLooping and #SelectedLevels > 0 then
+			if table.find(SelectedLevels, "Closest Trees") then
+				for i,v in pairs(Trees:GetChildren()) do
+					for t,y in pairs(v:GetChildren()) do
+						for j,k in pairs(y.Storage:GetChildren()) do
+							if (Player.Character:WaitForChild("HumanoidRootPart").Position - k.PrimaryPart.Position).Magnitude < 30 then
+								Damage:Fire(k.Name)
+							end
+						end
+					end
+				end
+			else
+				for i,v in pairs(SelectedAreas) do
+					for e,r in pairs(SelectedLevels) do
+						if Trees:FindFirstChild(v):FindFirstChild(r) then
+							if Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model") then
+								Damage:Fire(Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model").Name)
+							end
 						end
 					end
 				end
