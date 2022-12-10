@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.3.2")
+CurrentVersion("v1.3.3")
 
 local good = false
 
@@ -100,7 +100,7 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoSkills.CurrentValue then
 			for _,r in pairs(Player.Character:GetChildren()) do
-				if r:IsA("Tool") then
+				if r:IsA("Tool") and r.Name ~= "Defence" then
 					for i,v in pairs({"Z", "X", "C", "V", "B"}) do
 						if Player.Character:FindFirstChild("HumanoidRootPart") then
 							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
@@ -237,7 +237,7 @@ task.spawn(function()
 			local Mob
 
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
-				if v:IsA("Model") and v.Name == "NpcModel" then
+				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 
 					if (v.Parent.Name:gsub("%d", ""):split(" ")[1] == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob") and Magnitude < CurrentNumber then
@@ -246,8 +246,10 @@ task.spawn(function()
 					end
 				end
 			end
-
-			Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, Mob.Position.Y * .1, 0)
+			
+			if Mob then
+				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Mob.CFrame.LookVector * 20
+			end
 		end
 	end
 end)
