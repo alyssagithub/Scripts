@@ -1,8 +1,10 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.1.1")
+CurrentVersion("v1.2.1")
 
-local Islands = {"None"}
+local good = false
+
+local Islands = {}
 local Quests = {}
 local Mobs = {"Closest Mob"}
 
@@ -26,32 +28,57 @@ local Main = Window:CreateTab("Main", 4483362458)
 
 Main:CreateSection("Weapons")
 
-Main:CreateButton({
+Main:CreateToggle({
 	Name = "🛠 Equip all Tools",
 	Info = "Equips all the tools in your backpack",
-	Interact = 'equip',
-	Callback = function()
-		for i,v in pairs(Player.Backpack:GetChildren()) do
-			v.Parent = Player.Character
+	CurrentValue = false,
+	Flag = "EquipTools",
+	Callback = function(Value)
+		if not Value then
+			for i,v in pairs(Player.Character:GetChildren()) do
+				if v:IsA("Tool") then
+					v.Parent = Player.Backpack
+				end
+			end
 		end
 	end,
 })
 
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.EquipTools.CurrentValue then
+			for i,v in pairs(Player.Backpack:GetChildren()) do
+				v.Parent = Player.Character
+			end
+		end
+	end
+end)
+
 Main:CreateToggle({
 	Name = "⚔ Auto Train",
-	Info = "Automatically trains with your current item(s)",
+	Info = "Automatically trains with your current items",
 	CurrentValue = false,
 	Flag = "AutoTrain",
 	Callback = function(Value) end,
 })
 
+Player.PlayerGui.Warn.ChildAdded:Connect(function()
+	if Rayfield.Flags.AutoTrain.CurrentValue then
+		good = true
+	end
+end)
+
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoTrain.CurrentValue then
-			for i,Tool in pairs(Player.Character:GetChildren()) do
-				if Tool:IsA("Tool") then
+			for i,Tool in pairs(Player.Backpack:GetChildren()) do
+				Tool.Parent = Player.Character
+				repeat
 					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
-				end
+					task.wait()
+				until good or not Rayfield.Flags.AutoTrain.CurrentValue
+				good = false
+				Tool.Parent = Player.Backpack
 			end
 		end
 	end
@@ -102,7 +129,7 @@ task.spawn(function()
 						Player.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
 						fireproximityprompt(v.ChestInteract)
 						task.wait()
-					until not v or not v:FindFirstChild("ChestInteract")
+					until not v or not v:FindFirstChild("ChestInteract") or not Rayfield.Flags.AutoChests.CurrentValue
 					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
 				end
 			end
@@ -128,7 +155,7 @@ task.spawn(function()
 						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstChildWhichIsA("BasePart").CFrame
 						fireproximityprompt(v.Eat)
 						task.wait()
-					until not v or not v:FindFirstChild("Eat")
+					until not v or not v:FindFirstChild("Eat") or not Rayfield.Flags.AutoFruit.CurrentValue
 					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
 				end
 			end
@@ -136,26 +163,44 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateSection("Framerate")
-
 Main:CreateToggle({
-	Name = "💥 Disable Effects",
-	Info = "Disable effects from skills",
+	Name = "✅ Remove Name Tag",
+	Info = "Removes your name tag from others and yourself",
 	CurrentValue = false,
-	Flag = "Effects",
+	Flag = "RemoveNameTag",
 	Callback = function(Value)	end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Effects.CurrentValue then
-			for i,v in pairs(game:GetService("Workspace").Effects:GetChildren()) do
-				if not v:IsA("Folder") then
+		if Rayfield.Flags.RemoveNameTag.CurrentValue and Player.Character:WaitForChild("Head"):FindFirstChild("PlayerHealth") then
+			for i,v in pairs(Player.Character:GetDescendants())do
+				if v:IsA("BillboardGui") or v:IsA("SurfaceGui") then
 					v:Destroy()
 				end
 			end
+		end
+	end
+end)
 
-			for i,v in pairs(game:GetService("Workspace").Trees:GetChildren()) do
+Main:CreateSection("Effects")
+
+Main:CreateToggle({
+	Name = "💥 Disable Effects",
+	Info = "Disable effects from skills (must rejoin to reverse)",
+	CurrentValue = false,
+	Flag = "DisableEffects",
+	Callback = function(Value) end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.DisableEffects.CurrentValue and #game:GetService("ReplicatedStorage").Game["__Extra"].Modules.Skills:GetChildren() > 0 then
+			for i,v in pairs(game:GetService("ReplicatedStorage").Game["__Extra"].Modules.Skills:GetChildren()) do
+				v:Destroy()
+			end
+			
+			for i,v in pairs(game:GetService("ReplicatedStorage").Game["__SkillsModules"]:GetChildren()) do
 				v:Destroy()
 			end
 		end
@@ -189,8 +234,10 @@ task.spawn(function()
 
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 				if v:IsA("Model") and v.Name == "NpcModel" then
-					if (Rayfield.Flags.SelectedMob.CurrentOption ~= "Closest Mob" and v.Parent.Name:match(Rayfield.Flags.SelectedMob.CurrentOption)) and (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < CurrentNumber or (Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" and (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < CurrentNumber) then
-						CurrentNumber = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+					
+					if (v.Parent.Name:gsub("%d", ""):split(" ")[1] == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob") and Magnitude < CurrentNumber then
+						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
 					end
 				end
@@ -204,12 +251,10 @@ end)
 Misc:CreateDropdown({
 	Name = "🏝 Teleport to Island",
 	Options = Islands,
-	CurrentOption = "None",
-	Flag = "SelectedIsland",
+	CurrentOption = "",
+	--Flag = "SelectedIsland",
 	Callback = function(Option)
-		if Option ~= "None" then
-			Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option).CFrame
-		end
+		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option).CFrame
 	end,
 })
 
@@ -234,8 +279,14 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" then
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
-				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
-					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", (v.Name:split("Quest")[2]:split("0")[2] == "" and tonumber(v.Name:split("Quest")[2])) or tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1])}})
+				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == "Lv. 10" then
+					local PreviousPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
+					repeat
+						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.HumanoidRootPart.CFrame
+						task.wait()
+						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", (v.Name:split("Quest")[2]:split("0")[2] == "" and tonumber(v.Name:split("Quest")[2])) or tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1])}})
+					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
+					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
 			end
 		end
