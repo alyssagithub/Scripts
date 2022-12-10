@@ -247,7 +247,7 @@ task.spawn(function()
 				end
 			end
 
-			Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, 10, 0)
+			Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, Mob.Position.Y * .1, 0)
 		end
 	end
 end)
