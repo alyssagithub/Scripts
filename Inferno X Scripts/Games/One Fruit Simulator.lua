@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.2.1")
+CurrentVersion("v1.2.2")
 
 local good = false
 
@@ -203,7 +203,7 @@ task.spawn(function()
 			for i,v in pairs(game:GetService("ReplicatedStorage").Game["__Extra"].Modules.Skills:GetChildren()) do
 				v:Destroy()
 			end
-			
+
 			for i,v in pairs(game:GetService("ReplicatedStorage").Game["__SkillsModules"]:GetChildren()) do
 				v:Destroy()
 			end
@@ -239,7 +239,7 @@ task.spawn(function()
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 				if v:IsA("Model") and v.Name == "NpcModel" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
-					
+
 					if (v.Parent.Name:gsub("%d", ""):split(" ")[1] == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob") and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
@@ -288,7 +288,7 @@ task.spawn(function()
 					repeat
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.HumanoidRootPart.CFrame
 						task.wait()
-						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", (v.Name:split("Quest")[2]:split("0")[2] == "" and tonumber(v.Name:split("Quest")[2])) or tonumber(v.Name:split("Quest")[2]:gsub("0", ""):split(" ")[1])}})
+						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", v:GetAttribute("QuestID")}})
 					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
