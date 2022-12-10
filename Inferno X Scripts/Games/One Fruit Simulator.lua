@@ -72,13 +72,17 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoTrain.CurrentValue then
 			for i,Tool in pairs(Player.Backpack:GetChildren()) do
-				Tool.Parent = Player.Character
-				repeat
-					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
-					task.wait()
-				until good or not Rayfield.Flags.AutoTrain.CurrentValue
-				good = false
-				Tool.Parent = Player.Backpack
+				if Tool.Parent == Player.Backpack then
+					Tool.Parent = Player.Character
+					repeat
+						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
+						task.wait()
+					until good or not Rayfield.Flags.AutoTrain.CurrentValue or Tool.Parent ~= Player.Character
+					good = false
+					if Tool.Parent == Player.Character then
+						Tool.Parent = Player.Backpack
+					end
+				end
 			end
 		end
 	end
