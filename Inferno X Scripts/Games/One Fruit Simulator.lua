@@ -240,7 +240,7 @@ task.spawn(function()
 				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 
-					if (v.Parent.Name:gsub("%d", ""):split(" ")[1] == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob") and Magnitude < CurrentNumber then
+					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob") and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
 					end
