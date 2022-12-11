@@ -79,7 +79,10 @@ function SendMessage(Message, Botname)
 	return Data or nil;
 end
 
-pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit(), "Execution")
+task.spawn(function()
+	repeat task.wait() until VCurrentVersion
+	pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." "..VCurrentVersion.." using "..getexploit(), "Execution")
+end)
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
 
@@ -250,11 +253,11 @@ local function CreateWindow()
 				end
 			end
 		end)
-		
+
 		Universal:CreateSection("Safety")
-		
+
 		local GroupId = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Creator.CreatorTargetId
-		
+
 		Universal:CreateToggle({
 			Name = "🚪 Leave Upon Staff Join",
 			Info = "Kicks you if a player above the group role 1 joins/is in the server",
@@ -273,7 +276,7 @@ local function CreateWindow()
 				end
 			end,
 		})
-		
+
 		game:GetService("Players").PlayerAdded:Connect(function(v)
 			if Rayfield.Flags["Universal-AutoLeave"].CurrentValue then
 				pcall(function()
