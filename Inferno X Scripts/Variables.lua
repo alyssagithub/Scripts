@@ -158,7 +158,7 @@ local function CreateWindow()
 			end,
 		})
 
-		Universal:CreateToggle({
+		local AutoRejoin = Universal:CreateToggle({
 			Name = "🔁 Auto Rejoin",
 			CurrentValue = false,
 			Flag = "Universal-AutoRejoin",
@@ -197,7 +197,7 @@ local function CreateWindow()
 
 		Rayfield:LoadConfiguration()
 
-		Universal:CreateSection("")
+		Universal:CreateSection("Modifiers")
 
 		local Speed
 
@@ -248,6 +248,40 @@ local function CreateWindow()
 				if Jump and Player.Character.Humanoid.JumpPower ~= Jump then
 					Player.Character.Humanoid.JumpPower = Jump
 				end
+			end
+		end)
+		
+		Universal:CreateSection("Safety")
+		
+		local GroupId = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Creator.CreatorTargetId
+		
+		Universal:CreateToggle({
+			Name = "🚪 Leave Upon Staff Join",
+			Info = "Kicks you if a player above the group role 1 joins/is in the server",
+			CurrentValue = false,
+			Flag = "Universal-AutoLeave",
+			Callback = function(Value)
+				if Value then
+					for i,v in pairs(game.Players:GetPlayers()) do
+						pcall(function()
+							if v:IsInGroup(GroupId) and v:GetRoleInGroup(GroupId) > 1 then
+								AutoRejoin:Set(false)
+								Player:Kick("Detected Staff (Player above group role 1)")
+							end
+						end)
+					end
+				end
+			end,
+		})
+		
+		game:GetService("Players").PlayerAdded:Connect(function(v)
+			if Rayfield.Flags["Universal-AutoLeave"].CurrentValue then
+				pcall(function()
+					if v:IsInGroup(GroupId) and v:GetRoleInGroup(GroupId) > 1 then
+						AutoRejoin:Set(false)
+						Player:Kick("Detected Staff (Player above group role 1)")
+					end
+				end)
 			end
 		end)
 
