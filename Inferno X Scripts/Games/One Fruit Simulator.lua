@@ -304,6 +304,7 @@ task.spawn(function()
 					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
+						break
 					elseif (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob2.CurrentOption or Rayfield.Flags.SelectedMob2.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob2.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob2.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
