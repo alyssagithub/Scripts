@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.5.5")
+CurrentVersion("v1.5.6")
 
 local good = false
 
@@ -170,7 +170,14 @@ task.spawn(function()
 					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
 					repeat
 						Player.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
-						fireproximityprompt(v.ChestInteract)
+						if fireproximityprompt then
+							fireproximityprompt(v.ChestInteract)
+						else
+							local virtualInput = game:GetService("VirtualInputManager")
+							virtualInput:SendKeyEvent(true, tostring(v.ProximityPrompt.KeyboardKeyCode), false, nil)
+							task.wait(v.ProximityPrompt.HoldDuration + 1)
+							virtualInput:SendKeyEvent(false, tostring(v.ProximityPrompt.KeyboardKeyCode), false, nil)
+						end
 						task.wait()
 					until not v or not v:FindFirstChild("ChestInteract") or not Rayfield.Flags.AutoChests.CurrentValue
 					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
@@ -196,7 +203,14 @@ task.spawn(function()
 					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
 					repeat
 						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstChildWhichIsA("BasePart").CFrame
-						fireproximityprompt(v.Eat)
+						if fireproximityprompt then
+							fireproximityprompt(v.Eat)
+						else
+							local virtualInput = game:GetService("VirtualInputManager")
+							virtualInput:SendKeyEvent(true, tostring(v.Eat.KeyboardKeyCode), false, nil)
+							task.wait(v.Eat.HoldDuration + 1)
+							virtualInput:SendKeyEvent(false, tostring(v.Eat.KeyboardKeyCode), false, nil)
+						end
 						task.wait()
 					until not v or not v:FindFirstChild("Eat") or not Rayfield.Flags.AutoFruit.CurrentValue
 					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
