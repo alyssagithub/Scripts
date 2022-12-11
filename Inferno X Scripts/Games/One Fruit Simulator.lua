@@ -1,15 +1,22 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.4.4")
+CurrentVersion("v1.5.4")
 
 local good = false
 
 local Islands = {}
+local Interactions = {}
 local Quests = {}
-local Mobs = {"Closest Mob"}
+local Mobs = {"Closest Mob", "None"}
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
 	table.insert(Islands, v.Name)
+end
+
+for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Interactions"]:GetChildren()) do
+	if not table.find(Interactions, v.Name) then
+		table.insert(Interactions, v.Name)
+	end
 end
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
@@ -89,7 +96,7 @@ Main:CreateToggle({
 	Callback = function(Value) end,
 })
 
-Player.PlayerGui.Warn.ChildAdded:Connect(function()
+Player:WaitForChild("PlayerGui"):WaitForChild("Warn").ChildAdded:Connect(function()
 	if Rayfield.Flags.AutoTrain.CurrentValue then
 		good = true
 	end
@@ -97,7 +104,7 @@ end)
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.AutoTrain.CurrentValue then
+		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") then
 			for i,Tool in pairs(Player.Backpack:GetChildren()) do
 				if Tool.Parent == Player.Backpack then
 					Tool.Parent = Player.Character
@@ -125,7 +132,7 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.AutoSkills.CurrentValue then
+		if Rayfield.Flags.AutoSkills.CurrentValue and Player.Character:FindFirstChildOfClass("Tool") then
 			for _,r in pairs(Player.Character:GetChildren()) do
 				if r:IsA("Tool") and r.Name ~= "Defence" then
 					for i,v in pairs({"Z", "X", "C", "V", "B"}) do
@@ -243,10 +250,18 @@ local Misc = Window:CreateTab("Misc", 4483362458)
 Misc:CreateSection("Teleports")
 
 Misc:CreateDropdown({
-	Name = "👾 Mob",
+	Name = "👾 Mob (Priority)",
 	Options = Mobs,
-	CurrentOption = "Closest Mob",
+	CurrentOption = "None",
 	Flag = "SelectedMob",
+	Callback = function(Option)	end,
+})
+
+Misc:CreateDropdown({
+	Name = "👾 Mob 2",
+	Options = Mobs,
+	CurrentOption = "None",
+	Flag = "SelectedMob2",
 	Callback = function(Option)	end,
 })
 
@@ -259,10 +274,10 @@ Misc:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.MobTeleport.CurrentValue and Player.Character:FindFirstChild("HumanoidRootPart") then
+		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" and Player.Character:FindFirstChild("HumanoidRootPart") then
 			local CurrentNumber = math.huge
 			local Mob
-
+			
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
@@ -270,10 +285,13 @@ task.spawn(function()
 					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
+					elseif (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob2.CurrentOption or Rayfield.Flags.SelectedMob2.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob2.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob2.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
+						CurrentNumber = Magnitude
+						Mob = v.HumanoidRootPart
 					end
 				end
 			end
-
+			
 			if Mob then
 				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Mob.CFrame.LookVector * 20
 			end
@@ -288,6 +306,16 @@ Misc:CreateDropdown({
 	--Flag = "SelectedIsland",
 	Callback = function(Option)
 		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option).CFrame
+	end,
+})
+
+Misc:CreateDropdown({
+	Name = "🛡 Teleport to Interaction",
+	Options = Interactions,
+	CurrentOption = "",
+	--Flag = "SelectedIsland",
+	Callback = function(Option)
+		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__Interactions"]:FindFirstChild(Option).PrimaryPart.CFrame
 	end,
 })
 
