@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.5.4")
+CurrentVersion("v1.5.5")
 
 local good = false
 
@@ -105,16 +105,21 @@ end)
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") then
-			for i,Tool in pairs(Player.Backpack:GetChildren()) do
-				if Tool.Parent == Player.Backpack then
-					Tool.Parent = Player.Character
-					repeat
-						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
-						task.wait()
-					until good or not Rayfield.Flags.AutoTrain.CurrentValue or Tool.Parent ~= Player.Character
-					good = false
-					if Tool.Parent == Player.Character then
-						Tool.Parent = Player.Backpack
+			local Tool2 = Player.Character:FindFirstChildOfClass("Tool")
+			if Tool2 then
+				game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool2, Tool2:GetAttribute("Type")}})
+			else
+				for i,Tool in pairs(Player.Backpack:GetChildren()) do
+					if Tool.Parent == Player.Backpack then
+						Tool.Parent = Player.Character
+						repeat
+							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
+							task.wait()
+						until good or not Rayfield.Flags.AutoTrain.CurrentValue or Tool.Parent ~= Player.Character
+						good = false
+						if Tool.Parent == Player.Character then
+							Tool.Parent = Player.Backpack
+						end
 					end
 				end
 			end
@@ -313,7 +318,7 @@ Misc:CreateDropdown({
 	Name = "🛡 Teleport to Interaction",
 	Options = Interactions,
 	CurrentOption = "",
-	--Flag = "SelectedIsland",
+	--Flag = "SelectedInteraction",
 	Callback = function(Option)
 		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__Interactions"]:FindFirstChild(Option).PrimaryPart.CFrame
 	end,
