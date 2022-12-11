@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.3.4")
+CurrentVersion("v1.4.4")
 
 local good = false
 
@@ -19,6 +19,33 @@ end
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 	if v:IsA("Model") and v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
 		table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
+	end
+end
+
+for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren()) do
+	if not r.Name:match("__") then
+		local ExistingOfMob = {}
+		local CurrentNumber = 0
+		local BestMob
+
+		for i,v in pairs(r:GetChildren()) do
+			if v:FindFirstChild("NpcHealth") and not ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] then
+				ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = 1
+			elseif v:FindFirstChild("NpcHealth") then
+				ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] + 1
+			end
+		end
+
+		for i,v in pairs(ExistingOfMob) do
+			if v > CurrentNumber then
+				CurrentNumber = v
+				BestMob = i
+			end
+		end
+
+		if BestMob then
+			table.insert(Mobs, r.Name.." ("..BestMob.."'s Island)")
+		end
 	end
 end
 
@@ -237,16 +264,16 @@ task.spawn(function()
 			local Mob
 
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
-				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
+				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 
-					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob") and Magnitude < CurrentNumber then
+					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
 					end
 				end
 			end
-			
+
 			if Mob then
 				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Mob.CFrame.LookVector * 20
 			end
