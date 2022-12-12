@@ -267,7 +267,7 @@ local function CreateWindow()
 				if Value then
 					for i,v in pairs(game.Players:GetPlayers()) do
 						pcall(function()
-							if v:IsInGroup(GroupId) and v:GetRoleInGroup(GroupId) > 1 then
+							if v:IsInGroup(GroupId) and v:GetRankInGroup(GroupId) > 1 then
 								AutoRejoin:Set(false)
 								Player:Kick("Detected Staff (Player above group role 1)")
 							end
@@ -280,7 +280,7 @@ local function CreateWindow()
 		game:GetService("Players").PlayerAdded:Connect(function(v)
 			if Rayfield.Flags["Universal-AutoLeave"].CurrentValue then
 				pcall(function()
-					if v:IsInGroup(GroupId) and v:GetRoleInGroup(GroupId) > 1 then
+					if v:IsInGroup(GroupId) and v:GetRankInGroup(GroupId) > 1 then
 						AutoRejoin:Set(false)
 						Player:Kick("Detected Staff (Player above group role 1)")
 					end
