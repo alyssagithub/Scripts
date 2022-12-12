@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.5.6")
+CurrentVersion("v1.5.7")
 
 local good = false
 
@@ -55,6 +55,15 @@ for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren())
 		end
 	end
 end
+
+task.spawn(function()
+	while task.wait() do
+		local Depth = game:GetService("Lighting"):FindFirstChildWhichIsA("DepthOfFieldEffect")
+		if Depth then
+			Depth:Destroy()
+		end
+	end
+end)
 
 local Window = CreateWindow()
 
@@ -296,11 +305,11 @@ task.spawn(function()
 		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" and Player.Character:FindFirstChild("HumanoidRootPart") then
 			local CurrentNumber = math.huge
 			local Mob
-			
+
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
-					
+
 					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
@@ -310,7 +319,7 @@ task.spawn(function()
 					end
 				end
 			end
-			
+
 			if Mob then
 				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Mob.CFrame.LookVector * 20
 			end
