@@ -300,11 +300,10 @@ task.spawn(function()
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
-
-					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
+					
+					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
-						break
 					elseif (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob2.CurrentOption or Rayfield.Flags.SelectedMob2.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob2.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob2.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
 						CurrentNumber = Magnitude
 						Mob = v.HumanoidRootPart
