@@ -321,11 +321,35 @@ task.spawn(function()
 			end
 
 			if Mob then
-				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Mob.CFrame.LookVector * 20
+				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, Rayfield.Flags.YOffset.CurrentValue, 0) + Mob.CFrame.LookVector * Rayfield.Flags.LookVector.CurrentValue
 			end
 		end
 	end
 end)
+
+Misc:CreateSlider({
+	Name = "LookVector Offset",
+	Info = "Changes the LookVector Offset (how far you are away)",
+	Range = {0, 50},
+	Increment = .1,
+	Suffix = "",
+	CurrentValue = 20,
+	Flag = "LookVector",
+	Callback = function(Value) end,
+})
+
+Misc:CreateSlider({
+	Name = "Y Offset",
+	Info = "Changes the Y Offset (how high you are)",
+	Range = {-50, 50},
+	Increment = .1,
+	Suffix = "",
+	CurrentValue = 0,
+	Flag = "YOffset",
+	Callback = function(Value) end,
+})
+
+Misc:CreateSection("")
 
 Misc:CreateDropdown({
 	Name = "🏝 Teleport to Island",
