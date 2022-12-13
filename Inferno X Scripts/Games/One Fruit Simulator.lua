@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.5.7")
+CurrentVersion("v1.6.7")
 
 local good = false
 
@@ -152,7 +152,7 @@ task.spawn(function()
 					for i,v in pairs({"Z", "X", "C", "V", "B"}) do
 						if Player.Character:FindFirstChild("HumanoidRootPart") then
 							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
-							task.wait()
+							task.wait(1)
 						end
 					end
 				end
