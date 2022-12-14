@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.6.7")
+CurrentVersion("v1.6.8")
 
 local good = false
 
@@ -330,10 +330,10 @@ end)
 Misc:CreateSlider({
 	Name = "LookVector Offset",
 	Info = "Changes the LookVector Offset (how far you are away)",
-	Range = {0, 50},
+	Range = {-50, 50},
 	Increment = .1,
 	Suffix = "",
-	CurrentValue = 20,
+	CurrentValue = -20,
 	Flag = "LookVector",
 	Callback = function(Value) end,
 })
