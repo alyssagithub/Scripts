@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.6.8")
+CurrentVersion("v1.6.9")
 
 local good = false
 
@@ -122,7 +122,7 @@ task.spawn(function()
 					if Tool.Parent == Player.Backpack then
 						Tool.Parent = Player.Character
 						repeat
-							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
+							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\8", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
 							task.wait()
 						until good or not Rayfield.Flags.AutoTrain.CurrentValue or Tool.Parent ~= Player.Character
 						good = false
@@ -151,7 +151,7 @@ task.spawn(function()
 				if r:IsA("Tool") and r.Name ~= "Defence" then
 					for i,v in pairs({"Z", "X", "C", "V", "B"}) do
 						if Player.Character:FindFirstChild("HumanoidRootPart") then
-							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
+							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\8", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
 							task.wait(1)
 						end
 					end
