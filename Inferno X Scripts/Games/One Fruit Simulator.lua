@@ -174,6 +174,7 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoChests.CurrentValue then
+			--[[
 			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
 				if v:FindFirstChild("ChestInteract") then
 					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
@@ -192,6 +193,7 @@ task.spawn(function()
 					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
 				end
 			end
+			]]
 		end
 	end
 end)
@@ -397,7 +399,7 @@ task.spawn(function()
 					repeat
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.HumanoidRootPart.CFrame
 						task.wait()
-						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\7", "GetQuest", v:GetAttribute("QuestID")}})
+						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\5", "GetQuest", v:GetAttribute("QuestID")}})
 					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
