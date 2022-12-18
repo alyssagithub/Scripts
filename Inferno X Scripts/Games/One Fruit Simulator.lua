@@ -464,7 +464,8 @@ Misc:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Haki.CurrentValue and (not Player.Character:FindFirstChild("BusoH") or Player.Character:FindFirstChild("BusoH"):FindFirstChildWhichIsA("BasePart").Transparency ~= 0) then
-			game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "BusoHaki"}})
+			virtualInput:SendKeyEvent(true, "T", false, nil)
+			virtualInput:SendKeyEvent(false, "T", false, nil)
 		end
 	end
 end)
