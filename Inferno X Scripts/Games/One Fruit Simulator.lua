@@ -84,6 +84,8 @@ Player.Character:WaitForChild("Humanoid").Died:Connect(function()
 			end
 		end
 	end
+	Player.CharacterAdded:Wait()
+	Dead = false
 end)
 
 Main:CreateToggle({
