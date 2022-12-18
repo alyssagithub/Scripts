@@ -178,7 +178,7 @@ Main:CreateToggle({
 	Callback = function(Value)	end,
 })
 
-task.spawn(function()
+--[[task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoChests.CurrentValue then
 			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
@@ -200,7 +200,7 @@ task.spawn(function()
 			end
 		end
 	end
-end)
+end)]]
 
 Main:CreateToggle({
 	Name = "🥭 Auto Collect Fruit",
