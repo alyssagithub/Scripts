@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.7.8")
+CurrentVersion("v1.7.9")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -109,7 +109,7 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") then
+		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") and Player.Character:FindFirstChild("HumanoidRootPart") then
 			local Tool2 = Player.Character:FindFirstChildOfClass("Tool")
 			if Tool2 then
 				require(game:GetService("ReplicatedStorage").SharedModules.Controllers.ToolController).UseTool("Combat", Enum.UserInputState.Begin)
@@ -124,6 +124,16 @@ task.spawn(function()
 						end
 					end
 				end
+			end
+		end
+	end
+end)
+
+Player.Character:WaitForChild("Humanoid").Died:Connect(function()
+	if Player.Character:FindFirstChildOfClass("Tool") then
+		for i,Tool in pairs(Player.Character:GetChildren()) do
+			if Tool:IsA("Tool") then
+				Tool.Parent = Player.Backpack
 			end
 		end
 	end
