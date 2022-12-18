@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.7.9")
+CurrentVersion("v1.7.10")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -397,7 +397,7 @@ Misc:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" then
+		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" and Player.Character:FindFirstChild("HumanoidRootPart") then
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
 				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
 					local PreviousPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
@@ -411,7 +411,7 @@ task.spawn(function()
 							task.wait(v.Interact.HoldDuration + 1)
 							virtualInput:SendKeyEvent(false, tostring(v.Interact.KeyboardKeyCode), false, nil)
 						end
-					until Player.PlayerGui.Quests.Container.Visible
+					until Player.PlayerGui.Quests.Container.Visible or not Player.Character:FindFirstChild("HumanoidRootPart") or not Rayfield.Flags.Quest.CurrentValue
 
 					repeat
 						if firesignal then
@@ -420,12 +420,12 @@ task.spawn(function()
 							Click(Player.PlayerGui.Quests.Container.Accept.Click)
 						end
 						task.wait()
-					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
+					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue or not Player.Character:FindFirstChild("HumanoidRootPart")
 
 					repeat
 						Click(Player.PlayerGui.Quests.Container.Cancel.Click)
 						task.wait()
-					until Player.PlayerGui.Quests.Container.Visible == false
+					until Player.PlayerGui.Quests.Container.Visible == false or not Player.Character:FindFirstChild("HumanoidRootPart") or not Rayfield.Flags.Quest.CurrentValue
 
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
