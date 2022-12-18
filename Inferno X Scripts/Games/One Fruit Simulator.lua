@@ -277,7 +277,7 @@ end)
 
 local Misc = Window:CreateTab("Misc", 4483362458)
 
-Misc:CreateSection("Teleports")
+Misc:CreateSection("Mob Teleports")
 
 Misc:CreateDropdown({
 	Name = "👾 Mob (Priority)",
@@ -304,12 +304,12 @@ Misc:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" and Player.Character:FindFirstChild("HumanoidRootPart") then
+		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" then
 			local CurrentNumber = math.huge
 			local Mob
 
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
-				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" then
+				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" and Player.Character:FindFirstChild("HumanoidRootPart") then
 					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 
 					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) then
@@ -351,7 +351,7 @@ Misc:CreateSlider({
 	Callback = function(Value) end,
 })
 
-Misc:CreateSection("")
+Misc:CreateSection("Area Teleports")
 
 Misc:CreateDropdown({
 	Name = "🏝 Teleport to Island",
