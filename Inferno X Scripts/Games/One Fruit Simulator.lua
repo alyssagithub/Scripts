@@ -73,6 +73,19 @@ local Main = Window:CreateTab("Main", 4483362458)
 
 Main:CreateSection("Weapons")
 
+local Dead = false
+
+Player.Character:WaitForChild("Humanoid").Died:Connect(function()
+	Dead = true
+	if Player.Character:FindFirstChildOfClass("Tool") then
+		for i,Tool in pairs(Player.Character:GetChildren()) do
+			if Tool:IsA("Tool") then
+				Tool.Parent = Player.Backpack
+			end
+		end
+	end
+end)
+
 Main:CreateToggle({
 	Name = "🛠 Equip all Tools",
 	Info = "Equips all the tools in your backpack",
@@ -91,7 +104,7 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.EquipTools.CurrentValue then
+		if Rayfield.Flags.EquipTools.CurrentValue and not Dead then
 			for i,v in pairs(Player.Backpack:GetChildren()) do
 				v.Parent = Player.Character
 			end
@@ -109,7 +122,7 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") then
+		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") and not Dead then
 			local Tool2 = Player.Character:FindFirstChildOfClass("Tool")
 			if Tool2 and Player.Character:FindFirstChild("HumanoidRootPart") then
 				require(game:GetService("ReplicatedStorage").SharedModules.Controllers.ToolController).UseTool("Combat", Enum.UserInputState.Begin)
@@ -124,16 +137,6 @@ task.spawn(function()
 						end
 					end
 				end
-			end
-		end
-	end
-end)
-
-Player.Character:WaitForChild("Humanoid").Died:Connect(function()
-	if Player.Character:FindFirstChildOfClass("Tool") then
-		for i,Tool in pairs(Player.Character:GetChildren()) do
-			if Tool:IsA("Tool") then
-				Tool.Parent = Player.Backpack
 			end
 		end
 	end
