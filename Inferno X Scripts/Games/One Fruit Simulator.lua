@@ -414,19 +414,10 @@ task.spawn(function()
 					until Player.PlayerGui.Quests.Container.Visible or not Player.Character:FindFirstChild("HumanoidRootPart") or not Rayfield.Flags.Quest.CurrentValue
 
 					repeat
-						if firesignal then
-							firesignal(Player.PlayerGui.Quests.Container.Accept.Click.Activated)
-						else
-							Click(Player.PlayerGui.Quests.Container.Accept.Click)
-						end
+						Click(Player.PlayerGui.Quests.Container.Accept.Click)
 						task.wait()
 					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue or not Player.Character:FindFirstChild("HumanoidRootPart")
-
-					repeat
-						Click(Player.PlayerGui.Quests.Container.Cancel.Click)
-						task.wait()
-					until Player.PlayerGui.Quests.Container.Visible == false or not Player.Character:FindFirstChild("HumanoidRootPart") or not Rayfield.Flags.Quest.CurrentValue
-
+						
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
 			end
