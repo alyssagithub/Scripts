@@ -1,13 +1,15 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.7.10")
+CurrentVersion("v1.8.10")
 
 local virtualInput = game:GetService("VirtualInputManager")
+
+local ChestTeleporting
 
 local Islands = {}
 local Interactions = {}
 local Quests = {}
-local Mobs = {"Closest Mob", "None"}
+local Mobs = {"Closest Mob", "None", "SEA MONSTER"}
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
 	table.insert(Islands, v.Name)
@@ -26,6 +28,8 @@ end
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
 	if v:IsA("Model") and v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
 		table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
+	elseif v:IsA("Model") and v:FindFirstChild("Wyoru") then
+		table.insert(Mobs, "Great Gorilla King.")
 	end
 end
 
@@ -55,6 +59,8 @@ for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren())
 		end
 	end
 end
+
+print("[Inferno X] Debug: Mobs List:\n\n"..table.concat(Mobs, ", "))
 
 task.spawn(function()
 	while task.wait() do
@@ -173,36 +179,33 @@ end)
 Main:CreateSection("Collecting")
 
 Main:CreateToggle({
-	Name = "💼 Auto Collect Chests (BROKEN)",
+	Name = "💼 Auto Collect Chests",
 	Info = "Automatically collects chests that spawn",
 	CurrentValue = false,
 	Flag = "AutoChests",
 	Callback = function(Value)	end,
 })
 
---[[task.spawn(function()
+task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoChests.CurrentValue then
 			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
-				if v:FindFirstChild("ChestInteract") then
-					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
-					repeat
-						Player.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
-						if fireproximityprompt then
-							fireproximityprompt(v.ChestInteract)
-						else
-							virtualInput:SendKeyEvent(true, tostring(v.ProximityPrompt.KeyboardKeyCode), false, nil)
-							task.wait(v.ProximityPrompt.HoldDuration + 1)
-							virtualInput:SendKeyEvent(false, tostring(v.ProximityPrompt.KeyboardKeyCode), false, nil)
-						end
-						task.wait()
-					until not v or not v:FindFirstChild("ChestInteract") or not Rayfield.Flags.AutoChests.CurrentValue
-					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
+				if v:GetAttribute("Type") and v:FindFirstChild("ChestInteract") then
+					ChestTeleporting = true
+					local SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
+					task.wait()
+					Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.PrimaryPart.CFrame
+					task.wait(2.5)
+					if v:FindFirstChild("ChestInteract") then
+						fireproximityprompt(v.ChestInteract)
+					end
+					Player.Character:WaitForChild("HumanoidRootPart").CFrame = SavedPosition
+					ChestTeleporting = false
 				end
 			end
 		end
 	end
-end)]]
+end)
 
 Main:CreateToggle({
 	Name = "🥭 Auto Collect Fruit",
@@ -309,7 +312,7 @@ Misc:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" then
+		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" and not ChestTeleporting then
 			local CurrentNumber = math.huge
 			local Mob
 
@@ -327,7 +330,7 @@ task.spawn(function()
 				end
 			end
 
-			if Mob then
+			if Mob and not ChestTeleporting then
 				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, Rayfield.Flags.YOffset.CurrentValue, 0) + Mob.CFrame.LookVector * Rayfield.Flags.LookVector.CurrentValue
 			end
 		end
@@ -413,16 +416,14 @@ task.spawn(function()
 						end
 					until Player.PlayerGui.Quests.Container.Visible or not Player.Character:FindFirstChild("HumanoidRootPart") or not Rayfield.Flags.Quest.CurrentValue
 
-					repeat
-						if firesignal then
-							firesignal(Player.PlayerGui.Quests.Container.Accept.Click.Activated)
-						else
-							Click(Player.PlayerGui.Quests.Container.Accept.Click)
-						end
-						task.wait()
-					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue or not Player.Character:FindFirstChild("HumanoidRootPart")
-						
+					if firesignal then
+						firesignal(Player.PlayerGui.Quests.Container.Accept.Click.Activated)
+					else
+						Click(Player.PlayerGui.Quests.Container.Accept.Click)
+					end
+
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
+					break
 				end
 			end
 		end
@@ -444,7 +445,11 @@ task.spawn(function()
 			for i,v in pairs(Player.Backpack:GetChildren()) do
 				if v.Name:lower():match("fruit") and v:FindFirstChildWhichIsA("BasePart") then
 					v.Parent = Player.Character
-					game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "EatFruit", v, "Storage"}})
+					if firesignal then
+						firesignal(Player.PlayerGui.HUD.Background.StorageButton.Click.Activated)
+					else
+						Click(Player.PlayerGui.HUD.Background.StorageButton.Click)
+					end
 				end
 			end
 		end
