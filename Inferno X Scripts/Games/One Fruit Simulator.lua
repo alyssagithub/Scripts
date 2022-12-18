@@ -109,13 +109,13 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") and Player.Character:FindFirstChild("HumanoidRootPart") then
+		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") then
 			local Tool2 = Player.Character:FindFirstChildOfClass("Tool")
-			if Tool2 then
+			if Tool2 and Player.Character:FindFirstChild("HumanoidRootPart") then
 				require(game:GetService("ReplicatedStorage").SharedModules.Controllers.ToolController).UseTool("Combat", Enum.UserInputState.Begin)
 			else
 				for i,Tool in pairs(Player.Backpack:GetChildren()) do
-					if Tool.Parent == Player.Backpack then
+					if Tool.Parent == Player.Backpack and Player.Character:FindFirstChild("HumanoidRootPart") then
 						Tool.Parent = Player.Character
 						require(game:GetService("ReplicatedStorage").SharedModules.Controllers.ToolController).UseTool("Combat", Enum.UserInputState.Begin)
 						task.wait(.1)
@@ -407,7 +407,7 @@ task.spawn(function()
 							virtualInput:SendKeyEvent(false, tostring(v.Interact.KeyboardKeyCode), false, nil)
 						end
 					until Player.PlayerGui.Quests.Container.Visible
-					
+
 					repeat
 						if firesignal then
 							firesignal(Player.PlayerGui.Quests.Container.Accept.Click.Activated)
@@ -416,12 +416,12 @@ task.spawn(function()
 						end
 						task.wait()
 					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
-					
+
 					repeat
 						Click(Player.PlayerGui.Quests.Container.Cancel.Click)
 						task.wait()
 					until Player.PlayerGui.Quests.Container.Visible == false
-					
+
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
 			end
