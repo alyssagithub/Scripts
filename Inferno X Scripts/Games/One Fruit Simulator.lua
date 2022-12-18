@@ -65,6 +65,8 @@ task.spawn(function()
 	end
 end)
 
+Player:WaitForChild("PlayerGui"):WaitForChild("Menu"):WaitForChild("FramesBackground"):WaitForChild("Configs").Visible = false
+
 local Window = CreateWindow()
 
 local Main = Window:CreateTab("Main", 4483362458)
@@ -156,7 +158,7 @@ end)
 Main:CreateSection("Collecting")
 
 Main:CreateToggle({
-	Name = "💼 Auto Collect Chests",
+	Name = "💼 Auto Collect Chests (BROKEN)",
 	Info = "Automatically collects chests that spawn",
 	CurrentValue = false,
 	Flag = "AutoChests",
@@ -166,7 +168,6 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoChests.CurrentValue then
-			--[[
 			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
 				if v:FindFirstChild("ChestInteract") then
 					local PreviousPosition = Player.Character.HumanoidRootPart.CFrame
@@ -184,7 +185,6 @@ task.spawn(function()
 					Player.Character.HumanoidRootPart.CFrame = PreviousPosition
 				end
 			end
-			]]
 		end
 	end
 end)
@@ -325,7 +325,7 @@ Misc:CreateSlider({
 	Range = {-50, 50},
 	Increment = .1,
 	Suffix = "",
-	CurrentValue = -20,
+	CurrentValue = -14,
 	Flag = "LookVector",
 	Callback = function(Value) end,
 })
@@ -396,7 +396,22 @@ task.spawn(function()
 							task.wait(v.Interact.HoldDuration + 1)
 							virtualInput:SendKeyEvent(false, tostring(v.Interact.KeyboardKeyCode), false, nil)
 						end
+					until Player.PlayerGui.Quests.Container.Visible
+					
+					repeat
+						if firesignal then
+							firesignal(Player.PlayerGui.Quests.Container.Accept.Click.Activated)
+						else
+							Click(Player.PlayerGui.Quests.Container.Accept.Click)
+						end
+						task.wait()
 					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
+					
+					repeat
+						Click(Player.PlayerGui.Quests.Container.Cancel.Click)
+						task.wait()
+					until Player.PlayerGui.Quests.Container.Visible == false
+					
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
 			end
