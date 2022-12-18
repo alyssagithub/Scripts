@@ -1,8 +1,8 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.6.9")
+CurrentVersion("v1.7.8")
 
-local good = false
+local virtualInput = game:GetService("VirtualInputManager")
 
 local Islands = {}
 local Interactions = {}
@@ -105,27 +105,18 @@ Main:CreateToggle({
 	Callback = function(Value) end,
 })
 
-Player:WaitForChild("PlayerGui"):WaitForChild("Warn").ChildAdded:Connect(function()
-	if Rayfield.Flags.AutoTrain.CurrentValue then
-		good = true
-	end
-end)
-
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.AutoTrain.CurrentValue and Player.Backpack:FindFirstChildOfClass("Tool") then
 			local Tool2 = Player.Character:FindFirstChildOfClass("Tool")
 			if Tool2 then
-				game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\3", "Combat", 1, false, Tool2, Tool2:GetAttribute("Type")}})
+				require(game:GetService("ReplicatedStorage").SharedModules.Controllers.ToolController).UseTool("Combat", Enum.UserInputState.Begin)
 			else
 				for i,Tool in pairs(Player.Backpack:GetChildren()) do
 					if Tool.Parent == Player.Backpack then
 						Tool.Parent = Player.Character
-						repeat
-							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\8", "Combat", 1, false, Tool, Tool:GetAttribute("Type")}})
-							task.wait()
-						until good or not Rayfield.Flags.AutoTrain.CurrentValue or Tool.Parent ~= Player.Character
-						good = false
+						require(game:GetService("ReplicatedStorage").SharedModules.Controllers.ToolController).UseTool("Combat", Enum.UserInputState.Begin)
+						task.wait(.1)
 						if Tool.Parent == Player.Character then
 							Tool.Parent = Player.Backpack
 						end
@@ -151,8 +142,9 @@ task.spawn(function()
 				if r:IsA("Tool") and r.Name ~= "Defence" then
 					for i,v in pairs({"Z", "X", "C", "V", "B"}) do
 						if Player.Character:FindFirstChild("HumanoidRootPart") then
-							game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\8", "skillsControl", r.Name, v, "Release", require(game:GetService("ReplicatedStorage").SharedModules.ExtraFunctions).GetCurrentMouse(Player, true, 1200)[1]}})
-							task.wait(1)
+							virtualInput:SendKeyEvent(true, v, false, nil)
+							virtualInput:SendKeyEvent(false, v, false, nil)
+							task.wait(.1)
 						end
 					end
 				end
@@ -183,7 +175,6 @@ task.spawn(function()
 						if fireproximityprompt then
 							fireproximityprompt(v.ChestInteract)
 						else
-							local virtualInput = game:GetService("VirtualInputManager")
 							virtualInput:SendKeyEvent(true, tostring(v.ProximityPrompt.KeyboardKeyCode), false, nil)
 							task.wait(v.ProximityPrompt.HoldDuration + 1)
 							virtualInput:SendKeyEvent(false, tostring(v.ProximityPrompt.KeyboardKeyCode), false, nil)
@@ -217,7 +208,6 @@ task.spawn(function()
 						if fireproximityprompt then
 							fireproximityprompt(v.Eat)
 						else
-							local virtualInput = game:GetService("VirtualInputManager")
 							virtualInput:SendKeyEvent(true, tostring(v.Eat.KeyboardKeyCode), false, nil)
 							task.wait(v.Eat.HoldDuration + 1)
 							virtualInput:SendKeyEvent(false, tostring(v.Eat.KeyboardKeyCode), false, nil)
@@ -399,7 +389,13 @@ task.spawn(function()
 					repeat
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.HumanoidRootPart.CFrame
 						task.wait()
-						game:GetService("ReplicatedStorage").RemoteEvent:FireServer({{"\5", "GetQuest", v:GetAttribute("QuestID")}})
+						if fireproximityprompt then
+							fireproximityprompt(v.Interact)
+						else
+							virtualInput:SendKeyEvent(true, tostring(v.Interact.KeyboardKeyCode), false, nil)
+							task.wait(v.Interact.HoldDuration + 1)
+							virtualInput:SendKeyEvent(false, tostring(v.Interact.KeyboardKeyCode), false, nil)
+						end
 					until tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] ~= "{1.5" or not Rayfield.Flags.Quest.CurrentValue
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = PreviousPosition
 				end
