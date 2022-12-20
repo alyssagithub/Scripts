@@ -287,6 +287,8 @@ local function CreateWindow()
 				end)
 			end
 		end)
+			
+		Universal:CreateSection("Grinding")
 		
 		Universal:CreateButton({
 			Name = "🔂 One-Time Server Hop",
