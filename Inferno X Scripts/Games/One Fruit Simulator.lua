@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.8.10")
+CurrentVersion("v1.9.10")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -10,6 +10,7 @@ local Islands = {}
 local Interactions = {}
 local Quests = {}
 local Mobs = {"Closest Mob", "None", "SEA MONSTER"}
+local Players = {}
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
 	table.insert(Islands, v.Name)
@@ -62,6 +63,12 @@ end
 
 print("[Inferno X] Debug: Mobs List:\n\n"..table.concat(Mobs, ", "))
 
+for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+	if v and v ~= Player then
+		table.insert(Players, (v.DisplayName ~= v.Name and v.DisplayName.." (@"..v.Name..")" or v.Name))
+	end
+end
+
 task.spawn(function()
 	while task.wait() do
 		local Depth = game:GetService("Lighting"):FindFirstChildWhichIsA("DepthOfFieldEffect")
@@ -94,28 +101,26 @@ Player.Character:WaitForChild("Humanoid").Died:Connect(function()
 	Dead = false
 end)
 
+local EquippedTool
+
 Main:CreateToggle({
-	Name = "🛠 Equip all Tools",
-	Info = "Equips all the tools in your backpack",
+	Name = "🛠 Auto Re-Equip Tool",
+	Info = "Automatically re-equips the tool you have equipped when this is enabled",
 	CurrentValue = false,
 	Flag = "EquipTools",
 	Callback = function(Value)
-		if not Value then
-			for i,v in pairs(Player.Character:GetChildren()) do
-				if v:IsA("Tool") then
-					v.Parent = Player.Backpack
-				end
-			end
+		if Value then
+			EquippedTool = Player.Character:FindFirstChildOfClass("Tool").Name
+		else
+			EquippedTool = nil
 		end
 	end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.EquipTools.CurrentValue and not Dead then
-			for i,v in pairs(Player.Backpack:GetChildren()) do
-				v.Parent = Player.Character
-			end
+		if Rayfield.Flags.EquipTools.CurrentValue and not Dead and EquippedTool and not Player.Character:FindFirstChild(EquippedTool) and Player.Backpack:FindFirstChild(EquippedTool) then
+			Player.Backpack:FindFirstChild(EquippedTool).Parent = Player.Character
 		end
 	end
 end)
@@ -150,7 +155,7 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateToggle({
+local AutoSkillsToggle = Main:CreateToggle({
 	Name = "💨 Auto Skills",
 	Info = "Automatically uses your weapon(s)' skills (Z-B)",
 	CurrentValue = false,
@@ -471,3 +476,105 @@ task.spawn(function()
 		end
 	end
 end)
+
+local Combat = Window:CreateTab("Combat", 4483362458)
+
+local PlayerDropdown = Combat:CreateDropdown({
+	Name = "😎 Player",
+	Options = Players,
+	CurrentOption = "",
+	Flag = "SelectedPlayer",
+	Callback = function(Option) end,
+})
+
+game:GetService("Players").PlayerAdded:Connect(function(PlayerAdded)
+	PlayerDropdown:Add((PlayerAdded.DisplayName ~= PlayerAdded.Name and PlayerAdded.DisplayName.." (@"..PlayerAdded.Name..")" or PlayerAdded.Name))
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function(PlayerAdded)
+	PlayerDropdown:Remove((PlayerAdded.DisplayName ~= PlayerAdded.Name and PlayerAdded.DisplayName.." (@"..PlayerAdded.Name..")" or PlayerAdded.Name))
+end)
+
+Combat:CreateToggle({
+	Name = "💰 Select Highest Bounty Player",
+	CurrentValue = false,
+	Flag = "Bounty",
+	Callback = function(Value) end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Bounty.CurrentValue then
+			local CurrentNumber = 0
+			local HighestBounty
+
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v and v ~= Player and v:FindFirstChild("leaderstats") and v.leaderstats.Bounty.Value > CurrentNumber then
+					CurrentNumber = v.leaderstats.Bounty.Value
+					HighestBounty = v
+				end
+			end
+			
+			if Rayfield.Flags.SelectedPlayer.CurrentOption ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
+				PlayerDropdown:Set((HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name))
+			end
+		end
+	end
+end)
+
+Combat:CreateToggle({
+	Name = "⚪ Teleport to Player",
+	Info = "Constantly teleports to the selected player",
+	CurrentValue = false,
+	Flag = "Teleport",
+	Callback = function(Value) end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Teleport.CurrentValue then
+			local CurrentPlayer = game:GetService("Players"):FindFirstChild(Rayfield.Flags.SelectedPlayer.CurrentOption) or game:GetService("Players"):FindFirstChild(Rayfield.Flags.SelectedPlayer.CurrentOption:split("@")[2]:split(")")[1])
+			if CurrentPlayer then
+				Player.Character:WaitForChild("HumanoidRootPart").CFrame = CurrentPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
+			end
+		end
+	end
+end)
+
+Combat:CreateToggle({
+	Name = "⭕ Killaura",
+	Info = "Enables/Disables Auto Skills if killaura distance is met (non-safezone)",
+	CurrentValue = false,
+	Flag = "Killaura",
+	Callback = function(Value) end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Killaura.CurrentValue and not Player.PlayerGui.HUD.Background.Safe.Visible then
+			local IsPlayer = false
+			
+			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v and v ~= Player and v.Character and (v.Character:WaitForChild("HumanoidRootPart").Position - Player.Character:WaitForChild("HumanoidRootPart").Position).Magnitude <= Rayfield.Flags.KillauraDistance.CurrentValue then
+					IsPlayer = true
+				end
+			end
+			
+			if not IsPlayer and Rayfield.Flags.AutoSkills.CurrentValue then
+				AutoSkillsToggle:Set(false)
+			elseif IsPlayer and not Rayfield.Flags.AutoSkills.CurrentValue then
+				AutoSkillsToggle:Set(true)
+			end
+		end
+	end
+end)
+
+Combat:CreateSlider({
+	Name = "🔢 Killaura Distance",
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 30,
+	Flag = "KillauraDistance",
+	Callback = function(Value)	end,
+})
