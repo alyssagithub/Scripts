@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.9.10")
+CurrentVersion("v1.10.10")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -79,6 +79,19 @@ task.spawn(function()
 end)
 
 Player:WaitForChild("PlayerGui"):WaitForChild("Menu"):WaitForChild("FramesBackground"):WaitForChild("Configs").Visible = false
+
+local JebusPart = Instance.new("Part")
+JebusPart.Anchored = true
+JebusPart.Size = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Size + Vector3.new(0, 4, 0)
+JebusPart.Position = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Position
+JebusPart.CanCollide = false
+JebusPart.Name = "Jebus"
+JebusPart.Transparency = 1
+JebusPart.Parent = game:GetService("Workspace")["__GAME"]["__Ocean"].Water
+
+game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean:GetPropertyChangedSignal("Position"):Connect(function()
+	JebusPart.Position = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Position
+end)
 
 local Window = CreateWindow()
 
@@ -477,6 +490,16 @@ task.spawn(function()
 	end
 end)
 
+Misc:CreateToggle({
+	Name = "🌊 Jebus",
+	Info = "Allows you to walk on water",
+	CurrentValue = false,
+	Flag = "Jebus",
+	Callback = function(Value)
+		JebusPart.CanCollide = Value
+	end,
+})
+
 local Combat = Window:CreateTab("Combat", 4483362458)
 
 local PlayerDropdown = Combat:CreateDropdown({
@@ -514,7 +537,7 @@ task.spawn(function()
 					HighestBounty = v
 				end
 			end
-			
+
 			if HighestBounty and Rayfield.Flags.SelectedPlayer.CurrentOption ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
 				PlayerDropdown:Set((HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name))
 			end
@@ -553,13 +576,13 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Killaura.CurrentValue and not Player.PlayerGui.HUD.Background.Safe.Visible then
 			local IsPlayer = false
-			
+
 			for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 				if v and v ~= Player and v.Character and (v.Character:WaitForChild("HumanoidRootPart").Position - Player.Character:WaitForChild("HumanoidRootPart").Position).Magnitude <= Rayfield.Flags.KillauraDistance.CurrentValue then
 					IsPlayer = true
 				end
 			end
-			
+
 			if not IsPlayer and Rayfield.Flags.AutoSkills.CurrentValue then
 				AutoSkillsToggle:Set(false)
 			elseif IsPlayer and not Rayfield.Flags.AutoSkills.CurrentValue then
