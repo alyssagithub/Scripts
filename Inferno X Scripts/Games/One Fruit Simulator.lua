@@ -515,7 +515,7 @@ task.spawn(function()
 				end
 			end
 			
-			if Rayfield.Flags.SelectedPlayer.CurrentOption ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
+			if HighestBounty and Rayfield.Flags.SelectedPlayer.CurrentOption ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
 				PlayerDropdown:Set((HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name))
 			end
 		end
