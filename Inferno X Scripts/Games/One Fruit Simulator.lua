@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.10.10")
+CurrentVersion("v1.11.10")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -9,7 +9,7 @@ local ChestTeleporting
 local Islands = {}
 local Interactions = {}
 local Quests = {}
-local Mobs = {"Closest Mob", "None", "SEA MONSTER"}
+local Mobs = {"Closest Mob", "None", "SEA MONSTER", "SEA BEAST"}
 local Players = {}
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
@@ -55,7 +55,7 @@ for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren())
 			end
 		end
 
-		if BestMob then
+		if BestMob and not table.find(Mobs, r.Name.." ("..BestMob.."'s Island)") then
 			table.insert(Mobs, r.Name.." ("..BestMob.."'s Island)")
 		end
 	end
@@ -258,6 +258,35 @@ task.spawn(function()
 end)
 
 Main:CreateToggle({
+	Name = "🎁 Auto Collect Gifts",
+	Info = "Automatically collects fruit that spawn",
+	CurrentValue = false,
+	Flag = "AutoGift",
+	Callback = function(Value)	end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.AutoGift.CurrentValue then
+			for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+				if v.Name == "GiftModel" and v:FindFirstChild("ChestInteract") then
+					ChestTeleporting = true
+					local SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
+					task.wait()
+					Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.Model:FindFirstChildWhichIsA("BasePart").CFrame
+					task.wait(2.5)
+					if v:FindFirstChild("ChestInteract") then
+						fireproximityprompt(v.ChestInteract)
+					end
+					Player.Character:WaitForChild("HumanoidRootPart").CFrame = SavedPosition
+					ChestTeleporting = false
+				end
+			end
+		end
+	end
+end)
+
+Main:CreateToggle({
 	Name = "✅ Remove Name Tag",
 	Info = "Removes your name tag from others and yourself",
 	CurrentValue = false,
@@ -305,7 +334,7 @@ local Misc = Window:CreateTab("Misc", 4483362458)
 
 Misc:CreateSection("Mob Teleports")
 
-Misc:CreateDropdown({
+local Mob1 = Misc:CreateDropdown({
 	Name = "👾 Mob (Priority)",
 	Options = Mobs,
 	CurrentOption = "None",
@@ -313,13 +342,57 @@ Misc:CreateDropdown({
 	Callback = function(Option)	end,
 })
 
-Misc:CreateDropdown({
+local Mob2 = Misc:CreateDropdown({
 	Name = "👾 Mob 2",
 	Options = Mobs,
 	CurrentOption = "None",
 	Flag = "SelectedMob2",
 	Callback = function(Option)	end,
 })
+
+game:GetService("Workspace")["__GAME"]["__Mobs"].ChildAdded:Connect(function(Child)
+	if Child:IsA("Folder") then
+		local ExistingOfMob = {}
+		local CurrentNumber = 0
+		local BestMob
+
+		for i,v in pairs(Child:GetChildren()) do
+			if v:FindFirstChild("NpcHealth") and not ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] then
+				ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = 1
+			elseif v:FindFirstChild("NpcHealth") then
+				ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] + 1
+			end
+		end
+
+		for i,v in pairs(ExistingOfMob) do
+			if v > CurrentNumber then
+				CurrentNumber = v
+				BestMob = i
+			end
+		end
+
+		if BestMob and not table.find(Mobs, Child.Name.." ("..BestMob.."'s Island)" ) then
+			Mob1:Add(Child.Name.." ("..BestMob.."'s Island)")
+			Mob2:Add(Child.Name.." ("..BestMob.."'s Island)")
+		end
+		
+		Child.ChildAdded:Connect(function(Descendant)
+			if Descendant:IsA("Model") and not table.find(Mobs, Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text) then
+				table.insert(Mobs, Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
+				Mob1:Add(Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
+				Mob2:Add(Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
+			end
+		end)
+		
+		for i,v in pairs(Child:GetChildren()) do
+			if not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
+				table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
+				Mob1:Add(v.NpcHealth.ViewerFrame.TName.Text)
+				Mob2:Add(v.NpcHealth.ViewerFrame.TName.Text)
+			end
+		end
+	end
+end)
 
 Misc:CreateToggle({
 	Name = "⚡ Teleport to Mob",
