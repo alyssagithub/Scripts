@@ -559,6 +559,8 @@ task.spawn(function()
 		if Rayfield.Flags.Haki.CurrentValue and (not Player.Character:FindFirstChild("BusoH") or Player.Character:FindFirstChild("BusoH"):FindFirstChildWhichIsA("BasePart").Transparency ~= 0) then
 			virtualInput:SendKeyEvent(true, "T", false, nil)
 			virtualInput:SendKeyEvent(false, "T", false, nil)
+			virtualInput:SendKeyEvent(true, "R", false, nil)
+			virtualInput:SendKeyEvent(false, "R", false, nil)
 		end
 	end
 end)
