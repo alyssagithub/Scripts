@@ -1,16 +1,19 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.11.10")
+CurrentVersion("v1.12.10")
 
 local virtualInput = game:GetService("VirtualInputManager")
 
 local ChestTeleporting
 
+local Mob1
+
 local Islands = {}
 local Interactions = {}
 local Quests = {}
-local Mobs = {"Closest Mob", "None", "SEA MONSTER", "SEA BEAST"}
+local Mobs = {"Closest Mob", "None", "SEA KING", "SEA BEAST"}
 local Players = {}
+local SelectedMobs = {}
 
 for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
 	table.insert(Islands, v.Name)
@@ -60,8 +63,6 @@ for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren())
 		end
 	end
 end
-
-print("[Inferno X] Debug: Mobs List:\n\n"..table.concat(Mobs, ", "))
 
 for i,v in pairs(game:GetService("Players"):GetPlayers()) do
 	if v and v ~= Player then
@@ -213,7 +214,7 @@ task.spawn(function()
 					local SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
 					task.wait()
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.PrimaryPart.CFrame
-					task.wait(2.5)
+					task.wait(Rayfield.Flags.CollectDelay.CurrentValue)
 					if v:FindFirstChild("ChestInteract") then
 						fireproximityprompt(v.ChestInteract)
 					end
@@ -259,7 +260,7 @@ end)
 
 Main:CreateToggle({
 	Name = "🎁 Auto Collect Gifts",
-	Info = "Automatically collects fruit that spawn",
+	Info = "Automatically collects gifts that spawn",
 	CurrentValue = false,
 	Flag = "AutoGift",
 	Callback = function(Value)	end,
@@ -274,7 +275,7 @@ task.spawn(function()
 					local SavedPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
 					task.wait()
 					Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.Model:FindFirstChildWhichIsA("BasePart").CFrame
-					task.wait(2.5)
+					task.wait(Rayfield.Flags.CollectDelay.CurrentValue)
 					if v:FindFirstChild("ChestInteract") then
 						fireproximityprompt(v.ChestInteract)
 					end
@@ -285,6 +286,16 @@ task.spawn(function()
 		end
 	end
 end)
+
+Main:CreateSlider({
+	Name = "🐌 Collect Delay",
+	Range = {1.5, 5},
+	Increment = .1,
+	Suffix = "Seconds",
+	CurrentValue = 2.5,
+	Flag = "CollectDelay",
+	Callback = function(Value)	end,
+})
 
 Main:CreateToggle({
 	Name = "✅ Remove Name Tag",
@@ -306,7 +317,7 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateSection("Effects")
+Main:CreateSection("Performance")
 
 Main:CreateToggle({
 	Name = "💥 Disable Effects",
@@ -330,24 +341,42 @@ task.spawn(function()
 	end
 end)
 
+Main:CreateButton({
+	Name = "🐛 Load Island Mobs",
+	Callback = function()
+		local ReturnPosition = Player.Character.HumanoidRootPart.CFrame
+
+		for i,v in pairs(Islands) do
+			Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(v).CFrame
+			task.wait(1.5)
+		end
+
+		Player.Character.HumanoidRootPart.CFrame = ReturnPosition
+	end,
+})
+
 local Misc = Window:CreateTab("Misc", 4483362458)
 
 Misc:CreateSection("Mob Teleports")
 
-local Mob1 = Misc:CreateDropdown({
-	Name = "👾 Mob (Priority)",
-	Options = Mobs,
-	CurrentOption = "None",
-	Flag = "SelectedMob",
-	Callback = function(Option)	end,
-})
+local MobLabel = Misc:CreateLabel("Selected Mobs:")
 
-local Mob2 = Misc:CreateDropdown({
-	Name = "👾 Mob 2",
+Mob1 = Misc:CreateDropdown({
+	Name = "👾 Mob",
 	Options = Mobs,
 	CurrentOption = "None",
-	Flag = "SelectedMob2",
-	Callback = function(Option)	end,
+	--Flag = "SelectedMob",
+	Callback = function(Option)
+		if table.find(SelectedMobs, Option) then
+			table.remove(SelectedMobs, table.find(SelectedMobs, Option))
+		else
+			table.insert(SelectedMobs, Option)
+		end
+		pcall(function()
+			Mob1:Set("")
+			MobLabel:Set("Selected Mobs: "..table.concat(SelectedMobs, ", "))
+		end)
+	end,
 })
 
 game:GetService("Workspace")["__GAME"]["__Mobs"].ChildAdded:Connect(function(Child)
@@ -373,22 +402,19 @@ game:GetService("Workspace")["__GAME"]["__Mobs"].ChildAdded:Connect(function(Chi
 
 		if BestMob and not table.find(Mobs, Child.Name.." ("..BestMob.."'s Island)" ) then
 			Mob1:Add(Child.Name.." ("..BestMob.."'s Island)")
-			Mob2:Add(Child.Name.." ("..BestMob.."'s Island)")
 		end
-		
+
 		Child.ChildAdded:Connect(function(Descendant)
 			if Descendant:IsA("Model") and not table.find(Mobs, Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text) then
 				table.insert(Mobs, Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
 				Mob1:Add(Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
-				Mob2:Add(Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
 			end
 		end)
-		
+
 		for i,v in pairs(Child:GetChildren()) do
-			if not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
+			if v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
 				table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
 				Mob1:Add(v.NpcHealth.ViewerFrame.TName.Text)
-				Mob2:Add(v.NpcHealth.ViewerFrame.TName.Text)
 			end
 		end
 	end
@@ -403,26 +429,29 @@ Misc:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.MobTeleport.CurrentValue and Rayfield.Flags.MobTeleport.CurrentValue ~= "None" and not ChestTeleporting then
-			local CurrentNumber = math.huge
-			local Mob
+		if Rayfield.Flags.MobTeleport.CurrentValue and #SelectedMobs > 0 and not ChestTeleporting then
+			for t,b in pairs(SelectedMobs) do
+				local CurrentNumber = math.huge
+				local Mob
 
-			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
-				if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" and Player.Character:FindFirstChild("HumanoidRootPart") then
-					local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+				for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
+					if v:IsA("Model") and v.Name == "NpcModel" and v.Parent:FindFirstChild("NpcHealth") and v.Parent.NpcHealth.ViewerFrame.Frame.HealthText.Text:split("/")[1] ~= "0" and Player.Character:FindFirstChild("HumanoidRootPart") then
+						local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 
-					if (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob.CurrentOption or Rayfield.Flags.SelectedMob.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob.CurrentOption:split(" ")[1])) then
-						CurrentNumber = Magnitude
-						Mob = v.HumanoidRootPart
-					elseif (v.Parent.NpcHealth.ViewerFrame.TName.Text == Rayfield.Flags.SelectedMob2.CurrentOption or Rayfield.Flags.SelectedMob2.CurrentOption == "Closest Mob" or (Rayfield.Flags.SelectedMob2.CurrentOption:match("_") and v.Parent.Parent.Name == Rayfield.Flags.SelectedMob2.CurrentOption:split(" ")[1])) and Magnitude < CurrentNumber then
-						CurrentNumber = Magnitude
-						Mob = v.HumanoidRootPart
+						if (v.Parent.NpcHealth.ViewerFrame.TName.Text == b or b == "Closest Mob" or (b:match("_") and v.Parent.Parent.Name == b:split(" ")[1])) then
+							CurrentNumber = Magnitude
+							Mob = v.HumanoidRootPart
+						elseif (v.Parent.NpcHealth.ViewerFrame.TName.Text == b or b == "Closest Mob" or (b:match("_") and v.Parent.Parent.Name == b:split(" ")[1])) and Magnitude < CurrentNumber then
+							CurrentNumber = Magnitude
+							Mob = v.HumanoidRootPart
+						end
 					end
 				end
-			end
 
-			if Mob and not ChestTeleporting then
-				Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, Rayfield.Flags.YOffset.CurrentValue, 0) + Mob.CFrame.LookVector * Rayfield.Flags.LookVector.CurrentValue
+				if Mob and not ChestTeleporting then
+					Player.Character.HumanoidRootPart.CFrame = Mob.CFrame + Vector3.new(0, Rayfield.Flags.YOffset.CurrentValue, 0) + Mob.CFrame.LookVector * Rayfield.Flags.LookVector.CurrentValue
+					break
+				end
 			end
 		end
 	end
