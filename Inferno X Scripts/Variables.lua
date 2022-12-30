@@ -225,7 +225,7 @@ local function CreateWindow()
 
 		task.spawn(function()
 			while task.wait() do
-				if Player.Character.Humanoid.WalkSpeed ~= Rayfield.Flags["Universal-WalkSpeed"].CurrentValue then
+				if Rayfield.Flags["Universal-WalkSpeed"].CurrentValue ~= 16 and Player.Character.Humanoid.WalkSpeed ~= Rayfield.Flags["Universal-WalkSpeed"].CurrentValue then
 					Player.Character.Humanoid.WalkSpeed = Rayfield.Flags["Universal-WalkSpeed"].CurrentValue
 				end
 			end
@@ -242,7 +242,7 @@ local function CreateWindow()
 
 		task.spawn(function()
 			while task.wait() do
-				if Player.Character.Humanoid.JumpPower ~= Rayfield.Flags["Universal-JumpPower"].CurrentValue then
+				if Rayfield.Flags["Universal-JumpPower"].CurrentValue ~= 50 and Player.Character.Humanoid.JumpPower ~= Rayfield.Flags["Universal-JumpPower"].CurrentValue then
 					Player.Character.Humanoid.JumpPower = Rayfield.Flags["Universal-JumpPower"].CurrentValue
 				end
 			end
