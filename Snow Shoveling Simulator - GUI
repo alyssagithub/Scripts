@@ -1,0 +1,118 @@
+local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+
+CurrentVersion("v1.0.0")
+
+local LoadModule = require(game:GetService("ReplicatedStorage"):WaitForChild("LoadModule"))
+local Network = LoadModule("Network")
+local Debounce = false
+
+local BlacklistedBlocks = {}
+
+local Window = CreateWindow()
+
+local Main = Window:CreateTab("Main", 4483362458)
+
+Main:CreateToggle({
+	Name = "❄ Auto Shovel Snow",
+	CurrentValue = false,
+	Flag = "Shovel",
+	Callback = function(Value)	end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Shovel.CurrentValue and not Debounce and Player:GetAttribute("Storage") ~= Player:GetAttribute("MaxStorage") then
+			local Snow
+
+			if not Player.Character:FindFirstChildOfClass("Tool") then
+				Player.Backpack:FindFirstChildOfClass("Tool").Parent = Player.Character
+			end
+
+			for i,v in pairs(workspace.Regions.Winterville.Tiles:GetChildren()) do
+				if v:GetAttribute("Type") == "Snow" and v:GetAttribute("Height") > 20 then
+					Snow = v
+					break
+				end
+			end
+
+			repeat
+				local SelectedSnow = {}
+
+				Player.Character.HumanoidRootPart.CFrame = CFrame.new(Snow.Position + Vector3.new(0, 5, 0))
+
+				for i,v in pairs(workspace.Regions.Winterville.Tiles:GetChildren()) do
+					if v:FindFirstChild("Highlight") then
+						table.insert(SelectedSnow, v)
+					end
+				end
+
+				if #SelectedSnow > 0 then
+					game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer("Shovel", Player.Character:FindFirstChildOfClass("Tool"), SelectedSnow)
+				end
+
+				task.wait()
+			until Snow:GetAttribute("Height") == 0 or Player:GetAttribute("Storage") == Player:GetAttribute("MaxStorage") or not Rayfield.Flags.Shovel.CurrentValue or Debounce
+		end
+	end
+end)
+
+Main:CreateToggle({
+	Name = "💰 Auto Sell Snow",
+	CurrentValue = false,
+	Flag = "Sell",
+	Callback = function(Value)	end,
+})
+
+Network:Bind("SnowBackpackFull", function()
+	if Rayfield.Flags.Sell.CurrentValue and not Debounce then
+		Debounce = true
+		repeat
+			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.Interactions.Frosty.Position + Vector3.new(0, 5, 0))
+			task.wait()
+			game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer("SellSnow", "Frosty")
+		until game.Players.LocalPlayer:GetAttribute("Storage") == 0 or not Rayfield.Flags.Sell.CurrentValue
+		Debounce = false
+	end
+end)
+
+Main:CreateToggle({
+	Name = "🎒 Auto Buy Backpacks",
+	CurrentValue = false,
+	Flag = "Backpacks",
+	Callback = function(Value)	end,
+})
+
+task.spawn(function()
+	while task.wait(1) do
+		if Rayfield.Flags.Backpacks.CurrentValue then
+			local Data = LoadModule("PlayerData").Data
+			local ShopBackpack = workspace.Regions.Winterville.Shops.WaynesPacks.ShopItems:FindFirstChild(#Data.Backpacks + 1)
+
+			if ShopBackpack.Info.Price.Value <= Data.Money then
+				game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer("BuyItem", ShopBackpack)
+				game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer("TakeItem", ShopBackpack)
+			end
+		end
+	end
+end)
+
+Main:CreateToggle({
+	Name = "⚒ Auto Buy Shovels",
+	CurrentValue = false,
+	Flag = "Shovels",
+	Callback = function(Value)	end,
+})
+
+task.spawn(function()
+	while task.wait(1) do
+		if Rayfield.Flags.Shovels.CurrentValue then
+			local Data = require(game:GetService("ReplicatedStorage").LoadModule)("PlayerData").Data
+			local ShopTool = game:GetService("Workspace").Regions.Winterville.Shops.JimsTools.ShopItems:FindFirstChild(#Data.CurrentTools + 1)
+
+			if ShopTool.Info.Price.Value <= Data.Money then
+				game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer("BuyItem", ShopTool)
+				game:GetService("ReplicatedStorage").Modules.Network.RemoteEvent:FireServer("TakeItem", ShopTool)
+			end
+		end
+	end
+end)
