@@ -9,7 +9,7 @@ if Games[game.PlaceId] then
 	loadstring(game:HttpGet(Games[game.PlaceId]))()
 else
 	game.StarterGui:SetCore("SendNotification", {
-	    Title = "Inferno X Noification";
+	    Title = "Inferno X Notification";
 	    Text = "Game not supported";
 	    Duration = 10;
     })
