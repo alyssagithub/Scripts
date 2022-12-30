@@ -220,16 +220,12 @@ local function CreateWindow()
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.WalkSpeed,
 			Flag = "Universal-WalkSpeed",
-			Callback = function(Value)	end,
-		})
-
-		task.spawn(function()
-			while task.wait() do
-				if Rayfield.Flags["Universal-WalkSpeed"].CurrentValue ~= 16 and Player.Character.Humanoid.WalkSpeed ~= Rayfield.Flags["Universal-WalkSpeed"].CurrentValue then
-					Player.Character.Humanoid.WalkSpeed = Rayfield.Flags["Universal-WalkSpeed"].CurrentValue
+			Callback = function(Value)
+				if Player.Character.Humanoid.WalkSpeed ~= Value then
+					Player.Character.Humanoid.WalkSpeed = Value
 				end
-			end
-		end)
+			end,
+		})
 		
 		Universal:CreateSlider({
 			Name = "⬆ JumpPower",
@@ -237,16 +233,12 @@ local function CreateWindow()
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.JumpPower,
 			Flag = "Universal-JumpPower",
-			Callback = function(Value)	end,
-		})
-
-		task.spawn(function()
-			while task.wait() do
-				if Rayfield.Flags["Universal-JumpPower"].CurrentValue ~= 50 and Player.Character.Humanoid.JumpPower ~= Rayfield.Flags["Universal-JumpPower"].CurrentValue then
-					Player.Character.Humanoid.JumpPower = Rayfield.Flags["Universal-JumpPower"].CurrentValue
+			Callback = function(Value)
+				if Player.Character.Humanoid.JumpPower ~= Value then
+					Player.Character.Humanoid.JumpPower = Value
 				end
-			end
-		end)
+			end,
+		})
 
 		Universal:CreateSection("Safety")
 
