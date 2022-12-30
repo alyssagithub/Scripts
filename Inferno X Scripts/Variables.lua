@@ -18,15 +18,17 @@ local HttpService = game:GetService("HttpService")
 pcall(function()
 	if isfile and writefile and readfile then
 		local CurrentTime = tick()
+		
+		local function SetWebhook()
+			writefile("InfernoXWebhooking.txt", CurrentTime)
+			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+			Webhook = GlobalWebhook
+		end
 
 		if not isfile("InfernoXWebhooking.txt") then
-			writefile("InfernoXWebhooking.txt", CurrentTime)
-			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-			Webhook = GlobalWebhook
+			SetWebhook()
 		elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 7200 then
-			writefile("InfernoXWebhooking.txt", CurrentTime)
-			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-			Webhook = GlobalWebhook
+			SetWebhook()
 		else
 			Webhook = nil
 		end
@@ -115,7 +117,7 @@ local function Notify(Message, Duration)
 	Rayfield:Notify({
 		Title = "🔥 Inferno X",
 		Content = Message,
-		Duration = Duration,
+		Duration = Duration or 5,
 		Image = 4483362458,
 		Actions = {},
 	})
@@ -131,7 +133,7 @@ local function CreateWindow()
 		ConfigurationSaving = {
 			Enabled = true,
 			FolderName = "InfernoXConfig",
-			FileName = game.PlaceId
+			FileName = game.PlaceId.."-"..Player.Name
 		},
 		Discord = {
 			Enabled = true,
@@ -142,24 +144,23 @@ local function CreateWindow()
 
 	repeat task.wait() until Window
 
-	task.defer(function()
-		task.wait(1.5)
+	task.delay(1.5, function()
 		local Universal = Window:CreateTab("Universal", 4483362458)
 
 		Universal:CreateToggle({
 			Name = "🚫 Anti-AFK",
 			CurrentValue = false,
 			Flag = "Universal-AntiAFK",
-			Callback = function(Value)
-				if Value then
-					local VirtualUser = game:GetService("VirtualUser")
-					Player.Idled:Connect(function()
-						VirtualUser:CaptureController()
-						VirtualUser:ClickButton2(Vector2.new())
-					end)
-				end
-			end,
+			Callback = function(Value)	end,
 		})
+		
+		local VirtualUser = game:GetService("VirtualUser")
+		Player.Idled:Connect(function()
+			if Rayfield.Flags["Universal-AntiAFK"].CurrentValue then
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton2(Vector2.new())
+			end
+		end)
 
 		local AutoRejoin = Universal:CreateToggle({
 			Name = "🔁 Auto Rejoin",
@@ -172,7 +173,7 @@ local function CreateWindow()
 					local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
 
 					po.ChildAdded:connect(function(a)
-						if a.Name == 'ErrorPrompt' then
+						if Rayfield.Flags["Universal-AutoRejoin"].CurrentValue and a.Name == 'ErrorPrompt' then
 							while true do
 								ts:Teleport(game.PlaceId)
 								task.wait(2)
@@ -201,55 +202,43 @@ local function CreateWindow()
 		Rayfield:LoadConfiguration()
 
 		Universal:CreateSection("Modifiers")
-
-		local Speed
+		
+		if syn and not getgenv().MTAPIMutex then 
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() 
+			Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
+			Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
+		end
 
 		Universal:CreateSlider({
 			Name = "💨 WalkSpeed",
 			Range = {0, 500},
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.WalkSpeed,
-			--Flag = "Universal-WalkSpeed",
-			Callback = function(Value)
-				Speed = Value
-				if Speed then
-					if syn then
-						if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
-					end
-					Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
-				end
-			end,
+			Flag = "Universal-WalkSpeed",
+			Callback = function(Value)	end,
 		})
 
 		task.spawn(function()
 			while task.wait() do
-				if Speed and Player.Character.Humanoid.WalkSpeed ~= Speed then
-					Player.Character.Humanoid.WalkSpeed = Speed
+				if Player.Character.Humanoid.WalkSpeed ~= Rayfield.Flags["Universal-WalkSpeed"].CurrentValue then
+					Player.Character.Humanoid.WalkSpeed = Rayfield.Flags["Universal-WalkSpeed"].CurrentValue
 				end
 			end
 		end)
-
-		local Jump
-
+		
 		Universal:CreateSlider({
 			Name = "⬆ JumpPower",
 			Range = {0, 500},
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.JumpPower,
-			--Flag = "Universal-JumpPower",
-			Callback = function(Value)
-				Jump = Value
-				if syn then
-					if not getgenv().MTAPIMutex then loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() end
-				end
-				Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
-			end,
+			Flag = "Universal-JumpPower",
+			Callback = function(Value)	end,
 		})
 
 		task.spawn(function()
 			while task.wait() do
-				if Jump and Player.Character.Humanoid.JumpPower ~= Jump then
-					Player.Character.Humanoid.JumpPower = Jump
+				if Player.Character.Humanoid.JumpPower ~= Rayfield.Flags["Universal-JumpPower"].CurrentValue then
+					Player.Character.Humanoid.JumpPower = Rayfield.Flags["Universal-JumpPower"].CurrentValue
 				end
 			end
 		end)
@@ -269,7 +258,7 @@ local function CreateWindow()
 						pcall(function()
 							if v:IsInGroup(GroupId) and v:GetRankInGroup(GroupId) > 1 then
 								AutoRejoin:Set(false)
-								Player:Kick("Detected Staff (Player above group role 1)")
+								Player:Kick("Detected Staff (Player above group rank 1)")
 							end
 						end)
 					end
@@ -282,43 +271,47 @@ local function CreateWindow()
 				pcall(function()
 					if v:IsInGroup(GroupId) and v:GetRankInGroup(GroupId) > 1 then
 						AutoRejoin:Set(false)
-						Player:Kick("Detected Staff (Player above group role 1)")
+						Player:Kick("Detected Staff (Player above group rank 1)")
 					end
 				end)
 			end
 		end)
-			
+
 		Universal:CreateSection("Grinding")
 		
+		local function ServerHop()
+			local Http = game:GetService("HttpService")
+			local TPS = game:GetService("TeleportService")
+			local Api = "https://games.roblox.com/v1/games/"
+
+			local _place,_id = game.PlaceId, game.JobId
+			local _servers = Api.._place.."/servers/Public?sortOrder=Desc&limit=100"
+
+			local function ListServers(cursor)
+				local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+				return Http:JSONDecode(Raw)
+			end
+
+			local Next; repeat
+				local Servers = ListServers(Next)
+				for i,v in next, Servers.data do
+					if v.playing < v.maxPlayers and v.id ~= _id then
+						local s,r = pcall(TPS.TeleportToPlaceInstance,TPS,_place,v.id,Player)
+						if s then break end
+					end
+				end
+
+				Next = Servers.nextPageCursor
+			until not Next
+		end
+
 		Universal:CreateButton({
 			Name = "🔂 One-Time Server Hop",
 			Callback = function()
-				local Http = game:GetService("HttpService")
-				local TPS = game:GetService("TeleportService")
-				local Api = "https://games.roblox.com/v1/games/"
-
-				local _place,_id = game.PlaceId, game.JobId
-				local _servers = Api.._place.."/servers/Public?sortOrder=Desc&limit=100"
-
-				local function ListServers(cursor)
-					local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-					return Http:JSONDecode(Raw)
-				end
-
-				local Next; repeat
-					local Servers = ListServers(Next)
-					for i,v in next, Servers.data do
-						if v.playing < v.maxPlayers and v.id ~= _id then
-							local s,r = pcall(TPS.TeleportToPlaceInstance,TPS,_place,v.id,Player)
-							if s then break end
-						end
-					end
-
-					Next = Servers.nextPageCursor
-				until not Next
+				ServerHop()
 			end,
 		})
-		
+
 		Universal:CreateToggle({
 			Name = "🔁 Server Hop",
 			Info = "Automatically server hops after the interval",
@@ -326,7 +319,7 @@ local function CreateWindow()
 			Flag = "Universal-ServerHop",
 			Callback = function(Value)	end,
 		})
-		
+
 		Universal:CreateSlider({
 			Name = "⏲ Server Hop Intervals",
 			Info = "Sets the interval in seconds for the Server Hop",
@@ -336,33 +329,11 @@ local function CreateWindow()
 			Flag = "Universal-ServerhopIntervals",
 			Callback = function(Value)	end,
 		})
-		
+
 		task.spawn(function()
 			while task.wait(Rayfield.Flags["Universal-ServerhopIntervals"].CurrentValue) do
 				if Rayfield.Flags["Universal-ServerHop"].CurrentValue then
-					local Http = game:GetService("HttpService")
-					local TPS = game:GetService("TeleportService")
-					local Api = "https://games.roblox.com/v1/games/"
-
-					local _place,_id = game.PlaceId, game.JobId
-					local _servers = Api.._place.."/servers/Public?sortOrder=Desc&limit=100"
-					
-					local function ListServers(cursor)
-						local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-						return Http:JSONDecode(Raw)
-					end
-
-					local Next; repeat
-						local Servers = ListServers(Next)
-						for i,v in next, Servers.data do
-							if v.playing < v.maxPlayers and v.id ~= _id then
-								local s,r = pcall(TPS.TeleportToPlaceInstance,TPS,_place,v.id,Player)
-								if s then break end
-							end
-						end
-
-						Next = Servers.nextPageCursor
-					until not Next
+					ServerHop()
 				end
 			end
 		end)
@@ -408,39 +379,37 @@ local function CreateWindow()
 			Enter = true,
 			RemoveTextAfterFocusLost = false,
 			Callback = function(Text)
-				if Text ~= "" and Text ~= " " then
+				if #Text > 3 then
 					pcall(function()
 						if isfile and writefile and readfile then
 							local CurrentTime = tick()
+							
+							local function SetSuggestionsWebhook()
+								Webhook = SuggestionsWebhook
+								local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
+								if success then
+									Notify("Successfully Sent Suggestion", 5)
+									writefile("InfernoXWebhooking2.txt", CurrentTime)
+									print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
+								else
+									Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
+								end
+							end
 
 							if not isfile("InfernoXWebhooking2.txt") then
-								Webhook = SuggestionsWebhook
-								local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
-								if success then
-									Notify("Successfully Sent Suggestion", 5)
-									writefile("InfernoXWebhooking2.txt", CurrentTime)
-									print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-								else
-									Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
-								end
+								SetSuggestionsWebhook()
 							elseif tonumber(readfile("InfernoXWebhooking2.txt")) < CurrentTime - 86400 then
-								Webhook = SuggestionsWebhook
-								local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
-								if success then
-									Notify("Successfully Sent Suggestion", 5)
-									writefile("InfernoXWebhooking2.txt", CurrentTime)
-									print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
-								else
-									Notify("Unsuccessful Sending Suggestion, Error: "..result, 5)
-								end
+								SetSuggestionsWebhook()
 							else
 								Webhook = nil
 								Notify("You are on a 24 Hour Cooldown", 5)
 							end
 						else
-							Notify("Your Executor does not support this feature")
+							Notify("Your Executor does not support this feature", 5)
 						end
 					end)
+				else
+					Notify("Invalid Suggestion", 5)
 				end
 			end,
 		})
