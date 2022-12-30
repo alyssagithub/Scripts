@@ -204,58 +204,6 @@ local function CreateWindow()
 			end,
 		})
 
-		Rayfield:LoadConfiguration()
-
-		Universal:CreateSection("Modifiers")
-
-		if syn and not getgenv().MTAPIMutex then 
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() 
-			Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
-			Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
-		end
-
-		local Speed
-
-		Universal:CreateSlider({
-			Name = "💨 WalkSpeed",
-			Range = {0, 500},
-			Increment = 1,
-			CurrentValue = Player.Character.Humanoid.WalkSpeed,
-			--Flag = "Universal-WalkSpeed",
-			Callback = function(Value)
-				Speed = Value
-			end,
-		})
-
-		task.spawn(function()
-			while task.wait() do
-				if Speed and Player.Character.Humanoid.WalkSpeed ~= Speed then
-					Player.Character.Humanoid.WalkSpeed = Speed
-				end
-			end
-		end)
-
-		local Jump
-
-		Universal:CreateSlider({
-			Name = "⬆ JumpPower",
-			Range = {0, 500},
-			Increment = 1,
-			CurrentValue = Player.Character.Humanoid.JumpPower,
-			--Flag = "Universal-JumpPower",
-			Callback = function(Value)
-				Jump = Value
-			end,
-		})
-
-		task.spawn(function()
-			while task.wait() do
-				if Jump and Player.Character.Humanoid.JumpPower ~= Jump then
-					Player.Character.Humanoid.JumpPower = Jump
-				end
-			end
-		end)
-
 		Universal:CreateSection("Safety")
 
 		local GroupId = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Creator.CreatorTargetId
@@ -424,6 +372,8 @@ local function CreateWindow()
 				end
 			end,
 		})
+		
+		Rayfield:LoadConfiguration()
 	end)
 
 	return Window
