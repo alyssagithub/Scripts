@@ -23,7 +23,7 @@ local HttpService = game:GetService("HttpService")
 pcall(function()
 	if isfile and writefile and readfile then
 		local CurrentTime = tick()
-		
+
 		local function SetWebhook()
 			writefile("InfernoXWebhooking.txt", CurrentTime)
 			print("[Inferno X] Debug: Webhook Delay Set at "..CurrentTime)
@@ -158,7 +158,7 @@ local function CreateWindow()
 			Flag = "Universal-AntiAFK",
 			Callback = function(Value)	end,
 		})
-		
+
 		local VirtualUser = game:GetService("VirtualUser")
 		Player.Idled:Connect(function()
 			if Rayfield.Flags["Universal-AntiAFK"].CurrentValue then
@@ -207,38 +207,54 @@ local function CreateWindow()
 		Rayfield:LoadConfiguration()
 
 		Universal:CreateSection("Modifiers")
-		
+
 		if syn and not getgenv().MTAPIMutex then 
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/KikoTheDon/MT-Api-v2/main/__source/mt-api%20v2.lua", true))() 
 			Player.Character.Humanoid:AddPropertyEmulator("WalkSpeed")
 			Player.Character.Humanoid:AddPropertyEmulator("JumpPower")
 		end
 
+		local Speed
+
 		Universal:CreateSlider({
 			Name = "💨 WalkSpeed",
 			Range = {0, 500},
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.WalkSpeed,
-			Flag = "Universal-WalkSpeed",
+			--Flag = "Universal-WalkSpeed",
 			Callback = function(Value)
-				if Player.Character.Humanoid.WalkSpeed ~= Value then
-					Player.Character.Humanoid.WalkSpeed = Value
-				end
+				Speed = Value
 			end,
 		})
-		
+
+		task.spawn(function()
+			while task.wait() do
+				if Speed and Player.Character.Humanoid.WalkSpeed ~= Speed then
+					Player.Character.Humanoid.WalkSpeed = Speed
+				end
+			end
+		end)
+
+		local Jump
+
 		Universal:CreateSlider({
 			Name = "⬆ JumpPower",
 			Range = {0, 500},
 			Increment = 1,
 			CurrentValue = Player.Character.Humanoid.JumpPower,
-			Flag = "Universal-JumpPower",
+			--Flag = "Universal-JumpPower",
 			Callback = function(Value)
-				if Player.Character.Humanoid.JumpPower ~= Value then
-					Player.Character.Humanoid.JumpPower = Value
-				end
+				Jump = Value
 			end,
 		})
+
+		task.spawn(function()
+			while task.wait() do
+				if Jump and Player.Character.Humanoid.JumpPower ~= Jump then
+					Player.Character.Humanoid.JumpPower = Jump
+				end
+			end
+		end)
 
 		Universal:CreateSection("Safety")
 
@@ -275,7 +291,7 @@ local function CreateWindow()
 		end)
 
 		Universal:CreateSection("Grinding")
-		
+
 		local function ServerHop()
 			local Http = game:GetService("HttpService")
 			local TPS = game:GetService("TeleportService")
@@ -378,7 +394,7 @@ local function CreateWindow()
 					pcall(function()
 						if isfile and writefile and readfile then
 							local CurrentTime = tick()
-							
+
 							local function SetSuggestionsWebhook()
 								Webhook = SuggestionsWebhook
 								local success, result = pcall(SendMessage, "[Inferno X] Data: "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." suggested "..Text.." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, "Suggestion")
