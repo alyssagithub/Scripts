@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1")
+CurrentVersion("v1.1")
 
 local Services = game:GetService("ReplicatedStorage").Knit.Services
 local workspace = workspace
@@ -76,7 +76,7 @@ task.spawn(function()
 					local StartTime = tick()
 
 					repeat task.wait() until not v or not SelectedArea:FindFirstChild(v.Name) or not Rayfield.Flags.Mine.CurrentValue or ChildAdded or (tick() - StartTime > 2 and Player.PlayerGui.Main.Prompts.Click.DPS.Text == "DPS: 0")
-					
+
 					if not ChildAdded then
 						print("[Inferno X] Debug: Mined "..v.Name.." in "..math.round(tick() - StartTime).." seconds")
 					else
@@ -158,6 +158,18 @@ task.spawn(function()
 		end
 	end
 end)
+
+Main:CreateButton({
+	Name = "🐦 Redeem all Codes",
+	Interact = 'redeem',
+	Callback = function()
+		for _,v in pairs({"release", "wow500likes", "likes1000thx", "update1", "newgame", "thx2500likes", "update2", "visits2m"}) do
+			game:GetService("ReplicatedStorage").Knit.Services.CodeService.RF.UseCode:InvokeServer(v)
+			print("[Inferno X] Debug: Redeemed code "..v)
+			task.wait(2)
+		end
+	end,
+})
 
 local Teleport
 
@@ -266,12 +278,12 @@ local function Giant(ToGiant, ScrollingFrame, Remote)
 	for i,v in pairs(Items) do
 		if v.Amount >= 5 then
 			local Selected = {}
-			
+
 			for e = 1, 5 do
 				Selected[Items[i].Ids[e]] = true
 				print("[Inferno X] Debug: Selected Giant ID "..Items[i].Ids[e])
 			end
-			
+
 			Services.GiantService.RF[Remote]:InvokeServer({["Current"..ToGiant] = Items[i].Ids[1], ["Chosen"] = Selected})
 		end
 	end
