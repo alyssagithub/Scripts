@@ -1,6 +1,6 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.2.2")
+CurrentVersion("v1.2.3")
 
 local ChopLooping
 
@@ -8,7 +8,6 @@ local BossLooping
 local OrbLooping
 local ChestLooping
 local ClaimLooping
-local PuzzleLooping
 
 local HatchLooping
 
@@ -235,34 +234,6 @@ task.spawn(function()
 				if v:IsA("Frame") and v.Claim.Visible == true then
 					firesignal(v.Click.MouseButton1Up)
 				end
-			end
-		end
-	end
-end)
-
-Main:CreateSection("Christmas Event")
-
-Main:CreateToggle({
-	Name = "🛷 Auto Find Puzzle Piece",
-	CurrentValue = false,
-	Flag = "AutoPuzzle",
-	Callback = function(Value)
-		PuzzleLooping = Value
-	end,
-})
-
-task.spawn(function()
-	while task.wait() do
-		if PuzzleLooping then
-			local Piece = game:GetService("Workspace").Scripts.Christmas.Puzzle:FindFirstChildOfClass("Model")
-			if Piece then
-				local Mesh = Piece:FindFirstChildWhichIsA("MeshPart")
-				repeat
-					Player.Character.HumanoidRootPart.CFrame = Mesh.CFrame
-					fireproximityprompt(Mesh.ProximityPrompt)
-					task.wait()
-				until #game:GetService("Workspace").Scripts.Christmas.Puzzle:GetChildren() == 0
-				Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace").Scripts.Christmas.cam.CFrame
 			end
 		end
 	end
