@@ -303,8 +303,6 @@ local function CreateWindow()
 
 		local Credits = Window:CreateTab("Credits/Suggestions", 4483362458)
 
-		Credits:CreateLabel("🔥 Inferno X was made by alyssa#2303 🔥")
-
 		Credits:CreateButton({
 			Name = "➡ Join Discord discord.gg/rtgv8Jp3fM ⬅",
 			Callback = function()
