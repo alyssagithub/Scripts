@@ -139,11 +139,6 @@ local function CreateWindow()
 			Enabled = true,
 			FolderName = "InfernoXConfig",
 			FileName = game.PlaceId.."-"..Player.Name
-		},
-		Discord = {
-			Enabled = true,
-			Invite = "rtgv8Jp3fM",
-			RememberJoins = true
 		}
 	})
 
@@ -301,34 +296,7 @@ local function CreateWindow()
 			end
 		end)
 
-		local Credits = Window:CreateTab("Credits/Suggestions", 4483362458)
-
-		Credits:CreateButton({
-			Name = "➡ Join Discord discord.gg/rtgv8Jp3fM ⬅",
-			Callback = function()
-				local HttpService = game:GetService("HttpService")
-				local http_req = (syn and syn.request) or (http and http.request) or http_request
-				if http_req then
-					http_req({
-						Url = 'http://127.0.0.1:6463/rpc?v=1',
-						Method = 'POST',
-						Headers = {
-							['Content-Type'] = 'application/json',
-							Origin = 'https://discord.com'
-						},
-						Body = HttpService:JSONEncode({
-							cmd = 'INVITE_BROWSER',
-							nonce = HttpService:GenerateGUID(false),
-							args = {code = 'rtgv8Jp3fM'}
-						})
-					})
-				elseif setclipboard then
-					setclipboard("https://discord.gg/rtgv8Jp3fM")
-
-					Notify("Link Copied to Clipboard", 5)
-				end
-			end,
-		})
+		local Credits = Window:CreateTab("Suggestions", 4483362458)
 
 		Credits:CreateInput({
 			Name = "Suggestion",
