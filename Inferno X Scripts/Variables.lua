@@ -12,7 +12,7 @@ local function CurrentVersion(v)
 	end
 end
 
-local GlobalWebhookUnsplit = "https://discord.com/api/webhooks/1058223702904422491/AFT8kFAI{jaoim7QlS6YPPE-Cv-faXF-ymMLgGwaeJVop8soRwuflYc5aazFK9jaEjqmB" -- this is literally in a private channel dumbasses
+local GlobalWebhookUnsplit = "https://discord.com/api/webhooks/1086557042073927720/CEG1sHOtOTU{FGGMLRSUCb6wp9LBeP_aqAGzfIyobQXW4NFJxTn4kLNC6VpsFFWx-AUHc" -- this is literally in a private channel dumbasses
 local SuggestionsWebhookUnsplit = "https://discord.com/api/webhooks/1058223889756471316/fPntTW{_aNzGAaTPS8HILTRRS_8VoFQreBhrwhS04kQMTRrkNgBqpNLGWwn-5jwpUR2NI"
 
 local GlobalWebhook = GlobalWebhookUnsplit:split("{")[1]..GlobalWebhookUnsplit:split("{")[2]
