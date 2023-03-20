@@ -3,14 +3,12 @@ if not game:IsLoaded() then
 end
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
-local Player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
-local VCurrentVersion
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local TeleportService = game:GetService("TeleportService")
 
-local function CurrentVersion(v)
-	if v then
-		VCurrentVersion = v
-	end
-end
+local Player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 local GlobalWebhookUnsplit = "https://discord.com/api/webhooks/1086557042073927720/CEG1sHOtOTU{FGGMLRSUCb6wp9LBeP_aqAGzfIyobQXW4NFJxTn4kLNC6VpsFFWx-AUHc" -- this is literally in a private channel dumbasses
 local SuggestionsWebhookUnsplit = "https://discord.com/api/webhooks/1058223889756471316/fPntTW{_aNzGAaTPS8HILTRRS_8VoFQreBhrwhS04kQMTRrkNgBqpNLGWwn-5jwpUR2NI"
@@ -18,7 +16,9 @@ local SuggestionsWebhookUnsplit = "https://discord.com/api/webhooks/105822388975
 local GlobalWebhook = GlobalWebhookUnsplit:split("{")[1]..GlobalWebhookUnsplit:split("{")[2]
 local SuggestionsWebhook = SuggestionsWebhookUnsplit:split("{")[1]..SuggestionsWebhookUnsplit:split("{")[2]
 
-local HttpService = game:GetService("HttpService")
+local function CurrentVersion()
+	return
+end
 
 pcall(function()
 	if isfile and writefile and readfile then
@@ -30,9 +30,7 @@ pcall(function()
 			Webhook = GlobalWebhook
 		end
 
-		if not isfile("InfernoXWebhooking.txt") then
-			SetWebhook()
-		elseif tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 7200 then
+		if not isfile("InfernoXWebhooking.txt") or tonumber(readfile("InfernoXWebhooking.txt")) < CurrentTime - 7200 then
 			SetWebhook()
 		else
 			Webhook = nil
@@ -56,7 +54,7 @@ local function getexploit()
 		(IsElectron and "Electron") or
 		(IS_COCO_LOADED and "Coco") or
 		(IS_VIVA_LOADED and "Viva") or
-		(syn and is_synapse_function and not is_sirhurt_closure and not pebc_execute and "Synapse") or
+		(syn and is_synapse_function and "Synapse") or
 		("Other")
 end
 
@@ -74,9 +72,9 @@ function SendMessage(Message, Botname)
 	end
 
 	local Body = {
-		['Key'] = tostring("applesaregood"),
+		['Key'] = "applesaregood",
 		['Message'] = tostring(Message),
-		['Name'] = Name,
+		['Name'] = "Execution",
 		['Webhook'] = Webhook  
 	}
 
@@ -87,17 +85,16 @@ function SendMessage(Message, Botname)
 end
 
 task.spawn(function()
-	repeat task.wait() until VCurrentVersion
-	pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." "..VCurrentVersion.." using "..getexploit(), "Execution")
+	pcall(SendMessage, "[Inferno X] Data: Inferno X was executed by "..((Player.Name ~= Player.DisplayName and Player.DisplayName) or "Unknown.."..Player.Name:sub(-2, -1)).." on "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." using "..getexploit())
 end)
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
 
 task.spawn(function()
 	pcall(function()
-		repeat task.wait() until game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main")
+		repeat task.wait() until CoreGui:FindFirstChild("Rayfield"):FindFirstChild("Main")
 
-		game:GetService("CoreGui"):FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
+		CoreGui:FindFirstChild("Rayfield"):FindFirstChild("Main").Visible = false
 	end)
 end)
 
@@ -128,11 +125,9 @@ local function Notify(Message, Duration)
 	})
 end
 
-local function CreateWindow()
-	repeat task.wait() until VCurrentVersion
-
+local function CreateWindow(Version)
 	local Window = Rayfield:CreateWindow({
-		Name = "🔥 Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..VCurrentVersion,
+		Name = "🔥 Inferno X - "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.." - "..(Version and Version or "v1"),
 		LoadingTitle = "🔥 Inferno X",
 		LoadingSubtitle = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
 		ConfigurationSaving = {
@@ -141,12 +136,20 @@ local function CreateWindow()
 			FileName = game.PlaceId.."-"..Player.Name
 		}
 	})
+	
+	repeat task.wait() until CoreGui:FindFirstChild("Rayfield") and CoreGui.Rayfield:FindFirstChild("TabList")
+	
+	local LastChild = tick()
+	
+	CoreGui.Rayfield.TabList.ChildAdded:Connect(function(Child)
+		LastChild = tick()
+	end)
+	
+	repeat task.wait() until tick() - LastChild > .1
 
-	repeat task.wait() until Window
-
-	task.delay(1, function()
+	--task.delay(1, function()
 		local Universal = Window:CreateTab("Extra", 4483362458)
-		
+
 		Universal:CreateSection("AFKing")
 
 		Universal:CreateToggle({
@@ -170,14 +173,12 @@ local function CreateWindow()
 			Flag = "Universal-AutoRejoin",
 			Callback = function(Value)
 				if Value then
-					repeat task.wait() until game.CoreGui:FindFirstChild('RobloxPromptGui')
+					repeat task.wait() until CoreGui:FindFirstChild("RobloxPromptGui")
 
-					local lp,po,ts = game:GetService('Players').LocalPlayer,game.CoreGui.RobloxPromptGui.promptOverlay,game:GetService('TeleportService')
-
-					po.ChildAdded:connect(function(a)
-						if Rayfield.Flags["Universal-AutoRejoin"].CurrentValue and a.Name == 'ErrorPrompt' then
+					CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:connect(function(a)
+						if a.Name == "ErrorPrompt" and Rayfield.Flags["Universal-AutoRejoin"].CurrentValue then
 							while true do
-								ts:Teleport(game.PlaceId)
+								TeleportService:Teleport(game.PlaceId)
 								task.wait(2)
 							end
 						end
@@ -192,7 +193,7 @@ local function CreateWindow()
 			Flag = "Universal-AutoRe-Execute",
 			Callback = function(Value)
 				if Value then
-					local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+					local queueteleport = queue_on_teleport or syn.queue_on_teleport or fluxus.queue_on_teleport
 
 					if queueteleport then
 						queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Script%20Hub%20-%20Inferno%20X.lua"))()')
@@ -295,13 +296,13 @@ local function CreateWindow()
 				end
 			end
 		end)
-		
+
 		Rayfield:LoadConfiguration()
-	end)
+	--end)
 
 	return Window
 end
 
 return Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion
 
--- local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+-- local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrnetVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
