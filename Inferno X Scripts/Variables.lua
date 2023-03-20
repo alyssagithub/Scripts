@@ -137,11 +137,11 @@ local function CreateWindow(Version)
 		}
 	})
 	
-	repeat task.wait() until CoreGui:FindFirstChild("Rayfield") and CoreGui.Rayfield:FindFirstChild("TabList")
+	repeat task.wait() until CoreGui:FindFirstChild("Rayfield") and CoreGui.Rayfield:FindFirstChild("Main") and CoreGui.Rayfield.Main:FindFirstChild("TabList")
 	
 	local LastChild = tick()
 	
-	CoreGui.Rayfield.TabList.ChildAdded:Connect(function(Child)
+	CoreGui.Rayfield.Main.TabList.ChildAdded:Connect(function(Child)
 		LastChild = tick()
 	end)
 	
