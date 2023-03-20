@@ -140,12 +140,14 @@ local function CreateWindow(Version)
 	repeat task.wait() until CoreGui:FindFirstChild("Rayfield") and CoreGui.Rayfield:FindFirstChild("Main") and CoreGui.Rayfield.Main:FindFirstChild("TabList")
 	
 	local LastChild = tick()
+	local ChildFound = false
 	
 	CoreGui.Rayfield.Main.TabList.ChildAdded:Connect(function(Child)
 		LastChild = tick()
+		ChildFound = true
 	end)
 	
-	repeat task.wait() until tick() - LastChild > .1
+	repeat task.wait() until ChildFound and tick() - LastChild > 1
 
 	--task.delay(1, function()
 		local Universal = Window:CreateTab("Extra", 4483362458)
