@@ -8,8 +8,6 @@ local Services = game:GetService("ReplicatedStorage").Packages.Knit.Services
 local workspace = workspace
 local virtualInput = game:GetService("VirtualInputManager")
 
-local LastHit = 0
-
 local Quests = {}
 local Eggs = {}
 local EggsTP = {}
@@ -87,10 +85,6 @@ task_spawn(function()
 				end
 			end
 			
-			if Mob then
-			    LastHit = tick()
-			end
-			
 			Services.ClickService.RF.Click:InvokeServer(Mob)
 		end
 	end
@@ -128,7 +122,7 @@ task_spawn(function()
                 repeat
                     Player.Character.HumanoidRootPart.CFrame = ClosestNPC.HumanoidRootPart.CFrame + Vector3_new(0, 10, 0) + ClosestNPC.HumanoidRootPart.CFrame.LookVector * 5
                     task_wait()
-                until not ClosestNPC or not workspace.Live.NPCs.Client:FindFirstChild(ClosestNPC.Name) or not Rayfield.Flags.TPNPC.CurrentValue or (Rayfield.Flags.Swing.CurrentValue and tick() - LastHit >= 1)
+                until not ClosestNPC or not workspace.Live.NPCs.Client:FindFirstChild(ClosestNPC.Name) or not Rayfield.Flags.TPNPC.CurrentValue
             end
         end
     end
