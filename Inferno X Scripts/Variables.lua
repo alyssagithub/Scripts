@@ -136,8 +136,22 @@ local function CreateWindow(Version)
 			FileName = game.PlaceId.."-"..Player.Name
 		}
 	})
+	
+	local CoreGui = game:GetService("CoreGui")
 
-	task.delay(1, function()
+	local LastChild = tick()
+	local ChildFound = false
+
+	CoreGui:WaitForChild("Rayfield"):WaitForChild("Main"):WaitForChild("TabList").ChildAdded:Connect(function(Child)
+		LastChild = tick()
+		ChildFound = true
+	end)
+
+	repeat
+		task.wait()
+	until ChildFound and tick() - LastChild > .1
+
+	--task.delay(1, function()
 		local Universal = Window:CreateTab("Extra", 4483362458)
 
 		Universal:CreateSection("AFKing")
@@ -288,7 +302,7 @@ local function CreateWindow(Version)
 		end)
 
 		Rayfield:LoadConfiguration()
-	end)
+	--end)
 
 	return Window
 end
