@@ -148,9 +148,8 @@ local function CreateWindow(Version)
 
 		repeat
 			task.wait()
-		until ChildFound and tick() - LastChild > .1
-
-		--task.delay(1, function()
+		until ChildFound and tick() - LastChild > .15
+		
 		local Universal = Window:CreateTab("Extra", 4483362458)
 
 		Universal:CreateSection("AFKing")
@@ -302,7 +301,6 @@ local function CreateWindow(Version)
 
 		Rayfield:LoadConfiguration()
 	end)
-	--end)
 
 	return Window
 end
