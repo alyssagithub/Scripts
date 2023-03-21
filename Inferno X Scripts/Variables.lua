@@ -294,9 +294,9 @@ local function CreateWindow(Version)
 				end
 			end
 		end)
+		
+		Rayfield:LoadConfiguration()
 	end)
-	
-	Rayfield:LoadConfiguration()
 
 	return Window
 end
