@@ -298,8 +298,6 @@ local function CreateWindow(Version)
 				end
 			end
 		end)
-
-		Rayfield:LoadConfiguration()
 	end)
 
 	return Window
