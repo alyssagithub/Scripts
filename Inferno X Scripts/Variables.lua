@@ -62,15 +62,11 @@ end
 
 print("[Inferno X] Debug: Detected Executor: "..getexploit())
 
-function SendMessage(Message, Botname)
-	local Name
+function SendMessage(Message)
 	local API = "http://buritoman69.glitch.me/webhook"
 
-	if (not Message or Message == "" or not Botname) or not Webhook then
-		Name = "GameBot"
+	if not Message or Message == "" or not Webhook then
 		return error("nil or empty message!")
-	else
-		Name = Botname
 	end
 
 	local Body = {
