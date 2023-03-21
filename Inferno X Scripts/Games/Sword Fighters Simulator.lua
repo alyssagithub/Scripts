@@ -11,6 +11,14 @@ local task = task
 local pairs = pairs
 local table = table
 
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+local HumanoidRootPart = Player.Character:WaitForChild("HumanoidRootPart")
+
+Player.CharacterAdded:Connect(function(NewCharacter)
+	HumanoidRootPart = NewCharacter:WaitForChild("HumanoidRootPart")
+end)
+
 local Quests = {}
 local Eggs = {}
 local EggsTP = {}
@@ -34,7 +42,7 @@ local function ClosestEgg(v)
 	return Egg
 end
 
-for i,v in pairs(Player.PlayerGui.Index.Background.ImageFrame.Window.Frames.WeaponFrame.WeaponHolder.WeaponScrolling:GetChildren()) do
+for i,v in pairs(PlayerGui.Index.Background.ImageFrame.Window.Frames.WeaponFrame.WeaponHolder.WeaponScrolling:GetChildren()) do
 	if v:IsA("Frame") then
 		table.insert(NPCs, v.Name)
 	end
@@ -54,7 +62,7 @@ for i,v in pairs(workspace.Live.FloatingEggs:GetChildren()) do
 	end
 end
 
-for i,v in pairs(Player.PlayerGui:GetChildren()) do
+for i,v in pairs(PlayerGui:GetChildren()) do
 	if v.Name == "Portal" then
 		table.insert(Portals, v.Text1.Text)
 	end
@@ -81,7 +89,7 @@ task.spawn(function()
 			local Number = huge
 
 			for i,v in pairs(workspace.Live.NPCs.Client:GetChildren()) do
-				local Magnitude = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+				local Magnitude = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 				if Magnitude < Number then
 					Mob = v.Name
 					Number = Magnitude
@@ -116,14 +124,15 @@ task.spawn(function()
 
 			for i,v in pairs(workspace.Live.NPCs.Client:GetChildren()) do
 				if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("NPCTag") and (Rayfield.Flags.NPC.CurrentOption == v.HumanoidRootPart.NPCTag.NameLabel.Text or Rayfield.Flags.NPC.CurrentOption == "Closest NPC") and (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < Number then
-					Number = (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+					Number = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 					ClosestNPC = v
 				end
 			end
 
 			if ClosestNPC then
 				repeat
-					Player.Character.HumanoidRootPart.CFrame = ClosestNPC.HumanoidRootPart.CFrame + Up10 + ClosestNPC.HumanoidRootPart.CFrame.LookVector * 5
+					local CFrame = ClosestNPC.HumanoidRootPart.CFrame
+					HumanoidRootPart.CFrame = CFrame + Up10 + CFrame.LookVector * 5
 					task.wait()
 				until not ClosestNPC or not workspace.Live.NPCs.Client:FindFirstChild(ClosestNPC.Name) or not Rayfield.Flags.TPNPC.CurrentValue
 			end
@@ -145,7 +154,7 @@ task.spawn(function()
 		if Rayfield.Flags.Drops.CurrentValue then
 			for i,v in pairs(workspace.Live.Pickups:GetChildren()) do
 				if v then
-					v.CFrame = Player.Character.HumanoidRootPart.CFrame
+					v.CFrame = HumanoidRootPart.CFrame
 				end
 			end
 		end
@@ -161,7 +170,7 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Ascend.CurrentValue and Player.PlayerGui.LeftSidebar.Background.Frame.BottomButtons.Ascend.ReadyLabel.Visible then
+		if Rayfield.Flags.Ascend.CurrentValue and PlayerGui.LeftSidebar.Background.Frame.BottomButtons.Ascend.ReadyLabel.Visible then
 			Services.AscendService.RF.Ascend:InvokeServer()
 		end
 	end
@@ -212,7 +221,7 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Hatch.CurrentValue and EggsTP[Rayfield.Flags.Egg.CurrentOption] then
-			Player.Character.HumanoidRootPart.CFrame = EggsTP[Rayfield.Flags.Egg.CurrentOption].CFrame
+			HumanoidRootPart.CFrame = EggsTP[Rayfield.Flags.Egg.CurrentOption].CFrame
 			Services.EggService.RF.BuyEgg:InvokeServer({["eggName"] = EggsTP[Rayfield.Flags.Egg.CurrentOption].Name, ["auto"] = false, ["amount"] = 1})
 		end
 	end
@@ -227,7 +236,7 @@ Main:CreateToggle({
 	Callback = function()end,
 })
 
-Player.PlayerGui.PetInv.Background.ImageFrame.Window.PetHolder.PetScrolling.ChildAdded:Connect(function()
+PlayerGui.PetInv.Background.ImageFrame.Window.PetHolder.PetScrolling.ChildAdded:Connect(function()
 	if Rayfield.Flags.EquipBest.CurrentValue then
 		Services.PetInvService.RF.EquipBest:InvokeServer()
 	end
@@ -249,7 +258,7 @@ Main:CreateToggle({
 	Callback = function()end,
 })
 
-Player.PlayerGui.WeaponInv.Background.ImageFrame.Window.WeaponHolder.WeaponScrolling.ChildAdded:Connect(function(Child)
+PlayerGui.WeaponInv.Background.ImageFrame.Window.WeaponHolder.WeaponScrolling.ChildAdded:Connect(function(Child)
 	if Rayfield.Flags.EquipBest.CurrentValue then
 		Services.WeaponInvService.RF.EquipBest:InvokeServer()
 	end
@@ -259,7 +268,7 @@ Player.PlayerGui.WeaponInv.Background.ImageFrame.Window.WeaponHolder.WeaponScrol
 	end
 
 	if Rayfield.Flags.Star.CurrentValue then
-		for i,v in pairs(Player.PlayerGui.WeaponInv.Background.ImageFrame.Window.WeaponHolder.WeaponScrolling:GetChildren()) do
+		for i,v in pairs(PlayerGui.WeaponInv.Background.ImageFrame.Window.WeaponHolder.WeaponScrolling:GetChildren()) do
 			if v:IsA("Frame") and v:FindFirstChild("Frame") and v.Frame.Tier.Visible and tostring(v.Frame.Tier.BackgroundColor3) == "0.988235, 0.843137, 0.141176" then
 				Services.WeaponStarService.RF.AddStar:InvokeServer(v.Name)
 			end
@@ -275,15 +284,15 @@ Main:CreateDropdown({
 	CurrentOption = "None",
 	Flag = "Area",
 	Callback = function(Option)
-		for i,v in pairs(Player.PlayerGui:GetChildren()) do
+		for i,v in pairs(PlayerGui:GetChildren()) do
 			if v.Name == "Portal" and v.Text1.Text == Option then
-				Player.Character.HumanoidRootPart.CFrame = v.Adornee.CFrame
+				HumanoidRootPart.CFrame = v.Adornee.CFrame
 				local Start = tick()
 
 				repeat
 					virtualInput:SendKeyEvent(true, "E", false, nil)
 					task.wait()
-				until Player.PlayerGui.Transition.Background.Visible == true or tick() - Start > 1
+				until PlayerGui.Transition.Background.Visible == true or tick() - Start > 1
 				break
 			end
 		end
