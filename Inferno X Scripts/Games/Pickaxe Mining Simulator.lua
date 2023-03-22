@@ -1,15 +1,11 @@
-local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
+local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Variables.lua"))()
 
-CurrentVersion("v1.1")
-
-local Services = game:GetService("ReplicatedStorage").Knit.Services
+local Services = game:GetService("ReplicatedStorage").Packages._Index["sleitnick_knit@1.4.7"].knit.Services
 local workspace = workspace
-
-local ChildAdded = false
 
 local Folders = {}
 local Areas = {}
-local Ores = {"1", "2", "3", "4", "MegaOre", "All"}
+local Ores = {"Ore1", "Ore2", "Ore3", "Ore4", "MegaOre", "All"}
 local Eggs = {}
 
 for i,v in pairs(workspace:GetChildren()) do
@@ -23,14 +19,16 @@ if #Folders == 2 then
 end
 
 for i,v in pairs(workspace.WorldBox:GetChildren()) do
-	table.insert(Areas, v.Name)
+	if not table.find(Areas, v.Name) then
+		table.insert(Areas, v.Name)
+	end
 end
 
 for i,v in pairs(workspace.Eggs:GetChildren()) do
 	table.insert(Eggs, v.Name)
 end
 
-local Window = CreateWindow()
+local Window = CreateWindow("v2")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
@@ -62,26 +60,17 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Mine.CurrentValue and Rayfield.Flags.Area.CurrentOption ~= "" and Rayfield.Flags.Ore.CurrentOption ~= "" then
-			local SelectedArea = workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption)
-			for i,v in pairs(SelectedArea:GetChildren()) do
-				if v and v:FindFirstChild("Type") and (v.Type.Value:split("Ore")[2] == Rayfield.Flags.Ore.CurrentOption or v.Type.Value == Rayfield.Flags.Ore.CurrentOption or Rayfield.Flags.Ore.CurrentOption == "All") then
-					for e,r in pairs(Player.PlayerGui.Main.Prompts.Inventory.ScrollingFrame:GetChildren()) do
-						pcall(function()
-							if r.ClassName == "ImageButton" and r:FindFirstChild("Equipped") and r.Equipped.Visible then
-								Services.MineableService.RF.StartMining:InvokeServer({["Mineable"] = v, ["PickaxeId"] = r.Name})
-							end
-						end)
+			for i,v in pairs(workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption):GetChildren()) do
+				if v and (v:FindFirstChild("Type") and v.Type.Value:find(Rayfield.Flags.Ore.CurrentOption)) or Rayfield.Flags.Ore.CurrentOption == "All" and Rayfield.Flags.Mine.CurrentValue then
+					for e,r in pairs(workspace.PickaxeStorage[Player.Name]:GetChildren()) do
+						Services.MineableService.RF.StartMining:InvokeServer({["Mineable"] = v, ["PickaxeId"] = r.Name})
 					end
-
-					local StartTime = tick()
-
-					repeat task.wait() until not v or not SelectedArea:FindFirstChild(v.Name) or not Rayfield.Flags.Mine.CurrentValue or ChildAdded or (tick() - StartTime > 2 and Player.PlayerGui.Main.Prompts.Click.DPS.Text == "DPS: 0")
-
-					if not ChildAdded then
-						print("[Inferno X] Debug: Mined "..v.Name.." in "..math.round(tick() - StartTime).." seconds")
-					else
-						ChildAdded = false
-					end
+					
+					local Start = tick()
+					
+					repeat task.wait() until not v or not workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption):FindFirstChild(v.Name) or tick() - Start > 1 and Player.PlayerGui.HUD.Bottom.ClickButton.Visual.DPSLabel.Text == "DPS:0" or not Rayfield.Flags.Mine.CurrentValue
+					
+					print("[Inferno X] Debug: Mined an ore")
 				end
 			end
 		end
@@ -131,9 +120,12 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Rewards.CurrentValue and Player.PlayerGui.Main.Prompts.HUD.RightButtons.Rewards.Notification.Visible then
-			for i = 1, 9 do
-				Services.RewardService.RF.RequestCompletion:InvokeServer({["Id"] = i})
+		if Rayfield.Flags.Rewards.CurrentValue then
+			for i,v in pairs(Player.PlayerGui.Rewards.Frame.Contents:GetChildren()) do
+				if v.ClassName == "ImageButton" and v.Timer.Text == "CLAIM" then
+					Services.RewardService.RF.RequestCompletion:InvokeServer({["Id"] = v.Name})
+					v.Timer.Text = "CLAIMED"
+				end
 			end
 		end
 	end
@@ -148,9 +140,9 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Quests.CurrentValue and Player.PlayerGui.Main.Prompts.HUD.RightButtons.Achievements.Notification.Visible then
-			for _,v in pairs(Player.PlayerGui.Main.Prompts.Achievements.ScrollingFrame:GetChildren()) do
-				if v.ClassName == "ImageLabel" and v.Completed.Visible then
+		if Rayfield.Flags.Quests.CurrentValue then
+			for _,v in pairs(Player.PlayerGui.Achievements.Frame.ScrollingFrame:GetChildren()) do
+				if v.ClassName == "Frame" and v.Completed.Visible then
 					Services.AchievementService.RF.RequestCompletion:InvokeServer({["Id"] = v.Name})
 					v.Completed.Visible = false
 				end
@@ -158,18 +150,6 @@ task.spawn(function()
 		end
 	end
 end)
-
-Main:CreateButton({
-	Name = "🐦 Redeem all Codes",
-	Interact = 'redeem',
-	Callback = function()
-		for _,v in pairs({"release", "wow500likes", "likes1000thx", "update1", "newgame", "thx2500likes", "update2", "visits2m"}) do
-			game:GetService("ReplicatedStorage").Knit.Services.CodeService.RF.UseCode:InvokeServer(v)
-			print("[Inferno X] Debug: Redeemed code "..v)
-			task.wait(2)
-		end
-	end,
-})
 
 local Teleport
 
@@ -187,7 +167,7 @@ Teleport = Main:CreateDropdown({
 	end,
 })
 
-local Items = Window:CreateTab("Items/Pets", 4483362458)
+local Items = Window:CreateTab("Inventory", 4483362458)
 
 Items:CreateSection("Hatching")
 
@@ -199,16 +179,8 @@ Items:CreateDropdown({
 	Callback = function(Option)	end,
 })
 
-Items:CreateDropdown({
-	Name = "🔢 Amount",
-	Options = {"1", "2", "3"},
-	CurrentOption = "1",
-	Flag = "Amount",
-	Callback = function(Option)	end,
-})
-
 Items:CreateToggle({
-	Name = "🐣 Auto Hatch Egg",
+	Name = "🐣 Auto Hatch",
 	CurrentValue = false,
 	Flag = "Hatch",
 	Callback = function(Value)	end,
@@ -217,98 +189,28 @@ Items:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Hatch.CurrentValue and Rayfield.Flags.Egg.CurrentOption ~= "" then
-			Services.EggService.RF.OpenEgg:InvokeServer({["UpdateType"] = "Open", ["EggType"] = Rayfield.Flags.Egg.CurrentOption, ["Auto"] = false, ["Amount"] = tonumber(Rayfield.Flags.Amount.CurrentOption)})
+			Services.EggService.RF.OpenEgg:InvokeServer({["UpdateType"] = "Open", ["EggType"] = Rayfield.Flags.Egg.CurrentOption, ["Auto"] = false, ["Amount"] = 1})
 		end
 	end
 end)
 
-Items:CreateSection("Equipping")
+Items:CreateSection("Items")
 
 Items:CreateToggle({
-	Name = "👍 Auto Equip Best Pickaxe",
+	Name = "👍 Auto Equip Best",
 	CurrentValue = false,
-	Flag = "BestPick",
+	Flag = "EquipBest",
 	Callback = function(Value)	end,
 })
 
-Player.PlayerGui.Main.Prompts.Inventory.ScrollingFrame.ChildAdded:Connect(function(Child)
-	if Rayfield.Flags.BestPick.CurrentValue and Child.ClassName == "ImageButton" then
-		ChildAdded = true
-		firesignal(Player.PlayerGui.Main.Prompts.Inventory.EquipBest.Activated)
+Player.PlayerGui.Pickaxes.Frame.ScrollingFrame.ChildAdded:Connect(function(Child)
+	if Rayfield.Flags.EquipBest.CurrentValue and Child.ClassName == "TextButton" then
+		firesignal(Player.PlayerGui.Pickaxes.Frame.RightButtons.EquipBestButton.Activated)
 	end
 end)
 
-Items:CreateToggle({
-	Name = "👎 Auto Equip Best Pet",
-	CurrentValue = false,
-	Flag = "BestPet",
-	Callback = function(Value)	end,
-})
-
-Player.PlayerGui.Main.Prompts.PetInventory.ScrollingFrame.ChildAdded:Connect(function(Child)
-	if Rayfield.Flags.BestPet.CurrentValue and Child.ClassName == "ImageButton" then
-		firesignal(Player.PlayerGui.Main.Prompts.PetInventory.EquipBest.Activated)
-	end
-end)
-
-Items:CreateSection("Giant")
-
-Items:CreateToggle({
-	Name = "⚒ Auto Giant Pets",
-	Info = "Turns 5 of the same pet into a giant!",
-	CurrentValue = false,
-	Flag = "GiantPets",
-	Callback = function(Value)	end,
-})
-
-local function Giant(ToGiant, ScrollingFrame, Remote)
-	local Items = {}
-
-	for i,v in pairs(Player.PlayerGui.Main.Prompts.Giant[ScrollingFrame]:GetChildren()) do
-		if v.ClassName == "ImageButton" then
-			if not Items[v.Icon.Image] then
-				Items[v.Icon.Image] = {Amount = 1, Ids = {v.Name}}
-			else
-				table.insert(Items[v.Icon.Image].Ids, v.Name)
-				Items[v.Icon.Image].Amount = Items[v.Icon.Image].Amount + 1
-			end
-		end
-	end
-
-	for i,v in pairs(Items) do
-		if v.Amount >= 5 then
-			local Selected = {}
-
-			for e = 1, 5 do
-				Selected[Items[i].Ids[e]] = true
-				print("[Inferno X] Debug: Selected Giant ID "..Items[i].Ids[e])
-			end
-
-			Services.GiantService.RF[Remote]:InvokeServer({["Current"..ToGiant] = Items[i].Ids[1], ["Chosen"] = Selected})
-		end
-	end
-end
-
-task.spawn(function()
-	while task.wait() do
-		if Rayfield.Flags.GiantPets.CurrentValue then
-			Giant("Pet", "ScrollingFramePets", "RequestGiantPet")
-		end
-	end
-end)
-
-Items:CreateToggle({
-	Name = "🛠 Auto Giant Pickaxes",
-	Info = "Turns 5 of the same pickaxe into a giant!",
-	CurrentValue = false,
-	Flag = "GiantPicks",
-	Callback = function(Value)	end,
-})
-
-task.spawn(function()
-	while task.wait() do
-		if Rayfield.Flags.GiantPicks.CurrentValue then
-			Giant("Pickaxe", "ScrollingFrame", "RequestGiant")
-		end
+Player.PlayerGui.Pets.Frame.ScrollingFrame.ChildAdded:Connect(function(Child)
+	if Rayfield.Flags.EquipBest.CurrentValue and Child.ClassName == "TextButton" then
+		firesignal(Player.PlayerGui.Pets.Frame.RightButtons.EquipBestButton.Activated)
 	end
 end)
