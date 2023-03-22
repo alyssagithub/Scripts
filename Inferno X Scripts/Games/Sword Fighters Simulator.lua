@@ -123,7 +123,7 @@ task.spawn(function()
 			local ClosestNPC
 
 			for i,v in pairs(workspace.Live.NPCs.Client:GetChildren()) do
-				if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("NPCTag") and (Rayfield.Flags.NPC.CurrentOption == v.HumanoidRootPart.NPCTag.NameLabel.Text or Rayfield.Flags.NPC.CurrentOption == "Closest NPC") and (Player.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < Number then
+				if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("NPCTag") and (Rayfield.Flags.NPC.CurrentOption == v.HumanoidRootPart.NPCTag.NameLabel.Text or Rayfield.Flags.NPC.CurrentOption == "Closest NPC") and (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < Number then
 					Number = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 					ClosestNPC = v
 				end
