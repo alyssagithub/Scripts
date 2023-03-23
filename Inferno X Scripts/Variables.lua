@@ -91,7 +91,7 @@ local Data =
 local Request = (syn and syn.request) or request
 
 pcall(Request, {
-	Url = "https://discord.com/api/webhooks/1086557042073927720/CEG1sHOtOTUFGGMLRSUCb6wp9LBeP_aqAGzfIyobQXW4NFJxTn4kLNC6VpsFFWx-AUHc",
+	Url = GlobalWebhook,
 	Body = HttpService:JSONEncode(Data),
 	Method = "POST",
 	Headers = {["Content-Type"] = "application/json"}
