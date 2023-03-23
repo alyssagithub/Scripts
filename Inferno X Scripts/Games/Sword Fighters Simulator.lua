@@ -13,17 +13,22 @@ local table = table
 
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
+task.spawn(function()
+	PlayerGui:WaitForChild("Notification"):WaitForChild("Background"):WaitForChild("Notification").Visible = false
+end)
+
 local HumanoidRootPart = Player.Character:WaitForChild("HumanoidRootPart")
 
 Player.CharacterAdded:Connect(function(NewCharacter)
 	HumanoidRootPart = NewCharacter:WaitForChild("HumanoidRootPart")
 end)
 
+local NPCs = {"Closest NPC"}
 local Quests = {}
 local Eggs = {}
 local EggsTP = {}
 local Portals = {"None"}
-local NPCs = {"Closest NPC"}
+local UIs = {}
 
 local function ClosestEgg(v)
 	local Number = huge
@@ -65,6 +70,12 @@ end
 for i,v in pairs(PlayerGui:GetChildren()) do
 	if v.Name == "Portal" then
 		table.insert(Portals, v.Text1.Text)
+	end
+end
+
+for i,v in pairs(PlayerGui:GetChildren()) do
+	if v.ClassName == "ScreenGui" and not table.find(UIs, v.Name) then
+		table.insert(UIs, v.Name)
 	end
 end
 
@@ -197,6 +208,70 @@ task.spawn(function()
 				Services.QuestService.RF.ActionQuest:InvokeServer(v)
 			end
 			task.wait(1)
+		end
+	end
+end)
+
+Main:CreateToggle({
+	Name = "💼 Auto Claim Chest",
+	SectionParent = Farming,
+	CurrentValue = false,
+	Flag = "Chest",
+	Callback = function()end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Chest.CurrentValue then
+			for i,v in pairs(workspace.Live.Chests:GetChildren()) do
+				if not v.MeshPart.Chest.Text2.Text:find("(") then
+					Services.ChestService.RF.ClaimChest:InvokeServer(v.Name)
+				end
+			end
+		end
+	end
+end)
+
+Main:CreateToggle({
+	Name = "📈 Auto Upgrade",
+	SectionParent = Farming,
+	CurrentValue = false,
+	Flag = "Upgrade",
+	Callback = function(V)end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Chest.CurrentValue then
+			for i,v in pairs(PlayerGui.Upgrade.Background.ImageFrame.Window.Items.ItemHolder:GetChildren()) do
+				if v.ClassName == "Frame" then
+					for e,r in pairs(workspace.Resources.Teleports:GetChildren()) do
+						if r.Name:lower():find("area") then
+							Services.UpgradeService.RF.Upgrade:InvokeServer(r.Name, v)
+						end
+					end
+				end
+			end
+		end
+	end
+end)
+
+Main:CreateToggle({
+	Name = "🧊 Auto Buy Areas",
+	SectionParent = Farming,
+	CurrentValue = false,
+	Flag = "BuyAreas",
+	Callback = function()end,
+})
+
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Chest.CurrentValue then
+			for i,v in pairs(workspace.Assets.Locks:GetChildren()) do
+				if v.Transparency ~= 1 then
+					Services.AreaService.RF.BuyArea:InvokeServer(v.Name)
+				end
+			end
 		end
 	end
 end)
