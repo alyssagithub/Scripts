@@ -72,11 +72,12 @@ local Window = CreateWindow("v1")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
-Main:CreateSection("Combat")
+local Combat = Main:CreateSection("Combat")
 
 Main:CreateToggle({
 	Name = "🖱 Auto Swing",
 	Info = "Automatically gains power & attacks the closest NPC",
+	SectionParent = Combat,
 	CurrentValue = false,
 	Flag = "Swing",
 	Callback = function()end,
@@ -103,6 +104,7 @@ end)
 
 Main:CreateDropdown({
 	Name = "🏅 NPC",
+	SectionParent = Combat,
 	Options = NPCs,
 	CurrentOption = "",
 	Flag = "NPC",
@@ -111,6 +113,7 @@ Main:CreateDropdown({
 
 Main:CreateToggle({
 	Name = "🗡 Teleport to NPC",
+	SectionParent = Combat,
 	CurrentValue = false,
 	Flag = "TPNPC",
 	Callback = function()end,
@@ -140,10 +143,11 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateSection("Farming")
+local Farming = Main:CreateSection("Farming")
 
 Main:CreateToggle({
 	Name = "💎 Auto Collect Drops",
+	SectionParent = Farming,
 	CurrentValue = false,
 	Flag = "Drops",
 	Callback = function()end,
@@ -163,6 +167,7 @@ end)
 
 Main:CreateToggle({
 	Name = "💸 Auto Ascend",
+	SectionParent = Farming,
 	CurrentValue = false,
 	Flag = "Ascend",
 	Callback = function()end,
@@ -179,6 +184,7 @@ end)
 Main:CreateToggle({
 	Name = "📜 Auto Quest",
 	Info = "Automatically starts & completes quests.",
+	SectionParent = Farming,
 	CurrentValue = false,
 	Flag = "AutoQuest",
 	Callback = function()end,
@@ -195,10 +201,11 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateSection("Hatching")
+local Hatching = Main:CreateSection("Hatching")
 
 local EggDropdown = Main:CreateDropdown({
 	Name = "🥚 Egg",
+	SectionParent = Hatching,
 	Options = Eggs,
 	CurrentOption = "",
 	Flag = "Egg",
@@ -213,6 +220,7 @@ end)
 
 Main:CreateToggle({
 	Name = "🐣 Auto Hatch",
+	SectionParent = Hatching,
 	CurrentValue = false,
 	Flag = "Hatch",
 	Callback = function()end,
@@ -227,10 +235,11 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateSection("Inventory")
+local Inventory = Main:CreateSection("Inventory")
 
 Main:CreateToggle({
 	Name = "🔪 Equip Best",
+	SectionParent = Inventory,
 	CurrentValue = false,
 	Flag = "EquipBest",
 	Callback = function()end,
@@ -244,6 +253,7 @@ end)
 
 Main:CreateToggle({
 	Name = "🛠 Auto Forge",
+	SectionParent = Inventory,
 	Info = "Forge your weapons into divine/godly!",
 	CurrentValue = false,
 	Flag = "Forge",
@@ -252,6 +262,7 @@ Main:CreateToggle({
 
 Main:CreateToggle({
 	Name = "🌟 Auto Star",
+	SectionParent = Inventory,
 	Info = "Automatically adds stars to your godly weapons!",
 	CurrentValue = false,
 	Flag = "Star",
@@ -276,10 +287,11 @@ PlayerGui.WeaponInv.Background.ImageFrame.Window.WeaponHolder.WeaponScrolling.Ch
 	end
 end)
 
-Main:CreateSection("Transportation")
+local Transport = Main:CreateSection("Transportation")
 
 Main:CreateDropdown({
 	Name = "🌊 Teleport to Area",
+	SectionParent = Transport,
 	Options = Portals,
 	CurrentOption = "None",
 	Flag = "Area",
