@@ -106,7 +106,6 @@ task.spawn(function()
 	end
 end)
 
-
 local Section = Main:CreateSection("Progression")
 
 Main:CreateToggle({
@@ -125,6 +124,16 @@ task.spawn(function()
 		end
 	end
 end)
+
+Main:CreateToggle({
+	Name = "❌ Disable Hatch Animation",
+	SectionParent = Section,
+	CurrentValue = false,
+	Flag = "Animation",
+	Callback = function(Value)
+		Player:WaitForChild("PlayerScripts"):WaitForChild("eggOpeningAnim").Disabled = Value
+	end,
+})
 
 Main:CreateToggle({
 	Name = "🔁 Auto Ascend",
@@ -174,5 +183,18 @@ Main:CreateDropdown({
 	Flag = "World",
 	Callback = function(Option)
 		NormalRemotes.portalTeleport:FireServer(Option)
+	end,
+})
+
+Main:CreateSlider({
+	Name = "💨 Walkspeed Modifier",
+	SectionParent = Section,
+	Range = {0, 128},
+	Increment = 1,
+	Suffix = "",
+	CurrentValue = 32,
+	Flag = "Walkspeed",
+	Callback = function(Value)
+		Player.Character.Humanoid.WalkSpeed = Value
 	end,
 })
