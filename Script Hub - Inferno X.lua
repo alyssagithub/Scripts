@@ -41,8 +41,8 @@ local function Notification(Message)
 end
 
 if Games[game.PlaceId] then
+	Notification("Game is supported, loading script")
 	loadstring(game:HttpGet(Games[game.PlaceId]))()
-	Notification("Game is supported, loading script.")
 else
 	Notification("The current game is not supported")
 end
