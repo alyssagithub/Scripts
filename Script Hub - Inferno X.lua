@@ -36,12 +36,13 @@ local function Notification(Message)
 	StarterGui:SetCore("SendNotification", {
 		Title = "Inferno X Notification",
 		Text = Message,
-		Duration = 60
+		Duration = 10
 	})
 end
 
 if Games[game.PlaceId] then
 	loadstring(game:HttpGet(Games[game.PlaceId]))()
+	Notification("Game is supported, loading script.")
 else
 	Notification("The current game is not supported")
 end
