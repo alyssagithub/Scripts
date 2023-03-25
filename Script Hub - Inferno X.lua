@@ -25,6 +25,7 @@ local function GetExecutor()
 		(IsElectron and "Electron") or
 		(IS_COCO_LOADED and "Coco") or
 		(IS_VIVA_LOADED and "Viva") or
+		(fluxus and "Fluxus") or
 		(syn and is_synapse_function and "Synapse") or
 		("Other")
 end
@@ -45,6 +46,8 @@ else
 	Notification("The current game is not supported")
 end
 
-if GetExecutor() ~= "Synapse" then
-	Notification("The recommended executor is Synapse X")
+local CurrentExecutor = GetExecutor()
+
+if CurrentExecutor ~= "Synapse" and CurrentExecutor ~= "Fluxus" then
+	Notification("The recommended executor is Synapse X or Fluxus")
 end
