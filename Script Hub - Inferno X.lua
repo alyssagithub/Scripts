@@ -9,8 +9,6 @@ local Games = {
 	[12413786484] = "https://raw.githubusercontent.com/alyssagithub/Scripts/main/Inferno%20X%20Scripts/Games/Anime%20Lost%20Simulator.lua" -- Anime Lost Simulator
 }
 
-
-
 local function GetExecutor()
 	return
 		(secure_load and "Sentinel") or
