@@ -74,7 +74,7 @@ Main:CreateDropdown({
 
 Main:CreateToggle({
 	Name = "💰 Auto Farm",
-	Info = "Automatically collects the closest object to you.",
+	Info = "Automatically breaks the closest object to you.",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Mine",
@@ -379,19 +379,6 @@ Main:CreateButton({
 			for i,v in pairs(MAP.Sanctuary.Cacher:GetChildren()) do
 				HumanoidRootPart.CFrame = v:GetChildren()[1].CFrame
 				repeat task.wait() until not v or v.Parent ~= MAP.Sanctuary.Cacher
-			end
-		end
-	end,
-})
-
-Main:CreateButton({
-	Name = "🍀 Collect all Trefles",
-	SectionParent = Section,
-	Callback = function()
-		if workspace:FindFirstChild("Trefles") then
-			for i,v in pairs(workspace.Trefles:GetChildren()) do
-				HumanoidRootPart.CFrame = v.CFrame
-				repeat task.wait() until not v or v.Parent ~= workspace.Trefles
 			end
 		end
 	end,
