@@ -70,8 +70,8 @@ Main:CreateDropdown({
 })
 
 Main:CreateToggle({
-	Name = "⛏ Auto Mine",
-	Info = "Automatically mines the closest object to you.",
+	Name = "💰 Auto Farm",
+	Info = "Automatically collects the closest object to you.",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Mine",
@@ -246,7 +246,7 @@ end)
 local Section = Main:CreateSection("Inventory")
 
 Main:CreateToggle({
-	Name = "💰 Auto Equip Best",
+	Name = "👍 Auto Equip Best",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Best",
