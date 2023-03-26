@@ -209,8 +209,20 @@ Main:CreateDropdown({
 	end,
 })
 
+Main:CreateDropdown({
+	Name = "🔢 Amount",
+	SectionParent = Section,
+	Options = {"Single", "Triple", "Sextuple"},
+	CurrentOption = "Single",
+	Flag = "Amount",
+	Callback = function(Option)
+		Rayfield.Flags.Amount.CurrentOption = Option
+	end,
+})
+
 Main:CreateToggle({
 	Name = "🐣 Auto Hatch",
+	Info = "Note: The Egg Opening UI will not display",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Hatch",
@@ -228,7 +240,7 @@ task.spawn(function()
 					HumanoidRootPart.CFrame = Price.CFrame
 				end
 
-				Remotes.EggOpened:InvokeServer(EggOption, "Single")
+				Remotes.EggOpened:InvokeServer(EggOption, Rayfield.Flags.Amount.CurrentOption)
 			end
 		end
 	end
