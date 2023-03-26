@@ -248,16 +248,7 @@ end)
 
 local Section = Main:CreateSection("Inventory")
 
-Main:CreateToggle({
-	Name = "💎 Auto Evolve",
-	Info = "Automatically evolves unlocked normal, gold, and diamond pets.",
-	SectionParent = Section,
-	CurrentValue = false,
-	Flag = "Evolve",
-	Callback = function()end,
-})
-
-Inventory.ChildAdded:Connect(function()
+local function Evolve()
 	if Rayfield.Flags.Evolve.CurrentValue then
 		for e,r in pairs(Types) do
 			local ImageIds = {}
@@ -295,7 +286,18 @@ Inventory.ChildAdded:Connect(function()
 			end
 		end
 	end
-end)
+end
+
+Main:CreateToggle({
+	Name = "💎 Auto Evolve",
+	Info = "Automatically evolves unlocked normal, gold, and diamond pets.",
+	SectionParent = Section,
+	CurrentValue = false,
+	Flag = "Evolve",
+	Callback = Evolve,
+})
+
+Inventory.ChildAdded:Connect(Evolve)
 
 Main:CreateToggle({
 	Name = "👍 Auto Equip Best",
