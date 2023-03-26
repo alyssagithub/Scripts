@@ -58,6 +58,17 @@ local Main = Window:CreateTab("Main", 4483362458)
 
 local Section = Main:CreateSection("Farming")
 
+Main:CreateDropdown({
+	Name = "🗡 Method",
+	SectionParent = Section,
+	Options = {"All", "(Experimental) Split"},
+	CurrentOption = "All",
+	Flag = "Method",
+	Callback = function(Option)
+		Rayfield.Flags.Method.CurrentOption = Option
+	end,
+})
+
 Main:CreateToggle({
 	Name = "⛏ Auto Mine",
 	Info = "Automatically mines the closest object to you.",
@@ -84,23 +95,46 @@ task.spawn(function()
 			end
 
 			if Selected then
-				for i,v in pairs(Selected:GetChildren()) do
-					local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
-					if Magnitude < Number2 then
-						Number2 = Magnitude
-						Selected2 = v
-					end
-				end
 				
-				if Selected2 then
-					repeat
-						for i,v in pairs(Player.Pets:GetChildren()) do
-							if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
-								Remotes.Client:FireServer("PetAttack", Selected2)
+				if Rayfield.Flags.Method.CurrentOption == "All" then
+					for i,v in pairs(Selected:GetChildren()) do
+						local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
+						if Magnitude < Number2 then
+							Number2 = Magnitude
+							Selected2 = v
+						end
+					end
+
+					if Selected2 then
+						repeat
+							for i,v in pairs(Player.Pets:GetChildren()) do
+								if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
+									Remotes.Client:FireServer("PetAttack", Selected2)
+								end
+							end
+							task.wait()
+						until not Selected2 or not Selected2:FindFirstChildOfClass("BillboardGui") or not Selected2:FindFirstChildOfClass("BillboardGui").Enabled or not Rayfield.Flags.Mine.CurrentValue
+					end
+				else
+					local TableSelected = {}
+
+					for i,v in pairs(Player.Pets:GetChildren()) do
+						if v and v:FindFirstChild("Equipped") and v.Equipped.Value then
+							for e,r in pairs(Selected:GetChildren()) do
+								local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
+								if Magnitude < Number2 and not TableSelected[v.Name] then
+									Number2 = Magnitude
+									TableSelected[v.Name] = r
+								end
 							end
 						end
-						task.wait()
-					until not Selected2 or not Selected2:FindFirstChildOfClass("BillboardGui") or not Selected2:FindFirstChildOfClass("BillboardGui").Enabled or not Rayfield.Flags.Mine.CurrentValue
+					end
+
+					for i,v in pairs(Player.Pets:GetChildren()) do
+						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
+							Remotes.Client:FireServer("PetAttack", TableSelected[v.Name])
+						end
+					end
 				end
 			end
 		end
