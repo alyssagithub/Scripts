@@ -7,6 +7,9 @@ local Eggs = {}
 local Rifts = {"None"}
 local Areas = {"None"}
 local GUIs = {}
+local Types = {"Normal", "Golden", "Diamond", "Divin"}
+
+local Inventory = Player.PlayerGui.MainGui.PetInventory.MainFrame.Inventory.Inventory
 
 local Remotes = game:GetService("ReplicatedStorage").Remotes
 local MAP = workspace:WaitForChild("MAP")
@@ -244,6 +247,55 @@ task.spawn(function()
 end)
 
 local Section = Main:CreateSection("Inventory")
+
+Main:CreateToggle({
+	Name = "💎 Auto Evolve",
+	Info = "Automatically evolves unlocked normal, gold, and diamond pets.",
+	SectionParent = Section,
+	CurrentValue = false,
+	Flag = "Evolve",
+	Callback = function()end,
+})
+
+Inventory.ChildAdded:Connect(function()
+	if Rayfield.Flags.Evolve.CurrentValue then
+		for e,r in pairs(Types) do
+			local ImageIds = {}
+
+			for _,v in pairs(Inventory:GetChildren()) do
+				if v and v.ClassName == "ImageButton" and not v.Editable:FindFirstChild("LockMarker") and v:FindFirstChild("PetName") then
+					local Mode = (v.Editable.Icon:GetChildren()[1] and v.Editable.Icon:GetChildren()[1].Name or "Normal")
+					if Types[e - 1] == Mode or (r == "Normal" and Mode == r) then
+						local Index = ImageIds[v.Editable.Icon.Image]
+						local CompleteTable = {}
+
+						if Index then
+							Index.Amount = Index.Amount + 1
+						else
+							ImageIds[v.Editable.Icon.Image] = {IDs = {}, Amount = 1}
+							Index = ImageIds[v.Editable.Icon.Image]
+						end
+
+						table.insert(Index.IDs, v.Name)
+
+						if Index.Amount >= 6 then
+							for i = 1, 6 do
+								table.insert(CompleteTable, Index.IDs[i])
+							end
+
+							print("Evolve", v.PetName.Value, CompleteTable, Mode)
+							for e,r in pairs(CompleteTable) do
+								print(e,r)
+							end
+							Remotes.Client:FireServer("Evolve", v.PetName.Value, CompleteTable, Mode)
+							break
+						end
+					end
+				end
+			end
+		end
+	end
+end)
 
 Main:CreateToggle({
 	Name = "👍 Auto Equip Best",
