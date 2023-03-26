@@ -106,33 +106,30 @@ task.spawn(function()
 					end
 
 					if Selected2 then
-						repeat
-							for i,v in pairs(Player.Pets:GetChildren()) do
-								if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
-									Remotes.Client:FireServer("PetAttack", Selected2)
-								end
+						for i,v in pairs(Player.Pets:GetChildren()) do
+							if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
+								Remotes.Client:FireServer("PetAttack", Selected2)
 							end
-							task.wait()
-						until not Selected2 or not Selected2:FindFirstChildOfClass("BillboardGui") or not Selected2:FindFirstChildOfClass("BillboardGui").Enabled or not Rayfield.Flags.Mine.CurrentValue
+						end
 					end
 				else
 					local TableSelected = {}
 
 					for i,v in pairs(Player.Pets:GetChildren()) do
-						if v and v:FindFirstChild("Equipped") and v.Equipped.Value then
+						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not TableSelected[v] then
 							for e,r in pairs(Selected:GetChildren()) do
 								local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
-								if Magnitude < Number2 and not TableSelected[v.Name] then
+								if Magnitude < Number2 and not TableSelected[v] then
 									Number2 = Magnitude
-									TableSelected[v.Name] = r
+									TableSelected[v] = r
 								end
 							end
 						end
 					end
 
 					for i,v in pairs(Player.Pets:GetChildren()) do
-						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
-							Remotes.Client:FireServer("PetAttack", TableSelected[v.Name])
+						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value and TableSelected[v] then
+							Remotes.Client:FireServer("PetAttack", TableSelected[v])
 						end
 					end
 				end
