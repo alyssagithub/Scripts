@@ -300,6 +300,22 @@ Main:CreateToggle({
 Inventory.ChildAdded:Connect(Evolve)
 
 Main:CreateToggle({
+	Name = "❌ Disable Evolve GUI",
+	SectionParent = Section,
+	CurrentValue = false,
+	Flag = "DisableEvolve",
+	Callback = Evolve,
+})
+
+local GuiEvolve = Player.PlayerGui.MainGui.Evolve
+
+GuiEvolve:GetPropertyChangedSignal("Visible"):Connect(function()
+	if Rayfield.Flags.DisableEvolve.CurrentValue and GuiEvolve.Visible then
+		GuiEvolve.Visible = false
+	end
+end)
+
+Main:CreateToggle({
 	Name = "👍 Auto Equip Best",
 	SectionParent = Section,
 	CurrentValue = false,
