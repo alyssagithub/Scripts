@@ -64,12 +64,10 @@ local Section = Main:CreateSection("Farming")
 Main:CreateDropdown({
 	Name = "🗡 Method",
 	SectionParent = Section,
-	Options = {"All", "(Experimental) Split"},
+	Options = {"All", "Split"},
 	CurrentOption = "All",
 	Flag = "Method",
-	Callback = function(Option)
-		Rayfield.Flags.Method.CurrentOption = Option
-	end,
+	Callback = function()end,
 })
 
 Main:CreateToggle({
@@ -98,7 +96,6 @@ task.spawn(function()
 			end
 
 			if Selected then
-				
 				if Rayfield.Flags.Method.CurrentOption == "All" then
 					for i,v in pairs(Selected:GetChildren()) do
 						local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
@@ -115,7 +112,7 @@ task.spawn(function()
 							end
 						end
 					end
-				else
+				elseif Rayfield.Flags.Method.CurrentOption == "Split" then
 					local TableSelected = {}
 
 					for i,v in pairs(Player.Pets:GetChildren()) do
@@ -204,9 +201,7 @@ Main:CreateDropdown({
 	Options = Eggs,
 	CurrentOption = "Spawn",
 	Flag = "Egg",
-	Callback = function(Option)
-		Rayfield.Flags.Egg.CurrentOption = Option
-	end,
+	Callback = function()end,
 })
 
 Main:CreateDropdown({
@@ -215,9 +210,7 @@ Main:CreateDropdown({
 	Options = {"Single", "Triple", "Sextuple"},
 	CurrentOption = "Single",
 	Flag = "Amount",
-	Callback = function(Option)
-		Rayfield.Flags.Amount.CurrentOption = Option
-	end,
+	Callback = function()end,
 })
 
 Main:CreateToggle({
