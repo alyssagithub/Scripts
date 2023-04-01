@@ -118,10 +118,12 @@ task.spawn(function()
 					for i,v in pairs(Player.Pets:GetChildren()) do
 						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not TableSelected[v] then
 							for e,r in pairs(Selected:GetChildren()) do
-								local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
-								if Magnitude < Number2 and not TableSelected[v] then
-									Number2 = Magnitude
-									TableSelected[v] = r
+								if r.ClassName == "MeshPart" then
+									local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
+									if Magnitude < Number2 and not TableSelected[v] then
+										Number2 = Magnitude
+										TableSelected[v] = r
+									end
 								end
 							end
 						end
