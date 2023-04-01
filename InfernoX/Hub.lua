@@ -1,5 +1,5 @@
 local StarterGui = game:GetService("StarterGui")
-local link = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Games/"..game.PlaceId..".lua")
+local Link = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Games/"..game.PlaceId..".lua")
 
 if Link then
   StarterGui:SetCore("SendNotification", {
