@@ -229,8 +229,8 @@ task.spawn(function()
 			if workspace.Eggs:FindFirstChild(EggOption) then
 				local Price = workspace.Eggs[EggOption].Price
 
-				if (HumanoidRootPart.Position - Price.Position).Magnitude > 5 then
-					HumanoidRootPart.CFrame = Price.CFrame
+				if (HumanoidRootPart.Position - Price.Position).Magnitude > 6 then
+					HumanoidRootPart.CFrame = Price.CFrame + Vector3.new(0, 0, 5)
 				end
 
 				Remotes.EggOpened:InvokeServer(EggOption, Rayfield.Flags.Amount.CurrentOption)
