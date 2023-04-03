@@ -70,6 +70,15 @@ Main:CreateDropdown({
 	Callback = function()end,
 })
 
+Main:CreateDropdown({
+	Name = "🧱 Object Priority",
+	SectionParent = Section,
+	Options = {"None", "pile", "safe", "crate", "vault"},
+	CurrentOption = "None",
+	Flag = "Object",
+	Callback = function()end,
+})
+
 Main:CreateToggle({
 	Name = "💰 Auto Farm",
 	Info = "Automatically breaks the closest object to you.",
@@ -85,7 +94,6 @@ task.spawn(function()
 			local Number = huge
 			local Number2 = huge
 			local Selected
-			local Selected2
 
 			for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do
 				local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
@@ -97,18 +105,27 @@ task.spawn(function()
 
 			if Selected then
 				if Rayfield.Flags.Method.CurrentOption == "All" then
-					for i,v in pairs(Selected:GetChildren()) do
-						local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
-						if Magnitude < Number2 then
-							Number2 = Magnitude
-							Selected2 = v
+					local Selected2 = Selected:FindFirstChild(Selected.Name.."_"..Rayfield.Flags.Object.CurrentOption)
+
+					if not Selected2 then
+						for i,v in pairs(Selected:GetChildren()) do
+							if v.ClassName == "MeshPart" then
+								local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
+								if Magnitude < Number2 then
+									Number2 = Magnitude
+									Selected2 = v
+								end
+							end
 						end
 					end
 
 					if Selected2 then
 						for i,v in pairs(Player.Pets:GetChildren()) do
 							if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
-								Remotes.Client:FireServer("PetAttack", Selected2)
+								repeat
+									Remotes.Client:FireServer("PetAttack", Selected2)
+									task.wait()
+								until v.Attack.Value or Selected2.Parent == nil or not Rayfield.Flags.Mine.CurrentValue
 							end
 						end
 					end
@@ -117,6 +134,8 @@ task.spawn(function()
 
 					for i,v in pairs(Player.Pets:GetChildren()) do
 						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not TableSelected[v] then
+							TableSelected[v] = Selected:FindFirstChild(Selected.Name.."_"..Rayfield.Flags.Object.CurrentOption)
+							
 							for e,r in pairs(Selected:GetChildren()) do
 								if r.ClassName == "MeshPart" then
 									local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
@@ -131,7 +150,10 @@ task.spawn(function()
 
 					for i,v in pairs(Player.Pets:GetChildren()) do
 						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value and TableSelected[v] then
-							Remotes.Client:FireServer("PetAttack", TableSelected[v])
+							repeat
+								Remotes.Client:FireServer("PetAttack", TableSelected[v])
+								task.wait()
+							until v.Attack.Value or TableSelected[v].Parent == nil or not Rayfield.Flags.Mine.CurrentValue
 						end
 					end
 				end
@@ -243,56 +265,56 @@ end)
 
 local Section = Main:CreateSection("Inventory")
 
-local function Evolve()
-	if Rayfield.Flags.Evolve.CurrentValue then
-		for e,r in pairs(Types) do
-			local ImageIds = {}
-
-			for _,v in pairs(Inventory:GetChildren()) do
-				if v and v.ClassName == "ImageButton" and not v.Editable:FindFirstChild("LockMarker") and v:FindFirstChild("PetName") then
-					local Mode = (v.Editable.Icon:GetChildren()[1] and v.Editable.Icon:GetChildren()[1].Name or "Normal")
-					if Types[e - 1] == Mode or (r == "Normal" and Mode == r) then
-						local Index = ImageIds[v.Editable.Icon.Image]
-						local CompleteTable = {}
-
-						if Index then
-							Index.Amount = Index.Amount + 1
-						else
-							ImageIds[v.Editable.Icon.Image] = {IDs = {}, Amount = 1}
-							Index = ImageIds[v.Editable.Icon.Image]
-						end
-
-						table.insert(Index.IDs, v.Name)
-
-						if Index.Amount >= 6 then
-							for i = 1, 6 do
-								table.insert(CompleteTable, Index.IDs[i])
-							end
-
-							print("Evolve", v.PetName.Value, CompleteTable, Mode)
-							for e,r in pairs(CompleteTable) do
-								print(e,r)
-							end
-							Remotes.Client:FireServer("Evolve", v.PetName.Value, CompleteTable, Mode)
-							break
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
 Main:CreateToggle({
 	Name = "💎 Auto Evolve",
 	Info = "Automatically evolves unlocked normal, gold, and diamond pets.",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Evolve",
-	Callback = Evolve,
+	Callback = function()end,
 })
 
-Inventory.ChildAdded:Connect(Evolve)
+task.spawn(function()
+	while task.wait() do
+		if Rayfield.Flags.Evolve.CurrentValue then
+			for e,r in pairs(Types) do
+				local ImageIds = {}
+
+				for _,v in pairs(Inventory:GetChildren()) do
+					if v and v.ClassName == "ImageButton" and not v.Editable:FindFirstChild("LockMarker") and v:FindFirstChild("PetName") then
+						local Mode = (v.Editable.Icon:GetChildren()[1] and v.Editable.Icon:GetChildren()[1].Name or "Normal")
+						if Types[e - 1] == Mode or (r == "Normal" and Mode == r) then
+							local Index = ImageIds[v.Editable.Icon.Image]
+							local CompleteTable = {}
+
+							if Index then
+								Index.Amount = Index.Amount + 1
+							else
+								ImageIds[v.Editable.Icon.Image] = {IDs = {}, Amount = 1}
+								Index = ImageIds[v.Editable.Icon.Image]
+							end
+
+							table.insert(Index.IDs, v.Name)
+
+							if Index.Amount >= 6 then
+								for i = 1, 6 do
+									table.insert(CompleteTable, Index.IDs[i])
+								end
+
+								print("Evolve", v.PetName.Value, CompleteTable, Mode)
+								for e,r in pairs(CompleteTable) do
+									print(e,r)
+								end
+								Remotes.Client:FireServer("Evolve", v.PetName.Value, CompleteTable, Mode)
+								break
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end)
 
 Main:CreateToggle({
 	Name = "❌ Disable Evolve GUI",
