@@ -88,80 +88,61 @@ Main:CreateToggle({
 	Callback = function()end,
 })
 
+local function GetClosestObject(Blacklist)
+	local Number = huge
+	local Selected
+	
+	for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do
+		for e,r in pairs(v:GetChildren()) do
+			if r.ClassName == "MeshPart" and not table.find(Blacklist, r) then
+				if r.Name:find(Rayfield.Flags.Object.CurrentOption) then
+					Selected = r
+					break
+				end
+				
+				local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
+				
+				if Magnitude < Number then
+					Number = Magnitude
+					Selected = r
+				end
+			end
+		end
+	end
+	
+	return Selected
+end
+
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Mine.CurrentValue then
-			local Number = huge
-			local Number2 = huge
-			local Selected
-
-			for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do
-				local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
-				if Magnitude < Number and #v:GetChildren() >= 1 then
-					Number = Magnitude
-					Selected = v
+			local TableSelected = {}
+			local ChosenInstances = {}
+			local Pets = Player.Pets:GetChildren()
+			local Selected = GetClosestObject({})
+			
+			if Rayfield.Flags.Method.CurrentOption == "Split" then
+				for i,v in pairs(Pets) do
+					if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not TableSelected[v] and Selected and Selected.Parent then
+						TableSelected[v] = GetClosestObject(ChosenInstances)
+						table.insert(ChosenInstances, TableSelected[v])
+					end
 				end
 			end
-
-			if Selected then
-				if Rayfield.Flags.Method.CurrentOption == "All" then
-					local Selected2 = Selected:FindFirstChild(Selected.Name.."_"..Rayfield.Flags.Object.CurrentOption)
-
-					if not Selected2 then
-						for i,v in pairs(Selected:GetChildren()) do
-							if v.ClassName == "MeshPart" then
-								local Magnitude = (HumanoidRootPart.Position - v.Position).Magnitude
-								if Magnitude < Number2 then
-									Number2 = Magnitude
-									Selected2 = v
-								end
-							end
-						end
-					end
-
-					if Selected2 then
-						for i,v in pairs(Player.Pets:GetChildren()) do
-							if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
-								repeat
-									Remotes.Client:FireServer("PetAttack", Selected2)
-									task.wait()
-								until v.Attack.Value or Selected2.Parent == nil or not Rayfield.Flags.Mine.CurrentValue
-							end
-						end
-					end
-				elseif Rayfield.Flags.Method.CurrentOption == "Split" then
-					local TableSelected = {}
-
-					for i,v in pairs(Player.Pets:GetChildren()) do
-						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not TableSelected[v] then
-							TableSelected[v] = Selected:FindFirstChild(Selected.Name.."_"..Rayfield.Flags.Object.CurrentOption)
-							
-							for e,r in pairs(Selected:GetChildren()) do
-								if r.ClassName == "MeshPart" then
-									local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
-									if Magnitude < Number2 and not TableSelected[v] then
-										Number2 = Magnitude
-										TableSelected[v] = r
-									end
-								end
-							end
-						end
-					end
-
-					for i,v in pairs(Player.Pets:GetChildren()) do
-						if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value and TableSelected[v] then
-							repeat
-								Remotes.Client:FireServer("PetAttack", TableSelected[v])
-								task.wait()
-							until v.Attack.Value or TableSelected[v].Parent == nil or not Rayfield.Flags.Mine.CurrentValue
-						end
-					end
+				
+			for i,v in pairs(Pets) do
+				if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not v.Attack.Value then
+					local Object = TableSelected[v] or Selected
+					
+					repeat
+						Remotes.Client:FireServer("PetAttack", Object)
+						task.wait()
+					until v.Attack.Value or Object.Parent == nil or not Rayfield.Flags.Mine.CurrentValue
 				end
 			end
 		end
 	end
 end)
-
 
 Main:CreateToggle({
 	Name = "🎁 Auto Redeem Gifts",
@@ -321,7 +302,7 @@ Main:CreateToggle({
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "DisableEvolve",
-	Callback = Evolve,
+	Callback = function()end,
 })
 
 local GuiEvolve = Player.PlayerGui.MainGui.Evolve
