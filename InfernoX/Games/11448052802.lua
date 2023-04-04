@@ -92,19 +92,29 @@ local function GetClosestObject(Blacklist)
 	local Number = huge
 	local Selected
 	
-	for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do
-		for e,r in pairs(v:GetChildren()) do
-			if r.ClassName == "MeshPart" and not table.find(Blacklist, r) then
-				if r.Name:find(Rayfield.Flags.Object.CurrentOption) then
-					Selected = r
-					break
-				end
-				
+	for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do -- Example: SPAWN
+		for e,r in pairs(v:GetChildren()) do -- Example: SPAWN_pile
+			if r.ClassName == "MeshPart" and not table.find(Blacklist, r) and r.Name:find(Rayfield.Flags.Object.CurrentOption) then
 				local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
-				
-				if Magnitude < Number then
+
+				if Magnitude < Number and Magnitude < 200 then
 					Number = Magnitude
 					Selected = r
+				end
+			end
+		end
+	end
+	
+	if not Selected then
+		for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do -- Example: SPAWN
+			for e,r in pairs(v:GetChildren()) do -- Example: SPAWN_pile
+				if r.ClassName == "MeshPart" and not table.find(Blacklist, r) then
+					local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
+
+					if Magnitude < Number then
+						Number = Magnitude
+						Selected = r
+					end
 				end
 			end
 		end
@@ -137,7 +147,7 @@ task.spawn(function()
 					repeat
 						Remotes.Client:FireServer("PetAttack", Object)
 						task.wait()
-					until v.Attack.Value or Object.Parent == nil or not Rayfield.Flags.Mine.CurrentValue
+					until v.Attack.Value or not Object or Object.Parent == nil or not Rayfield.Flags.Mine.CurrentValue
 				end
 			end
 		end
