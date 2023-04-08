@@ -2,8 +2,8 @@ local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:Htt
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Remotes = ReplicatedStorage.Modules.LBConnection.Remotes
-local NormalRemotes = ReplicatedStorage.Remotes
+local Remotes = ReplicatedStorage:WaitForChild("Modules"):WaitForChild("LBConnection"):WaitForChild("Remotes")
+local NormalRemotes = ReplicatedStorage:WaitForChild("Remotes")
 
 local HumanoidRootPart = Player.Character:WaitForChild("HumanoidRootPart")
 
@@ -187,7 +187,7 @@ Main:CreateDropdown({
 })
 
 Main:CreateSlider({
-	Name = "💨 Walkspeed Modifier",
+	Name = "💨 WalkSpeed Modifier",
 	SectionParent = Section,
 	Range = {0, 128},
 	Increment = 1,
