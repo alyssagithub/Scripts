@@ -383,8 +383,7 @@ Main:CreateDropdown({
 				task.wait()
 			end
 
-			firetouchinterest(Part, HumanoidRootPart, 0)
-			firetouchinterest(Part, HumanoidRootPart, 1)
+			firetouchinterest(Part, HumanoidRootPart, 0); firetouchinterest(Part, HumanoidRootPart, 1)
 
 			if Option == "Evolve" then
 				task.wait()
@@ -396,7 +395,7 @@ Main:CreateDropdown({
 })
 
 Main:CreateButton({
-	Name = "🌊 Collect all Waterfall Pets",
+	Name = "🌊 Collect all Sanctuary Pets",
 	SectionParent = Section,
 	Callback = function()
 		if MAP:FindFirstChild("Sanctuary") then
@@ -404,6 +403,28 @@ Main:CreateButton({
 				HumanoidRootPart.CFrame = v:GetChildren()[1].CFrame
 				repeat task.wait() until not v or v.Parent ~= MAP.Sanctuary.Cacher
 			end
+		end
+	end,
+})
+
+Main:CreateButton({
+	Name = "🍦 Collect all Ice Cream",
+	SectionParent = Section,
+	Callback = function()
+		for i,v in pairs(game:GetService("Workspace")["ice_cream"]:GetChildren()) do
+			HumanoidRootPart.CFrame = v.CFrame
+			task.wait(.1)
+		end
+	end,
+})
+
+Main:CreateButton({
+	Name = "🧁 Collect all Cupcakes",
+	SectionParent = Section,
+	Callback = function()
+		for i,v in pairs(game:GetService("Workspace").cupcake:GetChildren()) do
+			HumanoidRootPart.CFrame = v.CFrame
+			task.wait(.1)
 		end
 	end,
 })
