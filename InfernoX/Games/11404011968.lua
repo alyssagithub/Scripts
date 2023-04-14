@@ -115,7 +115,7 @@ end)
 local Section = Main:CreateSection("Heroes")
 
 Main:CreateToggle({
-	Name = "🖱 Auto Open Crystal",
+	Name = "💎 Auto Open Crystal",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Open",
@@ -188,7 +188,7 @@ task.spawn(function()
 end)
 
 Main:CreateToggle({
-	Name = "🏝 Auto Buy Next Area",
+	Name = "🏝 Auto Buy Areas",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Area",
