@@ -11,7 +11,6 @@ RemoteEvent:FireServer({{"!", "EnemyRender", 500}})
 local HumanoidRootPart = Player.Character:WaitForChild("HumanoidRootPart")
 
 local Enemies = {"Closest Enemy"}
-local Eggs = {}
 
 local function EnemyTable(v)
 	local HealthBar = v:FindFirstChild("EnemyHealthBar", true)
@@ -20,14 +19,6 @@ local function EnemyTable(v)
 		if not table.find(Enemies, EnemyName) then
 			table.insert(Enemies, EnemyName)
 			return EnemyName
-		end
-	end
-end
-
-for i,v in pairs(workspace.Maps:GetChildren()) do
-	for i,v in pairs(v.Eggs:GetChildren()) do
-		if not table.find(Eggs, v.Name) then
-			table.insert(Eggs, v.Name)
 		end
 	end
 end
@@ -71,7 +62,7 @@ task.spawn(function()
 		if Rayfield.Flags.Attack.CurrentValue then
 			local Number = huge
 			local Enemy
-			
+
 			if EnemyDropdown.CurrentOption ~= "Closest Enemy" then
 				for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
 					if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("EnemyHealthBar") and v.HumanoidRootPart.EnemyHealthBar.Title.Text:match(EnemyDropdown.CurrentOption) then
@@ -83,7 +74,7 @@ task.spawn(function()
 					end
 				end
 			end
-			
+
 			if not Enemy then
 				for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
 					if v and v:FindFirstChild("HumanoidRootPart") then
@@ -95,10 +86,10 @@ task.spawn(function()
 					end
 				end
 			end
-			
+
 			if Enemy then
 				RemoteEvent:FireServer({{"%", Enemy.Name, true}})
-				
+
 				repeat task.wait() until not Enemy or not Enemy.Parent or not Rayfield.Flags.Attack.CurrentValue
 			end
 		end
@@ -128,7 +119,7 @@ task.spawn(function()
 					end
 				end
 			end
-			
+
 			if Enemy then
 				repeat
 					HumanoidRootPart.CFrame = Enemy.HumanoidRootPart.CFrame
@@ -187,13 +178,13 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Quest.CurrentValue then
 			for i,v in pairs(workspace.Maps:GetChildren()) do
-				RemoteEvent:FireServer({{"7", v.Components:FindFirstChild("NPC", true).Parent.Name}})
+				RemoteEvent:FireServer({{"9", v.Components:FindFirstChild("NPC", true).Parent.Name}})
 			end
 		end
 	end
 end)
 
-local Section = Main:CreateSection("Eggs")
+local Section = Main:CreateSection("Warriors")
 
 Main:CreateToggle({
 	Name = "🐣 Auto Open",
@@ -208,7 +199,7 @@ task.spawn(function()
 		if Rayfield.Flags.Open.CurrentValue then
 			local Number = huge
 			local Egg
-			
+
 			for i,v in pairs(workspace.Maps:GetChildren()) do
 				for i,v in pairs(v.Eggs:GetChildren()) do
 					if v.PrimaryPart and v.Egg:FindFirstChild("PriceBillboard") and v.Egg.PriceBillboard.Yen.Icon.Image ~= "rbxassetid://9126788621" then
@@ -220,14 +211,14 @@ task.spawn(function()
 					end
 				end
 			end
-			
+
 			if Egg then
 				local EggCFrame = Egg.PrimaryPart.CFrame
-				
+
 				if (HumanoidRootPart.Position - EggCFrame.Position).Magnitude > 4 then
 					HumanoidRootPart.CFrame = EggCFrame + EggCFrame.LookVector * 3
 				end
-				
+
 				Services.EggService.RF.Open:InvokeServer(Egg.Name, (Egg:FindFirstChild("Bottom") and 2 or false))
 			end
 		end
