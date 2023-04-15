@@ -1,91 +1,65 @@
-local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
+local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
 
-CurrentVersion("v1.2.3")
+local workspace = workspace
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ChopLooping
-
-local BossLooping
-local OrbLooping
-local ChestLooping
-local ClaimLooping
-
-local HatchLooping
-
-local CraftLooping
-local BestLooping
-
-local BestDelay = 5
+local HumanoidRootPart = Player.Character:WaitForChild("HumanoidRootPart")
 
 local SelectedAreas = {}
 local SelectedLevels = {}
 
-local SelectedEgg
-local TripleHatch
-
 local Areas = {}
-local Levels = {"Closest Trees"}
-local Chests = {}
+local Levels = {}
 local Eggs = {}
 
-local Loading = true
+local Loaded = false
 
-while Loading and task.wait() do
-	for i,v in pairs(Player.Character:GetChildren()) do
+repeat
+	for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
 		if v.Name:match("Axe") then
-			Loading = false
+			Loaded = true
 		end
 	end
-end
+	task.wait()
+until Loaded
 
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
-local TreeService = Knit.GetService("TreeService")
-local PetService = Knit.GetService("PetService")
-local Damage = TreeService.Damage
-local DataController = Knit.GetController("DataController")
-local EggService = Knit.GetService("EggService")
-local OrbService = Knit.GetService("OrbService")
-local RewardService = Knit.GetService("RewardService")
-local BossService = Knit.GetService("BossService")
-local AxeService = Knit.GetService("AxeService")
+local Services = ReplicatedStorage.Packages.Knit.Services
 
-local Trees = game:GetService("Workspace").Scripts.Trees
+local Trees = workspace.Scripts.Trees
 
 for i,v in pairs(Trees:GetChildren()) do
 	table.insert(Areas, v.Name)
 end
 
-for i,v in pairs(Trees:GetDescendants()) do
-	if v.Name:match("level") and not table.find(Levels, v.Name) then
-		table.insert(Levels, v.Name)
-	end
-end
-
-for i,v in pairs(require(game:GetService("ReplicatedStorage").Shared.List.Chests)) do
-	if type(v) == "table" then
-		for e,r in pairs(v) do
-			table.insert(Chests, e)
+for i,v in pairs(Trees:GetChildren()) do
+	for i,v in pairs(v:GetChildren()) do
+		if v.Name:match("level") and not table.find(Levels, v.Name) then
+			table.insert(Levels, v.Name)
 		end
 	end
 end
 
-for i,v in pairs(game:GetService("Workspace").Scripts.Eggs:GetChildren()) do
+for i,v in pairs(workspace.Scripts.Eggs:GetChildren()) do
 	if not v.Name:match("Robux") then
 		table.insert(Eggs, v.Name)
 	end
 end
 
-local Window = CreateWindow()
+local Window = CreateWindow("v1.3.3")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
-local AreaLabel = Main:CreateLabel("Selected Areas: ")
-local LevelLabel = Main:CreateLabel("Selected Levels: ")
+local Section = Main:CreateSection("Chopping")
 
-AreaDropdown = Main:CreateDropdown({
+local AreaLabel = Main:CreateLabel("Selected Areas: nil", Section)
+local LevelLabel = Main:CreateLabel("Selected Levels: nil", Section)
+
+Main:CreateDropdown({
 	Name = "🏝 Area",
+	SectionParent = Section,
 	Options = Areas,
 	CurrentOption = "",
-	--Flag = "SelectedArea",
+	Flag = "Area",
 	Callback = function(Value)
 		if Value ~= "" then
 			if table.find(SelectedAreas, Value) then
@@ -95,16 +69,16 @@ AreaDropdown = Main:CreateDropdown({
 			end
 
 			AreaLabel:Set("Selected Areas: "..table.concat(SelectedAreas, ", "))
-			AreaDropdown:Set("")
 		end
 	end,
 })
 
-LevelDropdown = Main:CreateDropdown({
+Main:CreateDropdown({
 	Name = "🔢 Level",
+	SectionParent = Section,
 	Options = Levels,
 	CurrentOption = "",
-	--Flag = "SelectedLevel",
+	Flag = "Level",
 	Callback = function(Value)
 		if Value ~= "" then
 			if table.find(SelectedLevels, Value) then
@@ -114,40 +88,28 @@ LevelDropdown = Main:CreateDropdown({
 			end
 
 			LevelLabel:Set("Selected Levels: "..table.concat(SelectedLevels, ", "))
-			LevelDropdown:Set("")
 		end
 	end,
 })
 
 Main:CreateToggle({
-	Name = "🌲 Auto Chop",
+	Name = "🪓 Auto Chop",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoChop",
-	Callback = function(Value)
-		ChopLooping = Value
-	end,
+	Flag = "Chop",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if ChopLooping and #SelectedLevels > 0 then
-			if table.find(SelectedLevels, "Closest Trees") then
-				for i,v in pairs(Trees:GetChildren()) do
-					for t,y in pairs(v:GetChildren()) do
-						for j,k in pairs(y.Storage:GetChildren()) do
-							if (Player.Character:WaitForChild("HumanoidRootPart").Position - k.PrimaryPart.Position).Magnitude < 30 then
-								Damage:Fire(k.Name)
-							end
-						end
-					end
-				end
-			else
-				for i,v in pairs(SelectedAreas) do
+		if Rayfield.Flags.Chop.CurrentValue then
+			for i,v in pairs(SelectedAreas) do
+				local Area = Trees:FindFirstChild(v)
+				if Area then
 					for e,r in pairs(SelectedLevels) do
-						if Trees:FindFirstChild(v):FindFirstChild(r) then
-							if Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model") then
-								Damage:Fire(Trees:FindFirstChild(v):FindFirstChild(r).Storage:FindFirstChildOfClass("Model").Name)
-							end
+						local Storage = Area:FindFirstChild(r):FindFirstChild("Storage")
+						if Storage and #Storage:GetChildren() > 0 then
+							Services:FindFirstChild("TreeComboChanged", true).Parent.Damage:FireServer(Storage:GetChildren()[1].Name)
 						end
 					end
 				end
@@ -156,63 +118,61 @@ task.spawn(function()
 	end
 end)
 
-Main:CreateSection("")
-
 Main:CreateToggle({
-	Name = "🐍 Auto Attack Bosses",
+	Name = "🐍 Auto Boss",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoBoss",
-	Callback = function(Value)
-		BossLooping = Value
-	end,
+	Flag = "Boss",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if BossLooping then
+		if Rayfield.Flags.Boss.CurrentValue then
 			for i,v in pairs(game:GetService("Workspace").Scripts.Areas:GetDescendants()) do
 				if v:IsA("Folder") and v.Name:match("Boss") then
-					BossService.Damage:Fire(v.ID.Value)
+					Services:FindFirstChild("BossDied", true).Parent.Damage:FireServer(v.ID.Value)
 				end
 			end
 		end
 	end
 end)
 
+local Section = Main:CreateSection("Collecting")
+
 Main:CreateToggle({
-	Name = "🔮 Auto Collect Orbs",
+	Name = "💰 Auto Collect",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoCollect",
-	Callback = function(Value)
-		OrbLooping = Value
-	end,
+	Flag = "Collect",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if OrbLooping then
-			for i,v in pairs(game:GetService("Workspace").Scripts.Orbs.Storage:GetChildren()) do
-				OrbService.CollectOrbs:Fire({v.Name})
-				v:Destroy()
+		if Rayfield.Flags.Collect.CurrentValue then
+			for i,v in pairs(workspace.Scripts.Orbs.Storage:GetChildren()) do
+				v.CFrame = HumanoidRootPart.CFrame
 			end
 		end
 	end
 end)
 
 Main:CreateToggle({
-	Name = "💼 Auto Collect Chests",
+	Name = "💼 Auto Claim Chests",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoChest",
-	Callback = function(Value)
-		ChestLooping = Value
-	end,
+	Flag = "Chests",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if ChestLooping then
-			for i,v in pairs(Chests) do
-				RewardService:ClaimChest(v)
+		if Rayfield.Flags.Chests.CurrentValue then
+			for i,v in pairs(workspace.Maps:GetChildren()) do
+				if v:FindFirstChild("CHEST1") then
+					Services:FindFirstChild("ClaimChest", true):InvokeServer(v.Name:split("] ")[2] or v.Name)
+				end
 			end
 		end
 	end
@@ -220,111 +180,85 @@ end)
 
 Main:CreateToggle({
 	Name = "🎁 Auto Claim Rewards",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoClaim",
-	Callback = function(Value)
-		ClaimLooping = Value
-	end,
+	Flag = "Rewards",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if ClaimLooping then
-			for i,v in pairs(Player.PlayerGui.MainUI.RewardsFrame.Main.Holder:GetChildren()) do
-				if v:IsA("Frame") and v.Claim.Visible == true then
-					firesignal(v.Click.MouseButton1Up)
-				end
+		if Rayfield.Flags.Rewards.CurrentValue then
+			for i = 1, 12 do
+				Services:FindFirstChild("ClaimPlaytimeReward", true):InvokeServer(i)
 			end
 		end
 	end
 end)
 
-local Pets = Window:CreateTab("Pets", 4483362458)
+local Section = Main:CreateSection("Inventory")
 
-Pets:CreateDropdown({
+Main:CreateDropdown({
 	Name = "🥚 Egg",
-	Options = Eggs,
-	CurrentOption = "",
-	Flag = "SelectedEgg",
-	Callback = function(Value)
-		SelectedEgg = Value
-	end,
+	SectionParent = Section,
+	Options = Areas,
+	CurrentOption = "Basic",
+	Flag = "Egg",
+	Callback = function()end,
 })
 
-Pets:CreateToggle({
+Main:CreateToggle({
 	Name = "3️⃣ Triple Hatch",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "TripleHatch",
-	Callback = function(Value)
-		if Value then
-			TripleHatch = "triple"
-		else
-			TripleHatch = "single"
-		end
-	end,
+	Flag = "Triple",
+	Callback = function()end,
 })
 
-Pets:CreateToggle({
-	Name = "🐣 Auto Hatch Egg",
+Main:CreateToggle({
+	Name = "🐣 Auto Hatch",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoHatch",
-	Callback = function(Value)
-		HatchLooping = Value
-	end,
+	Flag = "Hatch",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if HatchLooping and SelectedEgg then
-			EggService:Unbox(SelectedEgg, TripleHatch)
+		if Rayfield.Flags.Hatch.CurrentValue then
+			Services:FindFirstChild("Unbox", true):InvokeServer(Rayfield.Flags.Egg.CurrentOption, (Rayfield.Flags.Triple.CurrentValue and "triple" or "single"))
 		end
 	end
 end)
 
-Pets:CreateSection("")
-
-Pets:CreateToggle({
-	Name = "⚒ Auto Craft Pets",
+Main:CreateToggle({
+	Name = "🛠 Auto Craft",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoCraft",
-	Callback = function(Value)
-		CraftLooping = Value
-	end,
+	Flag = "Craft",
+	Callback = function()end,
 })
 
 task.spawn(function()
 	while task.wait() do
-		if CraftLooping then
-			PetService:CraftAll()
+		if Rayfield.Flags.Craft.CurrentValue then
+			Services:FindFirstChild("CraftAll", true):InvokeServer()
 		end
 	end
 end)
 
-Pets:CreateToggle({
+Main:CreateToggle({
 	Name = "🥇 Auto Equip Best",
+	SectionParent = Section,
 	CurrentValue = false,
-	Flag = "AutoEquipBest",
-	Callback = function(Value)
-		BestLooping = Value
-	end,
+	Flag = "Best",
+	Callback = function()end,
 })
 
-task.spawn(function()
-	while task.wait() do
-		if BestLooping then
-			firesignal(Player.PlayerGui.MainUI.PetsFrame.Additional.EquipBest.Click.MouseButton1Up)
-			task.wait(BestDelay)
-		end
+local PetsFrame = Player.PlayerGui.MainUI.PetsFrame
+
+PetsFrame.Main.Top.Holder.ChildAdded:Connect(function(Child)
+	if Rayfield.Flags.Best.CurrentValue then
+		firesignal(PetsFrame.Additional.EquipBest.Click.MouseButton1Up)
 	end
 end)
-
-Pets:CreateSlider({
-	Name = "🐌 Auto Equip Best Delay",
-	Range = {0, 60},
-	Increment = 1,
-	CurrentValue = 5,
-	Flag = "Delay",
-	Callback = function(Value)
-		BestDelay = Value
-	end,
-})
