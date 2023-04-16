@@ -1,5 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UseSpell = ReplicatedStorage.useSpell
+local UseSpell = ReplicatedStorage:WaitForChild("useSpell", 3)
+if not UseSpell then
+	return
+end
 local Swing = ReplicatedStorage.Swing
 local HumanoidRootPart = game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart")
 _G.Enabled = true
