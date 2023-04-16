@@ -72,9 +72,7 @@ Main:CreateDropdown({
 	Options = Enemies,
 	CurrentOption = "",
 	Flag = "Enemy",
-	Callback = function(Option)
-		Rayfield.Flags.Enemy.CurrentOption = Option
-	end,
+	Callback = function(Option)	end,
 })
 
 Main:CreateSlider({
@@ -99,7 +97,7 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		local Enemy = workspace.EnemyNPCs:FindFirstChild(Rayfield.Flags.Enemy.CurrentOption, true)
+		local Enemy = workspace.EnemyNPCs:FindFirstChild(Rayfield.Flags.Enemy.CurrentOption[1], true)
 		if Rayfield.Flags.TPEnemy.CurrentValue and Enemy and Enemy:FindFirstChild("HumanoidRootPart") then
 			HumanoidRootPart.CFrame = Enemy.HumanoidRootPart.CFrame + Enemy.HumanoidRootPart.CFrame.LookVector * Rayfield.Flags.Offset.CurrentValue
 		end
@@ -182,7 +180,7 @@ Main:CreateDropdown({
 	CurrentOption = "",
 	Flag = "World",
 	Callback = function(Option)
-		NormalRemotes.portalTeleport:FireServer(Option)
+		NormalRemotes.portalTeleport:FireServer(Option[1])
 	end,
 })
 
