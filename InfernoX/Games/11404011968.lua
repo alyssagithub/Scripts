@@ -18,7 +18,7 @@ for i,v in pairs(workspace.Maps:GetChildren()) do
 	end
 end
 
-local Window = CreateWindow("v1")
+local Window = CreateWindow("v1.1")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
