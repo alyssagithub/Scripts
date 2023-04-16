@@ -1,6 +1,4 @@
-local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
-
-CurrentVersion("v1.1.1")
+local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -70,7 +68,7 @@ for i,v in pairs(Plot.Heroes:GetChildren()) do
 	table.insert(HeroesList, v.Name)
 end
 
-local Window = CreateWindow()
+local Window = CreateWindow("v1.1.1")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
