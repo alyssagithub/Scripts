@@ -94,7 +94,7 @@ local function GetClosestObject(Blacklist)
 	
 	for i,v in pairs(workspace.ObjectsFolder:GetChildren()) do -- Example: SPAWN
 		for e,r in pairs(v:GetChildren()) do -- Example: SPAWN_pile
-			if r.ClassName == "MeshPart" and not table.find(Blacklist, r) and r.Name:find(Rayfield.Flags.Object.CurrentOption) then
+			if r.ClassName == "MeshPart" and not table.find(Blacklist, r) and r.Name:find(Rayfield.Flags.Object.CurrentOption[1]) then
 				local Magnitude = (HumanoidRootPart.Position - r.Position).Magnitude
 
 				if Magnitude < Number and Magnitude < 200 then
@@ -131,7 +131,7 @@ task.spawn(function()
 			local Pets = Player.Pets:GetChildren()
 			local Selected = GetClosestObject({})
 			
-			if Rayfield.Flags.Method.CurrentOption == "Split" then
+			if Rayfield.Flags.Method.CurrentOption[1] == "Split" then
 				for i,v in pairs(Pets) do
 					if v and v:FindFirstChild("Equipped") and v.Equipped.Value and not TableSelected[v] and Selected and Selected.Parent then
 						TableSelected[v] = GetClosestObject(ChosenInstances)
@@ -240,7 +240,7 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Hatch.CurrentValue and workspace:FindFirstChild("Eggs") then
-			local EggOption = Rayfield.Flags.Egg.CurrentOption
+			local EggOption = Rayfield.Flags.Egg.CurrentOption[1]
 			if workspace.Eggs:FindFirstChild(EggOption) then
 				local Price = workspace.Eggs[EggOption].Price
 
@@ -248,7 +248,7 @@ task.spawn(function()
 					HumanoidRootPart.CFrame = Price.CFrame + Vector3.new(-3, 0, 5)
 				end
 
-				Remotes.EggOpened:InvokeServer(EggOption, Rayfield.Flags.Amount.CurrentOption)
+				Remotes.EggOpened:InvokeServer(EggOption, Rayfield.Flags.Amount.CurrentOption[1])
 			end
 		end
 	end
@@ -346,8 +346,8 @@ Main:CreateDropdown({
 	CurrentOption = "None",
 	Flag = "Rift",
 	Callback = function(Option)
-		if MAP.Teleporter["FORCE_TP"]:FindFirstChild(Option) then
-			HumanoidRootPart.CFrame = MAP.Teleporter["FORCE_TP"][Option].CFrame
+		if MAP.Teleporter["FORCE_TP"]:FindFirstChild(Option[1]) then
+			HumanoidRootPart.CFrame = MAP.Teleporter["FORCE_TP"][Option[1]].CFrame
 		end
 	end,
 })
@@ -359,8 +359,8 @@ Main:CreateDropdown({
 	CurrentOption = "None",
 	Flag = "Area",
 	Callback = function(Option)
-		if MAP.Teleporter:FindFirstChild(Option) then
-			HumanoidRootPart.CFrame = MAP.Teleporter[Option].CFrame
+		if MAP.Teleporter:FindFirstChild(Option[1]) then
+			HumanoidRootPart.CFrame = MAP.Teleporter[Option[1]].CFrame
 		end
 	end,
 })
@@ -372,23 +372,23 @@ Main:CreateDropdown({
 	CurrentOption = "None",
 	--Flag = "GUI",
 	Callback = function(Option)
-		if workspace.OpenGuiParts:FindFirstChild(Option) then
+		if workspace.OpenGuiParts:FindFirstChild(Option[1]) then
 			local StoredName
-			local Part = workspace.OpenGuiParts[Option]
+			local Part = workspace.OpenGuiParts[Option[1]]
 
-			if Option == "Golden Factory" or Option == "Divin Machine" or Option == "Diamond Machine" then
-				StoredName = Option
+			if Option[1] == "Golden Factory" or Option[1] == "Divin Machine" or Option[1] == "Diamond Machine" then
+				StoredName = Option[1]
 				Part.Name = "Evolve"
-				Option = "Evolve"
+				Option[1] = "Evolve"
 				task.wait()
 			end
 
 			firetouchinterest(Part, HumanoidRootPart, 0); firetouchinterest(Part, HumanoidRootPart, 1)
 
-			if Option == "Evolve" then
+			if Option[1] == "Evolve" then
 				task.wait()
 				Part.Name = StoredName
-				Option = StoredName
+				Option[1] = StoredName
 			end
 		end
 	end,
