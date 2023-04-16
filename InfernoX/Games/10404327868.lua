@@ -62,10 +62,10 @@ Main:CreateDropdown({
 	Flag = "Area",
 	Callback = function(Value)
 		if Value ~= "" then
-			if table.find(SelectedAreas, Value) then
-				table.remove(SelectedAreas, table.find(SelectedAreas, Value))
+			if table.find(SelectedAreas, Value[1]) then
+				table.remove(SelectedAreas, table.find(SelectedAreas, Value[1]))
 			else
-				table.insert(SelectedAreas, Value)
+				table.insert(SelectedAreas, Value[1])
 			end
 
 			AreaLabel:Set("Selected Areas: "..table.concat(SelectedAreas, ", "))
@@ -81,10 +81,10 @@ Main:CreateDropdown({
 	Flag = "Level",
 	Callback = function(Value)
 		if Value ~= "" then
-			if table.find(SelectedLevels, Value) then
-				table.remove(SelectedLevels, table.find(SelectedLevels, Value))
+			if table.find(SelectedLevels, Value[1]) then
+				table.remove(SelectedLevels, table.find(SelectedLevels, Value[1]))
 			else
-				table.insert(SelectedLevels, Value)
+				table.insert(SelectedLevels, Value[1])
 			end
 
 			LevelLabel:Set("Selected Levels: "..table.concat(SelectedLevels, ", "))
@@ -226,7 +226,7 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Hatch.CurrentValue then
-			Services:FindFirstChild("Unbox", true):InvokeServer(Rayfield.Flags.Egg.CurrentOption, (Rayfield.Flags.Triple.CurrentValue and "triple" or "single"))
+			Services:FindFirstChild("Unbox", true):InvokeServer(Rayfield.Flags.Egg.CurrentOption[1], (Rayfield.Flags.Triple.CurrentValue and "triple" or "single"))
 		end
 	end
 end)
