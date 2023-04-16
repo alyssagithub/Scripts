@@ -1,7 +1,5 @@
 local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
 
-CurrentVersion("v1.1.0")
-
 local Plot = workspace.Plots:FindFirstChild(Player.Name)
 
 local AutoTapLooping
@@ -12,8 +10,6 @@ local AutoRebirthLooping
 local InfObbyMultiLooping
 local HatchLooping
 
-local SelectedEgg
-
 local Eggs = {}
 
 for i,v in pairs(game:GetService("Workspace").Plot.Eggs:GetChildren()) do
@@ -22,7 +18,7 @@ for i,v in pairs(game:GetService("Workspace").Plot.Eggs:GetChildren()) do
 	end
 end
 
-local Window = CreateWindow()
+local Window = CreateWindow("v1.1")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
@@ -150,9 +146,7 @@ Pets:CreateDropdown({
 	Options = Eggs,
 	CurrentOption = "",
 	Flag = "SelectedEgg",
-	Callback = function(Option)
-		SelectedEgg = Option
-	end,
+	Callback = function(Option)	end,
 })
 
 Pets:CreateToggle({
@@ -166,8 +160,8 @@ Pets:CreateToggle({
 
 task.spawn(function()
 	while task.wait(1) do
-		if HatchLooping and SelectedEgg then
-			game:GetService("ReplicatedStorage").Functions.Minions.BuyEgg:InvokeServer(SelectedEgg)
+		if HatchLooping then
+			game:GetService("ReplicatedStorage").Functions.Minions.BuyEgg:InvokeServer(Rayfield.Flags.SelectedEgg.CurrentOption[1])
 		end
 	end
 end)
