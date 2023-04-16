@@ -59,17 +59,17 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Mine.CurrentValue and Rayfield.Flags.Area.CurrentOption ~= "" and Rayfield.Flags.Ore.CurrentOption ~= "" then
-			for i,v in pairs(workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption):GetChildren()) do
-				if v and (v:FindFirstChild("Type") and v.Type.Value:find(Rayfield.Flags.Ore.CurrentOption)) or Rayfield.Flags.Ore.CurrentOption == "All" and Rayfield.Flags.Mine.CurrentValue then
+		if Rayfield.Flags.Mine.CurrentValue and Rayfield.Flags.Area.CurrentOption[1] ~= "" and Rayfield.Flags.Ore.CurrentOption[1] ~= "" then
+			for i,v in pairs(workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption[1]):GetChildren()) do
+				if v and (v:FindFirstChild("Type") and v.Type.Value:find(Rayfield.Flags.Ore.CurrentOption[1])) or Rayfield.Flags.Ore.CurrentOption[1] == "All" and Rayfield.Flags.Mine.CurrentValue then
 					for e,r in pairs(workspace.PickaxeStorage[Player.Name]:GetChildren()) do
 						Services.MineableService.RF.StartMining:InvokeServer({["Mineable"] = v, ["PickaxeId"] = r.Name})
 					end
-					
+
 					local Start = tick()
-					
-					repeat task.wait() until not v or not workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption):FindFirstChild(v.Name) or tick() - Start > 1 and Player.PlayerGui.HUD.Bottom.ClickButton.Visual.DPSLabel.Text == "DPS:0" or not Rayfield.Flags.Mine.CurrentValue
-					
+
+					repeat task.wait() until not v or not workspace.SpawnedMineables:FindFirstChild(Rayfield.Flags.Area.CurrentOption[1]):FindFirstChild(v.Name) or tick() - Start > 1 and Player.PlayerGui.HUD.Bottom.ClickButton.Visual.DPSLabel.Text == "DPS:0" or not Rayfield.Flags.Mine.CurrentValue
+
 					print("[Inferno X] Debug: Mined an ore")
 				end
 			end
@@ -160,7 +160,7 @@ Teleport = Main:CreateDropdown({
 	--Flag = "Teleport",
 	Callback = function(Option)
 		pcall(function()
-			Player.Character.HumanoidRootPart.CFrame = workspace.WorldBox[Option].CFrame
+			Player.Character.HumanoidRootPart.CFrame = workspace.WorldBox[Option[1]].CFrame
 
 			Teleport:Set("")
 		end)
@@ -188,8 +188,8 @@ Items:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Hatch.CurrentValue and Rayfield.Flags.Egg.CurrentOption ~= "" then
-			Services.EggService.RF.OpenEgg:InvokeServer({["UpdateType"] = "Open", ["EggType"] = Rayfield.Flags.Egg.CurrentOption, ["Auto"] = false, ["Amount"] = 1})
+		if Rayfield.Flags.Hatch.CurrentValue and Rayfield.Flags.Egg.CurrentOption[1] ~= "" then
+			Services.EggService.RF.OpenEgg:InvokeServer({["UpdateType"] = "Open", ["EggType"] = Rayfield.Flags.Egg.CurrentOption[1], ["Auto"] = false, ["Amount"] = 1})
 		end
 	end
 end)
