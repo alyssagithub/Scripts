@@ -63,9 +63,9 @@ task.spawn(function()
 			local Number = huge
 			local Enemy
 
-			if EnemyDropdown.CurrentOption ~= "Closest Enemy" then
+			if EnemyDropdown.CurrentOption[1] ~= "Closest Enemy" then
 				for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
-					if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("EnemyHealthBar") and v.HumanoidRootPart.EnemyHealthBar.Title.Text:match(EnemyDropdown.CurrentOption) then
+					if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("EnemyHealthBar") and v.HumanoidRootPart.EnemyHealthBar.Title.Text:match(EnemyDropdown.CurrentOption[1]) then
 						local Magnitude = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 						if Magnitude < Number then
 							Number = Magnitude
@@ -111,7 +111,7 @@ task.spawn(function()
 			local Enemy
 
 			for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
-				if v and v:FindFirstChild("HumanoidRootPart") and (v.HumanoidRootPart:FindFirstChild("EnemyHealthBar") and v.HumanoidRootPart.EnemyHealthBar.Title.Text == EnemyDropdown.CurrentOption) or EnemyDropdown.CurrentOption == "Closest Enemy" then
+				if v and v:FindFirstChild("HumanoidRootPart") and (v.HumanoidRootPart:FindFirstChild("EnemyHealthBar") and v.HumanoidRootPart.EnemyHealthBar.Title.Text == EnemyDropdown.CurrentOption[1]) or EnemyDropdown.CurrentOption[1] == "Closest Enemy" then
 					local Magnitude = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 					if Magnitude < Number then
 						Number = Magnitude
