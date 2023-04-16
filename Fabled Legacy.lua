@@ -4,6 +4,8 @@ local Swing = ReplicatedStorage.Swing
 local HumanoidRootPart = game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart")
 _G.Enabled = true
 
+pcall(queue_on_teleport or syn.queue_on_teleport or fluxus.queue_on_teleport, 'loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/Fabled%20Legacy.lua"))()')
+
 while _G.Enabled and task.wait() do
 	local Number = math.huge
 	local Closest
