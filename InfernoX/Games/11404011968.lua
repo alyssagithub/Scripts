@@ -138,10 +138,33 @@ Main:CreateToggle({
 	Callback = function()end,
 })
 
+Main:CreateToggle({
+	Name = "🧬 Auto Fuse",
+	Info = "Upon new hero, fuses unlocked heroes to the 1st hero",
+	SectionParent = Section,
+	CurrentValue = false,
+	Flag = "Fuse",
+	Callback = function()end,
+})
+
 Player.PlayerGui.InventoryUI.MainFrame.Outline.InnerFrame.InventoryScroll.InventoryNest.ChildAdded:Connect(function(Child)
-	if Child.ClassName == "Frame" and Rayfield.Flags.Best.CurrentValue then
-		Remotes.HeroRemotes.EquipBest:FireServer()
-		ChildAdded = true
+	if Child.ClassName == "Frame" then 
+		if Rayfield.Flags.Best.CurrentValue then
+			Remotes.HeroRemotes.EquipBest:FireServer()
+			ChildAdded = true
+		end
+		
+		if Rayfield.Flags.Fuse.CurrentValue then
+			local IDs = {}
+
+			for i,v in pairs(Player.PlayerGui.InventoryUI.MainFrame.Outline.InnerFrame.InventoryScroll.InventoryNest:GetChildren()) do
+				if v.ClassName == "Frame" and i > tonumber(Player.PlayerGui.InventoryUI.MainFrame.Outline.InnerFrame.EquippedCount.Text:split("/")[2]) then
+					table.insert(IDs, i)
+				end
+			end
+
+			Remotes.InventoryRemotes.FuseHeroes:FireServer(1, IDs)
+		end
 	end
 end)
 
