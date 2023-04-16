@@ -313,12 +313,12 @@ Main:CreateDropdown({
 	CurrentOption = "Your Own Plot",
 	--Flag = "SelectedPlot",
 	Callback = function(Value)
-		if Value == "Your Own Plot" then
+		if Value[1] == "Your Own Plot" then
 			Plot = PlayerPlot
 		else
 			for i,v in pairs(workspace.Plots:GetChildren()) do
-				if v.Owner.Value == game.Players:FindFirstChild(Value) then
-					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(game.Players:FindFirstChild(Value))
+				if v.Owner.Value == game.Players:FindFirstChild(Value[1]) then
+					game:GetService("ReplicatedStorage").Packages._Index:FindFirstChild("sleitnick_knit@1.4.7").knit.Services.WeaponService.RE.TeleportToPlot:FireServer(game.Players:FindFirstChild(Value[1]))
 					Plot = v
 				end
 			end
@@ -398,12 +398,12 @@ local HeroUpgrade = Heroes:CreateDropdown({
 	CurrentOption = "None",
 	Flag = "SelectedHero",
 	Callback = function(Value)
-		if Value == "None" then
+		if Value[1] == "None" then
 			SelectedHero = nil
 			SelectedHero2 = nil
 		else
-			SelectedHero = Value
-			SelectedHero2 = Value
+			SelectedHero = Value[1]
+			SelectedHero2 = Value[1]
 		end
 	end,
 })
@@ -540,10 +540,10 @@ Passive:CreateDropdown({
 	CurrentOption = "None",
 	--Flag = "SelectedEnchant",
 	Callback = function(Value)
-		if not table.find(SelectedEnchants, Value) and Value ~= "None" then
-			table.insert(SelectedEnchants, Value)
+		if not table.find(SelectedEnchants, Value[1]) and Value[1] ~= "None" then
+			table.insert(SelectedEnchants, Value[1])
 		elseif Value ~= "None" then
-			table.remove(SelectedEnchants, Value)
+			table.remove(SelectedEnchants, Value[1])
 		end
 
 		task.spawn(function()
@@ -595,7 +595,7 @@ Chest:CreateDropdown({
 	CurrentOption = "",
 	Flag = "SelectedChest",
 	Callback = function(Value)
-		SelectedChest = Value
+		SelectedChest = Value[1]
 	end,
 })
 
