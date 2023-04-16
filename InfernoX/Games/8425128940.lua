@@ -23,6 +23,10 @@ local function EnemyTable(v)
 	end
 end
 
+for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
+	EnemyTable(v)
+end
+
 local Window = CreateWindow("v1")
 
 local Main = Window:CreateTab("Main", 4483362458)
@@ -38,7 +42,7 @@ local EnemyDropdown = Main:CreateDropdown({
 	Callback = function()end,
 })
 
-task.spawn(function()
+--[[task.spawn(function()
 	while task.wait() do
 		for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
 			local EnemyName = EnemyTable(v)
@@ -47,7 +51,7 @@ task.spawn(function()
 			end
 		end
 	end
-end)
+end)]]
 
 Main:CreateToggle({
 	Name = "🗡 Auto Attack",
