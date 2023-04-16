@@ -1,6 +1,4 @@
-local Player, Rayfield, Click, comma, Notify, CreateWindow, CurrentVersion = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
-
-CurrentVersion("v1.12.10")
+local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
 
 local virtualInput = game:GetService("VirtualInputManager")
 
@@ -94,7 +92,7 @@ game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean:GetPropertyChangedS
 	JebusPart.Position = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Position
 end)
 
-local Window = CreateWindow()
+local Window = CreateWindow("v1.12.10")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
@@ -367,15 +365,13 @@ Mob1 = Misc:CreateDropdown({
 	CurrentOption = "None",
 	--Flag = "SelectedMob",
 	Callback = function(Option)
-		if table.find(SelectedMobs, Option) then
-			table.remove(SelectedMobs, table.find(SelectedMobs, Option))
+		if table.find(SelectedMobs, Option[1]) then
+			table.remove(SelectedMobs, table.find(SelectedMobs, Option[1]))
 		else
-			table.insert(SelectedMobs, Option)
+			table.insert(SelectedMobs, Option[1])
 		end
-		pcall(function()
-			Mob1:Set("")
-			MobLabel:Set("Selected Mobs: "..table.concat(SelectedMobs, ", "))
-		end)
+
+		MobLabel:Set("Selected Mobs: "..table.concat(SelectedMobs, ", "))
 	end,
 })
 
@@ -487,7 +483,7 @@ Misc:CreateDropdown({
 	CurrentOption = "",
 	--Flag = "SelectedIsland",
 	Callback = function(Option)
-		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option).CFrame
+		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:FindFirstChild(Option[1]).CFrame
 	end,
 })
 
@@ -497,7 +493,7 @@ Misc:CreateDropdown({
 	CurrentOption = "",
 	--Flag = "SelectedInteraction",
 	Callback = function(Option)
-		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__Interactions"]:FindFirstChild(Option).PrimaryPart.CFrame
+		Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__GAME"]["__Interactions"]:FindFirstChild(Option[1]).PrimaryPart.CFrame
 	end,
 })
 
@@ -520,9 +516,9 @@ Misc:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" and Player.Character:FindFirstChild("HumanoidRootPart") then
+		if Rayfield.Flags.Quest.CurrentValue and Rayfield.Flags.SelectedQuest.CurrentOption[1] ~= "" and tostring(Player.PlayerGui.Quests.CurrentQuestContainer.Position):split(",")[1] == "{1.5" and Player.Character:FindFirstChild("HumanoidRootPart") then
 			for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
-				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption then
+				if v.Head.Icon.TextLabel.Text:split("QUEST ")[2] == Rayfield.Flags.SelectedQuest.CurrentOption[1] then
 					local PreviousPosition = Player.Character:WaitForChild("HumanoidRootPart").CFrame
 					repeat
 						Player.Character:WaitForChild("HumanoidRootPart").CFrame = v.HumanoidRootPart.CFrame
@@ -642,7 +638,7 @@ task.spawn(function()
 				end
 			end
 
-			if HighestBounty and Rayfield.Flags.SelectedPlayer.CurrentOption ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
+			if HighestBounty and Rayfield.Flags.SelectedPlayer.CurrentOption[1] ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
 				PlayerDropdown:Set((HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name))
 			end
 		end
@@ -660,7 +656,7 @@ Combat:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Teleport.CurrentValue then
-			local CurrentPlayer = game:GetService("Players"):FindFirstChild(Rayfield.Flags.SelectedPlayer.CurrentOption) or game:GetService("Players"):FindFirstChild(Rayfield.Flags.SelectedPlayer.CurrentOption:split("@")[2]:split(")")[1])
+			local CurrentPlayer = game:GetService("Players"):FindFirstChild(Rayfield.Flags.SelectedPlayer.CurrentOption[1]) or game:GetService("Players"):FindFirstChild(Rayfield.Flags.SelectedPlayer.CurrentOption[1]:split("@")[2]:split(")")[1])
 			if CurrentPlayer then
 				Player.Character:WaitForChild("HumanoidRootPart").CFrame = CurrentPlayer.Character:WaitForChild("HumanoidRootPart").CFrame
 			end
