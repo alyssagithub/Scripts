@@ -140,7 +140,7 @@ Main:CreateToggle({
 
 Main:CreateToggle({
 	Name = "🧬 Auto Fuse",
-	Info = "Upon new hero, fuses unlocked heroes to the 1st hero",
+	Info = "Upon new hero, fuses heroes to the 1st hero",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Fuse",
