@@ -137,7 +137,7 @@ task.spawn(function()
 			local ClosestNPC
 
 			for i,v in pairs(workspace.Live.NPCs.Client:GetChildren()) do
-				if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("NPCTag") and (Rayfield.Flags.NPC.CurrentOption == v.HumanoidRootPart.NPCTag.NameLabel.Text or Rayfield.Flags.NPC.CurrentOption == "Closest NPC") and (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < Number then
+				if v and v:FindFirstChild("HumanoidRootPart") and v.HumanoidRootPart:FindFirstChild("NPCTag") and (Rayfield.Flags.NPC.CurrentOption[1] == v.HumanoidRootPart.NPCTag.NameLabel.Text or Rayfield.Flags.NPC.CurrentOption[1] == "Closest NPC") and (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude < Number then
 					Number = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
 					ClosestNPC = v
 				end
@@ -303,9 +303,9 @@ Main:CreateToggle({
 
 task.spawn(function()
 	while task.wait() do
-		if Rayfield.Flags.Hatch.CurrentValue and EggsTP[Rayfield.Flags.Egg.CurrentOption] then
-			HumanoidRootPart.CFrame = EggsTP[Rayfield.Flags.Egg.CurrentOption].CFrame
-			Services.EggService.RF.BuyEgg:InvokeServer({["eggName"] = EggsTP[Rayfield.Flags.Egg.CurrentOption].Name, ["auto"] = false, ["amount"] = 1})
+		if Rayfield.Flags.Hatch.CurrentValue and EggsTP[Rayfield.Flags.Egg.CurrentOption[1]] then
+			HumanoidRootPart.CFrame = EggsTP[Rayfield.Flags.Egg.CurrentOption[1]].CFrame
+			Services.EggService.RF.BuyEgg:InvokeServer({["eggName"] = EggsTP[Rayfield.Flags.Egg.CurrentOption[1]].Name, ["auto"] = false, ["amount"] = 1})
 		end
 	end
 end)
@@ -372,7 +372,7 @@ Main:CreateDropdown({
 	Flag = "Area",
 	Callback = function(Option)
 		for i,v in pairs(PlayerGui:GetChildren()) do
-			if v.Name == "Portal" and v.Text1.Text == Option then
+			if v.Name == "Portal" and v.Text1.Text == Option[1] then
 				HumanoidRootPart.CFrame = v.Adornee.CFrame
 				local Start = tick()
 
