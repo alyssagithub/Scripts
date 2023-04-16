@@ -70,7 +70,7 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Attack.CurrentValue then
-			local Mode = Rayfield.Flags.Mode.CurrentOption
+			local Mode = Rayfield.Flags.Mode.CurrentOption[1]
 			local Number = (Mode == "Mode: Killaura" and Rayfield.Flags.Distance.CurrentValue or huge)
 			local Closest
 
