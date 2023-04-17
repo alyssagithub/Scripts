@@ -9,12 +9,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local Character = Player.Character or Player.CharacterAdded:Wait()
+local HumanoidRootPart
 
 Player.CharacterAdded:Connect(function(Char)
 	Character = Char
+	HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 end)
 
-local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
 local UseSpell = ReplicatedStorage:WaitForChild("useSpell")
 local Swing = ReplicatedStorage:WaitForChild("Swing")
