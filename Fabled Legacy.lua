@@ -38,8 +38,12 @@ while _G.Enabled and task.wait() do
 
 	if Closest then
 		HumanoidRootPart.CFrame = CFrame.lookAt(HumanoidRootPart.Position, Vector3.new(Closest.Position.X, HumanoidRootPart.Position.Y, Closest.Position.Z))
-		UseSpell:FireServer("Q")
-		UseSpell:FireServer("E")
+		if not Player.PlayerGui.SpellGui.qMainFrame.coverQ.Visible then
+			UseSpell:FireServer("Q")
+		end
+		if not Player.PlayerGui.SpellGui.eMainFrame.coverE.Visible then
+			UseSpell:FireServer("E")
+		end
 		Swing:FireServer()
 	end
 end
