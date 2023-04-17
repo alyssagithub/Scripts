@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Player = Players.LocalPlayer or Players.PlayerAdded:Wait()
-local Character = Player.Character
+local Character = Player.Character or Player.CharacterAdded:Wait()
 
 Player.CharacterAdded:Connect(function(Char)
 	Character = Char
