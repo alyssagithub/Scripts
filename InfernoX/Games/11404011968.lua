@@ -138,9 +138,20 @@ Main:CreateToggle({
 	Callback = function()end,
 })
 
+Main:CreateSlider({
+	Name = "🔢 Hero to Fuse",
+	SectionParent = Section,
+	Range = {1, tonumber(Player.PlayerGui.InventoryUI.MainFrame.Outline.InnerFrame.EquippedCount.Text:split("/")[2]) or 3},
+	Increment = 1,
+	Suffix = "Best",
+	CurrentValue = 1,
+	Flag = "Hero",
+	Callback = function()end,
+})
+
 Main:CreateToggle({
 	Name = "🧬 Auto Fuse",
-	Info = "Upon new hero, fuses heroes to the 1st hero",
+	Info = "Upon new hero, fuses heroes to the best hero",
 	SectionParent = Section,
 	CurrentValue = false,
 	Flag = "Fuse",
@@ -163,7 +174,7 @@ Player.PlayerGui.InventoryUI.MainFrame.Outline.InnerFrame.InventoryScroll.Invent
 				end
 			end
 
-			Remotes.InventoryRemotes.FuseHeroes:FireServer(1, IDs)
+			Remotes.InventoryRemotes.FuseHeroes:FireServer(Rayfield.Flags.Hero.CurrentValue, IDs)
 		end
 	end
 end)
