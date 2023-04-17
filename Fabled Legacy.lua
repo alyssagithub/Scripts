@@ -6,8 +6,8 @@ pcall(queue_on_teleport or syn.queue_on_teleport or fluxus.queue_on_teleport, 'l
 
 pcall(function()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local UseSpell = ReplicatedStorage:FindFirstChild("useSpell")
-	local Swing = ReplicatedStorage.Swing
+	local UseSpell = ReplicatedStorage:WaitForChild("useSpell")
+	local Swing = ReplicatedStorage:WaitForChild("Swing")
 	local HumanoidRootPart = game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart")
 	_G.Enabled = true
 
