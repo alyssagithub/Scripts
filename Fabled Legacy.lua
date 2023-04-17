@@ -2,6 +2,8 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 
+repeat task.wait() until game:GetService("ReplicatedStorage")
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UseSpell = ReplicatedStorage:WaitForChild("useSpell", 3)
 if not UseSpell then
