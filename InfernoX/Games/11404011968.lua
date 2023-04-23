@@ -50,7 +50,7 @@ task.spawn(function()
 			for i,v in pairs(workspace.Maps:GetChildren()) do
 				for i,v in pairs(v.Enemies:GetChildren()) do
 					local Mode = Rayfield.Flags.Mode.CurrentOption[1]
-					if Mode == "Mode: Closest" or v.Name == Mode and v:FindFirstChild("Torso") and v.Torso.Transparency == 0 then
+					if Mode == "Mode: Closest" or v.Name == Mode and v:FindFirstChild("Torso") and v.PrimaryPart and v.Torso.Transparency == 0 then
 						local Magnitude = (HumanoidRootPart.Position - v.PrimaryPart.Position).Magnitude
 						if Magnitude < Number then
 							Number = Magnitude
