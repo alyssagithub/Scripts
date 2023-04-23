@@ -1,4 +1,4 @@
-local Player, Rayfield, Click, comma, Notify, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
+local Player, Rayfield, CreateWindow = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/main/InfernoX/Variables.lua"))()
 
 local workspace = workspace
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
