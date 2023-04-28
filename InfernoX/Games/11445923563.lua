@@ -397,20 +397,20 @@ game:GetService("Workspace")["__GAME"]["__Mobs"].ChildAdded:Connect(function(Chi
 		end
 
 		if BestMob and not table.find(Mobs, Child.Name.." ("..BestMob.."'s Island)" ) then
-			Mob1:Add(Child.Name.." ("..BestMob.."'s Island)")
+			--Mob1:Add(Child.Name.." ("..BestMob.."'s Island)")
 		end
 
 		Child.ChildAdded:Connect(function(Descendant)
 			if Descendant:IsA("Model") and not table.find(Mobs, Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text) then
 				table.insert(Mobs, Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
-				Mob1:Add(Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
+				--Mob1:Add(Descendant:WaitForChild("NpcHealth"):WaitForChild("ViewerFrame"):WaitForChild("TName").Text)
 			end
 		end)
 
 		for i,v in pairs(Child:GetChildren()) do
 			if v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
 				table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
-				Mob1:Add(v.NpcHealth.ViewerFrame.TName.Text)
+				--Mob1:Add(v.NpcHealth.ViewerFrame.TName.Text)
 			end
 		end
 	end
@@ -611,11 +611,11 @@ local PlayerDropdown = Combat:CreateDropdown({
 })
 
 game:GetService("Players").PlayerAdded:Connect(function(PlayerAdded)
-	PlayerDropdown:Add((PlayerAdded.DisplayName ~= PlayerAdded.Name and PlayerAdded.DisplayName.." (@"..PlayerAdded.Name..")" or PlayerAdded.Name))
+	--PlayerDropdown:Add((PlayerAdded.DisplayName ~= PlayerAdded.Name and PlayerAdded.DisplayName.." (@"..PlayerAdded.Name..")" or PlayerAdded.Name))
 end)
 
 game:GetService("Players").PlayerRemoving:Connect(function(PlayerAdded)
-	PlayerDropdown:Remove((PlayerAdded.DisplayName ~= PlayerAdded.Name and PlayerAdded.DisplayName.." (@"..PlayerAdded.Name..")" or PlayerAdded.Name))
+	--PlayerDropdown:Remove((PlayerAdded.DisplayName ~= PlayerAdded.Name and PlayerAdded.DisplayName.." (@"..PlayerAdded.Name..")" or PlayerAdded.Name))
 end)
 
 Combat:CreateToggle({
@@ -637,9 +637,11 @@ task.spawn(function()
 					HighestBounty = v
 				end
 			end
+			
+			local Bounty = (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name)
 
-			if HighestBounty and Rayfield.Flags.SelectedPlayer.CurrentOption[1] ~= (HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name) then
-				PlayerDropdown:Set((HighestBounty.DisplayName ~= HighestBounty.Name and HighestBounty.DisplayName.." (@"..HighestBounty.Name..")" or HighestBounty.Name))
+			if HighestBounty and Rayfield.Flags.SelectedPlayer.CurrentOption[1] ~= Bounty then
+				PlayerDropdown:Set(Bounty)
 			end
 		end
 	end
