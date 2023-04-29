@@ -13,83 +13,85 @@ local Mobs = {"Closest Mob", "None", "SEA KING", "SEA BEAST"}
 local Players = {}
 local SelectedMobs = {}
 
-for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
-	table.insert(Islands, v.Name)
-end
-
-for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Interactions"]:GetChildren()) do
-	if not table.find(Interactions, v.Name) then
-		table.insert(Interactions, v.Name)
+pcall(function()
+	for i,v in pairs(game:GetService("Workspace")["__GAME"]["__SpawnLocations"]:GetChildren()) do
+		table.insert(Islands, v.Name)
 	end
-end
 
-for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
-	table.insert(Quests, v.Head.Icon.TextLabel.Text:split("QUEST ")[2])
-end
-
-for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
-	if v:IsA("Model") and v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
-		table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
-	elseif v:IsA("Model") and v:FindFirstChild("Wyoru") then
-		table.insert(Mobs, "Great Gorilla King.")
+	for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Interactions"]:GetChildren()) do
+		if not table.find(Interactions, v.Name) then
+			table.insert(Interactions, v.Name)
+		end
 	end
-end
 
-for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren()) do
-	if not r.Name:match("__") then
-		local ExistingOfMob = {}
-		local CurrentNumber = 0
-		local BestMob
+	for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Quests"]:GetChildren()) do
+		table.insert(Quests, v.Head.Icon.TextLabel.Text:split("QUEST ")[2])
+	end
 
-		for i,v in pairs(r:GetChildren()) do
-			if v:FindFirstChild("NpcHealth") and not ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] then
-				ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = 1
-			elseif v:FindFirstChild("NpcHealth") then
-				ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] + 1
+	for i,v in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetDescendants()) do
+		if v:IsA("Model") and v:FindFirstChild("NpcHealth") and not table.find(Mobs, v.NpcHealth.ViewerFrame.TName.Text) then
+			table.insert(Mobs, v.NpcHealth.ViewerFrame.TName.Text)
+		elseif v:IsA("Model") and v:FindFirstChild("Wyoru") then
+			table.insert(Mobs, "Great Gorilla King.")
+		end
+	end
+
+	for e,r in pairs(game:GetService("Workspace")["__GAME"]["__Mobs"]:GetChildren()) do
+		if not r.Name:match("__") then
+			local ExistingOfMob = {}
+			local CurrentNumber = 0
+			local BestMob
+
+			for i,v in pairs(r:GetChildren()) do
+				if v:FindFirstChild("NpcHealth") and not ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] then
+					ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = 1
+				elseif v:FindFirstChild("NpcHealth") then
+					ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] = ExistingOfMob[v.NpcHealth.ViewerFrame.TName.Text] + 1
+				end
+			end
+
+			for i,v in pairs(ExistingOfMob) do
+				if v > CurrentNumber then
+					CurrentNumber = v
+					BestMob = i
+				end
+			end
+
+			if BestMob and not table.find(Mobs, r.Name.." ("..BestMob.."'s Island)") then
+				table.insert(Mobs, r.Name.." ("..BestMob.."'s Island)")
 			end
 		end
+	end
 
-		for i,v in pairs(ExistingOfMob) do
-			if v > CurrentNumber then
-				CurrentNumber = v
-				BestMob = i
+	for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+		if v and v ~= Player then
+			table.insert(Players, (v.DisplayName ~= v.Name and v.DisplayName.." (@"..v.Name..")" or v.Name))
+		end
+	end
+
+	task.spawn(function()
+		while task.wait() do
+			local Depth = game:GetService("Lighting"):FindFirstChildWhichIsA("DepthOfFieldEffect")
+			if Depth then
+				Depth:Destroy()
 			end
 		end
+	end)
 
-		if BestMob and not table.find(Mobs, r.Name.." ("..BestMob.."'s Island)") then
-			table.insert(Mobs, r.Name.." ("..BestMob.."'s Island)")
-		end
-	end
-end
+	Player:WaitForChild("PlayerGui"):WaitForChild("Menu"):WaitForChild("FramesBackground"):WaitForChild("Configs").Visible = false
 
-for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-	if v and v ~= Player then
-		table.insert(Players, (v.DisplayName ~= v.Name and v.DisplayName.." (@"..v.Name..")" or v.Name))
-	end
-end
-
-task.spawn(function()
-	while task.wait() do
-		local Depth = game:GetService("Lighting"):FindFirstChildWhichIsA("DepthOfFieldEffect")
-		if Depth then
-			Depth:Destroy()
-		end
-	end
-end)
-
-Player:WaitForChild("PlayerGui"):WaitForChild("Menu"):WaitForChild("FramesBackground"):WaitForChild("Configs").Visible = false
-
-local JebusPart = Instance.new("Part")
-JebusPart.Anchored = true
-JebusPart.Size = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Size + Vector3.new(0, 4, 0)
-JebusPart.Position = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Position
-JebusPart.CanCollide = false
-JebusPart.Name = "Jebus"
-JebusPart.Transparency = 1
-JebusPart.Parent = game:GetService("Workspace")["__GAME"]["__Ocean"].Water
-
-game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean:GetPropertyChangedSignal("Position"):Connect(function()
+	local JebusPart = Instance.new("Part")
+	JebusPart.Anchored = true
+	JebusPart.Size = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Size + Vector3.new(0, 4, 0)
 	JebusPart.Position = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Position
+	JebusPart.CanCollide = false
+	JebusPart.Name = "Jebus"
+	JebusPart.Transparency = 1
+	JebusPart.Parent = game:GetService("Workspace")["__GAME"]["__Ocean"].Water
+
+	game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean:GetPropertyChangedSignal("Position"):Connect(function()
+		JebusPart.Position = game:GetService("Workspace")["__GAME"]["__Ocean"].MovelOcean.Position
+	end)
 end)
 
 local Window = CreateWindow("v1.12.10")
