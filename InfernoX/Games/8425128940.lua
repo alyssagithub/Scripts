@@ -2,6 +2,7 @@ local Player, Rayfield, CreateWindow = loadstring(game:HttpGet("https://raw.gith
 
 local workspace = workspace
 local huge = math.huge
+local task = task
 
 local RemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent")
 local Services = game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.4.7"):WaitForChild("knit"):WaitForChild("Services")
@@ -27,7 +28,7 @@ for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
 	EnemyTable(v)
 end
 
-local Window = CreateWindow("v1")
+local Window = CreateWindow("v1.1")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
@@ -92,7 +93,11 @@ task.spawn(function()
 			end
 
 			if Enemy then
-				RemoteEvent:FireServer({{"%", Enemy.Name, true}})
+				if Rayfield.Flags.Teleport.CurrentValue then
+					HumanoidRootPart.CFrame = Enemy.HumanoidRootPart.CFrame
+				end
+				
+				RemoteEvent:FireServer({{"&", Enemy.Name, true}})
 
 				repeat task.wait() until not Enemy or not Enemy.Parent or not Rayfield.Flags.Attack.CurrentValue
 			end
@@ -108,32 +113,6 @@ Main:CreateToggle({
 	Callback = function()end,
 })
 
-task.spawn(function()
-	while task.wait() do
-		if Rayfield.Flags.Teleport.CurrentValue then
-			local Number = huge
-			local Enemy
-
-			for i,v in pairs(workspace.ClientEnemies:GetChildren()) do
-				if v and v:FindFirstChild("HumanoidRootPart") and (v.HumanoidRootPart:FindFirstChild("EnemyHealthBar") and v.HumanoidRootPart.EnemyHealthBar.Title.Text == EnemyDropdown.CurrentOption[1]) or EnemyDropdown.CurrentOption[1] == "Closest Enemy" then
-					local Magnitude = (HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
-					if Magnitude < Number then
-						Number = Magnitude
-						Enemy = v
-					end
-				end
-			end
-
-			if Enemy then
-				repeat
-					HumanoidRootPart.CFrame = Enemy.HumanoidRootPart.CFrame
-					task.wait()
-				until not Enemy or not Enemy.Parent or not Rayfield.Flags.Teleport.CurrentValue
-			end
-		end
-	end
-end)
-
 local Section = Main:CreateSection("Farming")
 
 Main:CreateToggle({
@@ -147,7 +126,7 @@ Main:CreateToggle({
 task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Click.CurrentValue then
-			RemoteEvent:FireServer({{"&"}})
+			RemoteEvent:FireServer({{"'"}})
 		end
 	end
 end)
@@ -182,7 +161,7 @@ task.spawn(function()
 	while task.wait() do
 		if Rayfield.Flags.Quest.CurrentValue then
 			for i,v in pairs(workspace.Maps:GetChildren()) do
-				RemoteEvent:FireServer({{"9", v.Components:FindFirstChild("NPC", true).Parent.Name}})
+				RemoteEvent:FireServer({{"@", v.Components:FindFirstChild("NPC", true).Parent.Name}})
 			end
 		end
 	end
