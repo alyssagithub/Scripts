@@ -2,9 +2,18 @@ local Player, Rayfield, CreateWindow = loadstring(game:HttpGet("https://raw.gith
 
 local workspace = workspace
 local huge = math.huge
+local task = task
+
 local Remotes = game:GetService("ReplicatedStorage").Remotes
 
-local HumanoidRootPart = Player.Character:WaitForChild("HumanoidRootPart")
+local Character = Player.Character or Player.CharacterAdded:Wait()
+
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+Player.CharacterAdded:Connect(function(NewCharacter)
+	Character = NewCharacter
+	HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+end)
 
 local ChildAdded = false
 
@@ -18,7 +27,7 @@ for i,v in pairs(workspace.Maps:GetChildren()) do
 	end
 end
 
-local Window = CreateWindow("v1.1")
+local Window = CreateWindow("v1.1.1")
 
 local Main = Window:CreateTab("Main", 4483362458)
 
