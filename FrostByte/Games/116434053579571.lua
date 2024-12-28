@@ -35,7 +35,7 @@ local Window = Rayfield:CreateWindow({
 	ConfigurationSaving = {
 		Enabled = true,
 		FolderName = nil,
-		FileName = "FrostByte Settings"
+		FileName = `FrostByte-{game.PlaceId}`
 	},
 
 	Discord = {
