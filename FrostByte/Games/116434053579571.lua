@@ -6,6 +6,7 @@ local Flags = Rayfield.Flags
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualUser = game:GetService("VirtualUser")
 
 local Player = game:GetService("Players").LocalPlayer
 
@@ -223,6 +224,28 @@ Tab:CreateToggle({
 			for _, QuestRemotes in {{"Dialog_Start", "Mouse"}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
 				BinderEvent:FireServer(QuestRemotes[1], QuestRemotes[2])
 			end
+		end
+	end,
+})
+
+local Tab = Window:CreateTab("Universal", "earth")
+
+Tab:CreateSection("AFK")
+
+Tab:CreateToggle({
+	Name = "Anti AFK Disconnection",
+	CurrentValue = true,
+	Flag = "AntiAFK",
+	Callback = function(Value)
+		if Value then
+			getgenv().IdledConnection = Player.Idled:Connect(function()
+				if Flags.AntiAFK.CurrentValue then
+					VirtualUser:CaptureController()
+					VirtualUser:ClickButton2(Vector2.new())
+				end
+			end)
+		elseif IdledConnection then
+			IdledConnection:Disconnect()
 		end
 	end,
 })
