@@ -172,6 +172,7 @@ Tab:CreateToggle({
 
 				if SuccessfulPurchases == ElementNumber then
 					BinderFunction:InvokeServer("Marketplace_Refresh")
+					task.wait(5)
 				end
 			end
 		end
