@@ -1,6 +1,6 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local Version = "v1.0.0"
+local Version = "v1.1.0"
 
 local Flags = Rayfield.Flags
 
@@ -64,29 +64,20 @@ Tab:CreateToggle({
 
 			local CharacterPosition = HumanoidRootPart.Position
 			
-			for i,v in Ores do
-				if not v.Model:GetChildren()[1] then
-					table.remove(Ores, i)
+			for _, Ore in Ores do
+				if not Ore.Model:GetChildren()[1] then
+					continue
 				end
+				
+				local RemoteName = "Mining_MineOre"
+
+				if Ore:FindFirstChild("OreTipGiant") then
+					RemoteName ..= "P"
+				end
+
+				BinderEvent:FireServer(RemoteName, Ore.Name, 0.90812974927491, Flags.Critical.CurrentValue)
+				break
 			end
-
-			table.sort(Ores, function(a, b)
-				return (CharacterPosition - a.Base.Position).Magnitude < (CharacterPosition - b.Base.Position).Magnitude
-			end)
-
-			local ClosestOre = Ores[1]
-
-			if not ClosestOre then
-				continue
-			end
-
-			local RemoteName = "Mining_MineOre"
-
-			if ClosestOre:FindFirstChild("OreTipGiant") then
-				RemoteName ..= "P"
-			end
-
-			BinderEvent:FireServer(RemoteName, ClosestOre.Name, 0.90812974927491, Flags.Critical.CurrentValue)
 		end
 	end,
 })
@@ -101,51 +92,33 @@ Tab:CreateToggle({
 
 Tab:CreateDivider()
 
-Tab:CreateToggle({
-	Name = "🧱 Auto TP to Ores",
-	CurrentValue = false,
-	Flag = "TP",
-	Callback = function(Value)
-		while Flags.TP.CurrentValue and task.wait() do
-			if QuestTPing then
-				continue
-			end
-
-			local HumanoidRootPart = Player.Character:FindFirstChild("HumanoidRootPart")
-
-			if not HumanoidRootPart then
-				continue
-			end
-
-			local Ores = OresFolder:GetChildren()
-
-			for i,v in Ores do
-				if not v.Model:GetChildren()[1] then
-					continue
-				end
-
-				local Size = v:GetExtentsSize()
-
-				HumanoidRootPart:PivotTo(v.Base:GetPivot() + Vector3.new(Size.X / 3, 4, 0))
-				break
-			end
-		end
-	end,
-})
+local function CollectDrops()
+	for i,v in workspace.Drops:GetChildren() do
+		firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+		firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+	end
+end
 
 Tab:CreateToggle({
 	Name = "💎 Auto Collect Drops",
 	CurrentValue = false,
 	Flag = "Collect",
 	Callback = function(Value)
-		while Flags.Collect.CurrentValue and task.wait() do
-			for i,v in workspace.Drops:GetChildren() do
-				firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
-				firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
-			end
+		if Value then
+			CollectDrops()
 		end
 	end,
 })
+
+if CollectConnection then
+	CollectConnection:Disconnect()
+end
+
+getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
+	if Flags.Collect.CurrentValue then
+		CollectDrops()
+	end
+end)
 
 Tab:CreateSection("Upgrades")
 
@@ -240,8 +213,6 @@ Tab:CreateToggle({
 			QuestTPing = false
 
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
-				continue
-			elseif not QuestElem then
 				continue
 			end
 
