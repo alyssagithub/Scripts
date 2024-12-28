@@ -19,7 +19,6 @@ local UpgradeTreeImages = ReplicatedStorage.Assets.UpgradeTreeImages
 local OresFolder = workspace.Ores
 
 local BoughtUpgrades = {}
-local SuccessfulPurchases = 0
 local QuestTPing = false
 
 local Window = Rayfield:CreateWindow({
@@ -47,7 +46,7 @@ local Window = Rayfield:CreateWindow({
 
 local Tab = Window:CreateTab("Automation", "repeat")
 
-Tab:CreateSection("Ores")
+Tab:CreateSection("Mining")
 
 Tab:CreateToggle({
 	Name = "⛏ Auto Mine",
@@ -60,11 +59,11 @@ Tab:CreateToggle({
 			if not HumanoidRootPart then
 				continue
 			end
-			
+
 			local Ores = OresFolder:GetChildren()
 
 			local CharacterPosition = HumanoidRootPart.Position
-			
+
 			table.sort(Ores, function(a, b)
 				return (CharacterPosition - a.Base.Position).Magnitude < (CharacterPosition - b.Base.Position).Magnitude
 			end)
@@ -74,17 +73,27 @@ Tab:CreateToggle({
 			if not ClosestOre then
 				continue
 			end
-			
+
 			local RemoteName = "Mining_MineOre"
-			
+
 			if ClosestOre:FindFirstChild("OreTipGiant") then
 				RemoteName ..= "P"
 			end
-			
-			BinderEvent:FireServer(RemoteName, ClosestOre.Name)
+
+			BinderEvent:FireServer(RemoteName, ClosestOre.Name, 0.90812974927491, Flags.Critical.CurrentValue)
 		end
 	end,
 })
+
+Tab:CreateToggle({
+	Name = "💥 Auto Critical Strike Ores (only works on ores with a crit zone)",
+	CurrentValue = false,
+	Flag = "Critical",
+	Callback = function(Value)
+	end,
+})
+
+Tab:CreateDivider()
 
 Tab:CreateToggle({
 	Name = "💎 Auto TP to Ores",
@@ -95,7 +104,7 @@ Tab:CreateToggle({
 			if QuestTPing then
 				continue
 			end
-			
+
 			local HumanoidRootPart = Player.Character:FindFirstChild("HumanoidRootPart")
 
 			if not HumanoidRootPart then
@@ -103,14 +112,14 @@ Tab:CreateToggle({
 			end
 
 			local Ores = OresFolder:GetChildren()
-			
+
 			for i,v in Ores do
 				if not v.Model:GetChildren()[1] then
 					continue
 				end
-				
+
 				local Size = v:GetExtentsSize()
-				
+
 				HumanoidRootPart:PivotTo(v.Base:GetPivot() + Vector3.new(Size.X / 3, 4, 0))
 				break
 			end
@@ -126,10 +135,16 @@ Tab:CreateToggle({
 	Flag = "Marketplace",
 	Callback = function(Value)
 		while Flags.Marketplace.CurrentValue and task.wait(1) do
-			for i = 1, 3 do
-				if BinderFunction:InvokeServer("Marketplace_Purchase", tostring(i)) then
-					SuccessfulPurchases += 1
+			local ElementNumber = 0
+			
+			for i,v in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
+				if not v:IsA("Frame") then
+					continue
 				end
+				
+				ElementNumber += 1
+				
+				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(ElementNumber))
 			end
 		end
 	end,
@@ -141,12 +156,24 @@ Tab:CreateToggle({
 	Flag = "Refresh",
 	Callback = function(Value)
 		while Flags.Refresh.CurrentValue and task.wait(1) do
-			if SuccessfulPurchases ~= 3 then
-				continue
-			end
+			local ElementNumber = 0
+			local SuccessfulPurchases = 0
 
-			BinderFunction:InvokeServer("Marketplace_Refresh")
-			SuccessfulPurchases = 0
+			for i,v in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
+				if not v:IsA("Frame") then
+					continue
+				end
+
+				ElementNumber += 1
+				
+				if v.Inner.Center.Purchased2.Visible then
+					SuccessfulPurchases += 1
+				end
+
+				if SuccessfulPurchases == ElementNumber then
+					BinderFunction:InvokeServer("Marketplace_Refresh")
+				end
+			end
 		end
 	end,
 })
@@ -163,7 +190,7 @@ Tab:CreateToggle({
 				if BoughtUpgrades[Upgrade.Name] then
 					continue
 				end
-				
+
 				task.spawn(function()
 					if BinderFunction:InvokeServer("Tree_Upgrade", Upgrade.Name) then
 						BoughtUpgrades[Upgrade.Name] = true
@@ -188,17 +215,17 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		while Flags.Quests.CurrentValue and task.wait(1) do
 			local QuestElem = Player.PlayerGui.StartGui.Quests.Inner:FindFirstChild("QuestElem")
-			
+
 			QuestTPing = false
-			
+
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
 				continue
 			end
-			
+
 			QuestTPing = true
-			
+
 			Player.Character:PivotTo(workspace.Map.Mouse.HumanoidRootPart:GetPivot())
-			
+
 			for _, QuestRemotes in {{"Dialog_Start", "Mouse"}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
 				BinderEvent:FireServer(QuestRemotes[1], QuestRemotes[2])
 			end
