@@ -1,4 +1,4 @@
-local Link = game:HttpGet(`https://github.com/alyssagithub/Scripts/blob/main/FrostByte/Games/{game.PlaceId}.lua`)
+local Link = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{game.PlaceId}.lua`)
 
 if Link then
   game:GetService("StarterGui"):SetCore("SendNotification", {
