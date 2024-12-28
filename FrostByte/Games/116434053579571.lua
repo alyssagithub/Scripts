@@ -63,6 +63,12 @@ Tab:CreateToggle({
 			local Ores = OresFolder:GetChildren()
 
 			local CharacterPosition = HumanoidRootPart.Position
+			
+			for i,v in Ores do
+				if not v.Model:GetChildren()[1] then
+					table.remove(Ores, i)
+				end
+			end
 
 			table.sort(Ores, function(a, b)
 				return (CharacterPosition - a.Base.Position).Magnitude < (CharacterPosition - b.Base.Position).Magnitude
