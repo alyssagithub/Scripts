@@ -1,8 +1,4 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
 local Version = "v1.1.0"
-
-local Flags = Rayfield.Flags
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -21,6 +17,10 @@ local OresFolder = workspace.Ores
 
 local BoughtUpgrades = {}
 local QuestTPing = false
+
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
+
+local Flags = Rayfield.Flags
 
 local Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {Version}`,
@@ -55,7 +55,13 @@ Tab:CreateToggle({
 	Flag = "Mine",
 	Callback = function(Value)
 		while Flags.Mine.CurrentValue and task.wait() do
-			local HumanoidRootPart = Player.Character:FindFirstChild("HumanoidRootPart")
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
+			
+			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 
 			if not HumanoidRootPart then
 				continue
@@ -76,7 +82,7 @@ Tab:CreateToggle({
 					RemoteName ..= "P"
 				end
 
-				BinderEvent:FireServer(RemoteName, Ore.Name, 0.90812974927491, Flags.Critical.CurrentValue)
+				BinderEvent:FireServer(RemoteName, Ore.Name, Random.new():NextNumber(0.8, 0.9), Flags.Critical.CurrentValue)
 				break
 			end
 		end
@@ -84,7 +90,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "💥 Auto Critical Strike Ores (only works on ores with a crit zone)",
+	Name = "💥 Auto Critical Strike Ores (Fails Without a Crit Zone)",
 	CurrentValue = false,
 	Flag = "Critical",
 	Callback = function(Value)
@@ -92,6 +98,38 @@ Tab:CreateToggle({
 })
 
 Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "🧱 Auto TP to Ores",
+	CurrentValue = false,
+	Flag = "TP",
+	Callback = function(Value)
+		while Flags.TP.CurrentValue and task.wait() do
+			if QuestTPing then
+				continue
+			end
+			
+			local HumanoidRootPart = Player.Character:FindFirstChild("HumanoidRootPart")
+			
+			if not HumanoidRootPart then
+				continue
+			end
+			
+			local Ores = OresFolder:GetChildren()
+			
+			for i,v in Ores do
+				if not v.Model:GetChildren()[1] then
+					continue
+				end
+				
+				local Size = v:GetExtentsSize()
+				
+				HumanoidRootPart:PivotTo(v.Base:GetPivot() + Vector3.new(Size.X / 3, 4, 0))
+				break
+			end
+		end
+	end,
+})
 
 local function CollectDrops()
 	for i,v in workspace.Drops:GetChildren() do
@@ -107,19 +145,14 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		if Value then
 			CollectDrops()
+			getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
+				CollectDrops()
+			end)
+		elseif CollectConnection then
+			CollectConnection:Disconnect()
 		end
 	end,
 })
-
-if CollectConnection then
-	CollectConnection:Disconnect()
-end
-
-getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
-	if Flags.Collect.CurrentValue then
-		CollectDrops()
-	end
-end)
 
 Tab:CreateSection("Upgrades")
 
@@ -153,14 +186,14 @@ Tab:CreateToggle({
 			local ElementNumber = 0
 			local SuccessfulPurchases = 0
 
-			for i,v in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
-				if not v:IsA("Frame") then
+			for _, Deal in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
+				if not Deal:IsA("Frame") then
 					continue
 				end
 
 				ElementNumber += 1
 				
-				if v.Inner.Center.Purchased2.Visible then
+				if Deal.Inner.Center.Purchased2.Visible then
 					SuccessfulPurchases += 1
 				end
 
@@ -233,16 +266,14 @@ local Tab = Window:CreateTab("Universal", "earth")
 Tab:CreateSection("AFK")
 
 Tab:CreateToggle({
-	Name = "Anti AFK Disconnection",
+	Name = "🔒 Anti AFK Disconnection",
 	CurrentValue = true,
 	Flag = "AntiAFK",
 	Callback = function(Value)
 		if Value then
 			getgenv().IdledConnection = Player.Idled:Connect(function()
-				if Flags.AntiAFK.CurrentValue then
-					VirtualUser:CaptureController()
-					VirtualUser:ClickButton2(Vector2.new())
-				end
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton2(Vector2.new())
 			end)
 		elseif IdledConnection then
 			IdledConnection:Disconnect()
