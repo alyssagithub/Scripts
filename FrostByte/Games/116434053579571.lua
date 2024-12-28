@@ -63,7 +63,7 @@ Tab:CreateToggle({
 			
 			local Ores = OresFolder:GetChildren()
 
-			local CharacterPosition = Player.Character.HumanoidRootPart.Position
+			local CharacterPosition = HumanoidRootPart.Position
 			
 			table.sort(Ores, function(a, b)
 				return (CharacterPosition - a.Base.Position).Magnitude < (CharacterPosition - b.Base.Position).Magnitude
