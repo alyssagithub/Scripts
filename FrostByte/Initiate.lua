@@ -1,5 +1,6 @@
 -- loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()
 local Code = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{game.PlaceId}.lua`)
+print("begin debug")
 
 if Code then
   game:GetService("StarterGui"):SetCore("SendNotification", {
