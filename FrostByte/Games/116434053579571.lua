@@ -102,7 +102,7 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "💎 Auto TP to Ores",
+	Name = "🧱 Auto TP to Ores",
 	CurrentValue = false,
 	Flag = "TP",
 	Callback = function(Value)
@@ -121,13 +121,27 @@ Tab:CreateToggle({
 
 			for i,v in Ores do
 				if not v.Model:GetChildren()[1] then
-					--continue
+					continue
 				end
 
 				local Size = v:GetExtentsSize()
 
 				HumanoidRootPart:PivotTo(v.Base:GetPivot() + Vector3.new(Size.X / 3, 4, 0))
 				break
+			end
+		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "💎 Auto Collect Drops",
+	CurrentValue = false,
+	Flag = "Collect",
+	Callback = function(Value)
+		while Flags.Collect.CurrentValue and task.wait() do
+			for i,v in workspace.Drops:GetChildren() do
+				firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+				firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
 			end
 		end
 	end,
@@ -226,6 +240,8 @@ Tab:CreateToggle({
 			QuestTPing = false
 
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
+				continue
+			elseif not QuestElem then
 				continue
 			end
 
