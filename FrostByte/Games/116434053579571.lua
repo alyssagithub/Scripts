@@ -115,7 +115,7 @@ Tab:CreateToggle({
 
 			for i,v in Ores do
 				if not v.Model:GetChildren()[1] then
-					continue
+					--continue
 				end
 
 				local Size = v:GetExtentsSize()
