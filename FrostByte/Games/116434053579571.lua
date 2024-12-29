@@ -397,7 +397,7 @@ Tab:CreateToggle({
 			end
 
 			if Combined[NewStats] == Combined[OldStats] then
-				return
+				continue
 			end
 
 			local NewButton = Roll.New.Button
