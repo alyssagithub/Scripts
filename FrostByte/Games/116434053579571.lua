@@ -374,6 +374,7 @@ Tab:CreateToggle({
 			local Roll = Player.PlayerGui.StartGui.Roll
 
 			if not Roll.Visible or not Roll.Old.Visible then
+				UIStroke.Parent = nil
 				continue
 			end
 
