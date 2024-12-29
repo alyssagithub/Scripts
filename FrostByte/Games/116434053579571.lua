@@ -3,6 +3,7 @@ local Version = "v1.1.0"
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualUser = game:GetService("VirtualUser")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local Player = game:GetService("Players").LocalPlayer
 
@@ -17,6 +18,13 @@ local OresFolder = workspace.Ores
 
 local BoughtUpgrades = {}
 local QuestTPing = false
+local TierValues = {
+	C = 1,
+	B = 2,
+	A = 3,
+	S = 4,
+	X = 5
+}
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
 
@@ -56,11 +64,11 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		while Flags.Mine.CurrentValue and task.wait() do
 			local Character = Player.Character
-			
+
 			if not Character then
 				continue
 			end
-			
+
 			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 
 			if not HumanoidRootPart then
@@ -70,12 +78,12 @@ Tab:CreateToggle({
 			local Ores = OresFolder:GetChildren()
 
 			local CharacterPosition = HumanoidRootPart.Position
-			
+
 			for _, Ore in Ores do
 				if not Ore.Model:GetChildren()[1] then
 					continue
 				end
-				
+
 				local RemoteName = "Mining_MineOre"
 
 				if Ore:FindFirstChild("OreTipGiant") then
@@ -108,22 +116,22 @@ Tab:CreateToggle({
 			if QuestTPing then
 				continue
 			end
-			
+
 			local HumanoidRootPart = Player.Character:FindFirstChild("HumanoidRootPart")
-			
+
 			if not HumanoidRootPart then
 				continue
 			end
-			
+
 			local Ores = OresFolder:GetChildren()
-			
+
 			for i,v in Ores do
 				if not v.Model:GetChildren()[1] then
 					continue
 				end
-				
+
 				local Size = v:GetExtentsSize()
-				
+
 				HumanoidRootPart:PivotTo(v.Base:GetPivot() + Vector3.new(Size.X / 3, 4, 0))
 				break
 			end
@@ -131,7 +139,11 @@ Tab:CreateToggle({
 	end,
 })
 
-local function CollectDrops()
+local function CollectDrops(Enabled: boolean)
+	if not Enabled then
+		return
+	end
+	
 	for i,v in workspace.Drops:GetChildren() do
 		firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
 		firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
@@ -142,17 +154,16 @@ Tab:CreateToggle({
 	Name = "💎 Auto Collect Drops",
 	CurrentValue = false,
 	Flag = "Collect",
-	Callback = function(Value)
-		if Value then
-			CollectDrops()
-			getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
-				CollectDrops()
-			end)
-		elseif CollectConnection then
-			CollectConnection:Disconnect()
-		end
-	end,
+	Callback = CollectDrops,
 })
+
+if CollectConnection then
+	CollectConnection:Disconnect()
+end
+
+getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
+	CollectDrops(Flags.Collect.CurrentValue)
+end)
 
 Tab:CreateSection("Upgrades")
 
@@ -163,14 +174,14 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		while Flags.Marketplace.CurrentValue and task.wait(1) do
 			local ElementNumber = 0
-			
+
 			for i,v in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
 				if not v:IsA("Frame") then
 					continue
 				end
-				
+
 				ElementNumber += 1
-				
+
 				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(ElementNumber))
 			end
 		end
@@ -192,7 +203,7 @@ Tab:CreateToggle({
 				end
 
 				ElementNumber += 1
-				
+
 				if Deal.Inner.Center.Purchased2.Visible then
 					SuccessfulPurchases += 1
 				end
@@ -222,7 +233,7 @@ Tab:CreateToggle({
 				task.spawn(function()
 					if BinderFunction:InvokeServer("Tree_Upgrade", Upgrade.Name) then
 						BoughtUpgrades[Upgrade.Name] = true
-						print("Bought Upgrade:", Upgrade.Name)
+						
 						Rayfield:Notify({
 							Title = Upgrade.Name,
 							Content = "Bought by Auto Upgrade!",
@@ -261,6 +272,66 @@ Tab:CreateToggle({
 	end,
 })
 
+local UIStroke = Instance.new("UIStroke")
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 5
+
+Tab:CreateToggle({
+	Name = "📦 Highlight Best Keep/Replace Choice (Based on Tier)",
+	CurrentValue = false,
+	Flag = "KeepReplace",
+	Callback = function(Value)
+		while Flags.KeepReplace.CurrentValue and task.wait() do
+			local Roll = Player.PlayerGui.StartGui.Roll
+			
+			if not Roll.Visible then
+				continue
+			end
+			
+			local NewStats = Roll.New.Stat.Frame
+			local OldStats = Roll.Old.Stat.Frame
+			
+			local Combined = {
+				[NewStats] = 0,
+				[OldStats] = 0
+			}
+			
+			for _, Stats in {NewStats, OldStats} do
+				for _, Stat in Stats:GetChildren() do
+					Combined[Stats] += TierValues[Stat.Tier.Text]
+				end
+			end
+			
+			if Combined[NewStats] == Combined[OldStats] then
+				return
+			end
+			
+			local NewButton = Roll.New.Button
+			local OldButton = Roll.Old.Button
+			
+			local NewUIStroke = NewButton:FindFirstChild("UIStroke")
+			local OldUIStroke = OldButton:FindFirstChild("UIStroke")
+			
+			if NewUIStroke and NewUIStroke ~= UIStroke then
+				NewUIStroke:Destroy()
+			end
+			
+			if OldUIStroke and OldUIStroke ~= UIStroke then
+				OldUIStroke:Destroy()
+			end
+			
+			if Combined[NewStats] > Combined[OldStats] then
+				UIStroke.Parent = NewButton
+			else
+				UIStroke.Parent = OldButton
+			end
+		end
+		
+		UIStroke.Parent = nil
+	end,
+})
+
 local Tab = Window:CreateTab("Universal", "earth")
 
 Tab:CreateSection("AFK")
@@ -270,13 +341,18 @@ Tab:CreateToggle({
 	CurrentValue = true,
 	Flag = "AntiAFK",
 	Callback = function(Value)
-		if Value then
-			getgenv().IdledConnection = Player.Idled:Connect(function()
-				VirtualUser:CaptureController()
-				VirtualUser:ClickButton2(Vector2.new())
-			end)
-		elseif IdledConnection then
-			IdledConnection:Disconnect()
-		end
 	end,
 })
+
+if IdledConnection then
+	IdledConnection:Disconnect()
+end
+
+getgenv().IdledConnection = Player.Idled:Connect(function()
+	if not Flags.AntiAFK.CurrentValue then
+		return
+	end
+	
+	VirtualUser:CaptureController()
+	VirtualUser:ClickButton2(Vector2.zero)
+end)
