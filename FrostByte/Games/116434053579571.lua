@@ -1,4 +1,4 @@
-local Version = "v1.2.0"
+local Version = "v1.2.1"
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -259,7 +259,24 @@ Tab:CreateToggle({
 			QuestTPing = false
 
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
-				continue
+				local CompletedTasks = 0
+				local TotalTasks = 0
+				
+				for _, Task: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
+					if not Task:IsA("TextLabel") then
+						continue
+					end
+					
+					TotalTasks += 1
+					
+					if Task.FontFace.Bold then
+						CompletedTasks += 1
+					end
+				end
+				
+				if CompletedTasks ~= TotalTasks then
+					continue
+				end
 			end
 
 			QuestTPing = true
