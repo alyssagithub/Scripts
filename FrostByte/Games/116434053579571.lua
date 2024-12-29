@@ -263,8 +263,12 @@ Tab:CreateToggle({
 			end
 
 			QuestTPing = true
-
-			Player.Character:PivotTo(workspace.Map.Mouse.HumanoidRootPart:GetPivot())
+			
+			local MouseHumanoidRootPart = workspace.Map.Mouse.HumanoidRootPart
+			
+			if (Player.Character:GetPivot().Position - MouseHumanoidRootPart.Position).Magnitude > 10 then
+				Player.Character:PivotTo(MouseHumanoidRootPart:GetPivot())
+			end
 
 			for _, QuestRemotes in {{"Dialog_Start", "Mouse"}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
 				BinderEvent:FireServer(QuestRemotes[1], QuestRemotes[2])
@@ -288,7 +292,7 @@ Tab:CreateToggle({
 		while Flags.KeepReplace.CurrentValue and task.wait() do
 			local Roll = Player.PlayerGui.StartGui.Roll
 			
-			if not Roll.Visible then
+			if not Roll.Visible or not Roll.Old.Visible then
 				continue
 			end
 			
