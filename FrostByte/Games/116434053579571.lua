@@ -1,9 +1,8 @@
-local Version = "v1.1.0"
+local Version = "v1.2.0"
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualUser = game:GetService("VirtualUser")
-local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local Player = game:GetService("Players").LocalPlayer
 
@@ -13,6 +12,8 @@ local BinderEvent: RemoteEvent = ReplicatedStorage._Binder_Event
 local BinderFunction: RemoteFunction = ReplicatedStorage._Binder_Function
 
 local UpgradeTreeImages = ReplicatedStorage.Assets.UpgradeTreeImages
+
+local GiantOreSummary = Player.PlayerGui.GameGui.GiantOreSummary
 
 local OresFolder = workspace.Ores
 
@@ -272,6 +273,8 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateSection("QOL")
+
 local UIStroke = Instance.new("UIStroke")
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 UIStroke.Color = Color3.fromRGB(255, 255, 255)
@@ -299,6 +302,10 @@ Tab:CreateToggle({
 			
 			for _, Stats in {NewStats, OldStats} do
 				for _, Stat in Stats:GetChildren() do
+					if Stat.Name ~= "Stat" then
+						continue
+					end
+					
 					Combined[Stats] += TierValues[Stat.Tier.Text]
 				end
 			end
@@ -314,11 +321,11 @@ Tab:CreateToggle({
 			local OldUIStroke = OldButton:FindFirstChild("UIStroke")
 			
 			if NewUIStroke and NewUIStroke ~= UIStroke then
-				NewUIStroke:Destroy()
+				NewUIStroke.Parent = nil
 			end
 			
 			if OldUIStroke and OldUIStroke ~= UIStroke then
-				OldUIStroke:Destroy()
+				OldUIStroke.Parent = nil
 			end
 			
 			if Combined[NewStats] > Combined[OldStats] then
@@ -331,6 +338,25 @@ Tab:CreateToggle({
 		UIStroke.Parent = nil
 	end,
 })
+
+Tab:CreateToggle({
+	Name = "❌ Remove Giant Ore Summary",
+	CurrentValue = false,
+	Flag = "GiantSummary",
+	Callback = function(Value)
+		GiantOreSummary.Visible = not Value
+	end,
+})
+
+if SummaryConnection then
+	SummaryConnection:Disconnect()
+end
+
+getgenv().SummaryConnection = GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(function()
+	if GiantOreSummary.Visible and Flags.GiantSummary.CurrentValue then
+		GiantOreSummary.Visible = false
+	end
+end)
 
 local Tab = Window:CreateTab("Universal", "earth")
 
