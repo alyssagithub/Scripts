@@ -21,11 +21,11 @@ local OresFolder = workspace.Ores
 local BoughtUpgrades = {}
 local QuestTPing = false
 local TierValues = {
-	C = 1,
-	B = 2,
-	A = 3,
-	S = 4,
-	X = 5
+	C = 1e1,
+	B = 1e2,
+	A = 1e3,
+	S = 1e4,
+	X = 1e5
 }
 
 local Dispensers = {}
@@ -396,10 +396,6 @@ Tab:CreateToggle({
 				end
 			end
 
-			if Combined[NewStats] == Combined[OldStats] then
-				continue
-			end
-
 			local NewButton = Roll.New.Button
 			local OldButton = Roll.Old.Button
 
@@ -414,7 +410,7 @@ Tab:CreateToggle({
 				OldUIStroke.Parent = nil
 			end
 
-			if Combined[NewStats] > Combined[OldStats] then
+			if Combined[NewStats] >= Combined[OldStats] then
 				UIStroke.Parent = NewButton
 			else
 				UIStroke.Parent = OldButton
