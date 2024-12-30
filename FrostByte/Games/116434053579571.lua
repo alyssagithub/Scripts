@@ -1,4 +1,4 @@
-local Version = "v1.3.1"
+local Version = "v1.3.2"
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -21,11 +21,11 @@ local OresFolder = workspace.Ores
 local BoughtUpgrades = {}
 local QuestTPing = false
 local TierValues = {
-	C = 1e1,
-	B = 1e2,
-	A = 1e3,
-	S = 1e4,
-	X = 1e5
+	C = 1,
+	B = 2,
+	A = 3,
+	S = 4,
+	X = 5
 }
 
 local Dispensers = {}
@@ -42,8 +42,8 @@ local function CollectDrops(Enabled: boolean)
 	end
 
 	for i,v in workspace.Drops:GetChildren() do
-		firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
-		firetouchinterest(v.Frame, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 0)
+		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 1)
 	end
 end
 
@@ -260,7 +260,7 @@ Tab:CreateSlider({
 Tab:CreateSection("Dispensers")
 
 Tab:CreateToggle({
-	Name = "🔄 • Auto Roll Equipment",
+	Name = "🔄 • Auto Roll Equipment (Disable to Collect)",
 	CurrentValue = false,
 	Flag = "Roll",
 	Callback = function(Value)
@@ -410,7 +410,7 @@ Tab:CreateToggle({
 				OldUIStroke.Parent = nil
 			end
 
-			if Combined[NewStats] >= Combined[OldStats] then
+			if Combined[NewStats] > Combined[OldStats] then
 				UIStroke.Parent = NewButton
 			else
 				UIStroke.Parent = OldButton
@@ -483,7 +483,7 @@ Tab:CreateToggle({
 			Character:PivotTo(Part:GetPivot() + Vector3.yAxis * 5)
 		end
 
-		if Value and not Flags.Safe.CurrentValue then
+		if Value then
 			Player.Character:PivotTo(PreviousLocation)
 		end
 	end,
@@ -513,3 +513,12 @@ getgenv().IdledConnection = Player.Idled:Connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.zero)
 end)
+
+Tab:CreateSection("Miscellaneous")
+
+Tab:CreateButton({
+	Name = "⚙️ • Rejoin",
+	Callback = function()
+		game:GetService("TeleportService"):Teleport(game.PlaceId)
+	end,
+})
