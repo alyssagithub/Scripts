@@ -6,7 +6,7 @@ local VirtualUser = game:GetService("VirtualUser")
 
 local Player = game:GetService("Players").LocalPlayer
 
-local PlaceName = MarketplaceService:GetProductInfo(game.PlaceId, Enum.InfoType.Asset).Name
+local PlaceName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 local BinderEvent: RemoteEvent = ReplicatedStorage._Binder_Event
 local BinderFunction: RemoteFunction = ReplicatedStorage._Binder_Function
