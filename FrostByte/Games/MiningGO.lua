@@ -1,4 +1,4 @@
-local Version = "v1.3.4"
+local Version = "v1.3.5"
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -523,6 +523,22 @@ getgenv().IdledConnection = Player.Idled:Connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.zero)
 end)
+
+Tab:CreateToggle({
+	Name = "✅ • Auto Re-Execute on Teleport",
+	CurrentValue = true,
+	Flag = "ReExecute",
+	Callback = function(Value)
+		if Value and queue_on_teleport then
+			queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()')
+		end
+	end,
+})
+
+if Flags.ReExecute.CurrentValue and queue_on_teleport then
+	print("queued")
+	queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()')
+end
 
 Tab:CreateSection("Miscellaneous")
 
