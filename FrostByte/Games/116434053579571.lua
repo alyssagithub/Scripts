@@ -216,7 +216,7 @@ Tab:CreateToggle({
 			local Title = Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.Cost.Title
 			local Numbers = Title.Text:gsub("%D", "")
 
-			if Title:find("k") then
+			if Title.Text:find("k") then
 				Numbers ..= "000"
 			end
 
@@ -402,11 +402,11 @@ Tab:CreateToggle({
 			local NewUIStroke = NewButton:FindFirstChild("UIStroke")
 			local OldUIStroke = OldButton:FindFirstChild("UIStroke")
 
-			if NewUIStroke and NewUIStroke ~= UIStroke then
+			if NewUIStroke then
 				NewUIStroke.Parent = nil
 			end
 
-			if OldUIStroke and OldUIStroke ~= UIStroke then
+			if OldUIStroke then
 				OldUIStroke.Parent = nil
 			end
 
@@ -446,11 +446,11 @@ local Part
 
 local function GenerateRandomPos(Min, Max, Negative)
 	local Positive = Random.new():NextNumber(Min, Max)
-	
+
 	if not Negative then
 		return Positive
 	end
-	
+
 	return if math.random(2) == 1 then Random.new():NextNumber(Min, Max) else Random.new():NextNumber(-Min, -Max)
 end
 
@@ -466,23 +466,23 @@ Tab:CreateToggle({
 			Part.Size = Vector3.new(10, 2, 10)
 			Part.Parent = workspace
 		end
-		
+
 		local PreviousLocation = Player.Character and Player.Character:GetPivot()
-		
+
 		while Flags.Safe.CurrentValue and task.wait() do
 			local Character = Player.Character
-			
+
 			if not Character or (Character:GetPivot().Position - Part.Position).Magnitude < 15 then
 				continue
 			end
-			
+
 			if QuestTPing then
 				continue
 			end
-			
+
 			Character:PivotTo(Part:GetPivot() + Vector3.yAxis * 5)
 		end
-		
+
 		if Value and not Flags.Safe.CurrentValue then
 			Player.Character:PivotTo(PreviousLocation)
 		end
