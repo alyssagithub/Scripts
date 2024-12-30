@@ -1,4 +1,4 @@
-local Version = "v1.3.3"
+local Version = "v1.3.4"
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -110,7 +110,8 @@ Tab:CreateToggle({
 				if Ore:FindFirstChild("OreTipGiant") then
 					RemoteName ..= "P"
 				end
-
+				
+				BinderEvent:FireServer("Mining_Start")
 				BinderEvent:FireServer(RemoteName, Ore.Name, Random.new():NextNumber(0.8, 0.9), Flags.Critical.CurrentValue)
 				break
 			end
@@ -271,7 +272,7 @@ Tab:CreateToggle({
 		while Flags.Roll.CurrentValue and task.wait() do
 			BinderFunction:InvokeServer("Roll_RollItem", Flags.Dispenser.CurrentOption[1])
 		end
-		
+
 		if Value then
 			CollectDrops(true)
 		end
