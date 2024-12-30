@@ -1,4 +1,4 @@
-local Version = "v1.3.2"
+local Version = "v1.3.3"
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -119,12 +119,14 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "💥 • Auto Critical Strike Ores (Needs a Crit Zone)",
+	Name = "💥 • Auto Critical Strike Ores",
 	CurrentValue = false,
 	Flag = "Critical",
 	Callback = function(Value)
 	end,
 })
+
+Tab:CreateLabel("Will Not Work Without a Crit Zone", "arrow-up")
 
 Tab:CreateToggle({
 	Name = "💎 • Auto Collect Drops",
@@ -142,7 +144,7 @@ getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
 end)
 
 Tab:CreateToggle({
-	Name = "🧱 • Auto TP to Ores (for Ore Pulse)",
+	Name = "🧱 • Auto TP to Ores",
 	CurrentValue = false,
 	Flag = "TP",
 	Callback = function(Value)
@@ -172,6 +174,8 @@ Tab:CreateToggle({
 		end
 	end,
 })
+
+Tab:CreateLabel("Only Use with Ore Pulse", "arrow-up")
 
 Tab:CreateSection("Marketplace")
 
@@ -260,16 +264,21 @@ Tab:CreateSlider({
 Tab:CreateSection("Dispensers")
 
 Tab:CreateToggle({
-	Name = "🔄 • Auto Roll Equipment (Disable to Collect)",
+	Name = "🔄 • Auto Roll Equipment",
 	CurrentValue = false,
 	Flag = "Roll",
 	Callback = function(Value)
 		while Flags.Roll.CurrentValue and task.wait() do
 			BinderFunction:InvokeServer("Roll_RollItem", Flags.Dispenser.CurrentOption[1])
+		end
+		
+		if Value then
 			CollectDrops(true)
 		end
 	end,
 })
+
+Tab:CreateLabel("Disable Collect Drops for Easier/AFK Use", "arrow-up")
 
 Tab:CreateDropdown({
 	Name = "⚒ • Equipment Dispenser",
