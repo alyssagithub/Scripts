@@ -48,11 +48,11 @@ end
 
 getgenv().FrostByteConnections = {}
 
-function HandleConnection(Connection: RBXScriptConnection, Name: string)
+getgenv().HandleConnection = function(Connection: RBXScriptConnection, Name: string)
 	if getgenv().FrostByteConnections[Name] then
 		getgenv().FrostByteConnections[Name]:Disconnect()
 	end
-	
+
 	getgenv().FrostByteConnections[Name] = Connection
 end
 
@@ -85,7 +85,6 @@ Window = Rayfield:CreateWindow({
 function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
 	
-	local getgenv = getfenv().getgenv
 	local firetouchinterest = getgenv().firetouchinterest
 	local queue_on_teleport = getgenv().queue_on_teleport
 	
