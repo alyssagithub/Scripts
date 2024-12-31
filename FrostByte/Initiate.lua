@@ -20,7 +20,7 @@ end
 
 PlaceName = PlaceName:gsub("[^%a]", "")
 
-local Code = = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
+local Code = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
 
 if Code then
 	Notify("Game found, the script is loading.")
