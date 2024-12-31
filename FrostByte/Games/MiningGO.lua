@@ -474,7 +474,7 @@ Tab:CreateToggle({
 			Character:PivotTo(Part:GetPivot() + Vector3.yAxis * 5)
 		end
 
-		if Value then
+		if Value and PreviousLocation then
 			Player.Character:PivotTo(PreviousLocation)
 		end
 	end,
