@@ -1,9 +1,10 @@
-ScriptVersion = "v1.3.5"
+ScriptVersion = "v1.3.6"
 
 -- removing linter warnings
-local getgenv = getfenv().getgenv
-local firetouchinterest = getgenv().firetouchinterest
-local queue_on_teleport = getgenv().queue_on_teleport
+local firetouchinterest = getfenv().firetouchinterest
+local queue_on_teleport = getfenv().queue_on_teleport
+local getconnections = getfenv().getconnections
+local HandleConnection: (RBXScriptConnection, string) -> () = getfenv().HandleConnection
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -31,10 +32,8 @@ local TierValues = {
 
 local Dispensers = {}
 
-for i,v in InteractZones:GetChildren() do
-	if v.Name:lower():find("dispenser") then
-		table.insert(Dispensers, v.Name)
-	end
+for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
+	table.insert(Dispensers, v.Name)
 end
 
 local function CollectDrops(Enabled: boolean)
@@ -117,13 +116,9 @@ Tab:CreateToggle({
 	Callback = CollectDrops,
 })
 
-if getgenv().CollectConnection then
-	getgenv().CollectConnection:Disconnect()
-end
-
-getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
+HandleConnection(workspace.Drops.ChildAdded:Connect(function()
 	CollectDrops(Flags.Collect.CurrentValue)
-end)
+end), "Collect")
 
 Tab:CreateToggle({
 	Name = "🧱 • Auto TP to Ores",
@@ -260,7 +255,7 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateLabel("Disable Collect Drops for Easier/AFK Use", "arrow-up")
+Tab:CreateLabel("Enable Auto Keep/Replace for Easier/AFK Use", "arrow-up")
 
 Tab:CreateDropdown({
 	Name = "⚒ • Equipment Dispenser",
@@ -269,6 +264,40 @@ Tab:CreateDropdown({
 	MultipleOptions = false,
 	Flag = "Dispenser",
 	Callback = function()end,
+})
+
+Tab:CreateToggle({
+	Name = "📖 • Auto Quest Roll",
+	CurrentValue = false,
+	Flag = "RollQuest",
+	Callback = function(Value)
+		while Flags.RollQuest.CurrentValue and task.wait() do
+			local QuestElem = Player.PlayerGui.StartGui.Quests.Inner:FindFirstChild("QuestElem")
+
+			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
+				for _, Quest: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
+					if not Quest:IsA("TextLabel") or not Quest.Text:lower():find("roll") or not Quest.FontFace.Bold then
+						continue
+					end
+
+					local Split1 = Quest.Text:split("Roll ")[2]
+					local Split2 = Split1:split(" [")[1]
+					local ResultingName = Split2:gsub("%d", "")
+					local DispenserName = `Dispenser{ResultingName}`
+
+					if not ReplicatedStorage.DispenserFrames:FindFirstChild(DispenserName) then
+						continue
+					end
+					
+					BinderFunction:InvokeServer("Roll_RollItem", DispenserName)
+				end
+			end
+		end
+
+		if Value then
+			CollectDrops(true)
+		end
+	end,
 })
 
 Tab:CreateSection("Upgrades")
@@ -334,10 +363,10 @@ Tab:CreateToggle({
 
 			QuestTPing = true
 
-			local MouseHumanoidRootPart = workspace.Map.Mouse.HumanoidRootPart
+			local Mouse = InteractZones.Mouse
 
-			if (Player.Character:GetPivot().Position - MouseHumanoidRootPart.Position).Magnitude > 10 then
-				Player.Character:PivotTo(MouseHumanoidRootPart:GetPivot())
+			if (Player.Character:GetPivot().Position - Mouse.Position).Magnitude > 10 then
+				Player.Character:PivotTo(Mouse:GetPivot())
 			end
 
 			for _, QuestRemotes in {{"Dialog_Start", "Mouse"}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
@@ -351,21 +380,15 @@ local Tab = Window:CreateTab("QOL", "leaf")
 
 Tab:CreateSection("UI")
 
-local UIStroke = Instance.new("UIStroke")
-UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke.Color = Color3.fromRGB(255, 255, 255)
-UIStroke.Thickness = 5
-
 Tab:CreateToggle({
-	Name = "📦 • Highlight Best Keep/Replace Choice (Based on Tier)",
+	Name = "📦 • Auto Keep/Replace Equipment (Based on Tier)",
 	CurrentValue = false,
 	Flag = "KeepReplace",
 	Callback = function(Value)
 		while Flags.KeepReplace.CurrentValue and task.wait() do
 			local Roll = Player.PlayerGui.StartGui.Roll
 
-			if not Roll.Visible or not Roll.Old.Visible then
-				UIStroke.Parent = nil
+			if not Roll.Visible then
 				continue
 			end
 
@@ -390,25 +413,29 @@ Tab:CreateToggle({
 			local NewButton = Roll.New.Button
 			local OldButton = Roll.Old.Button
 
-			local NewUIStroke = NewButton:FindFirstChild("UIStroke")
-			local OldUIStroke = OldButton:FindFirstChild("UIStroke")
-
-			if NewUIStroke then
-				NewUIStroke.Parent = nil
-			end
-
-			if OldUIStroke then
-				OldUIStroke.Parent = nil
-			end
-
 			if Combined[NewStats] > Combined[OldStats] then
-				UIStroke.Parent = NewButton
+				for i,v in getconnections(NewButton.MouseButton1Click) do
+					v:Fire()
+				end
+				print("Replacing")
+				
+				Rayfield:Notify({
+					Title = "Replaced Equipment",
+					Content = "Check output for more info.",
+					Duration = 10,
+					Image = "circle-alert",
+				})
+				
+				print("Old Stats Points:", Combined[OldStats], "New Stats Points:", Combined[NewStats])
 			else
-				UIStroke.Parent = OldButton
+				for i,v in getconnections(OldButton.MouseButton1Click) do
+					v:Fire()
+				end
+				print("Keeping")
 			end
+			
+			task.wait(0.1)
 		end
-
-		UIStroke.Parent = nil
 	end,
 })
 
@@ -421,15 +448,11 @@ Tab:CreateToggle({
 	end,
 })
 
-if getgenv().SummaryConnection then
-	getgenv().SummaryConnection:Disconnect()
-end
-
-getgenv().SummaryConnection = GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(function()
+HandleConnection(GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(function()
 	if GiantOreSummary.Visible and Flags.GiantSummary.CurrentValue then
 		GiantOreSummary.Visible = false
 	end
-end)
+end), "GiantSummary")
 
 Tab:CreateSection("Safety")
 
