@@ -8,6 +8,7 @@ local ScriptVersion = getfenv().ScriptVersion
 
 local Webhook = "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_8Qmtg8608Lc".."8cqzrXt2ox6TJqEdk-qXFPSC4QdLXGqJ9OF4vDaHSwH"
 
+local getgenv = getfenv().getgenv
 local getexecutorname = getfenv().getexecutorname
 local identifyexecutor = getfenv().identifyexecutor
 local request = getfenv().request
@@ -17,7 +18,7 @@ local Data =
 		embeds = {
 			{            
 				title = PlaceName,
-				color = tonumber(51555),
+				color = tonumber("0x"..Color3.fromRGB(0, 201, 99):ToHex()),
 				fields = {
 					{
 						name = "Executor",
@@ -40,6 +41,10 @@ pcall(request, {
 	Method = "POST",
 	Headers = {["Content-Type"] = "application/json"}
 })
+
+getgenv().gethui = function()
+	return game:GetService("CoreGui")
+end
 
 Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
 Flags = Rayfield.Flags
