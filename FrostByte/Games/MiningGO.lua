@@ -1,17 +1,13 @@
-local Version = "v1.3.5"
+ScriptVersion = "v1.3.5"
 
 -- removing linter warnings
 local getgenv = getfenv().getgenv
 local firetouchinterest = getgenv().firetouchinterest
 local queue_on_teleport = getgenv().queue_on_teleport
 
-local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VirtualUser = game:GetService("VirtualUser")
 
 local Player = game:GetService("Players").LocalPlayer
-
-local PlaceName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 local BinderEvent: RemoteEvent = ReplicatedStorage._Binder_Event
 local BinderFunction: RemoteFunction = ReplicatedStorage._Binder_Function
@@ -52,32 +48,12 @@ local function CollectDrops(Enabled: boolean)
 	end
 end
 
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
+local Rayfield = getfenv().Rayfield
 local Flags = Rayfield.Flags
 
-local Window = Rayfield:CreateWindow({
-	Name = `FrostByte | {PlaceName} | {Version}`,
-	Icon = "snowflake",
-	LoadingTitle = "❄ Presented to you by FrostByte ❄",
-	LoadingSubtitle = PlaceName,
-	Theme = "DarkBlue",
-
-	DisableRayfieldPrompts = false,
-	DisableBuildWarnings = false,
-
-	ConfigurationSaving = {
-		Enabled = true,
-		FolderName = nil,
-		FileName = `FrostByte-{game.PlaceId}`
-	},
-
-	Discord = {
-		Enabled = true,
-		Invite = "sS3tDP6FSB",
-		RememberJoins = true
-	},
-})
+local Window = getfenv().Window
 
 local Tab = Window:CreateTab("Automation", "repeat")
 
@@ -115,7 +91,7 @@ Tab:CreateToggle({
 				if Ore:FindFirstChild("OreTipGiant") then
 					RemoteName ..= "P"
 				end
-				
+
 				BinderEvent:FireServer("Mining_Start")
 				BinderEvent:FireServer(RemoteName, Ore.Name, Random.new():NextNumber(0.8, 0.9), Flags.Critical.CurrentValue)
 				break
@@ -504,51 +480,4 @@ Tab:CreateToggle({
 	end,
 })
 
-local Tab = Window:CreateTab("Universal", "earth")
-
-Tab:CreateSection("AFK")
-
-Tab:CreateToggle({
-	Name = "🔒 • Anti AFK Disconnection",
-	CurrentValue = true,
-	Flag = "AntiAFK",
-	Callback = function(Value)
-	end,
-})
-
-if getgenv().IdledConnection then
-	getgenv().IdledConnection:Disconnect()
-end
-
-getgenv().IdledConnection = Player.Idled:Connect(function()
-	if not Flags.AntiAFK.CurrentValue then
-		return
-	end
-
-	VirtualUser:CaptureController()
-	VirtualUser:ClickButton2(Vector2.zero)
-end)
-
-Tab:CreateToggle({
-	Name = "✅ • Auto Re-Execute on Teleport",
-	CurrentValue = true,
-	Flag = "ReExecute",
-	Callback = function(Value)
-		if Value and queue_on_teleport then
-			queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()')
-		end
-	end,
-})
-
-if Flags.ReExecute.CurrentValue and queue_on_teleport then
-	queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()')
-end
-
-Tab:CreateSection("Miscellaneous")
-
-Tab:CreateButton({
-	Name = "⚙️ • Rejoin",
-	Callback = function()
-		game:GetService("TeleportService"):Teleport(game.PlaceId)
-	end,
-})
+getfenv().CreateUniversalTabs()
