@@ -21,7 +21,7 @@ local InteractZones = ReplicatedStorage.InteractZones
 
 local GiantOreSummary = Player.PlayerGui.GameGui.GiantOreSummary
 
-local OresFolder = workspace.Ores
+local OresFolder = workspace:WaitForChild("Ores")
 
 local BoughtUpgrades = {}
 local QuestTPing = false
