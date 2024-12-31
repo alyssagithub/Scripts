@@ -536,7 +536,6 @@ Tab:CreateToggle({
 })
 
 if Flags.ReExecute.CurrentValue and queue_on_teleport then
-	print("queued")
 	queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()')
 end
 
