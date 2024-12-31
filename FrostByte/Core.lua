@@ -46,6 +46,16 @@ getgenv().gethui = function()
 	return game:GetService("CoreGui")
 end
 
+getgenv().FrostByteConnections = {}
+
+function HandleConnection(Connection: RBXScriptConnection, Name: string)
+	if getgenv().FrostByteConnections[Name] then
+		getgenv().FrostByteConnections[Name]:Disconnect()
+	end
+	
+	getgenv().FrostByteConnections[Name] = Connection
+end
+
 Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
 Flags = Rayfield.Flags
 
