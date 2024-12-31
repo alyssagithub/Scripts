@@ -1,5 +1,10 @@
 local Version = "v1.3.5"
 
+-- removing linter warnings
+local getgenv = getfenv().getgenv
+local firetouchinterest = getgenv().firetouchinterest
+local queue_on_teleport = getgenv().queue_on_teleport
+
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualUser = game:GetService("VirtualUser")
@@ -136,8 +141,8 @@ Tab:CreateToggle({
 	Callback = CollectDrops,
 })
 
-if CollectConnection then
-	CollectConnection:Disconnect()
+if getgenv().CollectConnection then
+	getgenv().CollectConnection:Disconnect()
 end
 
 getgenv().CollectConnection = workspace.Drops.ChildAdded:Connect(function()
@@ -440,8 +445,8 @@ Tab:CreateToggle({
 	end,
 })
 
-if SummaryConnection then
-	SummaryConnection:Disconnect()
+if getgenv().SummaryConnection then
+	getgenv().SummaryConnection:Disconnect()
 end
 
 getgenv().SummaryConnection = GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(function()
@@ -511,8 +516,8 @@ Tab:CreateToggle({
 	end,
 })
 
-if IdledConnection then
-	IdledConnection:Disconnect()
+if getgenv().IdledConnection then
+	getgenv().IdledConnection:Disconnect()
 end
 
 getgenv().IdledConnection = Player.Idled:Connect(function()
