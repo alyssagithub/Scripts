@@ -1,11 +1,5 @@
 ScriptVersion = "v1.3.6"
 
--- removing linter warnings
-local firetouchinterest = getfenv().firetouchinterest
-local queue_on_teleport = getfenv().queue_on_teleport
-local getconnections = getfenv().getconnections
-local HandleConnection: (RBXScriptConnection, string) -> () = getfenv().HandleConnection
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Player = game:GetService("Players").LocalPlayer
@@ -48,6 +42,12 @@ local function CollectDrops(Enabled: boolean)
 end
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+
+-- removing linter warnings
+local firetouchinterest = getfenv().firetouchinterest
+local queue_on_teleport = getfenv().queue_on_teleport
+local getconnections = getfenv().getconnections
+local HandleConnection: (RBXScriptConnection, string) -> () = getfenv().HandleConnection
 
 local Rayfield = getfenv().Rayfield
 local Flags = Rayfield.Flags
