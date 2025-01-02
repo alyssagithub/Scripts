@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.6"
+ScriptVersion = "v1.3.7"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -30,6 +30,12 @@ for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
 	table.insert(Dispensers, v.Name)
 end
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+
+local firetouchinterest = getfenv().firetouchinterest
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getfenv().HandleConnection
+local firesignal: (Signal: RBXScriptSignal) -> () = getfenv().firesignal
+
 local function CollectDrops(Enabled: boolean)
 	if not Enabled then
 		return
@@ -40,14 +46,6 @@ local function CollectDrops(Enabled: boolean)
 		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 1)
 	end
 end
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
-
--- removing linter warnings
-local firetouchinterest = getfenv().firetouchinterest
-local queue_on_teleport = getfenv().queue_on_teleport
-local getconnections = getfenv().getconnections
-local HandleConnection: (RBXScriptConnection, string) -> () = getfenv().HandleConnection
 
 local Rayfield = getfenv().Rayfield
 local Flags = Rayfield.Flags
@@ -107,8 +105,6 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateLabel("Will Not Work Without a Crit Zone", "arrow-up")
-
 Tab:CreateToggle({
 	Name = "💎 • Auto Collect Drops",
 	CurrentValue = false,
@@ -151,8 +147,6 @@ Tab:CreateToggle({
 		end
 	end,
 })
-
-Tab:CreateLabel("Only Use with Ore Pulse", "arrow-up")
 
 Tab:CreateSection("Marketplace")
 
@@ -221,7 +215,7 @@ Tab:CreateToggle({
 			end
 
 			if SuccessfulPurchases == ElementNumber then
-				BinderFunction:InvokeServer("Marketplace_Refresh")
+				firesignal(Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.MouseButton1Click)
 				task.wait(5)
 			end
 		end
@@ -238,7 +232,7 @@ Tab:CreateSlider({
 	Callback = function()end,
 })
 
-Tab:CreateSection("Dispensers")
+Tab:CreateSection("Rolling")
 
 Tab:CreateToggle({
 	Name = "🔄 • Auto Roll Equipment",
@@ -246,7 +240,7 @@ Tab:CreateToggle({
 	Flag = "Roll",
 	Callback = function(Value)
 		while Flags.Roll.CurrentValue and task.wait() do
-			BinderFunction:InvokeServer("Roll_RollItem", Flags.Dispenser.CurrentOption[1])
+			BinderFunction:InvokeServer("Roll_RollItem", Flags.Dispenser.CurrentOption[1], Flags.Empowered.CurrentValue)
 		end
 
 		if Value then
@@ -255,7 +249,12 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateLabel("Enable Auto Keep/Replace for Easier/AFK Use", "arrow-up")
+Tab:CreateToggle({
+	Name = "✨ • Empowered Auto Rolls",
+	CurrentValue = false,
+	Flag = "Empowered",
+	Callback = function()end,
+})
 
 Tab:CreateDropdown({
 	Name = "⚒ • Equipment Dispenser",
@@ -381,13 +380,13 @@ local Tab = Window:CreateTab("QOL", "leaf")
 Tab:CreateSection("UI")
 
 Tab:CreateToggle({
-	Name = "📦 • Auto Keep/Replace Equipment (Based on Tier)",
+	Name = "📦 • Auto Keep/Replace Equipment (Based on Tiers)",
 	CurrentValue = false,
 	Flag = "KeepReplace",
-	Callback = function(Value)
+	Callback = function()
 		while Flags.KeepReplace.CurrentValue and task.wait() do
 			local Roll = Player.PlayerGui.StartGui.Roll
-
+			
 			if not Roll.Visible then
 				continue
 			end
@@ -414,27 +413,27 @@ Tab:CreateToggle({
 			local OldButton = Roll.Old.Button
 
 			if Combined[NewStats] > Combined[OldStats] then
-				for i,v in getconnections(NewButton.MouseButton1Click) do
-					v:Fire()
-				end
-				print("Replacing")
+				repeat
+					firesignal(NewButton.MouseButton1Click)
+					task.wait()
+				until not Roll.Visible
 				
-				Rayfield:Notify({
-					Title = "Replaced Equipment",
-					Content = "Check output for more info.",
-					Duration = 10,
-					Image = "circle-alert",
-				})
-				
-				print("Old Stats Points:", Combined[OldStats], "New Stats Points:", Combined[NewStats])
+				print("replaced")
+			elseif Player.PlayerGui.StartGui.Roll.Reroll.Reroll.Text == "FREE" then
+				BinderEvent:FireServer("Rolling_Free_Reroll")
+
+				repeat
+					task.wait()
+				until Player.PlayerGui.StartGui.Roll.Reroll.Reroll.Text ~= "FREE"
+				print("rerolled")
 			else
-				for i,v in getconnections(OldButton.MouseButton1Click) do
-					v:Fire()
-				end
-				print("Keeping")
+				repeat
+					firesignal(OldButton.MouseButton1Click)
+					task.wait()
+				until not Roll.Visible
+				
+				print("kept")
 			end
-			
-			task.wait(0.1)
 		end
 	end,
 })
@@ -444,7 +443,9 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "GiantSummary",
 	Callback = function(Value)
-		GiantOreSummary.Visible = not Value
+		if GiantOreSummary.Visible and not Value then
+			GiantOreSummary.Visible = false
+		end
 	end,
 })
 
@@ -458,14 +459,12 @@ Tab:CreateSection("Safety")
 
 local Part
 
-local function GenerateRandomPos(Min, Max, Negative)
-	local Positive = Random.new():NextNumber(Min, Max)
-
-	if not Negative then
-		return Positive
+local function GenerateRandomPos(Min, Max)
+	if Max then
+		return Random.new():NextNumber(Min, Max)
 	end
 
-	return if math.random(2) == 1 then Random.new():NextNumber(Min, Max) else Random.new():NextNumber(-Min, -Max)
+	return Random.new():NextNumber(Min, -Min)
 end
 
 Tab:CreateToggle({
@@ -476,7 +475,7 @@ Tab:CreateToggle({
 		if Value and not Part then
 			Part = Instance.new("Part")
 			Part.Anchored = true
-			Part.Position = Vector3.new(GenerateRandomPos(800, 1000, true), GenerateRandomPos(800, 1000), GenerateRandomPos(800, 1000, true))
+			Part.Position = Vector3.new(GenerateRandomPos(1000), GenerateRandomPos(800, 1000), GenerateRandomPos(1000))
 			Part.Size = Vector3.new(10, 2, 10)
 			Part.Parent = workspace
 		end
