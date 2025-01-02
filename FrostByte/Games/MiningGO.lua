@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.7"
+ScriptVersion = "v1.3.8"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -275,7 +275,7 @@ Tab:CreateToggle({
 
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
 				for _, Quest: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
-					if not Quest:IsA("TextLabel") or not Quest.Text:lower():find("roll") or not Quest.FontFace.Bold then
+					if not Quest:IsA("TextLabel") or not Quest.Text:lower():find("roll") or Quest.FontFace.Bold then
 						continue
 					end
 
