@@ -415,7 +415,7 @@ Tab:CreateToggle({
 			if Combined[NewStats] > Combined[OldStats] then
 				repeat
 					firesignal(NewButton.MouseButton1Click)
-					task.wait()
+					task.wait(0.1)
 				until not Roll.Visible
 				
 				print("replaced")
@@ -423,13 +423,13 @@ Tab:CreateToggle({
 				BinderEvent:FireServer("Rolling_Free_Reroll")
 
 				repeat
-					task.wait()
+					task.wait(0.1)
 				until Player.PlayerGui.StartGui.Roll.Reroll.Reroll.Text ~= "FREE"
 				print("rerolled")
 			else
 				repeat
 					firesignal(OldButton.MouseButton1Click)
-					task.wait()
+					task.wait(0.1)
 				until not Roll.Visible
 				
 				print("kept")
