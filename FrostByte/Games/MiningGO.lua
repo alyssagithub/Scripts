@@ -411,6 +411,7 @@ Tab:CreateToggle({
 
 			local NewButton = Roll.New.Button
 			local OldButton = Roll.Old.Button
+			local RerollButton = Roll.Reroll.Reroll
 
 			if Combined[NewStats] > Combined[OldStats] then
 				print("replace start")
@@ -420,13 +421,13 @@ Tab:CreateToggle({
 				until not Roll.Visible
 				
 				print("replaced")
-			elseif Player.PlayerGui.StartGui.Roll.Reroll.Reroll.Text == "FREE" then
+			elseif RerollButton.Text == "FREE" and RerollButton.Parent.Visible then
 				print("reroll start")
 				BinderEvent:FireServer("Rolling_Free_Reroll")
 
 				repeat
 					task.wait(0.1)
-				until Player.PlayerGui.StartGui.Roll.Reroll.Reroll.Text ~= "FREE"
+				until RerollButton.Text ~= "FREE" or not RerollButton.Parent.Visible
 				print("rerolled")
 			else
 				print("keep start")
