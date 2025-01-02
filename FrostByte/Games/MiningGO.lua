@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.8"
+ScriptVersion = "v1.3.9"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -57,7 +57,7 @@ local Tab = Window:CreateTab("Automation", "repeat")
 Tab:CreateSection("Ores")
 
 Tab:CreateToggle({
-	Name = "⛏ • Auto Mine",
+	Name = "⛏ • Auto Mine (BLATANT)",
 	CurrentValue = false,
 	Flag = "Mine",
 	Callback = function(Value)
@@ -82,6 +82,10 @@ Tab:CreateToggle({
 				if not Ore.Model:GetChildren()[1] then
 					continue
 				end
+				
+				if Flags.Legit.CurrentValue and (Player.Character.HumanoidRootPart.Position - Ore.Base.Position).Magnitude > 15 then
+					continue
+				end
 
 				local RemoteName = "Mining_MineOre"
 
@@ -94,6 +98,14 @@ Tab:CreateToggle({
 				break
 			end
 		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "📏 • Only Mine Close Ores (Appears Legit)",
+	CurrentValue = false,
+	Flag = "Legit",
+	Callback = function(Value)
 	end,
 })
 
