@@ -1,4 +1,4 @@
-ScriptVersion = "v1.4.0"
+ScriptVersion = "v1.4.1"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -120,8 +120,10 @@ Tab:CreateToggle({
 			if QuestTPing then
 				continue
 			end
+			
+			local Character = Player.Character
 
-			local HumanoidRootPart = Player.Character:FindFirstChild("HumanoidRootPart")
+			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 
 			if not HumanoidRootPart then
 				continue
@@ -140,6 +142,7 @@ Tab:CreateToggle({
 				
 				LastTPLocation = Ore.Base:GetPivot() - Vector3.yAxis * Size.Y * 2
 				HumanoidRootPart:PivotTo(LastTPLocation)
+				Character.Humanoid.CameraOffset = Vector3.yAxis * 10
 				DidTP = true
 				break
 			end
@@ -151,6 +154,7 @@ Tab:CreateToggle({
 		
 		if Value and PreviousLocation then
 			Player.Character:PivotTo(PreviousLocation)
+			Player.Character.Humanoid.CameraOffset = Vector3.zero
 		end
 	end,
 })
