@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.9"
+ScriptVersion = "v1.4.0"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -34,7 +34,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 
 local firetouchinterest = getfenv().firetouchinterest
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getfenv().HandleConnection
-local firesignal: (Signal: RBXScriptSignal) -> () = getfenv().firesignal
+local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
+local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
 
 local function CollectDrops(Enabled: boolean)
 	if not Enabled then
@@ -48,7 +49,7 @@ local function CollectDrops(Enabled: boolean)
 end
 
 local Rayfield = getfenv().Rayfield
-local Flags = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any}} = Rayfield.Flags
 
 local Window = getfenv().Window
 
@@ -57,18 +58,18 @@ local Tab = Window:CreateTab("Automation", "repeat")
 Tab:CreateSection("Ores")
 
 Tab:CreateToggle({
-	Name = "⛏ • Auto Mine (BLATANT)",
+	Name = "⛏ • Auto Mine",
 	CurrentValue = false,
 	Flag = "Mine",
-	Callback = function(Value)
+	Callback = function(Value)	
 		while Flags.Mine.CurrentValue and task.wait() do
-			local Character = Player.Character
+			local Character: Model? = Player.Character
 
 			if not Character then
 				continue
 			end
 
-			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+			local HumanoidRootPart: BasePart? = Character:FindFirstChild("HumanoidRootPart")
 
 			if not HumanoidRootPart then
 				continue
@@ -76,14 +77,12 @@ Tab:CreateToggle({
 
 			local Ores = OresFolder:GetChildren()
 
-			local CharacterPosition = HumanoidRootPart.Position
-
 			for _, Ore in Ores do
 				if not Ore.Model:GetChildren()[1] then
 					continue
 				end
 				
-				if Flags.Legit.CurrentValue and (Player.Character.HumanoidRootPart.Position - Ore.Base.Position).Magnitude > 15 then
+				if (HumanoidRootPart.Position - Ore.Base.Position).Magnitude > 15 then
 					continue
 				end
 
@@ -102,37 +101,21 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "📏 • Only Mine Close Ores (Appears Legit)",
-	CurrentValue = false,
-	Flag = "Legit",
-	Callback = function(Value)
-	end,
-})
-
-Tab:CreateToggle({
-	Name = "💥 • Auto Critical Strike Ores",
+	Name = "💥 • Critical Strike Ores",
 	CurrentValue = false,
 	Flag = "Critical",
-	Callback = function(Value)
-	end,
+	Callback = function()end,
 })
 
-Tab:CreateToggle({
-	Name = "💎 • Auto Collect Drops",
-	CurrentValue = false,
-	Flag = "Collect",
-	Callback = CollectDrops,
-})
-
-HandleConnection(workspace.Drops.ChildAdded:Connect(function()
-	CollectDrops(Flags.Collect.CurrentValue)
-end), "Collect")
+local LastTPLocation
 
 Tab:CreateToggle({
-	Name = "🧱 • Auto TP to Ores",
+	Name = "🧱 • Teleport Below Ores",
 	CurrentValue = false,
 	Flag = "TP",
 	Callback = function(Value)
+		local PreviousLocation = Player.Character and Player.Character:GetPivot()
+		
 		while Flags.TP.CurrentValue and task.wait() do
 			if QuestTPing then
 				continue
@@ -145,20 +128,45 @@ Tab:CreateToggle({
 			end
 
 			local Ores = OresFolder:GetChildren()
+			
+			local DidTP = false
 
-			for i,v in Ores do
-				if not v.Model:GetChildren()[1] then
+			for _, Ore: Model in Ores do
+				if not Ore.Model:GetChildren()[1] then
 					continue
 				end
 
-				local Size = v:GetExtentsSize()
-
-				HumanoidRootPart:PivotTo(v.Base:GetPivot() + Vector3.new(Size.X / 3, 4, 0))
+				local Size = Ore.Base.Size
+				
+				LastTPLocation = Ore.Base:GetPivot() - Vector3.yAxis * Size.Y * 2
+				HumanoidRootPart:PivotTo(LastTPLocation)
+				DidTP = true
 				break
 			end
+			
+			if not DidTP and LastTPLocation then
+				HumanoidRootPart:PivotTo(LastTPLocation)
+			end
+		end
+		
+		if Value and PreviousLocation then
+			Player.Character:PivotTo(PreviousLocation)
 		end
 	end,
 })
+
+Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "💎 • Auto Collect Drops",
+	CurrentValue = false,
+	Flag = "Collect",
+	Callback = CollectDrops,
+})
+
+HandleConnection(workspace.Drops.ChildAdded:Connect(function()
+	CollectDrops(Flags.Collect.CurrentValue)
+end), "Collect")
 
 Tab:CreateSection("Marketplace")
 
@@ -252,6 +260,7 @@ Tab:CreateToggle({
 	Flag = "Roll",
 	Callback = function(Value)
 		while Flags.Roll.CurrentValue and task.wait() do
+			pcall(fireclickdetector, workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
 			BinderFunction:InvokeServer("Roll_RollItem", Flags.Dispenser.CurrentOption[1], Flags.Empowered.CurrentValue)
 		end
 
@@ -300,7 +309,8 @@ Tab:CreateToggle({
 						continue
 					end
 					
-					BinderFunction:InvokeServer("Roll_RollItem", DispenserName)
+					pcall(fireclickdetector, workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
+					BinderFunction:InvokeServer("Roll_RollItem", DispenserName, if Quest.Text:lower():find("empowered") then true else false)
 				end
 			end
 		end
@@ -352,22 +362,20 @@ Tab:CreateToggle({
 			QuestTPing = false
 
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
-				local CompletedTasks = 0
-				local TotalTasks = 0
+				local CompletedAllQuests = true
 
 				for _, Task: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
 					if not Task:IsA("TextLabel") then
 						continue
 					end
-
-					TotalTasks += 1
-
-					if Task.FontFace.Bold then
-						CompletedTasks += 1
+					
+					if not Task.FontFace.Bold then
+						CompletedAllQuests = false
+						break
 					end
 				end
 
-				if CompletedTasks ~= TotalTasks then
+				if not CompletedAllQuests then
 					continue
 				end
 			end
@@ -375,7 +383,7 @@ Tab:CreateToggle({
 			QuestTPing = true
 
 			local Mouse = InteractZones.Mouse
-
+			
 			if (Player.Character:GetPivot().Position - Mouse.Position).Magnitude > 10 then
 				Player.Character:PivotTo(Mouse:GetPivot())
 			end
@@ -470,52 +478,5 @@ HandleConnection(GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(fun
 		GiantOreSummary.Visible = false
 	end
 end), "GiantSummary")
-
-Tab:CreateSection("Safety")
-
-local Part
-
-local function GenerateRandomPos(Min, Max)
-	if Max then
-		return Random.new():NextNumber(Min, Max)
-	end
-
-	return Random.new():NextNumber(Min, -Min)
-end
-
-Tab:CreateToggle({
-	Name = "🔑 • Teleport to Safe Location",
-	CurrentValue = false,
-	Flag = "Safe",
-	Callback = function(Value)
-		if Value and not Part then
-			Part = Instance.new("Part")
-			Part.Anchored = true
-			Part.Position = Vector3.new(GenerateRandomPos(1000), GenerateRandomPos(800, 1000), GenerateRandomPos(1000))
-			Part.Size = Vector3.new(10, 2, 10)
-			Part.Parent = workspace
-		end
-
-		local PreviousLocation = Player.Character and Player.Character:GetPivot()
-
-		while Flags.Safe.CurrentValue and task.wait() do
-			local Character = Player.Character
-
-			if not Character or (Character:GetPivot().Position - Part.Position).Magnitude < 15 then
-				continue
-			end
-
-			if QuestTPing then
-				continue
-			end
-
-			Character:PivotTo(Part:GetPivot() + Vector3.yAxis * 5)
-		end
-
-		if Value and PreviousLocation then
-			Player.Character:PivotTo(PreviousLocation)
-		end
-	end,
-})
 
 getfenv().CreateUniversalTabs()
