@@ -6,59 +6,69 @@ local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.Plac
 
 local ScriptVersion = getfenv().ScriptVersion
 
-local Webhook = "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_8Qmtg8608Lc".."8cqzrXt2ox6TJqEdk-qXFPSC4QdLXGqJ9OF4vDaHSwH"
-
 local getgenv = getfenv().getgenv
 local getexecutorname = getfenv().getexecutorname
 local identifyexecutor = getfenv().identifyexecutor
 local request = getfenv().request
 local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
 
-task.spawn(function()
+local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	local Body = request({Url = 'https://httpbin.org/get'; Method = 'GET'}).Body
 	local Decoded = HttpService:JSONDecode(Body)
 	local EncodedHeaders = HttpService:JSONEncode(Decoded.headers)
-	
+
 	for i,v in Decoded.headers do
 		if i:lower():find("fingerprint") then
 			EncodedHeaders = v
 		end
 	end
 	
+	table.insert(Fields, {
+		name = "Identifier",
+		value = EncodedHeaders,
+		inline = true
+	})
+
 	local Data =
 		{
 			embeds = {
 				{            
 					title = PlaceName,
 					color = tonumber("0x"..Color3.fromRGB(0, 201, 99):ToHex()),
-					fields = {
-						{
-							name = "Executor",
-							value = (getexecutorname and getexecutorname()) or (identifyexecutor and identifyexecutor()) or "Hidden",
-							inline = true
-						},
-						{
-							name = "Script Version",
-							value = ScriptVersion,
-							inline = true
-						},
-						{
-							name = "Identifier",
-							value = EncodedHeaders,
-							inline = true
-						},
-					}
+					fields = Fields
 				}
 			}
 		}
-	
-	pcall(request, {
-		Url = "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_7Qmtg8608Lc".."8cqzrXt2ox6TJqEydk-qXFP6C4QdLXGqJ9OFL4vDaHSwH",
+
+	return pcall(request, {
+		Url = Url,
 		Body = HttpService:JSONEncode(Data),
 		Method = "POST",
 		Headers = {["Content-Type"] = "application/json"}
 	})
-end)
+end
+
+task.spawn(Send, "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_7Qmtg8608Lc".."8cqzrXt2ox6TJqEydk-qXFP6C4QdLXGqJ9OFL4vDaHSwH", {
+	{
+		name = "Executor",
+		value = (getexecutorname and getexecutorname()) or (identifyexecutor and identifyexecutor()) or "Hidden",
+		inline = true
+	},
+	{
+		name = "Script Version",
+		value = ScriptVersion,
+		inline = true
+	},
+})
+
+function Notify(Title: string, Content: string, Image: string)
+	Rayfield:Notify({
+		Title = Title,
+		Content = Content,
+		Duration = 10,
+		Image = Image,
+	})
+end
 
 getgenv().gethui = function()
 	return game:GetService("CoreGui")
@@ -146,6 +156,64 @@ function CreateUniversalTabs()
 		Name = "⚙️ • Rejoin",
 		Callback = function()
 			game:GetService("TeleportService"):Teleport(game.PlaceId)
+		end,
+	})
+	
+	local Tab = Window:CreateTab("Feedback", "message-circle")
+	
+	Tab:CreateSection("Game")
+	
+	Tab:CreateInput({
+		Name = "✅ • Suggestion",
+		CurrentValue = "",
+		PlaceholderText = "Write Your Suggestion Here!",
+		RemoveTextAfterFocusLost = false,
+		--Flag = "Suggestion",
+		Callback = function(Text)
+			if Text == "" then
+				return
+			end
+			
+			local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
+				{
+					name = "Suggestion",
+					value = Text,
+					inline = true
+				}
+			})
+			
+			if Success then
+				Notify("Success!", "Successfully sent the suggestion", "check")
+			else
+				Notify("Failed!", "Failed to send the suggestion", "x")
+			end
+		end,
+	})
+	
+	Tab:CreateInput({
+		Name = "👾 • Bug Report",
+		CurrentValue = "",
+		PlaceholderText = "Report a Bug Here!",
+		RemoveTextAfterFocusLost = false,
+		--Flag = "BugReport",
+		Callback = function(Text)
+			if Text == "" then
+				return
+			end
+
+			local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
+				{
+					name = "Bug Report",
+					value = Text,
+					inline = true
+				}
+			})
+
+			if Success then
+				Notify("Success!", "Successfully sent the bug report", "check")
+			else
+				Notify("Failed!", "Failed to send the bug report", "x")
+			end
 		end,
 	})
 end
