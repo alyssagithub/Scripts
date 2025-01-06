@@ -10,14 +10,7 @@ end
 
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
-if PlaceName:find("]") then
-	PlaceName = PlaceName:split("]")[2]
-end
-
-if PlaceName:find(")") then
-	PlaceName = PlaceName:split(")")[2]
-end
-
+PlaceName = PlaceName:gsub("%b[]", "")
 PlaceName = PlaceName:gsub("[^%a]", "")
 
 local Code = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
