@@ -177,13 +177,34 @@ function CreateUniversalTabs()
 		if Text == "" then
 			return
 		end
+		
+		local Features = ""
+		
+		for i,v in Flags do
+			if v.CurrentValue == true then
+				Features ..= `\n✅ - {v.Name}`
+			elseif v.CurrentOption then
+				Features ..= `\n📃 - {v.Name}: {table.concat(v.CurrentOption, ", ")}`
+			elseif v.CurrentValue == false then
+				Features ..= `\n❌ - {v.Name}`
+			elseif typeof(v.CurrentValue) == "number" then
+				Features ..= `\n🔢 - {v.Name}: {v.CurrentValue}`
+			else
+				Features ..= `\n❓ - {v.Name}`
+			end
+		end
 
 		local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
 			{
 				name = Name,
 				value = Text,
 				inline = true
-			}
+			},
+			{
+				name = "Features",
+				value = Features,
+				inline = true
+			},
 		})
 
 		if Success then
