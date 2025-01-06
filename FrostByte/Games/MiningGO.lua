@@ -1,4 +1,6 @@
-ScriptVersion = "v1.4.1"
+ScriptVersion = "v1.4.2"
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -30,9 +32,7 @@ for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
 	table.insert(Dispensers, v.Name)
 end
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
-
-local firetouchinterest = getfenv().firetouchinterest
+local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getfenv().HandleConnection
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
@@ -191,6 +191,10 @@ Tab:CreateToggle({
 
 				if Flags.Free.CurrentValue and v.Inner.Cost.Title.Text ~= "0" then
 					continue
+				end
+				
+				if not Flags.Marketplace.CurrentValue then
+					return
 				end
 
 				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(ElementNumber))
