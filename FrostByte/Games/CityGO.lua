@@ -1,4 +1,4 @@
-ScriptVersion = "v1.0.0"
+ScriptVersion = "v1.0.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -39,20 +39,18 @@ Tab:CreateToggle({
 	Flag = "Merge",
 	Callback = function(Value)	
 		while Flags.Merge.CurrentValue and task.wait() do
-			for _, Building: Frame in Player.PlayerGui.Inventory.Main.Main.Main.Body.Inventory["Decorative Frame"].Inventory:GetChildren() do
-				if not Building:IsA("Frame") then
-					continue
+			local Module = require(ReplicatedStorage.ClientSystems.Inventory)
+			
+			for Name, Building in Module._Inventory.All do
+				for Level, Info in Building do
+					local Count = Info.Count
+					
+					if Count < 3 then
+						continue
+					end
+					
+					RemoteEvents.Upgrade:FireServer(Name, Level, math.floor(Count / 3))
 				end
-				
-				local Count = Building.Count.Text:gsub("%D", "")
-				
-				if tonumber(Count) < 3 then
-					continue
-				end
-				
-				local Level = Building.Level.Text:gsub("%D", "")
-				
-				RemoteEvents.Upgrade:FireServer(Building.Name, Level, math.floor(tonumber(Count) / 3))
 			end
 		end
 	end,
@@ -60,13 +58,25 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Items")
 
-local function PickupDrops(Flamethrower: boolean?)
-	if not Flags.Pickup.CurrentValue and not Flags.Flamethrower.CurrentValue then
+local function PickupDrops()
+	if not Flags.Pickup.CurrentValue then
 		return
 	end
 	
-	for _, Drop: BasePart in (if Flamethrower then workspace.FlamethrowerEntityFolder else workspace.PotionEntityFolder):GetChildren() do
-		while Drop.Parent and (Flags.Pickup.CurrentValue or Flags.Flamethrower.CurrentValue) and task.wait() do
+	for _, Drop: BasePart in workspace.PotionEntityFolder:GetChildren() do
+		while Drop.Parent and Flags.Pickup.CurrentValue and task.wait() do
+			Player.Character:PivotTo(Drop:GetPivot())
+		end
+	end
+end
+
+local function PickupFlamethrowers()
+	if not Flags.Flamethrower.CurrentValue then
+		return
+	end
+	
+	for _, Drop: BasePart in workspace.FlamethrowerEntityFolder:GetChildren() do
+		while Drop.Parent and Flags.Flamethrower.CurrentValue and task.wait() do
 			Player.Character:PivotTo(Drop:GetPivot())
 		end
 	end
@@ -88,13 +98,11 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Flamethrower",
 	Callback = function(Value)	
-		PickupDrops(true)
+		PickupFlamethrowers()
 	end,
 })
 
-HandleConnection(workspace.FlamethrowerEntityFolder.ChildAdded:Connect(function()
-	PickupDrops(true)
-end), "Flamethrower")
+HandleConnection(workspace.FlamethrowerEntityFolder.ChildAdded:Connect(PickupFlamethrowers), "Flamethrower")
 
 Tab:CreateToggle({
 	Name = "🔁 • Auto Use Items",
