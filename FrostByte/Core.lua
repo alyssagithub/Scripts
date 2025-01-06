@@ -168,6 +168,26 @@ function CreateUniversalTabs()
 	
 	Tab:CreateSection("Game")
 	
+	local function HandleInput(Name: string, Text: string)
+		if Text == "" then
+			return
+		end
+
+		local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
+			{
+				name = Name,
+				value = Text,
+				inline = true
+			}
+		})
+
+		if Success then
+			Notify("Success!", `Successfully sent the {Name}`, "check")
+		else
+			Notify("Failed!", `Failed to send the {Name}`, "x")
+		end
+	end
+	
 	Tab:CreateInput({
 		Name = "✅ • Suggestion",
 		CurrentValue = "",
@@ -175,23 +195,7 @@ function CreateUniversalTabs()
 		RemoveTextAfterFocusLost = false,
 		--Flag = "Suggestion",
 		Callback = function(Text)
-			if Text == "" then
-				return
-			end
-			
-			local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
-				{
-					name = "Suggestion",
-					value = Text,
-					inline = true
-				}
-			})
-			
-			if Success then
-				Notify("Success!", "Successfully sent the suggestion", "check")
-			else
-				Notify("Failed!", "Failed to send the suggestion", "x")
-			end
+			HandleInput("Suggestion", Text)
 		end,
 	})
 	
@@ -202,23 +206,7 @@ function CreateUniversalTabs()
 		RemoveTextAfterFocusLost = false,
 		--Flag = "BugReport",
 		Callback = function(Text)
-			if Text == "" then
-				return
-			end
-
-			local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
-				{
-					name = "Bug Report",
-					value = Text,
-					inline = true
-				}
-			})
-
-			if Success then
-				Notify("Success!", "Successfully sent the bug report", "check")
-			else
-				Notify("Failed!", "Failed to send the bug report", "x")
-			end
+			HandleInput("Bug Report", Text)
 		end,
 	})
 end
