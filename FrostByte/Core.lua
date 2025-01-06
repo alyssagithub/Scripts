@@ -11,6 +11,7 @@ local getexecutorname = getfenv().getexecutorname
 local identifyexecutor = getfenv().identifyexecutor
 local request = getfenv().request
 local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
+local queue_on_teleport: (Code: string) -> () = getfenv().queue_on_teleport
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	if not Fields then
@@ -101,6 +102,21 @@ if not firesignal then
 		local Connections = getconnections(Signal)
 		Connections[#Connections]:Fire()
 	end
+end
+
+if queue_on_teleport then
+	queue_on_teleport([[
+	
+	local TeleportService = game:GetService("TeleportService")
+local TeleportData = TeleportService:GetLocalPlayerTeleportData()
+
+if TeleportData and typeof(TeleportData) == "table" and TeleportData.FrostByteRejoin then
+	return
+end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()
+	
+	]])
 end
 
 Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
