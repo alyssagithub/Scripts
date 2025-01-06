@@ -183,7 +183,7 @@ function CreateUniversalTabs()
 	Tab:CreateButton({
 		Name = "⚙️ • Rejoin",
 		Callback = function()
-			game:GetService("TeleportService"):Teleport(game.PlaceId)
+			game:GetService("TeleportService"):Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
 	
