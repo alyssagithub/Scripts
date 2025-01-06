@@ -66,10 +66,9 @@ local function PickupDrops(Flamethrower: boolean?)
 	end
 	
 	for _, Drop: BasePart in (if Flamethrower then workspace.FlamethrowerEntityFolder else workspace.PotionEntityFolder):GetChildren() do
-		repeat
+		while Drop.Parent and (Flags.Pickup.CurrentValue or Flags.Flamethrower.CurrentValue) and task.wait() do
 			Player.Character:PivotTo(Drop:GetPivot())
-			task.wait()
-		until not Drop.Parent or (not Flags.Pickup.CurrentValue and not Flags.Flamethrower.CurrentValue)
+		end
 	end
 end
 
@@ -108,9 +107,9 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				firesignal(Item.Use.MouseButton1Click)
-				
-				Item.Count:GetPropertyChangedSignal("Text"):Wait()
+				for i = 1, #ReplicatedStorage.Assets.Potions:GetChildren() do
+					RemoteFunctions.UsePotion:InvokeServer(tostring(i))
+				end
 			end
 		end
 	end,
