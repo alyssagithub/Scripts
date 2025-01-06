@@ -93,13 +93,18 @@ firesignal = getfenv().firesignal:: (RBXScriptSignal) -> ()
 
 if not firesignal then
 	firesignal = function(Signal: RBXScriptSignal)
+		if not getconnections then
+			Notify("Unsupported", "Your executor does not support 'getconnections'", "circle-alert")
+			return
+		end
+		
 		local Connections = getconnections(Signal)
 		Connections[#Connections]:Fire()
 	end
 end
 
 Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
-Flags = Rayfield.Flags
+local Flags = Rayfield.Flags
 
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion}`,
