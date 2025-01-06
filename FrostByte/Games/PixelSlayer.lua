@@ -1,4 +1,4 @@
-ScriptVersion = "v1.0.0"
+ScriptVersion = "v1.0.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -23,28 +23,6 @@ Tab:CreateToggle({
 		while Flags.Attack.CurrentValue and task.wait() do
 			for _, Mob in workspace.World.Mobs:GetChildren() do
 				Remotes.DamageFire:FireServer(Mob)
-			end
-		end
-	end,
-})
-
-Tab:CreateToggle({
-	Name = "🌀 • Teleport Above Mobs",
-	CurrentValue = false,
-	Flag = "Teleport",
-	Callback = function(Value)	
-		while Flags.Teleport.CurrentValue and task.wait() do
-			if not workspace.DungeonDirectory:GetChildren()[1] then
-				continue
-			end
-			
-			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
-				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 then
-					continue
-				end
-				
-				Player.Character:PivotTo(Mob:GetPivot() + Vector3.yAxis * Mob:GetExtentsSize().Y)
-				break
 			end
 		end
 	end,
