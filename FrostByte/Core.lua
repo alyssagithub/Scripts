@@ -121,7 +121,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	]])
 end
 
-Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
+Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/ab965bf9a6f9890e6447c9b377678f5bffd8a379/source.lua'))() -- older version
 local Flags = Rayfield.Flags
 
 Window = Rayfield:CreateWindow({
