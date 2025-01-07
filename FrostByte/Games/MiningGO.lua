@@ -1,4 +1,4 @@
-ScriptVersion = "v1.4.3"
+ScriptVersion = "v1.4.4"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -91,9 +91,12 @@ Tab:CreateToggle({
 				if Ore:FindFirstChild("OreTipGiant") then
 					RemoteName ..= "P"
 				end
-
+				
+				local Number = Random.new():NextNumber(0.7, 0.75)
+				
 				BinderEvent:FireServer("Mining_Start")
-				BinderEvent:FireServer(RemoteName, Ore.Name, Random.new():NextNumber(0.8, 0.9), Flags.Critical.CurrentValue)
+				task.wait(Number)
+				BinderEvent:FireServer(RemoteName, Ore.Name, Number, Flags.Critical.CurrentValue)
 				break
 			end
 		end
