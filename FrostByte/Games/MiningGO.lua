@@ -92,7 +92,7 @@ Tab:CreateToggle({
 					RemoteName ..= "P"
 				end
 				
-				local Number = Random.new():NextNumber(0.7, 0.75) -- 0.7, 0.75
+				local Number = Random.new():NextNumber(0.7, 0.75)
 				
 				BinderEvent:FireServer("Mining_Start")
 				task.wait(Number)
@@ -479,7 +479,7 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "GiantSummary",
 	Callback = function(Value)
-		if GiantOreSummary.Visible and not Value then
+		if GiantOreSummary.Visible and Value then
 			GiantOreSummary.Visible = false
 		end
 	end,
