@@ -29,6 +29,28 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
+	Name = "🌀 • (BROKEN) Teleport Above Mobs (BROKEN)",
+	CurrentValue = false,
+	Flag = "Teleport",
+	Callback = function(Value)	
+		while Flags.Teleport.CurrentValue and task.wait() do
+			if not workspace.DungeonDirectory:GetChildren()[1] then
+				continue
+			end
+			
+			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
+				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 then
+					continue
+				end
+				
+				Player.Character:PivotTo(Mob:GetPivot() + Vector3.yAxis * Mob:GetExtentsSize().Y)
+				break
+			end
+		end
+	end,
+})
+
+Tab:CreateToggle({
 	Name = "🔥 • Auto Use Abilities",
 	CurrentValue = false,
 	Flag = "Abilities",
