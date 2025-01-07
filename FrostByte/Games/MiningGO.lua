@@ -1,4 +1,4 @@
-ScriptVersion = "v1.4.4"
+ScriptVersion = "v1.4.5"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -92,7 +92,7 @@ Tab:CreateToggle({
 					RemoteName ..= "P"
 				end
 				
-				local Number = Random.new():NextNumber(0.7, 0.75)
+				local Number = Random.new():NextNumber(0.7, 0.75) -- 0.7, 0.75
 				
 				BinderEvent:FireServer("Mining_Start")
 				task.wait(Number)
@@ -183,24 +183,26 @@ Tab:CreateToggle({
 	Flag = "Marketplace",
 	Callback = function(Value)
 		while Flags.Marketplace.CurrentValue and task.wait(1) do
-			local ElementNumber = 0
-
-			for i,v in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
-				if not v:IsA("Frame") then
-					continue
-				end
-
-				ElementNumber += 1
-
-				if Flags.Free.CurrentValue and v.Inner.Cost.Title.Text ~= "0" then
+			for _, Element: Frame in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
+				if not Element:IsA("Frame") then
 					continue
 				end
 				
 				if not Flags.Marketplace.CurrentValue then
 					return
 				end
+				
+				if Flags.Free.CurrentValue then
+					if Element.Inner.Cost.Title.Text ~= "0" then
+						continue
+					end
 
-				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(ElementNumber))
+					if Element.Inner.Center.Purchased2.Visible then
+						continue
+					end
+				end
+
+				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(Element.LayoutOrder))
 			end
 		end
 	end,
