@@ -1,4 +1,4 @@
-ScriptVersion = "v1.4.2"
+ScriptVersion = "v1.4.3"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -262,14 +262,18 @@ Tab:CreateSlider({
 
 Tab:CreateSection("Rolling")
 
+local function Roll(Dispenser, Empowered)
+	pcall(fireclickdetector, workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
+	BinderFunction:InvokeServer("Roll_RollItem", Dispenser, Empowered)
+end
+
 Tab:CreateToggle({
 	Name = "🔄 • Auto Roll Equipment",
 	CurrentValue = false,
 	Flag = "Roll",
 	Callback = function(Value)
 		while Flags.Roll.CurrentValue and task.wait() do
-			pcall(fireclickdetector, workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
-			BinderFunction:InvokeServer("Roll_RollItem", Flags.Dispenser.CurrentOption[1], Flags.Empowered.CurrentValue)
+			Roll(Flags.Dispenser.CurrentOption[1], Flags.Empowered.CurrentValue)
 		end
 
 		if Value then
@@ -304,21 +308,16 @@ Tab:CreateToggle({
 
 			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
 				for _, Quest: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
-					if not Quest:IsA("TextLabel") or not Quest.Text:lower():find("roll") or Quest.FontFace.Bold then
-						continue
-					end
-
-					local Split1 = Quest.Text:split("Roll ")[2]
-					local Split2 = Split1:split(" [")[1]
-					local ResultingName = Split2:gsub("%d", "")
-					local DispenserName = `Dispenser{ResultingName}`
-
-					if not ReplicatedStorage.DispenserFrames:FindFirstChild(DispenserName) then
+					if not Quest:IsA("TextLabel") or Quest.FontFace.Bold then
 						continue
 					end
 					
-					pcall(fireclickdetector, workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
-					BinderFunction:InvokeServer("Roll_RollItem", DispenserName, if Quest.Text:lower():find("empowered") then true else false)
+					for _, Dispenser: string in Dispensers do
+						local ItemName = Dispenser:gsub("Dispenser ", "")
+						if Quest.Text:find(ItemName) then
+							Roll(Dispenser, if Quest.Text:find("Empowered") then true else false)
+						end
+					end
 				end
 			end
 		end
@@ -415,7 +414,7 @@ Tab:CreateToggle({
 		while Flags.KeepReplace.CurrentValue and task.wait() do
 			local Roll = Player.PlayerGui.StartGui.Roll
 			
-			if not Roll.Visible then
+			if not Roll.Visible or not Roll.Old.Stat:FindFirstChild("Frame") then
 				continue
 			end
 
