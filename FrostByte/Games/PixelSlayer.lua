@@ -52,7 +52,7 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "🌀 • Teleport Above Mobs",
+	Name = "🌀 • Teleport to Mobs",
 	CurrentValue = false,
 	Flag = "Teleport",
 	Callback = function(Value)
