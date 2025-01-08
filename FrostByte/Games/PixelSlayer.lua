@@ -1,4 +1,4 @@
-ScriptVersion = "v1.0.1"
+ScriptVersion = "v1.0.2"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -29,28 +29,6 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "🌀 • (BROKEN) Teleport Above Mobs (BROKEN)",
-	CurrentValue = false,
-	Flag = "Teleport",
-	Callback = function(Value)	
-		while Flags.Teleport.CurrentValue and task.wait() do
-			if not workspace.DungeonDirectory:GetChildren()[1] then
-				continue
-			end
-			
-			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
-				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 then
-					continue
-				end
-				
-				Player.Character:PivotTo(Mob:GetPivot() + Vector3.yAxis * Mob:GetExtentsSize().Y)
-				break
-			end
-		end
-	end,
-})
-
-Tab:CreateToggle({
 	Name = "🔥 • Auto Use Abilities",
 	CurrentValue = false,
 	Flag = "Abilities",
@@ -66,8 +44,69 @@ Tab:CreateToggle({
 					["mouseTargetUsingRange"] = Vector3.new(-598.558349609375, 0.3105278015136719, 348.0400085449219)
 				})
 			end
+			task.wait(1)
 		end
 	end,
+})
+
+Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "🌀 • Teleport Above Mobs",
+	CurrentValue = false,
+	Flag = "Teleport",
+	Callback = function(Value)
+		while Flags.Teleport.CurrentValue and task.wait() do
+			if not workspace.DungeonDirectory:GetChildren()[1] then
+				continue
+			end
+
+			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
+				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 then
+					continue
+				end
+
+				local BodyGyro = Player.Character.HumanoidRootPart:FindFirstChild("BodyGyro")
+
+				if BodyGyro then
+					BodyGyro:Destroy()
+				end
+
+				Player.Character:PivotTo(Mob.HumanoidRootPart.CFrame + Vector3.new(Flags.OffsetX.CurrentValue, Flags.OffsetY.CurrentValue, Flags.OffsetZ.CurrentValue))
+				break
+			end
+		end
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "🇽 • Teleport Offset X",
+	Range = {-10, 10},
+	Increment = 0.1,
+	Suffix = "",
+	CurrentValue = 0,
+	Flag = "OffsetX",
+	Callback = function()end,
+})
+
+Tab:CreateSlider({
+	Name = "🇾 • Teleport Offset Y",
+	Range = {-10, 10},
+	Increment = 0.1,
+	Suffix = "",
+	CurrentValue = 6,
+	Flag = "OffsetY",
+	Callback = function()end,
+})
+
+Tab:CreateSlider({
+	Name = "🇿 • Teleport Offset Z",
+	Range = {-10, 10},
+	Increment = 0.1,
+	Suffix = "",
+	CurrentValue = 0,
+	Flag = "OffsetZ",
+	Callback = function()end,
 })
 
 Tab:CreateSection("Upgrades")
@@ -181,6 +220,42 @@ Tab:CreateDropdown({
 	CurrentOption = "Empty Bottle",
 	MultipleOptions = true,
 	Flag = "Items",
+	Callback = function()end,
+})
+
+Tab:CreateSection("Dungeon")
+
+local Difficulties = {}
+
+for i,v in Player.PlayerGui.MainGui.DungeonInfo.Main.Dungeon.Difficulty:GetChildren() do
+	Difficulties[i] = v.Name
+end
+
+Tab:CreateToggle({
+	Name = "🏰 • Auto Enter Magicbound Castle",
+	CurrentValue = false,
+	Flag = "Magicbound",
+	Callback = function(Value)
+		while Flags.Magicbound.CurrentValue and task.wait() do
+			if workspace.DungeonDirectory:GetChildren()[1] or not Player.Character or not Player.Character:FindFirstChild("Equipped") then
+				continue
+			end
+			
+			Remotes.StartDungeon:FireServer("Magicbound Castle", table.find(Difficulties, Flags.Difficulty.CurrentOption[1]))
+			
+			repeat
+				task.wait()
+			until workspace.DungeonDirectory:GetChildren()[1]
+		end
+	end,
+})
+
+Tab:CreateDropdown({
+	Name = "📊 • Difficulty Mode",
+	Options = Difficulties,
+	CurrentOption = "Easy",
+	MultipleOptions = false,
+	Flag = "Difficulty",
 	Callback = function()end,
 })
 
