@@ -12,10 +12,17 @@ local identifyexecutor = getfenv().identifyexecutor
 local request = getfenv().request
 local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
 local queue_on_teleport: (Code: string) -> () = getfenv().queue_on_teleport
+local setfpscap: (FPS: number) -> () = getfenv().setfpscap
+local isrbxactive: () -> (boolean) = getfenv().isrbxactive
+local setclipboard: (Text: string) -> () = getfenv().setclipboard
 
 local Webhook1 = "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzI59v5hq".."T89zkgmo0q_tWBeaomDP8".."SO7UNYcw3H0Nif76ewQCwM".."A7qZBEl1OBX"
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
+	if not request then
+		return
+	end
+	
 	if not Fields then
 		Fields = {}
 	end
@@ -74,7 +81,7 @@ function Notify(Title: string, Content: string, Image: string)
 		Title = Title,
 		Content = Content,
 		Duration = 10,
-		Image = Image,
+		Image = Image or "info",
 	})
 end
 
@@ -94,17 +101,14 @@ end
 
 firesignal = getfenv().firesignal:: (RBXScriptSignal) -> ()
 
-if not firesignal then
+if not firesignal and getconnections then
 	firesignal = function(Signal: RBXScriptSignal)
-		if not getconnections then
-			Notify("Unsupported", "Your executor does not support 'getconnections'", "circle-alert")
-			return
-		end
-		
 		local Connections = getconnections(Signal)
 		Connections[#Connections]:Fire()
 	end
 end
+
+UnsupportedName = "Your Executor Doesn't Support This Feature"
 
 if queue_on_teleport then
 	queue_on_teleport([[
@@ -177,6 +181,45 @@ function CreateUniversalTabs()
 		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightMeta, false, game)
 		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightMeta, false, game)
 	end)
+	
+	Tab:CreateSection("Client")
+	
+	Tab:CreateSlider({
+		Name = if setfpscap then "🎮 • Max FPS (0 for Unlimited)" else UnsupportedName,
+		Range = {0, 240},
+		Increment = 1,
+		Suffix = "FPS",
+		CurrentValue = 0,
+		Flag = "FPS",
+		Callback = function(Value)
+			setfpscap(Value)
+		end,
+	})
+	
+	local PreviousValue
+	
+	Tab:CreateToggle({
+		Name = if isrbxactive then "⬜ • Disable 3D Rendering When Tabbed Out" else UnsupportedName,
+		CurrentValue = false,
+		Flag = "Rendering",
+		Callback = function(Value)
+			while Flags.Rendering.CurrentValue and task.wait() do
+				local CurrentValue = isrbxactive()
+				
+				if PreviousValue == CurrentValue then
+					continue
+				end
+				
+				PreviousValue = CurrentValue
+				
+				game:GetService("RunService"):Set3dRenderingEnabled(CurrentValue)
+			end
+			
+			if Value then
+				game:GetService("RunService"):Set3dRenderingEnabled(true)
+			end
+		end,
+	})
 
 	Tab:CreateSection("Miscellaneous")
 
@@ -191,56 +234,13 @@ function CreateUniversalTabs()
 	
 	Tab:CreateSection("Game")
 	
-	local function HandleInput(Name: string, Text: string)
-		if Text == "" then
-			return
-		end
-		
-		local Features = ""
-		
-		for i,v in Flags do
-			if v.CurrentValue == true then
-				Features ..= `\n✅ - {v.Name}`
-			elseif v.CurrentOption then
-				Features ..= `\n📃 - {v.Name}: {table.concat(v.CurrentOption, ", ")}`
-			elseif v.CurrentValue == false then
-				Features ..= `\n❌ - {v.Name}`
-			elseif typeof(v.CurrentValue) == "number" then
-				Features ..= `\n🔢 - {v.Name}: {v.CurrentValue}`
-			else
-				Features ..= `\n❓ - {v.Name}`
-			end
-		end
-
-		local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
-			{
-				name = Name,
-				value = Text,
-				inline = true
-			},
-			{
-				name = "Features",
-				value = Features,
-				inline = true
-			},
-		})
-
-		if Success then
-			Notify("Success!", `Successfully sent the {Name}`, "check")
-		else
-			Notify("Failed!", `Failed to send the {Name}`, "x")
-		end
-	end
-	
 	Tab:CreateInput({
 		Name = "✅ • Suggestion",
 		CurrentValue = "",
 		PlaceholderText = "Write Your Suggestion Here!",
 		RemoveTextAfterFocusLost = false,
-		--Flag = "Suggestion",
-		Callback = function(Text)
-			HandleInput("Suggestion", Text)
-		end,
+		Flag = "Suggestion",
+		Callback = function()end,
 	})
 	
 	Tab:CreateInput({
@@ -248,9 +248,97 @@ function CreateUniversalTabs()
 		CurrentValue = "",
 		PlaceholderText = "Report a Bug Here!",
 		RemoveTextAfterFocusLost = false,
-		--Flag = "BugReport",
-		Callback = function(Text)
-			HandleInput("Bug Report", Text)
+		Flag = "BugReport",
+		Callback = function()end,
+	})
+	
+	Tab:CreateButton({
+		Name = "📥 • Send Feedback",
+		Callback = function()
+			local BugReportValue = Flags.BugReport.CurrentValue
+			local SuggestionValue = Flags.Suggestion.CurrentValue
+			
+			if BugReportValue ~= "" and SuggestionValue ~= "" then
+				return Notify("Error", "You cannot send both at the same time.")
+			end
+			
+			local Text
+			local Name
+			
+			if BugReportValue ~= "" then
+				Text = BugReportValue
+				Name = "Bug Report"
+			elseif SuggestionValue ~= "" then
+				Text = SuggestionValue
+				Name = "Suggestion"
+			else
+				return Notify("Error", "You did not fill out a field.")
+			end
+			
+			local Features = ""
+
+			for i,v in Flags do
+				if v.CurrentValue == true then
+					Features ..= `\n✅ - {v.Name}`
+				elseif v.CurrentOption then
+					Features ..= `\n📃 - {v.Name}: {table.concat(v.CurrentOption, ", ")}`
+				elseif v.CurrentValue == false then
+					Features ..= `\n❌ - {v.Name}`
+				elseif typeof(v.CurrentValue) == "number" then
+					Features ..= `\n🔢 - {v.Name}: {v.CurrentValue}`
+				else
+					Features ..= `\n❓ - {v.Name}`
+				end
+			end
+			
+			Notify("Sending...", "Please wait while it sends.")
+
+			local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
+				{
+					name = Name,
+					value = Text,
+					inline = true
+				},
+				{
+					name = "Features",
+					value = Features,
+					inline = true
+				},
+			})
+			
+			if Success then
+				Notify("Success!", `Successfully sent the {Name}`, "check")
+			else
+				Notify("Failed!", `Failed to send the {Name}`, "x")
+			end
+		end,
+	})
+	
+	Tab:CreateSection("Discord")
+	
+	Tab:CreateButton({
+		Name = if request or setclipboard then "❄ • Join the FrostByte Discord!" else "https://discord.gg/sS3tDP6FSB",
+		Callback = function()
+			if request then
+				request({
+					Url = 'http://127.0.0.1:6463/rpc?v=1',
+					Method = 'POST',
+					Headers = {
+						['Content-Type'] = 'application/json',
+						Origin = 'https://discord.com'
+					},
+					Body = HttpService:JSONEncode({
+						cmd = 'INVITE_BROWSER',
+						nonce = HttpService:GenerateGUID(false),
+						args = {code = 'sS3tDP6FSB'}
+					})
+				})
+			elseif setclipboard then
+				setclipboard("https://discord.gg/sS3tDP6FSB")
+				Notify("Success!", "Copied Discord Link to Clipboard.")
+			else
+				Notify("Discord", "https://discord.gg/sS3tDP6FSB")
+			end
 		end,
 	})
 end
