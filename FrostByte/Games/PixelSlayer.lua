@@ -105,7 +105,7 @@ Tab:CreateSlider({
 	Range = {-10, 10},
 	Increment = 0.1,
 	Suffix = "",
-	CurrentValue = 6,
+	CurrentValue = 10,
 	Flag = "OffsetY",
 	Callback = function()end,
 })
