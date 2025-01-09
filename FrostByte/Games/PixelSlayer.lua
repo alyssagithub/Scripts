@@ -1,4 +1,4 @@
-ScriptVersion = "v1.0.2"
+ScriptVersion = "v1.0.3"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -51,6 +51,8 @@ Tab:CreateToggle({
 
 Tab:CreateDivider()
 
+local LastTPLocation
+
 Tab:CreateToggle({
 	Name = "🌀 • Teleport to Mobs",
 	CurrentValue = false,
@@ -60,6 +62,8 @@ Tab:CreateToggle({
 			if not workspace.DungeonDirectory:GetChildren()[1] then
 				continue
 			end
+			
+			local DidTP = false
 
 			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
 				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 or not Mob.HumanoidRootPart.Hitbox.Health.Enabled then
@@ -71,9 +75,16 @@ Tab:CreateToggle({
 				if BodyGyro then
 					BodyGyro:Destroy()
 				end
+				
+				DidTP = true
+				LastTPLocation = Mob.HumanoidRootPart.CFrame + Vector3.new(Flags.OffsetX.CurrentValue, Flags.OffsetY.CurrentValue, Flags.OffsetZ.CurrentValue)
 
-				Player.Character:PivotTo(Mob.HumanoidRootPart.CFrame + Vector3.new(Flags.OffsetX.CurrentValue, Flags.OffsetY.CurrentValue, Flags.OffsetZ.CurrentValue))
+				Player.Character:PivotTo(LastTPLocation)
 				break
+			end
+			
+			if not DidTP and LastTPLocation then
+				Player.Character:PivotTo(LastTPLocation)
 			end
 		end
 	end,
