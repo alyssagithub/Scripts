@@ -62,7 +62,7 @@ Tab:CreateToggle({
 			end
 
 			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
-				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 then
+				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 or not Mob.HumanoidRootPart.Hitbox.Health.Enabled then
 					continue
 				end
 
