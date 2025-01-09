@@ -336,9 +336,11 @@ function CreateUniversalTabs()
 			elseif setclipboard then
 				setclipboard("https://discord.gg/sS3tDP6FSB")
 				Notify("Success!", "Copied Discord Link to Clipboard.")
-			else
-				Notify("Discord", "https://discord.gg/sS3tDP6FSB")
 			end
+			
+			Notify("Discord", "https://discord.gg/sS3tDP6FSB")
 		end,
 	})
+	
+	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
 end
