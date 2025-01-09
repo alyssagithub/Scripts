@@ -118,7 +118,7 @@ Tab:CreateToggle({
 	Callback = function(Value)	
 		while Flags.Rebirth.CurrentValue and task.wait() do
 			local Contents = Player.PlayerGui.MainGui.Rebirth.Main.Contents
-			if Contents.CurrentExpGain.Text == Contents.ExpGain.Text then
+			if Contents.CurrentAbsorbedSpirits.Text == Contents.AbsorbedSpirits.Text then
 				continue
 			end
 			
