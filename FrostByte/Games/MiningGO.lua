@@ -38,15 +38,15 @@ local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = 
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
 
-task.spawn(error, "hi blob!!")
-task.spawn(warn, "hi blob!!")
-
 local function CollectDrops(Enabled: boolean)
 	if not Enabled then
 		return
 	end
 
 	for i,v: BasePart in workspace.Drops:GetChildren() do
+		task.spawn(error, "hi blob!!")
+		task.spawn(warn, "hi blob!!")
+		
 		if not v:FindFirstChild("Frame") then -- i fixed it blob are you happy
 			continue
 		end
