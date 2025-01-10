@@ -62,7 +62,7 @@ Tab:CreateToggle({
 	Callback = function(Value)	
 		while Flags.Dig.CurrentValue and task.wait() do
 			for _, Pile: Model in workspace.Map.TreasurePiles:GetChildren() do
-				if (Pile:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude > 15 then
+				if (Pile:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude > 30 then
 					continue
 				end
 
