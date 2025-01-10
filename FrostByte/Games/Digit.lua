@@ -56,7 +56,7 @@ local Tab = Window:CreateTab("Automation", "repeat")
 Tab:CreateSection("Digging")
 
 Tab:CreateToggle({
-	Name = "⛏️ • Auto Dig Close Piles",
+	Name = "⛏️ • Auto Dig Close Piles (Bypasses Capacity)",
 	CurrentValue = false,
 	Flag = "Dig",
 	Callback = function(Value)	
