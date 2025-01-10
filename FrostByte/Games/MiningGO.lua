@@ -32,17 +32,25 @@ for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
 	table.insert(Dispensers, v.Name)
 end
 
+local UnsupportedName: string = getfenv().UnsupportedName
 local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getfenv().HandleConnection
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
+
+task.spawn(error, "hi blob!!")
+task.spawn(warn, "hi blob!!")
 
 local function CollectDrops(Enabled: boolean)
 	if not Enabled then
 		return
 	end
 
-	for i,v in workspace.Drops:GetChildren() do
+	for i,v: BasePart in workspace.Drops:GetChildren() do
+		if not v:FindFirstChild("Frame") then
+			continue
+		end
+		
 		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 0)
 		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 1)
 	end
@@ -165,15 +173,17 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "💎 • Auto Collect Drops",
+	Name = if firetouchinterest then "💎 • Auto Collect Drops" else UnsupportedName,
 	CurrentValue = false,
 	Flag = "Collect",
 	Callback = CollectDrops,
 })
 
-HandleConnection(workspace.Drops.ChildAdded:Connect(function()
-	CollectDrops(Flags.Collect.CurrentValue)
-end), "Collect")
+if firetouchinterest then
+	HandleConnection(workspace.Drops.ChildAdded:Connect(function()
+		CollectDrops(Flags.Collect.CurrentValue)
+	end), "Collect")
+end
 
 Tab:CreateSection("Marketplace")
 
@@ -248,7 +258,7 @@ Tab:CreateToggle({
 			end
 
 			if SuccessfulPurchases == ElementNumber then
-				firesignal(Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.MouseButton1Click)
+				firesignal(Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.MouseButton1Click) -- switch back to remote
 				task.wait(5)
 			end
 		end
@@ -281,7 +291,7 @@ Tab:CreateToggle({
 			Roll(Flags.Dispenser.CurrentOption[1], Flags.Empowered.CurrentValue)
 		end
 
-		if Value then
+		if Value and firetouchinterest then
 			CollectDrops(true)
 		end
 	end,
@@ -327,7 +337,7 @@ Tab:CreateToggle({
 			end
 		end
 
-		if Value then
+		if Value and firetouchinterest then
 			CollectDrops(true)
 		end
 	end,
@@ -412,7 +422,7 @@ local Tab = Window:CreateTab("QOL", "leaf")
 Tab:CreateSection("UI")
 
 Tab:CreateToggle({
-	Name = "📦 • Auto Keep/Replace Equipment (Based on Tiers)",
+	Name = if firesignal then "📦 • Auto Keep/Replace Equipment (Based on Tiers)" else UnsupportedName,
 	CurrentValue = false,
 	Flag = "KeepReplace",
 	Callback = function()
