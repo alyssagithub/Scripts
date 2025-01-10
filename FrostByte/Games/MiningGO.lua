@@ -47,7 +47,7 @@ local function CollectDrops(Enabled: boolean)
 	end
 
 	for i,v: BasePart in workspace.Drops:GetChildren() do
-		if not v:FindFirstChild("Frame") then
+		if not v:FindFirstChild("Frame") then -- i fixed it blob are you happy
 			continue
 		end
 		
