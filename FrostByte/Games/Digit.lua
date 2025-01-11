@@ -17,22 +17,23 @@ local function AddComma(amount)
 	return formatted
 end
 
-pcall(function()
-	for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
-		local BuyPrice = require(v).BuyPrice
+for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
+	local Success, ItemInfo = pcall(require, v)
 
-		if not BuyPrice then
-			continue
-		end
+	local BuyPrice = "?"
 
-		local NewName = `{v.Name} (${AddComma(BuyPrice)})`
-		table.insert(Shovels, NewName)
-		OriginalShovelNames[NewName] = {
-			Name = v.Name,
-			BuyPrice = BuyPrice
-		}
+	if Success then
+		BuyPrice = ItemInfo.BuyPrice
 	end
-end)
+
+	local NewName = `{v.Name} (${AddComma(BuyPrice)})`
+	
+	table.insert(Shovels, NewName)
+	OriginalShovelNames[NewName] = {
+		Name = v.Name,
+		BuyPrice = BuyPrice
+	}
+end
 
 table.sort(Shovels, function(a,b)
 	return OriginalShovelNames[a].BuyPrice < OriginalShovelNames[b].BuyPrice
