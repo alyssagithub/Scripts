@@ -1,14 +1,16 @@
 ScriptVersion = "v1.1.1"
 
+--abc
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shovels = {}
 local OriginalShovelNames = {}
 
-local function AddComma(amount)
+local function AddComma(amount: number)
 	local formatted = amount
 	local k
-	while true do  
+	while true do
 		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
 		if (k==0) then
 			break
