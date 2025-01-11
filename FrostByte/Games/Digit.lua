@@ -19,10 +19,14 @@ end
 
 for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 	local Success, ItemInfo = pcall(require, v)
+	
+	if not ItemInfo.BuyPrice then
+		continue
+	end
 
 	local BuyPrice = 0
 
-	if Success and ItemInfo.BuyPrice then
+	if Success then
 		BuyPrice = ItemInfo.BuyPrice
 	end
 
