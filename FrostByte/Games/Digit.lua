@@ -1,7 +1,5 @@
 ScriptVersion = "v1.1.1"
 
---abc
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shovels = {}
@@ -24,7 +22,7 @@ for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 
 	local BuyPrice = 0
 
-	if Success then
+	if Success and ItemInfo.BuyPrice then
 		BuyPrice = ItemInfo.BuyPrice
 	end
 
