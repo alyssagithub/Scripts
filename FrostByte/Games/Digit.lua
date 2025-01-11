@@ -1,4 +1,4 @@
-ScriptVersion = "v1.1.0"
+ScriptVersion = "v1.1.1"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -63,7 +63,7 @@ local Tab = Window:CreateTab("Automation", "repeat")
 Tab:CreateSection("AFK Digging")
 
 Tab:CreateToggle({
-	Name = "⛏️ • Auto Dig Close Piles (Bypasses Capacity)",
+	Name = "⛏️ • Auto Dig Close Piles (Bypasses Capacity, Faster)",
 	CurrentValue = false,
 	Flag = "Dig",
 	Callback = function(Value)	
@@ -83,7 +83,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "🕳️ • Auto Create Piles (Any Terrain)",
+	Name = "🕳️ • Auto Create Piles (Bypasses Capacity, Any Terrain)",
 	CurrentValue = false,
 	Flag = "CreatePiles",
 	Callback = function(Value)	
@@ -115,8 +115,6 @@ Tab:CreateToggle({
 				continue
 			end
 
-			local RandomOffset = UDim2.fromScale(Random.new():NextNumber(0.01, 0.02), 0)
-
 			DigMinigame.Cursor.Position = DigMinigame.Area.Position
 		end
 	end,
@@ -144,13 +142,21 @@ Tab:CreateToggle({
 Tab:CreateSection("Items")
 
 Tab:CreateToggle({
-	Name = "💰 • Auto Sell Inventory",
+	Name = "💰 • Auto Sell Inventory at Max Capacity",
 	CurrentValue = false,
 	Flag = "Sell",
-	Callback = function(Value)	
+	Callback = function(Value)
 		Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, not Value)
 		
 		while Flags.Sell.CurrentValue and task.wait() do
+			local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
+			local Current = tonumber(Capacity.Text:split("(")[2]:split("/")[1])
+			local Max = tonumber(Capacity.Text:split(")")[1]:split("/")[2])
+			
+			if Current < Max then
+				continue
+			end
+			
 			local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
 				Command = "GetInventory"
 			})
@@ -180,16 +186,16 @@ Tab:CreateToggle({
 				
 				local PreviousPosition = Player.Character:GetPivot()
 				
-				Player.Character:PivotTo(Merchant:GetPivot())
-				
-				task.wait(0.1)
-
-				RemoteEvents.Merchant:FireServer({
-					Command = "SellAllTreasures",
-					Merchant = Merchant
-				})
-				
-				task.wait(0.1)
+				repeat
+					Player.Character:PivotTo(Merchant:GetPivot())
+					RemoteEvents.Merchant:FireServer({
+						Command = "SellAllTreasures",
+						Merchant = Merchant
+					})
+					task.wait(0.1)
+					Current = tonumber(Capacity.Text:split("(")[2]:split("/")[1])
+					Max = tonumber(Capacity.Text:split(")")[1]:split("/")[2])
+				until Current < Max or not Flags.Sell.CurrentValue
 				
 				Player.Character:PivotTo(PreviousPosition)
 				
