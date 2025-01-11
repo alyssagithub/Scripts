@@ -320,14 +320,14 @@ end), "MeteorRemoved")
 local Islands = {}
 
 for i,v in workspace.Map.Islands:GetChildren() do
-	if v.Name == "Ocean" then
-		continue
-	end
-	
 	table.insert(Islands, v.Name)
 end
 
 for i,v in ReplicatedStorage.Assets.Sounds.Soundtrack.Locations:GetChildren() do
+	if v.Name == "Ocean" then
+		continue
+	end
+	
 	if not table.find(Islands, v.Name) then
 		table.insert(Islands, v.Name)
 	end
