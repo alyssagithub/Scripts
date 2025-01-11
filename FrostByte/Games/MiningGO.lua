@@ -1,4 +1,4 @@
-ScriptVersion = "v1.4.5"
+ScriptVersion = "v1.4.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -44,9 +44,6 @@ local function CollectDrops(Enabled: boolean)
 	end
 
 	for i,v: BasePart in workspace.Drops:GetChildren() do
-		task.spawn(error, "hi blob!!")
-		task.spawn(warn, "hi blob!!")
-		
 		if not v:FindFirstChild("Frame") then -- i fixed it blob are you happy
 			continue
 		end
@@ -100,16 +97,28 @@ Tab:CreateToggle({
 					RemoteName ..= "P"
 				end
 				
-				local Number = Random.new():NextNumber(0.7, 0.75)
+				local Speed = Flags.Speed.CurrentValue
 				
 				BinderEvent:FireServer("Mining_Start")
-				task.wait(Number)
-				BinderEvent:FireServer(RemoteName, Ore.Name, Number, Flags.Critical.CurrentValue)
+				task.wait(Speed)
+				BinderEvent:FireServer(RemoteName, Ore.Name, Speed, Flags.Critical.CurrentValue)
 				break
 			end
 		end
 	end,
 })
+
+Tab:CreateSlider({
+	Name = "💨 • Auto Mine Speed",
+	Range = {0, 1},
+	Increment = 0.01,
+	Suffix = "Second(s)",
+	CurrentValue = 0.7,
+	Flag = "Speed",
+	Callback = function()end,
+})
+
+Tab:CreateDivider()
 
 Tab:CreateToggle({
 	Name = "💥 • Critical Strike Ores",
@@ -485,6 +494,31 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
+	Name = if firesignal then "✅ • Auto Keep Equipment" else UnsupportedName,
+	CurrentValue = false,
+	Flag = "Keep",
+	Callback = function()
+		while Flags.Keep.CurrentValue and task.wait() do
+			local Roll = Player.PlayerGui.StartGui.Roll
+
+			if not Roll.Visible or not Roll.Old.Stat:FindFirstChild("Frame") then
+				continue
+			end
+
+			local OldStats = Roll.Old.Stat.Frame
+			local OldButton = Roll.Old.Button
+
+			repeat
+				firesignal(OldButton.MouseButton1Click)
+				task.wait(0.1)
+			until not Roll.Visible
+		end
+	end,
+})
+
+Tab:CreateDivider()
+
+Tab:CreateToggle({
 	Name = "❌ • Remove Giant Ore Summary",
 	CurrentValue = false,
 	Flag = "GiantSummary",
@@ -500,5 +534,64 @@ HandleConnection(GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(fun
 		GiantOreSummary.Visible = false
 	end
 end), "GiantSummary")
+
+Tab:CreateSection("Transport")
+
+local WasVisible = false
+
+Tab:CreateToggle({
+	Name = "🎫 • Auto Purchase Ticket for Fission Flats",
+	CurrentValue = false,
+	Flag = "Ticket",
+	Callback = function(Value)
+		while Flags.Ticket.CurrentValue and task.wait() do
+			local Mouse = InteractZones.Mouse
+
+			local Distance = (Player.Character:GetPivot().Position - Mouse.Position).Magnitude
+
+			if Distance > 300 then
+				QuestTPing = false
+				continue
+			end
+			
+			local Purchased = false
+			
+			for i,v in Player.PlayerGui.GameGui.NotifPickup.Inner:GetChildren() do
+				if v.Name ~= "Notif" then
+					continue
+				end
+				
+				local Content: TextLabel = v.Inner.TextArea.Content
+				
+				if not Content.Text:find("Fission") then
+					continue
+				end
+				
+				local Numbers = Content.Text:gsub("%D", "")
+				
+				if tonumber(Numbers) and tonumber(Numbers) <= 5 then
+					QuestTPing = true
+					Player.Character:PivotTo(InteractZones.Roach2:GetPivot())
+					
+					repeat
+						task.wait()
+					until (Player.Character:GetPivot().Position - Mouse.Position).Magnitude >= 300 or not Flags.Ticket.CurrentValue
+				end
+				
+				Purchased = true
+				WasVisible = true
+				break
+			end
+			
+			if Purchased then
+				continue
+			end
+			
+			BinderFunction:InvokeServer("Ticket_Buy", "Fission Flats")
+			
+			print("purchasing ticket")
+		end
+	end,
+})
 
 getfenv().CreateUniversalTabs()
