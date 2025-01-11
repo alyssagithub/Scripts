@@ -294,7 +294,7 @@ local function MeteorIslandTeleport(Meteor: Model?)
 	
 	PreviousLocation = Character:GetPivot()
 	
-	Character:PivotTo(Meteor:GetPivot())
+	Character:PivotTo(Meteor:GetPivot() + Vector3.yAxis * 100)
 end
 
 Tab:CreateToggle({
