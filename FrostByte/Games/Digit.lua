@@ -128,6 +128,10 @@ Tab:CreateToggle({
 	Flag = "LegitPiles",
 	Callback = function(Value)	
 		while Flags.LegitPiles.CurrentValue and task.wait() do
+			if Player.PlayerGui.Main:FindFirstChild("DigMinigame") then
+				continue
+			end
+			
 			local VirtualInputManager = game:GetService("VirtualInputManager")
 			local X, Y = 0, 0
 			VirtualInputManager:SendMouseButtonEvent(X, Y, 0, true, game, 1)
