@@ -96,11 +96,6 @@ Tab:CreateToggle({
 				RemoteEvents.Digging:FireServer({
 					Command = "DigIntoSandSound"
 				})
-				
-				RemoteEvents.Digging:FireServer({
-					Command = "EnterMinigame",
-					TargetPileIndex = PileInfo.PileIndex
-				})
 			end
 		end
 	end,
