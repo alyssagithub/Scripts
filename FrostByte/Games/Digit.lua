@@ -348,6 +348,8 @@ HandleConnection(workspace.Map.Temporary.ChildRemoved:Connect(function(Child: Mo
 	end
 end), "MeteorRemoved")
 
+local PreviousLocation
+
 local function LunarCloudsTeleport(Lunar: Model?)
 	if Lunar.Name ~= "Lunar Clouds" or not Flags.LunarClouds.CurrentValue then
 		return
@@ -374,6 +376,11 @@ Tab:CreateToggle({
 })
 
 HandleConnection(workspace.Map.Islands.ChildAdded:Connect(LunarCloudsTeleport), "LunarClouds")
+HandleConnection(workspace.Map.Islands.ChildRemoved:Connect(function(Child: Model)
+	if Child.Name == "Lunar Clouds" and PreviousLocation then
+		Player.Character:PivotTo(PreviousLocation)
+	end
+end), "LunarCloudsRemoved")
 
 local Tab = Window:CreateTab("QOL", "leaf")
 
