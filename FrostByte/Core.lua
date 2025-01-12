@@ -230,6 +230,18 @@ function CreateUniversalTabs()
 			end
 		end,
 	})
+	
+	Tab:CreateSlider({
+		Name = "💨 • Set WalkSpeed",
+		Range = {0, 1000},
+		Increment = 1,
+		Suffix = "Studs/s",
+		CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
+		Flag = "FPS",
+		Callback = function(Value)
+			Player.Character.Humanoid.WalkSpeed = Value
+		end,
+	})
 
 	Tab:CreateSection("Miscellaneous")
 
