@@ -116,7 +116,11 @@ if queue_on_teleport then
 	local TeleportService = game:GetService("TeleportService")
 local TeleportData = TeleportService:GetLocalPlayerTeleportData()
 
-if TeleportData and typeof(TeleportData) == "table" and TeleportData.FrostByteRejoin then
+if not TeleportData then
+	return
+end
+
+if typeof(TeleportData) == "table" and TeleportData.FrostByteRejoin then
 	return
 end
 
