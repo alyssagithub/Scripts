@@ -19,14 +19,13 @@ end
 
 for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 	local Success, ItemInfo = pcall(require, v)
-	
-	if not ItemInfo.BuyPrice then
-		continue
-	end
 
 	local BuyPrice = 0
 
 	if Success then
+		if not ItemInfo.BuyPrice then
+			continue
+		end
 		BuyPrice = ItemInfo.BuyPrice
 	end
 
@@ -95,6 +94,10 @@ Tab:CreateToggle({
 	Flag = "CreatePiles",
 	Callback = function(Value)	
 		while Flags.CreatePiles.CurrentValue and task.wait() do	
+			if CollectionService:GetTagged("FrostBytePile")[1] then
+				continue
+			end
+			
 			local PileInfo: {["PileIndex"]: number, ["Success"]: boolean} = RemoteFunctions.Digging:InvokeServer({
 				Command = "CreatePile"
 			})
@@ -103,6 +106,8 @@ Tab:CreateToggle({
 				RemoteEvents.Digging:FireServer({
 					Command = "DigIntoSandSound"
 				})
+				
+				workspace.Map.TreasurePiles:WaitForChild(tostring(PileInfo.PileIndex)):AddTag("FrostBytePile")
 			end
 		end
 	end,
