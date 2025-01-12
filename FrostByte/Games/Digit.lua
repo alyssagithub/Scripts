@@ -1,4 +1,4 @@
-ScriptVersion = "v1.2.3"
+ScriptVersion = "v1.2.4"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -198,7 +198,7 @@ Tab:CreateToggle({
 Tab:CreateSection("Autoclicker")
 
 Tab:CreateToggle({
-	Name = "🕹️ • Auto Enter Pile Minigame\n| 100% Dig Success Rate, BUGGY",
+	Name = "🕹️ • Auto Enter Pile Minigame\n| 100% Dig Success Rate",
 	CurrentValue = false,
 	Flag = "PileMinigame",
 	Callback = function(Value)	
