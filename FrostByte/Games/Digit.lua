@@ -1,4 +1,4 @@
-ScriptVersion = "v1.2.1"
+ScriptVersion = "v1.2.3"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -107,9 +107,13 @@ Tab:CreateToggle({
 		end)
 		
 		while Flags.Dig.CurrentValue and task.wait() do
+			if not Player.Character:FindFirstChildOfClass("Tool") then
+				continue
+			end
+			
 			local Adornee = Player.Character.Shovel.Highlight.Adornee
 			
-			if not Adornee then
+			if not Adornee or Adornee.Parent ~= workspace.Map.TreasurePiles then
 				continue
 			end
 			
@@ -120,6 +124,42 @@ Tab:CreateToggle({
 		end
 	end,
 })
+
+local function LegitDig()
+	if not Flags.LegitDig.CurrentValue then
+		return
+	end
+	
+	local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
+
+	if not DigMinigame then
+		return
+	end
+	
+	local Connection: RBXScriptConnection
+	Connection = game:GetService("RunService").Heartbeat:Connect(function()
+		if not Player.PlayerGui.Main:FindFirstChild("DigMinigame") or not Flags.LegitDig.CurrentValue then
+			return Connection:Disconnect()
+		end
+		
+		DigMinigame.Cursor.Position = DigMinigame.Area.Position
+	end)
+	
+	HandleConnection(Connection, "LegitDigHeartbeat")
+end
+
+Tab:CreateToggle({
+	Name = "⛏️ • Auto Legit Dig",
+	CurrentValue = false,
+	Flag = "LegitDig",
+	Callback = function(Value)
+		if Value then
+			LegitDig()
+		end
+	end,
+})
+
+HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
 
 Tab:CreateToggle({
 	Name = "🕳️ • Auto Create Piles (Any Terrain)",
@@ -163,9 +203,17 @@ Tab:CreateToggle({
 	Flag = "PileMinigame",
 	Callback = function(Value)	
 		while Flags.PileMinigame.CurrentValue and task.wait() do
+			if not Player.Character:FindFirstChildOfClass("Tool") then
+				continue
+			end
+			
 			local Adornee: Model = Player.Character.Shovel.Highlight.Adornee
 			
 			if not Adornee or Adornee:GetAttribute("Completed") or Adornee:GetAttribute("Destroying") or Adornee:GetAttribute("Progress") >= Adornee:GetAttribute("MaxProgress") then
+				continue
+			end
+			
+			if Adornee.Parent ~= workspace.Map.TreasurePiles then
 				continue
 			end
 			
@@ -173,11 +221,14 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			local VirtualInputManager = game:GetService("VirtualInputManager")
+			Adornee:GetAttributeChangedSignal("Progress"):Wait()
+			
 			local X, Y = 0, 0
+			
+			local VirtualInputManager = game:GetService("VirtualInputManager")
 			VirtualInputManager:SendMouseButtonEvent(X, Y, 0, true, game, 1)
 			VirtualInputManager:SendMouseButtonEvent(X, Y, 0, false, game, 1)
-			task.wait(1)
+			VirtualInputManager:WaitForInputEventsProcessed()
 		end
 	end,
 })
@@ -390,7 +441,9 @@ local Tab = Window:CreateTab("QOL", "leaf")
 
 Tab:CreateSection("Inventory")
 
-Player:SetAttribute("OriginalMaxInventorySize", Player:GetAttribute("MaxInventorySize"))
+if not Player:GetAttribute("OriginalMaxInventorySize") then
+	Player:SetAttribute("OriginalMaxInventorySize", Player:GetAttribute("MaxInventorySize"))
+end
 
 Tab:CreateToggle({
 	Name = "♾ • Infinite Backpack Capacity",
