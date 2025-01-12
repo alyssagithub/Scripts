@@ -337,6 +337,8 @@ Tab:CreateToggle({
 			for i,v in workspace.Map.Temporary:GetChildren() do
 				MeteorIslandTeleport(v)
 			end
+		elseif PreviousLocation then
+			Player.Character:PivotTo(PreviousLocation)
 		end
 	end,
 })
@@ -371,6 +373,8 @@ Tab:CreateToggle({
 			for i,v in workspace.Map.Islands:GetChildren() do
 				LunarCloudsTeleport(v)
 			end
+		elseif PreviousLocation then
+			Player.Character:PivotTo(PreviousLocation)
 		end
 	end,
 })
