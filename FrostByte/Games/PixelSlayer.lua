@@ -1,4 +1,4 @@
-ScriptVersion = "v1.0.3"
+ScriptVersion = "v1.0.4"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -20,7 +20,7 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Attack",
 	Callback = function(Value)	
-		while Flags.Attack.CurrentValue and task.wait() do
+		while Flags.Attack.CurrentValue and task.wait(0.1) do
 			for _, Mob in workspace.World.Mobs:GetChildren() do
 				Remotes.DamageFire:FireServer(Mob)
 			end
@@ -34,19 +34,50 @@ Tab:CreateToggle({
 	Flag = "Abilities",
 	Callback = function(Value)	
 		while Flags.Abilities.CurrentValue and task.wait() do
-			for _, Ability: Frame? in Player.PlayerGui.MainGui.Soul.Main.Items.Scroll:GetChildren() do
-				if not Ability:IsA("Frame") or not Ability.Equipped.Visible then
+			for _, Ability: Frame in Player.PlayerGui.MainGui.Hotbar:GetChildren() do
+				if not Ability:IsA("Frame") or not tonumber(Ability.Name) then
 					continue
 				end
-
-				Remotes.PlayerRequestAbility:FireServer(tonumber(Ability.Name), {
-					["mouseTarget"] = Vector3.new(-598.558349609375, 0.3105278015136719, 348.0400085449219),
-					["mouseTargetUsingRange"] = Vector3.new(-598.558349609375, 0.3105278015136719, 348.0400085449219)
-				})
+				
+				if not Ability.Visible or Ability.Cooldown.Visible then
+					continue
+				end
+				
+				local Image = Ability.Label.Image
+				
+				for _, Item: Frame in Player.PlayerGui.MainGui.Soul.Main.Items.Scroll:GetChildren() do
+					if not Item:IsA("Frame") then
+						continue
+					end
+					
+					if Item.MainFrame.BackgroundFrame.Label.Image ~= Image then
+						continue
+					end
+					
+					Remotes.PlayerRequestAbility:FireServer(tonumber(Item.Name), {
+						["mouseTarget"] = Vector3.new(-598.558349609375, 0.3105278015136719, 348.0400085449219),
+						["mouseTargetUsingRange"] = Vector3.new(-598.558349609375, 0.3105278015136719, 348.0400085449219)
+					})
+					
+					print("using ability:", Item.Name)
+					
+					break
+				end
+				
+				task.wait(Flags.AbilityTime.CurrentValue)
 			end
-			task.wait(1)
 		end
 	end,
+})
+
+Tab:CreateSlider({
+	Name = "🔢 • Time Between Ability Use",
+	Range = {0, 5},
+	Increment = 0.01,
+	Suffix = "",
+	CurrentValue = 0,
+	Flag = "AbilityTime",
+	Callback = function()end,
 })
 
 Tab:CreateDivider()
@@ -172,6 +203,30 @@ Tab:CreateToggle({
 				
 				Remotes.ClaimQuest:FireServer(Quest.Name)
 			end
+		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "📈 • Auto Distribute Stat Points",
+	CurrentValue = false,
+	Flag = "Distribute",
+	Callback = function(Value)	
+		while Flags.Distribute.CurrentValue and task.wait(1) do
+			local Points = Player.PlayerGui.MainGui.Stats.Main.Available.Text:gsub("%D", "")
+			Points = math.floor(tonumber(Points) / 3)
+			
+			if Points <= 0 then
+				continue
+			end
+			
+			local args = {
+				[1] = Points,
+				[2] = Points,
+				[3] = Points
+			}
+
+			Remotes:WaitForChild("UpgradeStat"):FireServer(unpack(args))
 		end
 	end,
 })
