@@ -1,4 +1,4 @@
-ScriptVersion = "v1.2.4B"
+ScriptVersion = "v1.3.4"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
