@@ -1,4 +1,4 @@
-ScriptVersion = "v1.2.4"
+ScriptVersion = "v1.2.4B"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -25,7 +25,7 @@ for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 	local NewName
 
 	if Success then
-		if not ItemInfo.BuyPrice then
+		if not ItemInfo or not ItemInfo.BuyPrice then
 			continue
 		end
 		
@@ -90,7 +90,7 @@ local Tab = Window:CreateTab("Automation", "repeat")
 Tab:CreateSection("Digging")
 
 Tab:CreateToggle({
-	Name = "⛏️ • Auto Dig Close Piles (Faster)",
+	Name = "⛏️ • Auto Fast Dig",
 	CurrentValue = false,
 	Flag = "Dig",
 	Callback = function(Value)
@@ -125,42 +125,6 @@ Tab:CreateToggle({
 	end,
 })
 
-local function LegitDig()
-	if not Flags.LegitDig.CurrentValue then
-		return
-	end
-	
-	local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
-
-	if not DigMinigame then
-		return
-	end
-	
-	local Connection: RBXScriptConnection
-	Connection = game:GetService("RunService").Heartbeat:Connect(function()
-		if not Player.PlayerGui.Main:FindFirstChild("DigMinigame") or not Flags.LegitDig.CurrentValue then
-			return Connection:Disconnect()
-		end
-		
-		DigMinigame.Cursor.Position = DigMinigame.Area.Position
-	end)
-	
-	HandleConnection(Connection, "LegitDigHeartbeat")
-end
-
-Tab:CreateToggle({
-	Name = "⛏️ • Auto Legit Dig",
-	CurrentValue = false,
-	Flag = "LegitDig",
-	Callback = function(Value)
-		if Value then
-			LegitDig()
-		end
-	end,
-})
-
-HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
-
 Tab:CreateToggle({
 	Name = "🕳️ • Auto Create Piles (Any Terrain)",
 	CurrentValue = false,
@@ -184,51 +148,150 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateDivider()
+
+local function RandomVector(Size: Vector3, Position: Vector3)
+
+	local X = Position.X + math.random(-Size.X / 2, Size.X / 2)
+	local Z = Position.Z + math.random(-Size.Z / 2, Size.Z / 2)
+
+	return Vector3.new(X, Position.Y, Z)
+end
+
+local CanWalk = true
+
 Tab:CreateToggle({
-	Name = "🔄 • Auto Move While Digging\n| UNFINISHED",
+	Name = "🔄 • Auto Walk After Dig",
 	CurrentValue = false,
-	Flag = "Move",
-	Callback = function(Value)	
-		--[[while Flags.Move.CurrentValue and task.wait() do	
+	Flag = "DigWalk",
+	Callback = function(Value)
+		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+		
+		while Flags.DigWalk.CurrentValue and task.wait() do	
+			if Player:GetAttribute("IsDigging") then
+				continue
+			end
 			
-		end]]
+			local Character = Player.Character
+			
+			local WalkZoneSizeFlag = Flags.ZoneSize.CurrentValue
+			
+			local ZoneSize = Vector3.new(WalkZoneSizeFlag, 1, WalkZoneSizeFlag)
+			
+			local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+			
+			if not Visualizer then
+				Visualizer = Instance.new("Part")
+				Visualizer.Size = ZoneSize
+				Visualizer.Position = Character:GetPivot().Position - Vector3.yAxis * Character:GetExtentsSize().Y / 1.05
+				Visualizer.Anchored = true
+				Visualizer.Color = Color3.fromRGB(75, 255, 75)
+				Visualizer.CanCollide = false
+				Visualizer.CanQuery = false
+				Visualizer.Material = Enum.Material.ForceField
+				Visualizer.CastShadow = false
+				Visualizer.Name = "FrostByteVisualizer"
+				Visualizer.Parent = workspace
+			end
+			
+			local Humanoid: Humanoid = Character.Humanoid
+			
+			local FoundPile = false
+
+			for i,v in workspace.Map.TreasurePiles:GetChildren() do
+				if v:GetAttribute("Owner") ~= Player.UserId then
+					continue
+				end
+				
+				FoundPile = true
+
+				Humanoid:MoveTo(v:GetPivot().Position)
+				break
+			end
+			
+			if FoundPile then
+				continue
+			end
+			
+			if CanWalk then
+				Humanoid:MoveTo(RandomVector(ZoneSize, Visualizer.Position))
+				CanWalk = false
+
+				Humanoid.MoveToFinished:Once(function()
+					CanWalk = true
+				end)
+			end
+		end
+		
+		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+		
+		if Visualizer then
+			Visualizer:Destroy()
+		end
 	end,
 })
 
-Tab:CreateSection("Autoclicker")
+Tab:CreateSlider({
+	Name = "🟩 • Auto Walk Zone Size",
+	Range = {5, 100},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 20,
+	Flag = "ZoneSize",
+	Callback = function()end,
+})
+
+Tab:CreateSection("Legit Digging")
+
+local function LegitDig()
+	if not Flags.LegitDig.CurrentValue then
+		return
+	end
+
+	local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
+
+	if not DigMinigame then
+		return
+	end
+
+	local Connection: RBXScriptConnection
+	Connection = game:GetService("RunService").Heartbeat:Connect(function()
+		if not Player.PlayerGui.Main:FindFirstChild("DigMinigame") or not Flags.LegitDig.CurrentValue then
+			return Connection:Disconnect()
+		end
+
+		DigMinigame.Cursor.Position = DigMinigame.Area.Position
+	end)
+
+	HandleConnection(Connection, "LegitDigHeartbeat")
+end
 
 Tab:CreateToggle({
-	Name = "🕹️ • Auto Enter Pile Minigame\n| 100% Dig Success Rate",
+	Name = "⛏️ • Auto Legit Dig",
 	CurrentValue = false,
-	Flag = "PileMinigame",
+	Flag = "LegitDig",
+	Callback = function(Value)
+		if Value then
+			LegitDig()
+		end
+	end,
+})
+
+HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
+
+Tab:CreateToggle({
+	Name = "🕳️ • Auto Legit Create Piles",
+	CurrentValue = false,
+	Flag = "LegitPiles",
 	Callback = function(Value)	
-		while Flags.PileMinigame.CurrentValue and task.wait() do
-			if not Player.Character:FindFirstChildOfClass("Tool") then
+		while Flags.LegitPiles.CurrentValue and task.wait() do	
+			local Tool = Player.Character:FindFirstChildOfClass("Tool")
+			
+			if not Tool or Tool:GetAttribute("Type") ~= "Shovel" then
 				continue
 			end
 			
-			local Adornee: Model = Player.Character.Shovel.Highlight.Adornee
-			
-			if not Adornee or Adornee:GetAttribute("Completed") or Adornee:GetAttribute("Destroying") or Adornee:GetAttribute("Progress") >= Adornee:GetAttribute("MaxProgress") then
-				continue
-			end
-			
-			if Adornee.Parent ~= workspace.Map.TreasurePiles then
-				continue
-			end
-			
-			if Player.PlayerGui.Main:FindFirstChild("DigMinigame") then
-				continue
-			end
-			
-			Adornee:GetAttributeChangedSignal("Progress"):Wait()
-			
-			local X, Y = 0, 0
-			
-			local VirtualInputManager = game:GetService("VirtualInputManager")
-			VirtualInputManager:SendMouseButtonEvent(X, Y, 0, true, game, 1)
-			VirtualInputManager:SendMouseButtonEvent(X, Y, 0, false, game, 1)
-			VirtualInputManager:WaitForInputEventsProcessed()
+			Tool:Activate()
 		end
 	end,
 })
@@ -324,14 +387,14 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateDivider()
+--[[Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "🌟 • Auto Enchant Shovel\n| UNFINISHED",
+	Name = "🌟 • Auto Enchant Shovel\n| NOT USABLE",
 	CurrentValue = false,
 	Flag = "Enchant",
 	Callback = function(Value)
-		--[[while Flags.Enchant.CurrentValue and task.wait() do
+		while Flags.Enchant.CurrentValue and task.wait() do
 			local args = {
 				[1] = {
 					["Command"] = "OfferEnchant",
@@ -350,7 +413,7 @@ Tab:CreateToggle({
 
 			game:GetService("ReplicatedStorage"):WaitForChild("Source"):WaitForChild("Network"):WaitForChild("RemoteFunctions"):WaitForChild("MolePit"):InvokeServer(unpack(args))
 
-		end]]
+		end
 	end,
 })
 
@@ -361,7 +424,7 @@ Tab:CreateDropdown({
 	MultipleOptions = false,
 	--Flag = "Flag",
 	Callback = function()end,
-})
+})]]
 
 Tab:CreateSection("Islands")
 
