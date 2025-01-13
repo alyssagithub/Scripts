@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.4"
+ScriptVersion = "v1.3.5"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -188,7 +188,8 @@ Tab:CreateToggle({
 				Visualizer.Color = Color3.fromRGB(75, 255, 75)
 				Visualizer.CanCollide = false
 				Visualizer.CanQuery = false
-				Visualizer.Material = Enum.Material.ForceField
+				Visualizer.Material = Enum.Material.SmoothPlastic
+				Visualizer.Transparency = 0.1
 				Visualizer.CastShadow = false
 				Visualizer.Name = "FrostByteVisualizer"
 				Visualizer.Parent = workspace
