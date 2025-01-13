@@ -24,8 +24,8 @@ for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 	
 	local NewName
 
-	if Success then
-		if not ItemInfo or not ItemInfo.BuyPrice then
+	if Success and ItemInfo then
+		if not ItemInfo.BuyPrice then
 			continue
 		end
 		
