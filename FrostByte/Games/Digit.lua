@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.6"
+ScriptVersion = "v1.3.7"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -199,14 +199,22 @@ Tab:CreateToggle({
 			
 			local FoundPile = false
 
-			for i,v in workspace.Map.TreasurePiles:GetChildren() do
-				if v:GetAttribute("Owner") ~= Player.UserId then
+			for _, Pile: Model in workspace.Map.TreasurePiles:GetChildren() do
+				if Pile:GetAttribute("Owner") ~= Player.UserId then
 					continue
 				end
 				
 				FoundPile = true
+				
+				for _, Descendant: BasePart in Pile:GetDescendants() do
+					if not Descendant:IsA("BasePart") then
+						continue
+					end
+					
+					Descendant.CanCollide = false
+				end
 
-				Humanoid:MoveTo(v:GetPivot().Position)
+				Humanoid:MoveTo(Pile:GetPivot().Position)
 				break
 			end
 			
