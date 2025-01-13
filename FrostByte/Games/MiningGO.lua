@@ -1,4 +1,4 @@
-ScriptVersion = "v1.4.6"
+ScriptVersion = "v1.4.7"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -383,12 +383,20 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "📜 • Auto Quests",
+	Name = "📜 • Auto Mouse Quests",
 	CurrentValue = false,
 	Flag = "Quests",
 	Callback = function(Value)
 		while Flags.Quests.CurrentValue and task.wait(1) do
-			local QuestElem = Player.PlayerGui.StartGui.Quests.Inner:FindFirstChild("QuestElem")
+			local QuestElem
+			
+			for i,v in Player.PlayerGui.StartGui.Quests.Inner:GetChildren() do
+				local Title = v.Inner.TextArea.Title
+				if Title.Text:find("Mouse") then
+					QuestElem = v
+					break
+				end
+			end
 
 			QuestTPing = false
 
