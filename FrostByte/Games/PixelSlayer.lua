@@ -1,4 +1,4 @@
-ScriptVersion = "v1.0.4"
+ScriptVersion = "v1.0.5"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -136,7 +136,7 @@ Tab:CreateSlider({
 	Range = {-10, 10},
 	Increment = 0.1,
 	Suffix = "",
-	CurrentValue = 10,
+	CurrentValue = 0,
 	Flag = "OffsetY",
 	Callback = function()end,
 })
