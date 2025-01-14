@@ -8,7 +8,7 @@ local ScriptVersion = getfenv().ScriptVersion
 
 local getgenv = getfenv().getgenv
 local getexecutorname = getfenv().getexecutorname
-local identifyexecutor = getfenv().identifyexecutor
+local identifyexecutor: () -> (string) = getfenv().identifyexecutor
 local request = getfenv().request
 local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
 local queue_on_teleport: (Code: string) -> () = getfenv().queue_on_teleport
@@ -39,7 +39,7 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 	
 	table.insert(Fields, {
 		name = "Script Version",
-		value = ScriptVersion,
+		value = ScriptVersion or "Core",
 		inline = true
 	})
 	
@@ -139,7 +139,7 @@ Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoft
 local Flags = Rayfield.Flags
 
 Window = Rayfield:CreateWindow({
-	Name = `FrostByte | {PlaceName} | {ScriptVersion}`,
+	Name = `FrostByte | {PlaceName} | {ScriptVersion or identifyexecutor()}`,
 	Icon = "snowflake",
 	LoadingTitle = "❄ Brought to you by FrostByte ❄",
 	LoadingSubtitle = PlaceName,
@@ -233,7 +233,7 @@ function CreateUniversalTabs()
 	
 	Tab:CreateSlider({
 		Name = "💨 • Set WalkSpeed",
-		Range = {0, 1000},
+		Range = {0, 300},
 		Increment = 1,
 		Suffix = "Studs/s",
 		CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
@@ -254,7 +254,7 @@ function CreateUniversalTabs()
 	
 	local Tab = Window:CreateTab("Feedback", "message-circle")
 	
-	Tab:CreateSection("Game")
+	--[[Tab:CreateSection("Game")
 	
 	Tab:CreateInput({
 		Name = "✅ • Suggestion",
@@ -334,9 +334,13 @@ function CreateUniversalTabs()
 				Notify("Failed!", `Failed to send the {Name}`, "x")
 			end
 		end,
-	})
+	})]]
 	
 	Tab:CreateSection("Discord")
+	
+	Tab:CreateLabel("Suggestions & Bug Reports were moved to the Discord")
+	
+	Tab:CreateDivider()
 	
 	Tab:CreateButton({
 		Name = if request or setclipboard then "❄ • Join the FrostByte Discord!" else "https://discord.gg/sS3tDP6FSB",
@@ -365,4 +369,8 @@ function CreateUniversalTabs()
 	})
 	
 	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
+end
+
+if not ScriptVersion then
+	CreateUniversalTabs()
 end
