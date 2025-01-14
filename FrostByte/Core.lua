@@ -130,7 +130,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 end
 
 task.spawn(function()
-	while task.wait(5 * 60) do
+	while task.wait(Random.new():NextNumber(5 * 60, 10 * 60)) do
 		Notify("Enjoying this script?", "Join the discord at discord.gg/sS3tDP6FSB", "heart")
 	end
 end)
