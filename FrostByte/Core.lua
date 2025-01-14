@@ -5,6 +5,7 @@ local Player = game:GetService("Players").LocalPlayer
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 local ScriptVersion = getfenv().ScriptVersion
+local CoreVersion = "Core v1.0.0"
 
 local getgenv = getfenv().getgenv
 local getexecutorname = getfenv().getexecutorname
@@ -39,7 +40,7 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 	
 	table.insert(Fields, {
 		name = "Script Version",
-		value = ScriptVersion or "Core",
+		value = ScriptVersion or CoreVersion,
 		inline = true
 	})
 	
