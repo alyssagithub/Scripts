@@ -93,7 +93,7 @@ end
 
 getgenv().FrostByteConnections = getgenv().FrostByteConnections or {}
 
-function HandleConnection(Connection: RBXScriptConnection, Name: string)
+getgenv().HandleConnection = function(Connection: RBXScriptConnection, Name: string)
 	if getgenv().FrostByteConnections[Name] then
 		getgenv().FrostByteConnections[Name]:Disconnect()
 	end
