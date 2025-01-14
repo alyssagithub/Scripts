@@ -21,7 +21,6 @@ local Webhook1 = "https://disco".."rd.com/api/web".."hooks/132593779".."94380124
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	if not request then
-		print("calling notify:", Notify)
 		return Notify("Error", "Your executor does not support 'request'")
 	end
 	
