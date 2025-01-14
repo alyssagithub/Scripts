@@ -1,4 +1,4 @@
-getfenv().ScriptVersion = "v1.3.7"
+getgenv().ScriptVersion = "v1.3.7"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -65,14 +65,15 @@ end)
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
-local UnsupportedName: string = getfenv().UnsupportedName
-local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
-local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getfenv().HandleConnection
-local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
-local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
-local Notify: (Title: string, Content: string, Image: string) -> () = getfenv().Notify
+local getgenv: () -> ({[string]: any}) = getfenv().getgenv
+local UnsupportedName: string = getgenv().UnsupportedName
+local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getgenv().firetouchinterest
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local firesignal: (RBXScriptSignal) -> () = getgenv().firesignal
+local fireclickdetector: (ClickDetector) -> () = getgenv().fireclickdetector
+local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
-local Rayfield = getfenv().Rayfield
+local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any}} = Rayfield.Flags
 
 local CollectionService = game:GetService("CollectionService")
@@ -83,7 +84,7 @@ local Network = ReplicatedStorage:WaitForChild("Source"):WaitForChild("Network")
 local RemoteFunctions: {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
 local RemoteEvents: {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents")
 
-local Window = getfenv().Window
+local Window = getgenv().Window
 
 local Tab = Window:CreateTab("Automation", "repeat")
 
@@ -686,4 +687,4 @@ TeleporttoIsland = Tab:CreateDropdown({
 	end,
 })
 
-getfenv().CreateUniversalTabs()
+getgenv().CreateUniversalTabs()
