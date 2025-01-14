@@ -15,13 +15,12 @@ local isrbxactive: () -> (boolean) = getgenv().isrbxactive
 local setclipboard: (Text: string) -> () = getgenv().setclipboard
 
 local ScriptVersion = getgenv().ScriptVersion
-local CoreVersion = "Core v1.0.0"
 
 local Webhook1 = "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzI59v5hq".."T89zkgmo0q_tWBeaomDP8".."SO7UNYcw3H0Nif76ewQCwM".."A7qZBEl1OBX"
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	if not request then
-		return Notify("Error", "Your executor does not support 'request'")
+		return
 	end
 	
 	if not Fields then
@@ -40,7 +39,7 @@ local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, 
 	
 	table.insert(Fields, {
 		name = "Script Version",
-		value = ScriptVersion or CoreVersion,
+		value = ScriptVersion or "Core",
 		inline = true
 	})
 	
