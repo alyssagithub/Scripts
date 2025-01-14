@@ -1,15 +1,17 @@
-ScriptVersion = "v1.0.5"
+local getgenv: () -> ({[string]: any}) = getfenv().getgenv
+
+getgenv().ScriptVersion = "v1.0.5"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
-local Rayfield = getfenv().Rayfield
+local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
 local Player = game:GetService("Players").LocalPlayer
 
 local Remotes: {[string]: RemoteEvent & RemoteFunction} = game:GetService("ReplicatedStorage"):WaitForChild("Universe"):WaitForChild("Network"):WaitForChild("Remotes")
 
-local Window = getfenv().Window
+local Window = getgenv().Window
 
 local Tab = Window:CreateTab("Automatics", "repeat")
 
@@ -325,4 +327,4 @@ Tab:CreateDropdown({
 	Callback = function()end,
 })
 
-getfenv().CreateUniversalTabs()
+getgenv().CreateUniversalTabs()
