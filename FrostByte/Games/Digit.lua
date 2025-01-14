@@ -1,4 +1,4 @@
-ScriptVersion = "v1.3.7"
+getfenv().ScriptVersion = "v1.3.7"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
