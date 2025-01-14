@@ -1,4 +1,6 @@
-ScriptVersion = "v1.4.7"
+local getgenv: () -> ({[string]: any}) = getfenv().getgenv
+
+getgenv().ScriptVersion = "v1.4.7"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -32,11 +34,11 @@ for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
 	table.insert(Dispensers, v.Name)
 end
 
-local UnsupportedName: string = getfenv().UnsupportedName
-local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
-local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getfenv().HandleConnection
-local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
-local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
+local UnsupportedName: string = getgenv().UnsupportedName
+local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getgenv().firetouchinterest
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local firesignal: (RBXScriptSignal) -> () = getgenv().firesignal
+local fireclickdetector: (ClickDetector) -> () = getgenv().fireclickdetector
 
 local function CollectDrops(Enabled: boolean)
 	if not Enabled then
@@ -53,10 +55,10 @@ local function CollectDrops(Enabled: boolean)
 	end
 end
 
-local Rayfield = getfenv().Rayfield
+local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any}} = Rayfield.Flags
 
-local Window = getfenv().Window
+local Window = getgenv().Window
 
 local Tab = Window:CreateTab("Automation", "repeat")
 
@@ -602,4 +604,4 @@ Tab:CreateToggle({
 	end,
 })
 
-getfenv().CreateUniversalTabs()
+getgenv().CreateUniversalTabs()
