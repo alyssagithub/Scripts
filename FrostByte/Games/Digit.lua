@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.3.9"
+getgenv().ScriptVersion = "v1.4.0"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -308,6 +308,24 @@ Tab:CreateToggle({
 })
 
 Tab:CreateSection("Items")
+
+Tab:CreateToggle({
+	Name = "🆙 • Auto EXP Dupe",
+	CurrentValue = false,
+	Flag = "EXPDupe",
+	Callback = function(Value)
+		while Flags.EXPDupe.CurrentValue and task.wait() do
+			RemoteFunctions.Shop:InvokeServer({
+				Command = "Buy",
+				Type = "Item",
+				Product = "Biodegradable Shovel",
+				Amount = 1
+			})
+		end
+	end,
+})
+
+Tab:CreateDivider()
 
 local function PinMoles(Tool: Tool)
 	if not Flags.PinMoles.CurrentValue then
