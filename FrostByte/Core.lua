@@ -375,6 +375,8 @@ function CreateUniversalTabs()
 	})
 	
 	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
+	
+	Rayfield:LoadConfiguration()
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
