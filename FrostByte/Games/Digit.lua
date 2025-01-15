@@ -520,7 +520,7 @@ if not Player:GetAttribute("OriginalMaxInventorySize") then
 end
 
 Tab:CreateToggle({
-	Name = "♾ • Infinite Backpack Capacity",
+	Name = "♾ • Infinite Backpack Capacity (PATCHED)",
 	CurrentValue = false,
 	Flag = "InfiniteCap",
 	Callback = function(Value)
