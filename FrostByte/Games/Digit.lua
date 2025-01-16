@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.4.0"
+getgenv().ScriptVersion = "v1.4.0B"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -67,11 +67,15 @@ end)
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
-local UnsupportedName: string = getgenv().UnsupportedName
 local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getgenv().firetouchinterest
-local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local firesignal: (RBXScriptSignal) -> () = getgenv().firesignal
 local fireclickdetector: (ClickDetector) -> () = getgenv().fireclickdetector
+local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (any) -> ()) -> ((any) -> (any)) = getgenv().hookmetamethod
+local getnamecallmethod: () -> (string) = getgenv().getnamecallmethod
+local checkcaller: () -> (boolean) = getgenv().checkcaller
+
+local UnsupportedName: string = getgenv().UnsupportedName
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local Rayfield = getgenv().Rayfield
@@ -160,7 +164,7 @@ local function RandomVector(Size: Vector3, Position: Vector3)
 	return Vector3.new(X, Position.Y, Z)
 end
 
-local CanWalk = true
+local ChosenPosition
 
 Tab:CreateToggle({
 	Name = "🔄 • Auto Walk After Dig",
@@ -185,7 +189,7 @@ Tab:CreateToggle({
 			if not Visualizer then
 				Visualizer = Instance.new("Part")
 				Visualizer.Size = ZoneSize
-				Visualizer.Position = Character:GetPivot().Position - Vector3.yAxis * Character:GetExtentsSize().Y / 1.05
+				Visualizer.Position = Character:GetPivot().Position - Vector3.yAxis * Character.HumanoidRootPart.Size.Y
 				Visualizer.Anchored = true
 				Visualizer.Color = Color3.fromRGB(75, 255, 75)
 				Visualizer.CanCollide = false
@@ -224,14 +228,20 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			if CanWalk then
-				Humanoid:MoveTo(RandomVector(ZoneSize, Visualizer.Position))
-				CanWalk = false
-
+			if not ChosenPosition then
+				ChosenPosition = RandomVector(ZoneSize, Visualizer.Position)
+				
 				Humanoid.MoveToFinished:Once(function()
-					CanWalk = true
+					ChosenPosition = nil
 				end)
 			end
+			
+			Humanoid:MoveTo(ChosenPosition)
+		end
+		
+		if Value then
+			ChosenPosition = nil
+			Player.Character.Humanoid:MoveTo(Player.Character.HumanoidRootPart.Position)
 		end
 		
 		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
@@ -310,7 +320,7 @@ Tab:CreateToggle({
 Tab:CreateSection("Items")
 
 Tab:CreateToggle({
-	Name = "🆙 • Auto EXP Dupe",
+	Name = "🆙 • Auto EXP Dupe (OLD SERVERS ONLY)",
 	CurrentValue = false,
 	Flag = "EXPDupe",
 	Callback = function(Value)
@@ -416,45 +426,6 @@ Tab:CreateToggle({
 	end,
 })
 
---[[Tab:CreateDivider()
-
-Tab:CreateToggle({
-	Name = "🌟 • Auto Enchant Shovel\n| NOT USABLE",
-	CurrentValue = false,
-	Flag = "Enchant",
-	Callback = function(Value)
-		while Flags.Enchant.CurrentValue and task.wait() do
-			local args = {
-				[1] = {
-					["Command"] = "OfferEnchant",
-					["ID"] = "f2db00f37b"
-				}
-			}
-
-			game:GetService("ReplicatedStorage"):WaitForChild("Source"):WaitForChild("Network"):WaitForChild("RemoteFunctions"):WaitForChild("MolePit"):InvokeServer(unpack(args))
-			
-			local args = {
-				[1] = {
-					["Command"] = "OfferShovel",
-					["ID"] = "f963514648"
-				}
-			}
-
-			game:GetService("ReplicatedStorage"):WaitForChild("Source"):WaitForChild("Network"):WaitForChild("RemoteFunctions"):WaitForChild("MolePit"):InvokeServer(unpack(args))
-
-		end
-	end,
-})
-
-Tab:CreateDropdown({
-	Name = "🏝 • Enchantment to Stop at",
-	Options = Enchantments,
-	CurrentOption = "",
-	MultipleOptions = false,
-	--Flag = "Flag",
-	Callback = function()end,
-})]]
-
 Tab:CreateSection("Islands")
 
 local PreviousLocation
@@ -503,7 +474,7 @@ local function LunarCloudsTeleport(Lunar: Model?)
 	local Character = Player.Character
 
 	PreviousLocation = Character:GetPivot()
-
+	
 	Character:PivotTo(Lunar:GetPivot() + Vector3.yAxis * Lunar:GetExtentsSize().Y / 2)
 end
 
@@ -531,9 +502,111 @@ end), "LunarCloudsRemoved")
 
 local Tab = Window:CreateTab("QOL", "leaf")
 
+Tab:CreateSection("Items")
+
+Tab:CreateButton({
+	Name = `🔍 • Quick Appraise Held Item [${RemoteFunctions.LootPit:InvokeServer({Command = "GetPlayerPrice"})}]`,
+	Callback = function()
+		RemoteFunctions.LootPit:InvokeServer({
+			Command = "AppraiseItem"
+		})
+	end,
+})
+
+Tab:CreateButton({
+	Name = "🌟 • Quick Enchant Shovel",
+	Callback = function()
+		local Backpack = Player.Backpack
+
+		local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
+
+		if not Mole then
+			return Notify("Missing Item", "You do not have a mole or royal mole.")
+		end
+
+		for _, Item: Tool in Backpack:GetChildren() do
+			if Item:GetAttribute("Type") ~= "Shovel" then
+				continue
+			end
+
+			local Result = RemoteFunctions.MolePit:InvokeServer({
+				Command = "OfferEnchant",
+				ID = Mole:GetAttribute("ID")
+			})
+
+			if Result ~= true then
+				return Notify("Error", "Failed to offer the mole")
+			end
+
+			local Result = RemoteFunctions.MolePit:InvokeServer({
+				Command = "OfferShovel",
+				ID = Item:GetAttribute("ID")
+			})
+
+			if Result ~= true then
+				return Notify("Error", "Failed to offer the shovel")
+			end
+
+			return Notify("Success", "Successfully enchanted your shovel!")
+		end
+	end,
+})
+
 Tab:CreateSection("Inventory")
 
-if not Player:GetAttribute("OriginalMaxInventorySize") then
+local OpenBankHook
+local MoveToBankHook
+local AlreadyWaiting = false
+
+Tab:CreateToggle({
+	Name = "🏦 • Bank Anywhere",
+	CurrentValue = false,
+	Flag = "Bank",
+	Callback = function(Value)
+		if not OpenBankHook then
+			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
+				local method = getnamecallmethod()
+				local args = {...}
+				
+				if not checkcaller() and method == "InvokeServer" and args[1].Command == "OwnsProduct" and args[1].Product == "Store Anywhere" and Flags.Bank.CurrentValue then
+					return true
+				end
+				
+				return OpenBankHook(self, ...)
+			end)
+		end
+		
+		if not MoveToBankHook then
+			MoveToBankHook = hookmetamethod(RemoteFunctions.Inventory, "__namecall", function(self, ...)
+				local method = getnamecallmethod()
+				local args = {...}
+
+				if not checkcaller() and method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
+					local Result: {["Status"]: boolean}
+
+					AlreadyWaiting = true
+					
+					local Character = Player.Character
+					
+					local PreviousPosition = Character:GetPivot()
+
+					repeat
+						Character:PivotTo(workspace.Map.Islands.Nookville.BackpackIsland.Ronald:GetPivot())
+						Result = self:InvokeServer(args[1])
+					until (Result and Result.Status) or not Flags.Bank.CurrentValue
+
+					AlreadyWaiting = false
+					
+					Character:PivotTo(PreviousPosition)
+				end
+
+				return MoveToBankHook(self, ...)
+			end)
+		end
+	end,
+})
+
+--[[if not Player:GetAttribute("OriginalMaxInventorySize") then
 	Player:SetAttribute("OriginalMaxInventorySize", Player:GetAttribute("MaxInventorySize"))
 end
 
@@ -548,7 +621,7 @@ Tab:CreateToggle({
 			Player:SetAttribute("MaxInventorySize", Player:GetAttribute("OriginalMaxInventorySize"))
 		end
 	end,
-})
+})]]
 
 Tab:CreateSection("Shop")
 
