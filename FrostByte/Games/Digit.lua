@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.4.9"
+getgenv().ScriptVersion = "v1.5.0"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -559,7 +559,7 @@ local MoveToBankHook
 local AlreadyWaiting = false
 
 Tab:CreateToggle({
-	Name = "🏦 • Bank Anywhere",
+	Name = if hookmetamethod and getnamecallmethod and checkcaller then "🏦 • Bank Anywhere" else UnsupportedName,
 	CurrentValue = false,
 	Flag = "Bank",
 	Callback = function(Value)
