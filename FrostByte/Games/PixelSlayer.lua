@@ -1,15 +1,19 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.5"
+getgenv().ScriptVersion = "v1.0.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+
+local UnsupportedName: string = getgenv().UnsupportedName
 
 local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
 local Player = game:GetService("Players").LocalPlayer
 
-local Remotes: {[string]: RemoteEvent & RemoteFunction} = game:GetService("ReplicatedStorage"):WaitForChild("Universe"):WaitForChild("Network"):WaitForChild("Remotes")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Remotes: {[string]: RemoteEvent & RemoteFunction} = ReplicatedStorage:WaitForChild("Universe"):WaitForChild("Network"):WaitForChild("Remotes")
 
 local Window = getgenv().Window
 
@@ -274,13 +278,17 @@ Tab:CreateToggle({
 	end,
 })
 
-local Items = {}
+local Items = {UnsupportedName}
 
-for ItemName, _ in require(game:GetService("ReplicatedStorage").Universe.Items) do
-	table.insert(Items, ItemName)
-end
+pcall(function()
+	for ItemName, _ in require(ReplicatedStorage.Universe.Items) do
+		table.insert(Items, ItemName)
+	end
+	
+	table.remove(Items, 1)
 
-table.sort(Items)
+	table.sort(Items)
+end)
 
 Tab:CreateDropdown({
 	Name = "🔎 • Items to Craft",
