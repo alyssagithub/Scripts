@@ -324,24 +324,6 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Items")
 
---[[Tab:CreateToggle({
-	Name = "🆙 • Auto EXP Dupe (OLD SERVERS ONLY)",
-	CurrentValue = false,
-	Flag = "EXPDupe",
-	Callback = function(Value)
-		while Flags.EXPDupe.CurrentValue and task.wait() do
-			RemoteFunctions.Shop:InvokeServer({
-				Command = "Buy",
-				Type = "Item",
-				Product = "Biodegradable Shovel",
-				Amount = 1
-			})
-		end
-	end,
-})
-
-Tab:CreateDivider()]]
-
 local function PinMoles(Tool: Tool)
 	if not Flags.PinMoles.CurrentValue or not Tool.Name:find("Mole") or Tool:GetAttribute("Pinned") then
 		return
@@ -669,23 +651,6 @@ Tab:CreateToggle({
 	end,
 })
 
---[[if not Player:GetAttribute("OriginalMaxInventorySize") then
-	Player:SetAttribute("OriginalMaxInventorySize", Player:GetAttribute("MaxInventorySize"))
-end
-
-Tab:CreateToggle({
-	Name = "♾ • Infinite Backpack Capacity (PATCHED)",
-	CurrentValue = false,
-	Flag = "InfiniteCap",
-	Callback = function(Value)
-		if Value then
-			Player:SetAttribute("MaxInventorySize", 1e5)
-		else
-			Player:SetAttribute("MaxInventorySize", Player:GetAttribute("OriginalMaxInventorySize"))
-		end
-	end,
-})]]
-
 Tab:CreateSection("Shop")
 
 function SellInventory()
@@ -775,7 +740,6 @@ PurchaseShovel = Tab:CreateDropdown({
 	Options = Shovels,
 	CurrentOption = "",
 	MultipleOptions = false,
-	--Flag = "Flag",
 	Callback = function(CurrentOption)
 		CurrentOption = CurrentOption[1]
 
@@ -821,7 +785,6 @@ TeleporttoIsland = Tab:CreateDropdown({
 	Options = Islands,
 	CurrentOption = "",
 	MultipleOptions = false,
-	--Flag = "Flag",
 	Callback = function(CurrentOption)
 		CurrentOption = CurrentOption[1]
 
@@ -864,7 +827,6 @@ Tab:CreateToggle({
 					NewArgs.Command = Args[1].Command
 					NewArgs.State = false
 					self:FireServer(NewArgs)
-					print("firing server")
 					return
 				end
 				
