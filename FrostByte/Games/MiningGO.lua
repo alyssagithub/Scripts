@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.4.7"
+getgenv().ScriptVersion = "v1.4.8"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -56,7 +56,7 @@ local function CollectDrops(Enabled: boolean)
 end
 
 local Rayfield = getgenv().Rayfield
-local Flags: {[string]: {["CurrentValue"]: any}} = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
 local Window = getgenv().Window
 
@@ -392,8 +392,13 @@ Tab:CreateToggle({
 		while Flags.Quests.CurrentValue and task.wait(1) do
 			local QuestElem
 			
-			for i,v in Player.PlayerGui.StartGui.Quests.Inner:GetChildren() do
+			for i,v: Frame in Player.PlayerGui.StartGui.Quests.Inner:GetChildren() do
+				if not v:IsA("Frame") then
+					continue
+				end
+				
 				local Title = v.Inner.TextArea.Title
+				
 				if Title.Text:find("Mouse") then
 					QuestElem = v
 					break
