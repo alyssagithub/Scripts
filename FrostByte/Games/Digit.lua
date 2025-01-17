@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.0"
+getgenv().ScriptVersion = "v1.5.0b"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -70,7 +70,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getgenv().firetouchinterest
 local firesignal: (RBXScriptSignal) -> () = getgenv().firesignal
 local fireclickdetector: (ClickDetector) -> () = getgenv().fireclickdetector
-local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (any) -> ()) -> ((any) -> (any)) = getgenv().hookmetamethod
+local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getgenv().hookmetamethod
 local getnamecallmethod: () -> (string) = getgenv().getnamecallmethod
 local checkcaller: () -> (boolean) = getgenv().checkcaller
 
@@ -79,7 +79,7 @@ local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = 
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local Rayfield = getgenv().Rayfield
-local Flags: {[string]: {["CurrentValue"]: any}} = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
 local CollectionService = game:GetService("CollectionService")
 
@@ -95,29 +95,34 @@ local Tab = Window:CreateTab("Automation", "repeat")
 
 Tab:CreateSection("Digging")
 
+HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message, StackTrace, CallingScript)
+	if CallingScript.Name == "Shovel" and Message:find("attempt to index nil with 'GetAttribute'") then
+		local Character = Player.Character
+
+		local Tool = Character:FindFirstChildOfClass("Tool")
+		
+		if not Tool then
+			return
+		end
+
+		local Humanoid: Humanoid = Character.Humanoid
+
+		Humanoid:UnequipTools()
+		Humanoid:EquipTool(Tool)
+	end
+end), "ShovelError")
+
 Tab:CreateToggle({
 	Name = "⛏️ • Auto Fast Dig",
 	CurrentValue = false,
 	Flag = "Dig",
 	Callback = function(Value)
-		task.spawn(function()
-			while Flags.Dig.CurrentValue and task.wait() do
-				local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
-
-				if not DigMinigame then
-					continue
-				end
-				
-				DigMinigame.Cursor.Position = DigMinigame.Area.Position
-			end
-		end)
-		
 		while Flags.Dig.CurrentValue and task.wait() do
 			if not Player.Character:FindFirstChildOfClass("Tool") then
 				continue
 			end
 			
-			local Adornee = Player.Character.Shovel.Highlight.Adornee
+			local Adornee: Model? = Player.Character.Shovel.Highlight.Adornee
 			
 			if not Adornee or Adornee.Parent ~= workspace.Map.TreasurePiles then
 				continue
@@ -319,7 +324,7 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Items")
 
-Tab:CreateToggle({
+--[[Tab:CreateToggle({
 	Name = "🆙 • Auto EXP Dupe (OLD SERVERS ONLY)",
 	CurrentValue = false,
 	Flag = "EXPDupe",
@@ -335,25 +340,21 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateDivider()
+Tab:CreateDivider()]]
 
 local function PinMoles(Tool: Tool)
-	if not Flags.PinMoles.CurrentValue then
-		return
-	end
-	
-	if not Tool.Name:find("Mole") then
-		return
-	end
-	
-	if Tool:GetAttribute("Pinned") then
+	if not Flags.PinMoles.CurrentValue or not Tool.Name:find("Mole") or Tool:GetAttribute("Pinned") then
 		return
 	end
 
-	RemoteFunctions.Inventory:InvokeServer({
+	local Result = RemoteFunctions.Inventory:InvokeServer({
 		Command = "ToggleSlotPin",
 		UID = Tool:GetAttribute("ID")
 	})
+	
+	if Result then
+		Tool:SetAttribute("Pinned", not Tool:GetAttribute("Pinned"))
+	end
 end
 
 Tab:CreateToggle({
@@ -424,6 +425,66 @@ Tab:CreateToggle({
 			task.wait(5)
 		end
 	end,
+})
+
+Tab:CreateToggle({
+	Name = "💰 • Auto Sell Inventory at Max Capacity",
+	CurrentValue = false,
+	Flag = "Sell",
+	Callback = function(Value)	
+		while Flags.Sell.CurrentValue and task.wait() do
+			local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
+			local Current = tonumber(Capacity.Text:split("(")[2]:split("/")[1])
+			local Max = tonumber(Capacity.Text:split(")")[1]:split("/")[2])
+
+			if Current < Max then
+				continue
+			end
+
+			SellInventory()
+		end
+	end,
+})
+
+Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "🏧 • Auto Bank Certain Items (Needs Bank Anywhere)",
+	CurrentValue = false,
+	Flag = "BankItems",
+	Callback = function(Value)
+		while Flags.BankItems.CurrentValue and task.wait() do	
+			for _, Item: string in Flags.Items.CurrentOption do
+				local Tool = Player.Backpack:FindFirstChild(Item)
+				
+				if not Tool then
+					continue
+				end
+				
+				RemoteFunctions.Inventory:InvokeServer({
+					Command = "MoveToBank",
+					UID = Tool:GetAttribute("ID")
+				})
+			end
+		end
+	end,
+})
+
+local Items = {}
+
+for i,v in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
+	table.insert(Items, v.Name)
+end
+
+table.sort(Items)
+
+Tab:CreateDropdown({
+	Name = "💳 • Items to Bank",
+	Options = Items,
+	CurrentOption = "None",
+	MultipleOptions = true,
+	Flag = "Items",
+	Callback = function()end,
 })
 
 Tab:CreateSection("Islands")
@@ -563,7 +624,7 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Bank",
 	Callback = function(Value)
-		if not OpenBankHook then
+		if Value and not OpenBankHook then
 			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
 				local method = getnamecallmethod()
 				local args = {...}
@@ -576,12 +637,12 @@ Tab:CreateToggle({
 			end)
 		end
 		
-		if not MoveToBankHook then
+		if Value and not MoveToBankHook then
 			MoveToBankHook = hookmetamethod(RemoteFunctions.Inventory, "__namecall", function(self, ...)
 				local method = getnamecallmethod()
 				local args = {...}
 
-				if not checkcaller() and method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
+				if method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
 					local Result: {["Status"]: boolean}
 
 					AlreadyWaiting = true
@@ -599,8 +660,10 @@ Tab:CreateToggle({
 					
 					Character:PivotTo(PreviousPosition)
 				end
-
-				return MoveToBankHook(self, ...)
+				
+				local Success, Result = pcall(MoveToBankHook, self, ...)
+				
+				return if Success then Result else {Status = true}
 			end)
 		end
 	end,
@@ -625,7 +688,7 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Shop")
 
-local function SellInventory()
+function SellInventory()
 	local SellEnabled = Flags.Sell.CurrentValue
 	Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 
@@ -682,25 +745,6 @@ end
 Tab:CreateButton({
 	Name = "💰 • Quick Sell Inventory",
 	Callback = SellInventory,
-})
-
-Tab:CreateToggle({
-	Name = "💰 • Auto Sell Inventory at Max Capacity",
-	CurrentValue = false,
-	Flag = "Sell",
-	Callback = function(Value)	
-		while Flags.Sell.CurrentValue and task.wait() do
-			local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
-			local Current = tonumber(Capacity.Text:split("(")[2]:split("/")[1])
-			local Max = tonumber(Capacity.Text:split(")")[1]:split("/")[2])
-
-			if Current < Max then
-				continue
-			end
-			
-			SellInventory()
-		end
-	end,
 })
 
 Tab:CreateButton({
@@ -798,6 +842,35 @@ TeleporttoIsland = Tab:CreateDropdown({
 		end
 
 		TeleporttoIsland:Set({""})
+	end,
+})
+
+Tab:CreateSection("UI")
+
+local AFKHook
+
+Tab:CreateToggle({
+	Name = "🏷️ • Disable [AFK] Tag",
+	CurrentValue = false,
+	Flag = "AFKTag",
+	Callback = function(Value)	
+		if Value and not AFKHook then
+			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
+				local Method = getnamecallmethod()
+				local Args = {...}
+				
+				if not checkcaller() and Method == "FireServer" and Args[1].Command == "SetAFK" and Args[1].State and Flags.AFKTag.CurrentValue then
+					local NewArgs = {}
+					NewArgs.Command = Args[1].Command
+					NewArgs.State = false
+					self:FireServer(NewArgs)
+					print("firing server")
+					return
+				end
+				
+				return AFKHook(self, ...)
+			end)
+		end
 	end,
 })
 
