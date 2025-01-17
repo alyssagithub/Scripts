@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.9"
+getgenv().ScriptVersion = "v1.6.0"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -850,10 +850,10 @@ Tab:CreateSection("UI")
 local AFKHook
 
 Tab:CreateToggle({
-	Name = "🏷️ • Disable [AFK] Tag",
+	Name = if hookmetamethod and getnamecallmethod and checkcaller then "🏷️ • Disable [AFK] Tag" else UnsupportedName,
 	CurrentValue = false,
 	Flag = "AFKTag",
-	Callback = function(Value)	
+	Callback = function(Value)
 		if Value and not AFKHook then
 			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
 				local Method = getnamecallmethod()
