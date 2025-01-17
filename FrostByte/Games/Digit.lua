@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.0b"
+getgenv().ScriptVersion = "v1.5.9"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
