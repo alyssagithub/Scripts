@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.4.8"
+getgenv().ScriptVersion = "v1.4.9"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -393,7 +393,7 @@ Tab:CreateToggle({
 			local QuestElem
 			
 			for i,v: Frame in Player.PlayerGui.StartGui.Quests.Inner:GetChildren() do
-				if not v:IsA("Frame") then
+				if not v:FindFirstChild("Inner") then
 					continue
 				end
 				
