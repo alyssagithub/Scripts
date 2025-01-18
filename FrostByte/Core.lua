@@ -108,9 +108,13 @@ if not firesignal and getconnections then
 	end
 end
 
-local UnsupportedName = "(Executor Unsupported)"
+local UnsupportedName = " (Executor Unsupported)"
 
 getgenv().UnsupportedName = UnsupportedName
+
+getgenv().ApplyUnsupportedName = function(Name: string, Condition: boolean)
+	return Name..if Condition then "" else UnsupportedName
+end
 
 if queue_on_teleport then
 	queue_on_teleport([[
