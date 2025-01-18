@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.26.43"
+getgenv().ScriptVersion = "v1.26.46"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -424,7 +424,7 @@ Tab:CreateToggle({
 	Flag = "BankItems",
 	Callback = function(Value)
 		while Flags.BankItems.CurrentValue and task.wait() do	
-			for _, Item: string in Flags.Items.CurrentOption do
+			for _, Item: string in Flags.ItemsToBank.CurrentOption do
 				local Tool = Player.Backpack:FindFirstChild(Item)
 				
 				if not Tool then
@@ -537,7 +537,7 @@ Tab:CreateToggle({
 
 HandleConnection(workspace.Map.Temporary.ChildAdded:Connect(MeteorIslandTeleport), "Meteor")
 HandleConnection(workspace.Map.Temporary.ChildRemoved:Connect(function(Child: Model?)
-	if Child.Name == "Meteor Island" and PreviousLocation then
+	if Child.Name == "Meteor Island" and PreviousLocation and Flags.Meteor.CurrentValue then
 		Player.Character:PivotTo(PreviousLocation)
 	end
 end), "MeteorRemoved")
@@ -573,7 +573,7 @@ Tab:CreateToggle({
 
 HandleConnection(workspace.Map.Islands.ChildAdded:Connect(LunarCloudsTeleport), "LunarClouds")
 HandleConnection(workspace.Map.Islands.ChildRemoved:Connect(function(Child: Model)
-	if Child.Name == "Lunar Clouds" and PreviousLocation then
+	if Child.Name == "Lunar Clouds" and PreviousLocation and Flags.LunarClouds.CurrentValue then
 		Player.Character:PivotTo(PreviousLocation)
 	end
 end), "LunarCloudsRemoved")
