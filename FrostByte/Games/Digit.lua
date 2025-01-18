@@ -75,6 +75,7 @@ local getnamecallmethod: () -> (string) = getgenv().getnamecallmethod
 local checkcaller: () -> (boolean) = getgenv().checkcaller
 
 local UnsupportedName: string = getgenv().UnsupportedName
+local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
@@ -350,7 +351,7 @@ local function OpenContainer(Tool: Tool)
 end
 
 Tab:CreateToggle({
-	Name = if pcall(require, Treasures:FindFirstChildOfClass("ModuleScript")) then "💸 • Auto Open Containers" else UnsupportedName,
+	Name = ApplyUnsupportedName("💸 • Auto Open Containers", pcall(require, Treasures:FindFirstChildOfClass("ModuleScript"))),
 	CurrentValue = false,
 	Flag = "OpenContainers",
 	Callback = function(Value)
@@ -637,7 +638,7 @@ local MoveToBankHook
 local AlreadyWaiting = false
 
 Tab:CreateToggle({
-	Name = if hookmetamethod and getnamecallmethod and checkcaller then "🏦 • Bank Anywhere" else UnsupportedName,
+	Name = ApplyUnsupportedName("🏦 • Bank Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
 	CurrentValue = false,
 	Flag = "Bank",
 	Callback = function(Value)
@@ -848,7 +849,7 @@ Tab:CreateSection("UI")
 local AFKHook
 
 Tab:CreateToggle({
-	Name = if hookmetamethod and getnamecallmethod and checkcaller then "🏷️ • Disable [AFK] Tag" else UnsupportedName,
+	Name = ApplyUnsupportedName("🏷️ • Disable [AFK] Tag", hookmetamethod and getnamecallmethod and checkcaller),
 	CurrentValue = false,
 	Flag = "AFKTag",
 	Callback = function(Value)
