@@ -108,7 +108,7 @@ if not firesignal and getconnections then
 	end
 end
 
-local UnsupportedName = "Your Executor Doesn't Support This Feature"
+local UnsupportedName = "(Executor Unsupported)"
 
 getgenv().UnsupportedName = UnsupportedName
 
