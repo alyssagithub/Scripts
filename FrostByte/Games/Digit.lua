@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.26.46"
+getgenv().ScriptVersion = "v1.26.47"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -327,6 +327,29 @@ Tab:CreateSection("Items")
 
 local Treasures = ReplicatedStorage.Settings.Items.Treasures
 
+local ContainerNames = {
+	"Chest",
+	"Loot Bag",
+	"Crate",
+	"Magnet Box",
+	"Strange Vase",
+	"Sparkle Flask",
+	"Gift of Labor",
+	"Gift of Voyage",
+	"Gift of Elves",
+	"Frozen Container",
+	"Pinata Box",
+	"Frozen Magnet Box",
+	"Piggy Bank",
+	"Benson's Present",
+	"Benson's Royal Crate",
+	"Benson's Safe",
+	"Benson's Box",
+	"Gift of Dragons",
+	"Gift of Abundance",
+	"Gift of Fortune",
+}
+
 local function OpenContainer(Tool: Tool)
 	if not Flags.OpenContainers.CurrentValue then
 		return
@@ -338,9 +361,13 @@ local function OpenContainer(Tool: Tool)
 		return
 	end
 
-	local Info = require(Module)
-
-	if not Info.ContainerType then
+	local Success, Info = pcall(require, Module)
+	
+	if Success then
+		if not Info.ContainerType then
+			return
+		end
+	elseif not table.find(ContainerNames, Tool.Name) then
 		return
 	end
 
@@ -351,7 +378,7 @@ local function OpenContainer(Tool: Tool)
 end
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("💸 • Auto Open Containers", pcall(require, Treasures:FindFirstChildOfClass("ModuleScript"))),
+	Name = "💸 • Auto Open Containers",
 	CurrentValue = false,
 	Flag = "OpenContainers",
 	Callback = function(Value)
