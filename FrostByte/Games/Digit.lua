@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.26.47"
+getgenv().ScriptVersion = "v1.26.49"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -270,6 +270,10 @@ Tab:CreateToggle({
 				if Pile:GetAttribute("Owner") ~= Player.UserId then
 					continue
 				end
+				
+				if (Pile:GetPivot().Position - Visualizer.Position).Magnitude > ZoneSize.Magnitude * 2 then
+					continue
+				end
 
 				FoundPile = true
 
@@ -425,20 +429,65 @@ Tab:CreateToggle({
 	end,
 })
 
+local function SellInventory()
+	local SellEnabled = Flags.Sell.CurrentValue
+	Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+
+	local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
+	
+	local Merchant: Model
+
+	for _,v: TextLabel in workspace.Map.Islands:GetDescendants() do
+		if v.Name ~= "Title" or not v:IsA("TextLabel") or v.Text ~= "Merchant" then
+			continue
+		end
+
+		Merchant = v.Parent.Parent
+
+		break
+	end
+	
+	local PreviousPosition = Player.Character:GetPivot()
+	
+	local function GetInventorySize()
+		local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
+			Command = "GetInventory"
+		})
+		
+		local InventorySize = 0
+		
+		for ID, Object in Inventory do
+			InventorySize += 1
+		end
+		
+		return InventorySize
+	end
+	
+	local Teleported = false
+	
+	while GetInventorySize() >= Player:GetAttribute("MaxInventorySize") + 9 and Flags.Sell.CurrentValue == SellEnabled do
+		Player.Character:PivotTo(Merchant:GetPivot())
+
+		RemoteEvents.Merchant:FireServer({
+			Command = "SellAllTreasures",
+			Merchant = Merchant
+		})
+		
+		task.wait(0.1)
+		Teleported = true
+	end
+	
+	if Teleported then
+		Player.Character:PivotTo(PreviousPosition)
+	end
+end
+
 Tab:CreateToggle({
 	Name = "💰 • Auto Sell Inventory at Max Capacity",
 	CurrentValue = false,
 	Flag = "Sell",
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
-			local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
-			local Current = tonumber(Capacity.Text:split("(")[2]:split("/")[1])
-			local Max = tonumber(Capacity.Text:split(")")[1]:split("/")[2])
-
-			if Current < Max then
-				continue
-			end
-
 			SellInventory()
 		end
 	end,
@@ -715,60 +764,6 @@ Tab:CreateToggle({
 })
 
 Tab:CreateSection("Shop")
-
-function SellInventory()
-	local SellEnabled = Flags.Sell.CurrentValue
-	Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-
-	local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
-
-	local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
-		Command = "GetInventory"
-	})
-
-	local AnyObjects = false
-
-	for _, Object in Inventory do
-		if not Object.Attributes.Weight then
-			continue
-		end
-
-		AnyObjects = true
-		break
-	end
-
-	if not AnyObjects then
-		task.wait(5)
-		return
-	end
-
-	for i,v: TextLabel in workspace.Map.Islands:GetDescendants() do
-		if v.Name ~= "Title" or not v:IsA("TextLabel") or v.Text ~= "Merchant" then
-			continue
-		end
-
-		local Merchant: Model = v.Parent.Parent
-
-		local PreviousPosition = Player.Character:GetPivot()
-
-		local PreviousText = Capacity.Text
-
-		repeat
-			Player.Character:PivotTo(Merchant:GetPivot())
-
-			RemoteEvents.Merchant:FireServer({
-				Command = "SellAllTreasures",
-				Merchant = Merchant
-			})
-
-			task.wait(0.1)
-		until Capacity.Text ~= PreviousText or Flags.Sell.CurrentValue ~= SellEnabled
-
-		Player.Character:PivotTo(PreviousPosition)
-
-		break
-	end
-end
 
 Tab:CreateButton({
 	Name = "💰 • Quick Sell Inventory",
