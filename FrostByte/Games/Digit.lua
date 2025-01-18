@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.6.0"
+getgenv().ScriptVersion = "v1.6.0b"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -113,7 +113,7 @@ HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message
 end), "ShovelError")
 
 Tab:CreateToggle({
-	Name = "⛏️ • Auto Fast Dig",
+	Name = "⛏️ • Auto Fast Dig (Combinable with Legit)",
 	CurrentValue = false,
 	Flag = "Dig",
 	Callback = function(Value)
@@ -135,139 +135,6 @@ Tab:CreateToggle({
 		end
 	end,
 })
-
-Tab:CreateToggle({
-	Name = "🕳️ • Auto Create Piles (Any Terrain)",
-	CurrentValue = false,
-	Flag = "CreatePiles",
-	Callback = function(Value)	
-		while Flags.CreatePiles.CurrentValue and task.wait() do	
-			if Player:GetAttribute("PileCount") ~= 0 then
-				continue
-			end
-			
-			local PileInfo: {["PileIndex"]: number, ["Success"]: boolean} = RemoteFunctions.Digging:InvokeServer({
-				Command = "CreatePile"
-			})
-			
-			if PileInfo.Success then
-				RemoteEvents.Digging:FireServer({
-					Command = "DigIntoSandSound"
-				})
-			end
-		end
-	end,
-})
-
-Tab:CreateDivider()
-
-local function RandomVector(Size: Vector3, Position: Vector3)
-
-	local X = Position.X + math.random(-Size.X / 2, Size.X / 2)
-	local Z = Position.Z + math.random(-Size.Z / 2, Size.Z / 2)
-
-	return Vector3.new(X, Position.Y, Z)
-end
-
-local ChosenPosition
-
-Tab:CreateToggle({
-	Name = "🔄 • Auto Walk After Dig",
-	CurrentValue = false,
-	Flag = "DigWalk",
-	Callback = function(Value)
-		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
-		
-		while Flags.DigWalk.CurrentValue and task.wait() do	
-			if Player:GetAttribute("IsDigging") then
-				continue
-			end
-			
-			local Character = Player.Character
-			
-			local WalkZoneSizeFlag = Flags.ZoneSize.CurrentValue
-			
-			local ZoneSize = Vector3.new(WalkZoneSizeFlag, 1, WalkZoneSizeFlag)
-			
-			local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
-			
-			if not Visualizer then
-				Visualizer = Instance.new("Part")
-				Visualizer.Size = ZoneSize
-				Visualizer.Position = Character:GetPivot().Position - Vector3.yAxis * Character.HumanoidRootPart.Size.Y
-				Visualizer.Anchored = true
-				Visualizer.Color = Color3.fromRGB(75, 255, 75)
-				Visualizer.CanCollide = false
-				Visualizer.CanQuery = false
-				Visualizer.Material = Enum.Material.SmoothPlastic
-				Visualizer.Transparency = 0.4
-				Visualizer.CastShadow = false
-				Visualizer.Name = "FrostByteVisualizer"
-				Visualizer.Parent = workspace
-			end
-			
-			local Humanoid: Humanoid = Character.Humanoid
-			
-			local FoundPile = false
-
-			for _, Pile: Model in workspace.Map.TreasurePiles:GetChildren() do
-				if Pile:GetAttribute("Owner") ~= Player.UserId then
-					continue
-				end
-				
-				FoundPile = true
-				
-				for _, Descendant: BasePart in Pile:GetDescendants() do
-					if not Descendant:IsA("BasePart") then
-						continue
-					end
-					
-					Descendant.CanCollide = false
-				end
-
-				Humanoid:MoveTo(Pile:GetPivot().Position)
-				break
-			end
-			
-			if FoundPile then
-				continue
-			end
-			
-			if not ChosenPosition then
-				ChosenPosition = RandomVector(ZoneSize, Visualizer.Position)
-				
-				Humanoid.MoveToFinished:Once(function()
-					ChosenPosition = nil
-				end)
-			end
-			
-			Humanoid:MoveTo(ChosenPosition)
-		end
-		
-		if Value then
-			ChosenPosition = nil
-			Player.Character.Humanoid:MoveTo(Player.Character.HumanoidRootPart.Position)
-		end
-		
-		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
-		
-		if Visualizer then
-			Visualizer:Destroy()
-		end
-	end,
-})
-
-Tab:CreateSlider({
-	Name = "🟩 • Auto Walk Zone Size",
-	Range = {5, 100},
-	Increment = 1,
-	Suffix = "Studs",
-	CurrentValue = 20,
-	Flag = "ZoneSize",
-	Callback = function()end,
-})
-
-Tab:CreateSection("Legit Digging")
 
 local function LegitDig()
 	if not Flags.LegitDig.CurrentValue then
@@ -293,7 +160,7 @@ local function LegitDig()
 end
 
 Tab:CreateToggle({
-	Name = "⛏️ • Auto Legit Dig",
+	Name = "⛏️ • Auto Legit Dig (100% Success Rate)",
 	CurrentValue = false,
 	Flag = "LegitDig",
 	Callback = function(Value)
@@ -305,8 +172,33 @@ Tab:CreateToggle({
 
 HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
 
+Tab:CreateDivider()
+
 Tab:CreateToggle({
-	Name = "🕳️ • Auto Legit Create Piles",
+	Name = "🕳️ • Auto Create Piles on Any Terrain",
+	CurrentValue = false,
+	Flag = "CreatePiles",
+	Callback = function(Value)	
+		while Flags.CreatePiles.CurrentValue and task.wait() do	
+			if Player:GetAttribute("PileCount") ~= 0 then
+				continue
+			end
+			
+			local PileInfo: {["PileIndex"]: number, ["Success"]: boolean} = RemoteFunctions.Digging:InvokeServer({
+				Command = "CreatePile"
+			})
+			
+			if PileInfo.Success then
+				RemoteEvents.Digging:FireServer({
+					Command = "DigIntoSandSound"
+				})
+			end
+		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "🕳️ • Auto Legit Create Piles (Needed for Legit Dig)",
 	CurrentValue = false,
 	Flag = "LegitPiles",
 	Callback = function(Value)	
@@ -322,57 +214,153 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateDivider()
+
+local function RandomVector(Size: Vector3, Position: Vector3)
+
+	local X = Position.X + math.random(-Size.X / 2, Size.X / 2)
+	local Z = Position.Z + math.random(-Size.Z / 2, Size.Z / 2)
+
+	return Vector3.new(X, Position.Y, Z)
+end
+
+local ChosenPosition
+
+Tab:CreateToggle({
+	Name = "🔄 • Auto Walk After Dig",
+	CurrentValue = false,
+	Flag = "DigWalk",
+	Callback = function(Value)
+		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+
+		while Flags.DigWalk.CurrentValue and task.wait() do	
+			if Player:GetAttribute("IsDigging") then
+				continue
+			end
+
+			local Character = Player.Character
+
+			local WalkZoneSizeFlag = Flags.ZoneSize.CurrentValue
+
+			local ZoneSize = Vector3.new(WalkZoneSizeFlag, 1, WalkZoneSizeFlag)
+
+			local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+
+			if not Visualizer then
+				Visualizer = Instance.new("Part")
+				Visualizer.Size = ZoneSize
+				Visualizer.Position = Character:GetPivot().Position - Vector3.yAxis * Character.HumanoidRootPart.Size.Y
+				Visualizer.Anchored = true
+				Visualizer.Color = Color3.fromRGB(75, 255, 75)
+				Visualizer.CanCollide = false
+				Visualizer.CanQuery = false
+				Visualizer.Material = Enum.Material.SmoothPlastic
+				Visualizer.Transparency = 0.4
+				Visualizer.CastShadow = false
+				Visualizer.Name = "FrostByteVisualizer"
+				Visualizer.Parent = workspace
+			end
+
+			local Humanoid: Humanoid = Character.Humanoid
+
+			local FoundPile = false
+
+			for _, Pile: Model in workspace.Map.TreasurePiles:GetChildren() do
+				if Pile:GetAttribute("Owner") ~= Player.UserId then
+					continue
+				end
+
+				FoundPile = true
+
+				for _, Descendant: BasePart in Pile:GetDescendants() do
+					if not Descendant:IsA("BasePart") then
+						continue
+					end
+
+					Descendant.CanCollide = false
+				end
+
+				Humanoid:MoveTo(Pile:GetPivot().Position)
+				break
+			end
+
+			if FoundPile then
+				continue
+			end
+
+			if not ChosenPosition then
+				ChosenPosition = RandomVector(ZoneSize, Visualizer.Position)
+
+				Humanoid.MoveToFinished:Once(function()
+					ChosenPosition = nil
+				end)
+			end
+
+			Humanoid:MoveTo(ChosenPosition)
+		end
+
+		if Value then
+			ChosenPosition = nil
+			Player.Character.Humanoid:MoveTo(Player.Character.HumanoidRootPart.Position)
+		end
+
+		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+
+		if Visualizer then
+			Visualizer:Destroy()
+		end
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "🟩 • Auto Walk Zone Size",
+	Range = {5, 100},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 20,
+	Flag = "ZoneSize",
+	Callback = function()end,
+})
+
 Tab:CreateSection("Items")
 
-local function PinMoles(Tool: Tool)
-	if not Flags.PinMoles.CurrentValue or not Tool.Name:find("Mole") or Tool:GetAttribute("Pinned") then
+local Treasures = ReplicatedStorage.Settings.Items.Treasures
+
+local function OpenContainer(Tool: Tool)
+	if not Flags.OpenContainers.CurrentValue then
+		return
+	end
+	
+	local Module: ModuleScript? = Treasures:FindFirstChild(Tool.Name)
+
+	if not Module then
 		return
 	end
 
-	local Result = RemoteFunctions.Inventory:InvokeServer({
-		Command = "ToggleSlotPin",
-		UID = Tool:GetAttribute("ID")
-	})
-	
-	if Result then
-		Tool:SetAttribute("Pinned", not Tool:GetAttribute("Pinned"))
+	local Info = require(Module)
+
+	if not Info.ContainerType then
+		return
 	end
+
+	RemoteEvents.Treasure:FireServer({
+		Command = "RedeemContainer",
+		Container = Tool
+	})
 end
 
 Tab:CreateToggle({
-	Name = "📌 • Auto Pin Moles",
+	Name = if pcall(require, Treasures:FindFirstChildOfClass("ModuleScript")) then "💸 • Auto Open Containers" else UnsupportedName,
 	CurrentValue = false,
-	Flag = "PinMoles",
+	Flag = "OpenContainers",
 	Callback = function(Value)
-		if Value then
-			for _, Tool: Tool in Player.Backpack:GetChildren() do
-				PinMoles(Tool)
-			end
+		for _, Tool: Tool in Player.Backpack:GetChildren() do
+			OpenContainer(Tool)
 		end
 	end,
 })
 
-HandleConnection(Player.Backpack.ChildAdded:Connect(PinMoles), "PinMoles")
-
-Tab:CreateToggle({
-	Name = "💸 • Auto Open Magnet Boxes",
-	CurrentValue = false,
-	Flag = "OpenMagnet",
-	Callback = function(Value)
-		while Flags.OpenMagnet.CurrentValue and task.wait() do
-			for _, Tool: Tool in Player.Backpack:GetChildren() do
-				if not Tool.Name:find("Magnet Box") then
-					continue
-				end
-				
-				RemoteEvents.Treasure:FireServer({
-					Command = "RedeemContainer",
-					Container = Tool
-				})
-			end
-		end
-	end,
-})
+HandleConnection(Player.Backpack.ChildAdded:Connect(OpenContainer), "OpenContainers")
 
 local CollectedRewards = {}
 
@@ -431,7 +419,7 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "🏧 • Auto Bank Certain Items (Needs Bank Anywhere)",
+	Name = "🏧 • Auto Bank Certain Items",
 	CurrentValue = false,
 	Flag = "BankItems",
 	Callback = function(Value)
@@ -461,11 +449,58 @@ end
 table.sort(Items)
 
 Tab:CreateDropdown({
-	Name = "💳 • Items to Bank",
+	Name = "🏧 • Items to Bank",
 	Options = Items,
-	CurrentOption = "None",
 	MultipleOptions = true,
-	Flag = "Items",
+	Flag = "ItemsToBank",
+	Callback = function()end,
+})
+
+Tab:CreateDivider()
+
+local function PinItems(Tool: Tool)
+	if not Flags.PinItems.CurrentValue then
+		return
+	end
+	
+	if not table.find(Flags.ItemsToPin.CurrentOption, Tool.Name) then
+		return
+	end
+	
+	if Tool:GetAttribute("Pinned") then
+		return
+	end
+
+	local Result = RemoteFunctions.Inventory:InvokeServer({
+		Command = "ToggleSlotPin",
+		UID = Tool:GetAttribute("ID")
+	})
+
+	if Result then
+		Tool:SetAttribute("Pinned", not Tool:GetAttribute("Pinned"))
+	end
+end
+
+Tab:CreateToggle({
+	Name = "📌 • Auto Pin Items",
+	CurrentValue = false,
+	Flag = "PinItems",
+	Callback = function(Value)
+		if Value then
+			for _, Tool: Tool in Player.Backpack:GetChildren() do
+				PinItems(Tool)
+			end
+		end
+	end,
+})
+
+HandleConnection(Player.Backpack.ChildAdded:Connect(PinItems), "PinItems")
+
+Tab:CreateDropdown({
+	Name = "📌 • Items to Pin",
+	Options = Items,
+	MultipleOptions = true,
+	Flag = "ItemsToPin",
 	Callback = function()end,
 })
 
@@ -832,6 +867,37 @@ Tab:CreateToggle({
 				
 				return AFKHook(self, ...)
 			end)
+		end
+	end,
+})
+
+Tab:CreateSection("Miscellaneous")
+
+local Codes = {
+	"PLSMOLE",
+	"LUNARV2",
+	"TWITTER_DIGITRBLX",
+	"5MILLION",
+}
+
+Tab:CreateButton({
+	Name = "🐦 • Redeem Known Codes",
+	Callback = function()
+		for _, Code: string in Codes do
+			local Result = RemoteFunctions.Codes:InvokeServer({
+				Command = "Redeem",
+				Code = Code
+			})
+			
+			if Result.Status then
+				continue
+			elseif Result.AlreadyRedeemed then
+				Notify("Failed!", `The code '{Code}' has already been redeemed.`)
+			elseif Result.NotValid then
+				Notify("Failed!", `The code '{Code}' is not valid anymore.`)
+			else
+				Notify("Error", `The code '{Code}' has had an internal error while redeeming.`)
+			end
 		end
 	end,
 })
