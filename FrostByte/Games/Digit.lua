@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.56"
+getgenv().ScriptVersion = "v1.29.58"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -955,6 +955,8 @@ TeleporttoIsland = Tab:CreateDropdown({
 		if CurrentOption == "" then
 			return
 		end
+		
+		TeleporttoIsland:Set({""})
 
 		local Island: Folder = workspace.Map.Islands:FindFirstChild(CurrentOption)
 
@@ -964,11 +966,11 @@ TeleporttoIsland = Tab:CreateDropdown({
 
 		if Island:FindFirstChild("LocationSpawn") then
 			Player.Character:PivotTo(Island.LocationSpawn.CFrame)
+		elseif CurrentOption ~= "Badlands" then
+			Player.Character:PivotTo(Island:GetAttribute("Pivot") --[[+ Vector3.yAxis * Island:GetAttribute("Size") / 2]])
 		else
 			Player.Character:PivotTo(Island:GetAttribute("Pivot") + Vector3.yAxis * Island:GetAttribute("Size") / 2)
 		end
-
-		TeleporttoIsland:Set({""})
 	end,
 })
 
@@ -1008,6 +1010,8 @@ local Codes = {
 	"TWITTER_DIGITRBLX",
 	"5MILLION",
 	"SECRET",
+	"300KLIKES",
+	"12MVISITS",
 }
 
 Tab:CreateButton({
