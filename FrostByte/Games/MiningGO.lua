@@ -4,6 +4,18 @@ getgenv().ScriptVersion = "v1.4.9"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
+local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
+local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
+local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
+local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
+local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
+local checkcaller: () -> (boolean) = getfenv().checkcaller
+
+local UnsupportedName: string = getgenv().UnsupportedName
+local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Player = game:GetService("Players").LocalPlayer
@@ -33,12 +45,6 @@ local Dispensers = {}
 for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
 	table.insert(Dispensers, v.Name)
 end
-
-local UnsupportedName: string = getgenv().UnsupportedName
-local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getgenv().firetouchinterest
-local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
-local firesignal: (RBXScriptSignal) -> () = getgenv().firesignal
-local fireclickdetector: (ClickDetector) -> () = getgenv().fireclickdetector
 
 local function CollectDrops(Enabled: boolean)
 	if not Enabled then
