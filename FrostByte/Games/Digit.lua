@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.61"
+getgenv().ScriptVersion = "v1.29.62"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -241,6 +241,8 @@ Tab:CreateToggle({
 	Flag = "DigWalk",
 	Callback = function(Value)
 		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+		local Character = Player.Character
+		local StartPos = Character:GetPivot().Position - Vector3.yAxis * Character.HumanoidRootPart.Size.Y
 
 		while Flags.DigWalk.CurrentValue and task.wait() do	
 			if Player:GetAttribute("IsDigging") then
@@ -254,11 +256,16 @@ Tab:CreateToggle({
 			local ZoneSize = Vector3.new(WalkZoneSizeFlag, 1, WalkZoneSizeFlag)
 
 			local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
+			
+			if Visualizer and Visualizer.Size ~= ZoneSize then
+				Visualizer:Destroy()
+				Visualizer = nil
+			end
 
 			if not Visualizer then
 				Visualizer = Instance.new("Part")
 				Visualizer.Size = ZoneSize
-				Visualizer.Position = Character:GetPivot().Position - Vector3.yAxis * Character.HumanoidRootPart.Size.Y
+				Visualizer.Position = StartPos
 				Visualizer.Anchored = true
 				Visualizer.Color = Color3.fromRGB(75, 255, 75)
 				Visualizer.CanCollide = false
