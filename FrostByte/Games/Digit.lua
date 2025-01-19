@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.58"
+getgenv().ScriptVersion = "v1.29.59"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -347,7 +347,7 @@ Tab:CreateToggle({
 		while Flags.Skip.CurrentValue and task.wait() do
 			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
 
-			if not PileAdornee or PileAdornee:GetAttribute("Blacklisted") then
+			if not PileAdornee then
 				continue
 			end
 			
