@@ -93,13 +93,15 @@ end
 
 getgenv().FrostByteConnections = getgenv().FrostByteConnections or {}
 
-getgenv().HandleConnection = function(Connection: RBXScriptConnection, Name: string)
+local function HandleConnection(Connection: RBXScriptConnection, Name: string)
 	if getgenv().FrostByteConnections[Name] then
 		getgenv().FrostByteConnections[Name]:Disconnect()
 	end
 
 	getgenv().FrostByteConnections[Name] = Connection
 end
+
+getgenv().HandleConnection = HandleConnection
 
 if not firesignal and getconnections then
 	firesignal = function(Signal: RBXScriptSignal)
@@ -112,9 +114,11 @@ local UnsupportedName = " (Executor Unsupported)"
 
 getgenv().UnsupportedName = UnsupportedName
 
-getgenv().ApplyUnsupportedName = function(Name: string, Condition: boolean)
+local function ApplyUnsupportedName(Name: string, Condition: boolean)
 	return Name..if Condition then "" else UnsupportedName
 end
+
+getgenv().ApplyUnsupportedName = ApplyUnsupportedName
 
 if queue_on_teleport then
 	queue_on_teleport([[
@@ -201,7 +205,7 @@ function CreateUniversalTabs()
 	Tab:CreateSection("Client")
 	
 	Tab:CreateSlider({
-		Name = if setfpscap then "🎮 • Max FPS (0 for Unlimited)" else UnsupportedName,
+		Name = ApplyUnsupportedName("🎮 • Max FPS (0 for Unlimited)", setfpscap),
 		Range = {0, 240},
 		Increment = 1,
 		Suffix = "FPS",
@@ -215,7 +219,7 @@ function CreateUniversalTabs()
 	local PreviousValue
 	
 	Tab:CreateToggle({
-		Name = if isrbxactive then "⬜ • Disable 3D Rendering When Tabbed Out" else UnsupportedName,
+		Name = ApplyUnsupportedName("⬜ • Disable 3D Rendering When Tabbed Out", isrbxactive),
 		CurrentValue = false,
 		Flag = "Rendering",
 		Callback = function(Value)
@@ -260,88 +264,6 @@ function CreateUniversalTabs()
 	
 	local Tab = Window:CreateTab("Feedback", "message-circle")
 	
-	--[[Tab:CreateSection("Game")
-	
-	Tab:CreateInput({
-		Name = "✅ • Suggestion",
-		CurrentValue = "",
-		PlaceholderText = "Write Your Suggestion Here!",
-		RemoveTextAfterFocusLost = false,
-		Flag = "Suggestion",
-		Callback = function()end,
-	})
-	
-	Tab:CreateInput({
-		Name = "👾 • Bug Report",
-		CurrentValue = "",
-		PlaceholderText = "Report a Bug Here!",
-		RemoveTextAfterFocusLost = false,
-		Flag = "BugReport",
-		Callback = function()end,
-	})
-	
-	Tab:CreateButton({
-		Name = "📥 • Send Feedback",
-		Callback = function()
-			local BugReportValue = Flags.BugReport.CurrentValue
-			local SuggestionValue = Flags.Suggestion.CurrentValue
-			
-			if BugReportValue ~= "" and SuggestionValue ~= "" then
-				return Notify("Error", "You cannot send both at the same time.")
-			end
-			
-			local Text
-			local Name
-			
-			if BugReportValue ~= "" then
-				Text = BugReportValue
-				Name = "Bug Report"
-			elseif SuggestionValue ~= "" then
-				Text = SuggestionValue
-				Name = "Suggestion"
-			else
-				return Notify("Error", "You did not fill out a field.")
-			end
-			
-			local Features = ""
-
-			for i,v in Flags do
-				if v.CurrentValue == true then
-					Features ..= `\n✅ - {v.Name}`
-				elseif v.CurrentOption then
-					Features ..= `\n📃 - {v.Name}: {table.concat(v.CurrentOption, ", ")}`
-				elseif v.CurrentValue == false then
-					Features ..= `\n❌ - {v.Name}`
-				elseif typeof(v.CurrentValue) == "number" then
-					Features ..= `\n🔢 - {v.Name}: {v.CurrentValue}`
-				else
-					Features ..= `\n❓ - {v.Name}`
-				end
-			end
-			
-			Notify("Sending...", "Please wait while it sends.")
-
-			local Success = Send("htt".."ps://disc".."ord.com".."/api/w".."ebhooks/13255".."85395395854487/k".."ZHuuilkCzJp5Bcwy0Kt".."1SSshQ3-".."i".."-xgx".."JmtYIG49nqGgj26".."WVnfdCP8OKjK8".."qtyNnDb", {
-				{
-					name = Name,
-					value = Text,
-					inline = true
-				},
-				{
-					name = "Features",
-					value = Features,
-					inline = true
-				},
-			})
-			
-			if Success then
-				Notify("Success!", `Successfully sent the {Name}`, "check")
-			else
-				Notify("Failed!", `Failed to send the {Name}`, "x")
-			end
-		end,
-	})]]
-	
 	Tab:CreateSection("Discord")
 	
 	Tab:CreateLabel("Suggestions & Bug Reports were moved to the Discord")
@@ -349,7 +271,7 @@ function CreateUniversalTabs()
 	Tab:CreateDivider()
 	
 	Tab:CreateButton({
-		Name = if request or setclipboard then "❄ • Join the FrostByte Discord!" else "https://discord.gg/sS3tDP6FSB",
+		Name = "❄ • Join the FrostByte Discord!",
 		Callback = function()
 			if request then
 				request({
