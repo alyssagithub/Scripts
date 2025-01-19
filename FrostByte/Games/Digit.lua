@@ -374,8 +374,10 @@ Tab:CreateToggle({
 
 local RarityList = {}
 
-for Name: string, _ in Rarities do
-	table.insert(RarityList, Name)
+if Success then
+	for Name: string, _ in Rarities do
+		table.insert(RarityList, Name)
+	end
 end
 
 Tab:CreateDropdown({
