@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.59"
+getgenv().ScriptVersion = "v1.29.61"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -500,11 +500,13 @@ Tab:CreateToggle({
 })
 
 local function GetInventorySize()
+	local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
+		Command = "GetInventory"
+	})
+
 	local InventorySize = 0
 
-	InventorySize += #Player.Backpack:GetChildren()
-
-	if Player.Character:FindFirstChildOfClass("Tool") then
+	for ID, Object in Inventory do
 		InventorySize += 1
 	end
 
@@ -532,6 +534,8 @@ local function SellInventory()
 	
 	local Teleported = false
 	
+	local StartTime = tick()
+	
 	repeat
 		Player.Character:PivotTo(Merchant:GetPivot())
 
@@ -542,7 +546,7 @@ local function SellInventory()
 
 		task.wait(0.1)
 		Teleported = true
-	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled
+	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled or tick() - StartTime >= 3
 	
 	if Teleported then
 		Player.Character:PivotTo(PreviousPosition)
@@ -556,6 +560,7 @@ Tab:CreateToggle({
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
 			if GetInventorySize() < Player:GetAttribute("MaxInventorySize") + 9 then
+				print("InventorySize:", GetInventorySize(), "Max:", Player:GetAttribute("MaxInventorySize") + 9)
 				continue
 			end
 			
