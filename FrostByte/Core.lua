@@ -5,14 +5,16 @@ local Player = game:GetService("Players").LocalPlayer
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 local getgenv = getfenv().getgenv
-local getexecutorname = getgenv().getexecutorname
-local identifyexecutor: () -> (string) = getgenv().identifyexecutor
-local request = getgenv().request
-local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getgenv().getconnections
-local queue_on_teleport: (Code: string) -> () = getgenv().queue_on_teleport
-local setfpscap: (FPS: number) -> () = getgenv().setfpscap
-local isrbxactive: () -> (boolean) = getgenv().isrbxactive
-local setclipboard: (Text: string) -> () = getgenv().setclipboard
+
+local getexecutorname = getfenv().getexecutorname
+local identifyexecutor: () -> (string) = getfenv().identifyexecutor
+local request = getfenv().request
+local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
+local queue_on_teleport: (Code: string) -> () = getfenv().queue_on_teleport
+local setfpscap: (FPS: number) -> () = getfenv().setfpscap
+local isrbxactive: () -> (boolean) = getfenv().isrbxactive
+local setclipboard: (Text: string) -> () = getfenv().setclipboard
+local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 
 local ScriptVersion = getgenv().ScriptVersion
 
@@ -99,8 +101,6 @@ getgenv().HandleConnection = function(Connection: RBXScriptConnection, Name: str
 	getgenv().FrostByteConnections[Name] = Connection
 end
 
-getgenv().firesignal = getgenv().firesignal:: (RBXScriptSignal) -> ()
-
 if not firesignal and getconnections then
 	firesignal = function(Signal: RBXScriptSignal)
 		local Connections = getconnections(Signal)
@@ -186,12 +186,8 @@ function CreateUniversalTabs()
 		Callback = function(Value)
 		end,
 	})
-
-	if getgenv().IdledConnection then
-		getgenv().IdledConnection:Disconnect()
-	end
-
-	getgenv().IdledConnection = Player.Idled:Connect(function()
+	
+	getgenv().HandleConnection(Player.Idled:Connect(function()
 		if not Flags.AntiAFK.CurrentValue then
 			return
 		end
@@ -200,7 +196,7 @@ function CreateUniversalTabs()
 		VirtualUser:ClickButton2(Vector2.zero)
 		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightMeta, false, game)
 		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightMeta, false, game)
-	end)
+	end), "AntiAFK")
 	
 	Tab:CreateSection("Client")
 	
