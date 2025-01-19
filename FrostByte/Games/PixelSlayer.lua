@@ -4,7 +4,17 @@ getgenv().ScriptVersion = "v1.0.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
+local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
+local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
+local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
+local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
+local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
+local checkcaller: () -> (boolean) = getfenv().checkcaller
+
 local UnsupportedName: string = getgenv().UnsupportedName
+local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
