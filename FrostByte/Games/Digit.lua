@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.26.49"
+getgenv().ScriptVersion = "v1.29.54"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -96,20 +96,20 @@ local Tab = Window:CreateTab("Automation", "repeat")
 
 Tab:CreateSection("Digging")
 
+local function ReEquipTool(Tool: Tool)
+	if not Tool then
+		return
+	end
+	
+	local Humanoid: Humanoid = Player.Character.Humanoid
+
+	Humanoid:UnequipTools()
+	Humanoid:EquipTool(Tool)
+end
+
 HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message, StackTrace, CallingScript)
 	if CallingScript.Name == "Shovel" and Message:find("attempt to index nil with 'GetAttribute'") then
-		local Character = Player.Character
-
-		local Tool = Character:FindFirstChildOfClass("Tool")
-		
-		if not Tool then
-			return
-		end
-
-		local Humanoid: Humanoid = Character.Humanoid
-
-		Humanoid:UnequipTools()
-		Humanoid:EquipTool(Tool)
+		ReEquipTool(Player.Character:FindFirstChildOfClass("Tool"))
 	end
 end), "ShovelError")
 
@@ -125,7 +125,7 @@ Tab:CreateToggle({
 			
 			local Adornee: Model? = Player.Character.Shovel.Highlight.Adornee
 			
-			if not Adornee or Adornee.Parent ~= workspace.Map.TreasurePiles then
+			if not Adornee or Adornee.Parent ~= workspace.Map.TreasurePiles or Adornee:GetAttribute("Blacklisted") then
 				continue
 			end
 			
@@ -147,17 +147,10 @@ local function LegitDig()
 	if not DigMinigame then
 		return
 	end
-
-	local Connection: RBXScriptConnection
-	Connection = game:GetService("RunService").Heartbeat:Connect(function()
-		if not Player.PlayerGui.Main:FindFirstChild("DigMinigame") or not Flags.LegitDig.CurrentValue then
-			return Connection:Disconnect()
-		end
-
-		DigMinigame.Cursor.Position = DigMinigame.Area.Position
-	end)
-
-	HandleConnection(Connection, "LegitDigHeartbeat")
+	
+	local Area: Frame = DigMinigame.Area
+	
+	Area.Size = UDim2.fromScale(2, Area.Size.Y.Scale)
 end
 
 Tab:CreateToggle({
@@ -203,10 +196,16 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "LegitPiles",
 	Callback = function(Value)	
-		while Flags.LegitPiles.CurrentValue and task.wait() do	
+		while Flags.LegitPiles.CurrentValue and task.wait() do
 			local Tool = Player.Character:FindFirstChildOfClass("Tool")
 			
 			if not Tool or Tool:GetAttribute("Type") ~= "Shovel" then
+				continue
+			end
+			
+			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
+
+			if PileAdornee and PileAdornee:GetAttribute("Blacklisted") then
 				continue
 			end
 			
@@ -267,7 +266,7 @@ Tab:CreateToggle({
 			local FoundPile = false
 
 			for _, Pile: Model in workspace.Map.TreasurePiles:GetChildren() do
-				if Pile:GetAttribute("Owner") ~= Player.UserId then
+				if Pile:GetAttribute("Owner") ~= Player.UserId or Pile:GetAttribute("Blacklisted") then
 					continue
 				end
 				
@@ -324,6 +323,66 @@ Tab:CreateSlider({
 	Suffix = "Studs",
 	CurrentValue = 20,
 	Flag = "ZoneSize",
+	Callback = function()end,
+})
+
+Tab:CreateDivider()
+
+local Rarities: {[string]: {["Color"]: Color3, ["BarColor"]: Color3}} = require(ReplicatedStorage.Settings.Rarities)
+
+Tab:CreateToggle({
+	Name = "✨ • Auto Skip Rarities (Bad with Fast Dig)",
+	CurrentValue = false,
+	Flag = "Skip",
+	Callback = function(Value)
+		while Flags.Skip.CurrentValue and task.wait() do
+			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
+
+			if not PileAdornee or PileAdornee:GetAttribute("Blacklisted") then
+				continue
+			end
+			
+			local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
+			
+			if not DigMinigame then
+				continue
+			end
+			
+			local ImageColor3: Color3 = DigMinigame.Background.ImageColor3
+			
+			local Rarity
+			
+			for i,v in Rarities do
+				if v.BarColor == ImageColor3 then
+					Rarity = i
+					break
+				end
+			end
+			
+			if not table.find(Flags.Rarity.CurrentOption, Rarity) then
+				continue
+			end
+			
+			task.wait(0.1)
+			
+			ReEquipTool(Player.Character:FindFirstChildOfClass("Tool"))
+			
+			PileAdornee:SetAttribute("Blacklisted", true)
+		end
+	end,
+})
+
+local RarityList = {}
+
+for Name: string, _ in Rarities do
+	table.insert(RarityList, Name)
+end
+
+Tab:CreateDropdown({
+	Name = "📃 • Rarities",
+	Options = RarityList,
+	MultipleOptions = true,
+	Flag = "Rarity",
 	Callback = function()end,
 })
 
@@ -429,11 +488,20 @@ Tab:CreateToggle({
 	end,
 })
 
-local function SellInventory()
-	local SellEnabled = Flags.Sell.CurrentValue
-	Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+local function GetInventorySize()
+	local InventorySize = 0
 
-	local Capacity: TextLabel = Player.PlayerGui.Main.Core.Inventory.Disclaimer.Capacity
+	InventorySize += #Player.Backpack:GetChildren()
+
+	if Player.Character:FindFirstChildOfClass("Tool") then
+		InventorySize += 1
+	end
+
+	return InventorySize
+end
+
+local function SellInventory()
+	Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 	
 	local Merchant: Model
 
@@ -447,35 +515,23 @@ local function SellInventory()
 		break
 	end
 	
+	local SellEnabled = Flags.Sell.CurrentValue
 	local PreviousPosition = Player.Character:GetPivot()
-	
-	local function GetInventorySize()
-		local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
-			Command = "GetInventory"
-		})
-		
-		local InventorySize = 0
-		
-		for ID, Object in Inventory do
-			InventorySize += 1
-		end
-		
-		return InventorySize
-	end
+	local PreviousSize = GetInventorySize()
 	
 	local Teleported = false
 	
-	while GetInventorySize() >= Player:GetAttribute("MaxInventorySize") + 9 and Flags.Sell.CurrentValue == SellEnabled do
+	repeat
 		Player.Character:PivotTo(Merchant:GetPivot())
 
 		RemoteEvents.Merchant:FireServer({
 			Command = "SellAllTreasures",
 			Merchant = Merchant
 		})
-		
+
 		task.wait(0.1)
 		Teleported = true
-	end
+	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled
 	
 	if Teleported then
 		Player.Character:PivotTo(PreviousPosition)
@@ -488,6 +544,10 @@ Tab:CreateToggle({
 	Flag = "Sell",
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
+			if GetInventorySize() < Player:GetAttribute("MaxInventorySize") + 9 then
+				continue
+			end
+			
 			SellInventory()
 		end
 	end,
@@ -634,7 +694,7 @@ local function LunarCloudsTeleport(Lunar: Model?)
 end
 
 Tab:CreateToggle({
-	Name = "✨ • Auto Teleport to Lunar Clouds",
+	Name = "🌥 • Auto Teleport to Lunar Clouds",
 	CurrentValue = false,
 	Flag = "LunarClouds",
 	Callback = function(Value)
@@ -704,6 +764,41 @@ Tab:CreateButton({
 
 			return Notify("Success", "Successfully enchanted your shovel!")
 		end
+	end,
+})
+
+local Icons = {
+	Mole = "rbxassetid://71479472086037",
+	RoyalMole = "rbxassetid://71400449192663"
+}
+
+Tab:CreateButton({
+	Name = "🔢 • Get Mole Count (Open Bank First)",
+	Callback = function()
+		local Moles = 0
+		local RoyalMoles = 0
+		
+		for i,v: Tool in Player.Backpack:GetChildren() do
+			if v.Name == "Mole" then
+				Moles += 1
+			elseif v.Name == "Royal Mole" then
+				Moles += 1
+			end
+		end
+		
+		for i,v: ImageLabel in Player.PlayerGui.Main.Core.Inventory.Inventory.Slots:GetChildren() do
+			if not v:IsA("ImageLabel") then
+				continue
+			end
+			
+			if v.Icon.Image == Icons.Mole then
+				Moles += 1
+			elseif v.Icon.Image == Icons.RoyalMole then
+				RoyalMoles += 1
+			end
+		end
+		
+		Notify("Total Moles", `You have {Moles} Moles and {RoyalMoles} Royal Moles`)
 	end,
 })
 
@@ -901,6 +996,7 @@ local Codes = {
 	"LUNARV2",
 	"TWITTER_DIGITRBLX",
 	"5MILLION",
+	"SECRET",
 }
 
 Tab:CreateButton({
