@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.54"
+getgenv().ScriptVersion = "v1.29.55"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -328,10 +328,10 @@ Tab:CreateSlider({
 
 Tab:CreateDivider()
 
-local Rarities: {[string]: {["Color"]: Color3, ["BarColor"]: Color3}} = require(ReplicatedStorage.Settings.Rarities)
+local Success, Rarities: {[string]: {["Color"]: Color3, ["BarColor"]: Color3}} = pcall(require, ReplicatedStorage.Settings.Rarities)
 
 Tab:CreateToggle({
-	Name = "✨ • Auto Skip Rarities (Bad with Fast Dig)",
+	Name = ApplyUnsupportedName("✨ • Auto Skip Rarities (Bad with Fast Dig)", Success),
 	CurrentValue = false,
 	Flag = "Skip",
 	Callback = function(Value)
