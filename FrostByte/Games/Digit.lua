@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.55"
+getgenv().ScriptVersion = "v1.29.56"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -148,9 +148,18 @@ local function LegitDig()
 		return
 	end
 	
-	local Area: Frame = DigMinigame.Area
-	
-	Area.Size = UDim2.fromScale(2, Area.Size.Y.Scale)
+	local Connection: RBXScriptConnection
+	Connection = game:GetService("RunService").Heartbeat:Connect(function()
+		local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
+		
+		if not DigMinigame or not Flags.LegitDig.CurrentValue then
+			return Connection:Disconnect()
+		end
+
+		DigMinigame.Cursor.Position = DigMinigame.Area.Position
+	end)
+
+	HandleConnection(Connection, "LegitDigHeartbeat")
 end
 
 Tab:CreateToggle({
