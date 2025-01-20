@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.0.4"
+getgenv().ScriptVersion = "v2.0.5"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -780,6 +780,7 @@ Tab:CreateToggle({
 			end
 		elseif PreviousLocation then
 			Player.Character:PivotTo(PreviousLocation)
+			PreviousLocation = nil
 		end
 	end,
 })
@@ -788,6 +789,7 @@ HandleConnection(workspace.Map.Temporary.ChildAdded:Connect(MeteorIslandTeleport
 HandleConnection(workspace.Map.Temporary.ChildRemoved:Connect(function(Child: Model?)
 	if Child.Name == "Meteor Island" and PreviousLocation and Flags.Meteor.CurrentValue then
 		Player.Character:PivotTo(PreviousLocation)
+		PreviousLocation = nil
 	end
 end), "MeteorRemoved")
 
@@ -802,7 +804,7 @@ local function LunarCloudsTeleport(Lunar: Model?)
 
 	PreviousLocation = Character:GetPivot()
 	
-	Character:PivotTo(Lunar:GetPivot() + Vector3.yAxis * Lunar:GetExtentsSize().Y / 2)
+	Character:PivotTo(Lunar.SpawnPoint.CFrame)
 end
 
 Tab:CreateToggle({
@@ -816,6 +818,7 @@ Tab:CreateToggle({
 			end
 		elseif PreviousLocation then
 			Player.Character:PivotTo(PreviousLocation)
+			PreviousLocation = nil
 		end
 	end,
 })
@@ -824,6 +827,7 @@ HandleConnection(workspace.Map.Islands.ChildAdded:Connect(LunarCloudsTeleport), 
 HandleConnection(workspace.Map.Islands.ChildRemoved:Connect(function(Child: Model)
 	if Child.Name == "Lunar Clouds" and PreviousLocation and Flags.LunarClouds.CurrentValue then
 		Player.Character:PivotTo(PreviousLocation)
+		PreviousLocation = nil
 	end
 end), "LunarCloudsRemoved")
 
@@ -1028,6 +1032,8 @@ TeleporttoIsland = Tab:CreateDropdown({
 
 		if Island:FindFirstChild("LocationSpawn") then
 			Player.Character:PivotTo(Island.LocationSpawn.CFrame)
+		elseif Island:FindFirstChild("SpawnPoint") then
+			Player.Character:PivotTo(Island.SpawnPoint.CFrame)
 		elseif CurrentOption ~= "Badlands" then
 			Player.Character:PivotTo(Island:GetAttribute("Pivot") --[[+ Vector3.yAxis * Island:GetAttribute("Size") / 2]])
 		else
