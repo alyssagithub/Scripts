@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.0.0"
+getgenv().ScriptVersion = "v2.0.2"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -214,7 +214,7 @@ Tab:CreateToggle({
 			
 			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
 
-			if PileAdornee and PileAdornee:GetAttribute("Blacklisted") then
+			if PileAdornee and (PileAdornee.Parent ~= workspace.Map.TreasurePiles or PileAdornee:GetAttribute("Blacklisted") or PileAdornee:GetAttribute("Completed") or PileAdornee:GetAttribute("Destroying")) then
 				continue
 			end
 			
@@ -579,7 +579,7 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "🏧 • Auto Bank Items",
+	Name = "🏧 • Auto Bank Items (Needs Bank Anywhere/Gamepass)",
 	CurrentValue = false,
 	Flag = "BankItems",
 	Callback = function(Value)
