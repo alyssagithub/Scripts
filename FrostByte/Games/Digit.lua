@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.0.3"
+getgenv().ScriptVersion = "v2.0.4"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -631,6 +631,8 @@ local function PinItems(Tool: Tool)
 	if Tool:GetAttribute("Pinned") then
 		return
 	end
+	
+	task.wait(0.1)
 
 	local Result = RemoteFunctions.Inventory:InvokeServer({
 		Command = "ToggleSlotPin",
