@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.0.2"
+getgenv().ScriptVersion = "v2.0.3"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -451,6 +451,8 @@ local function OpenContainer(Tool: Tool)
 	elseif not table.find(ContainerNames, Tool.Name) then
 		return
 	end
+	
+	task.wait(0.1)
 
 	RemoteEvents.Treasure:FireServer({
 		Command = "RedeemContainer",
