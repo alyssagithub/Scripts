@@ -179,7 +179,37 @@ function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
 	local VirtualInputManager = game:GetService("VirtualInputManager")
 	
-	local Tab = Window:CreateTab("Universal", "earth")
+	local Tab = Window:CreateTab("Client", "user")
+	
+	Tab:CreateSection("Discord")
+
+	Tab:CreateButton({
+		Name = "❄ • Join the FrostByte Discord!",
+		Callback = function()
+			if request then
+				request({
+					Url = 'http://127.0.0.1:6463/rpc?v=1',
+					Method = 'POST',
+					Headers = {
+						['Content-Type'] = 'application/json',
+						Origin = 'https://discord.com'
+					},
+					Body = HttpService:JSONEncode({
+						cmd = 'INVITE_BROWSER',
+						nonce = HttpService:GenerateGUID(false),
+						args = {code = 'sS3tDP6FSB'}
+					})
+				})
+			elseif setclipboard then
+				setclipboard("https://discord.gg/sS3tDP6FSB")
+				Notify("Success!", "Copied Discord Link to Clipboard.")
+			end
+
+			Notify("Discord", "https://discord.gg/sS3tDP6FSB")
+		end,
+	})
+
+	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
 
 	Tab:CreateSection("AFK")
 
@@ -202,7 +232,7 @@ function CreateUniversalTabs()
 		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightMeta, false, game)
 	end), "AntiAFK")
 	
-	Tab:CreateSection("Client")
+	Tab:CreateSection("Performance")
 	
 	Tab:CreateSlider({
 		Name = ApplyUnsupportedName("🎮 • Max FPS (0 for Unlimited)", setfpscap),
@@ -241,6 +271,8 @@ function CreateUniversalTabs()
 		end,
 	})
 	
+	Tab:CreateSection("Properties")
+	
 	Tab:CreateSlider({
 		Name = "💨 • Set WalkSpeed",
 		Range = {0, 300},
@@ -253,7 +285,7 @@ function CreateUniversalTabs()
 		end,
 	})
 
-	Tab:CreateSection("Miscellaneous")
+	Tab:CreateSection("Development")
 
 	Tab:CreateButton({
 		Name = "⚙️ • Rejoin",
@@ -261,42 +293,6 @@ function CreateUniversalTabs()
 			game:GetService("TeleportService"):Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
-	
-	local Tab = Window:CreateTab("Feedback", "message-circle")
-	
-	Tab:CreateSection("Discord")
-	
-	Tab:CreateLabel("Suggestions & Bug Reports were moved to the Discord")
-	
-	Tab:CreateDivider()
-	
-	Tab:CreateButton({
-		Name = "❄ • Join the FrostByte Discord!",
-		Callback = function()
-			if request then
-				request({
-					Url = 'http://127.0.0.1:6463/rpc?v=1',
-					Method = 'POST',
-					Headers = {
-						['Content-Type'] = 'application/json',
-						Origin = 'https://discord.com'
-					},
-					Body = HttpService:JSONEncode({
-						cmd = 'INVITE_BROWSER',
-						nonce = HttpService:GenerateGUID(false),
-						args = {code = 'sS3tDP6FSB'}
-					})
-				})
-			elseif setclipboard then
-				setclipboard("https://discord.gg/sS3tDP6FSB")
-				Notify("Success!", "Copied Discord Link to Clipboard.")
-			end
-			
-			Notify("Discord", "https://discord.gg/sS3tDP6FSB")
-		end,
-	})
-	
-	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
 	
 	Rayfield:LoadConfiguration()
 end
