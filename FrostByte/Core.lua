@@ -209,7 +209,7 @@ function CreateUniversalTabs()
 		end,
 	})
 
-	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "snowflake")
+	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "link")
 
 	Tab:CreateSection("AFK")
 
