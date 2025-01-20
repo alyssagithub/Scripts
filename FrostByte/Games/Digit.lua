@@ -567,7 +567,6 @@ Tab:CreateToggle({
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
 			if GetInventorySize() < Player:GetAttribute("MaxInventorySize") + 9 then
-				print("InventorySize:", GetInventorySize(), "Max:", Player:GetAttribute("MaxInventorySize") + 9)
 				continue
 			end
 			
