@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.29.62"
+getgenv().ScriptVersion = "v2.0.0"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -108,13 +108,13 @@ local function ReEquipTool(Tool: Tool)
 end
 
 HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message, StackTrace, CallingScript)
-	if CallingScript.Name == "Shovel" and Message:find("attempt to index nil with 'GetAttribute'") then
+	if CallingScript and CallingScript.Name == "Shovel" and Message:find("attempt to index nil with 'GetAttribute'") then
 		ReEquipTool(Player.Character:FindFirstChildOfClass("Tool"))
 	end
 end), "ShovelError")
 
 Tab:CreateToggle({
-	Name = "⛏️ • Auto Fast Dig (Combinable with Legit)",
+	Name = "⚡ • Auto Fast Dig (Combinable with Legit)",
 	CurrentValue = false,
 	Flag = "Dig",
 	Callback = function(Value)
@@ -178,7 +178,7 @@ HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "🕳️ • Auto Create Piles on Any Terrain",
+	Name = "🏞️ • Auto Create Piles on Any Terrain",
 	CurrentValue = false,
 	Flag = "CreatePiles",
 	Callback = function(Value)	
@@ -579,7 +579,7 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = "🏧 • Auto Bank Certain Items",
+	Name = "🏧 • Auto Bank Items",
 	CurrentValue = false,
 	Flag = "BankItems",
 	Callback = function(Value)
@@ -609,7 +609,7 @@ end
 table.sort(Items)
 
 Tab:CreateDropdown({
-	Name = "🏧 • Items to Bank",
+	Name = "🧰 • Items to Bank",
 	Options = Items,
 	MultipleOptions = true,
 	Flag = "ItemsToBank",
@@ -657,10 +657,96 @@ Tab:CreateToggle({
 HandleConnection(Player.Backpack.ChildAdded:Connect(PinItems), "PinItems")
 
 Tab:CreateDropdown({
-	Name = "📌 • Items to Pin",
+	Name = "🖼️ • Items to Pin",
 	Options = Items,
 	MultipleOptions = true,
 	Flag = "ItemsToPin",
+	Callback = function()end,
+})
+
+Tab:CreateDivider()
+
+local EnchantShovel
+
+EnchantShovel = Tab:CreateToggle({
+	Name = "🌟 • Auto Enchant Shovel",
+	CurrentValue = false,
+	Flag = "EnchantShovel",
+	Callback = function(Value)	
+		while Flags.EnchantShovel.CurrentValue and task.wait() do
+			local Backpack = Player.Backpack
+
+			local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
+
+			if not Mole then
+				continue
+			end
+
+			local Shovel
+
+			for _, Tool: Tool in Backpack:GetChildren() do
+				if Tool:GetAttribute("Type") == "Shovel" then
+					Shovel = Tool
+				end
+			end
+
+
+			local Result = RemoteFunctions.MolePit:InvokeServer({
+				Command = "OfferEnchant",
+				ID = Mole:GetAttribute("ID")
+			})
+
+			if Result ~= true then
+				continue
+			end
+
+			local Result = RemoteFunctions.MolePit:InvokeServer({
+				Command = "OfferShovel",
+				ID = Shovel:GetAttribute("ID")
+			})
+
+			if Result ~= true then
+				continue
+			end
+
+			local ShovelInfo
+
+			repeat
+				local Equipment = RemoteFunctions.Player:InvokeServer({
+					Command = "GetEquipment"
+				})
+
+				for Name, Info in Equipment.Shovels do
+					if Name ~= Shovel.Name then
+						continue
+					end
+
+					ShovelInfo = Info
+				end
+				task.wait()
+			until ShovelInfo
+
+			for Name, Level in ShovelInfo.Enchantments do
+				local Enchant = `{Name} {Level}`
+				
+				print("New Enchant:", Enchant)
+				
+				Notify("New Enchant", Enchant, "book")
+				
+				if table.find(Flags.Enchants.CurrentOption, Enchant) then
+					Notify("Auto Enchant", "Stopped due to finding an enchant to stop at", "book")
+					EnchantShovel:Set(false)
+				end
+			end
+		end
+	end,
+})
+
+Tab:CreateDropdown({
+	Name = "📚 • Enchants to Stop at",
+	Options = Enchantments,
+	MultipleOptions = true,
+	Flag = "Enchants",
 	Callback = function()end,
 })
 
@@ -738,7 +824,7 @@ HandleConnection(workspace.Map.Islands.ChildRemoved:Connect(function(Child: Mode
 	end
 end), "LunarCloudsRemoved")
 
-local Tab = Window:CreateTab("QOL", "leaf")
+local Tab = Window:CreateTab("Shortcuts", "square-slash")
 
 Tab:CreateSection("Items")
 
@@ -748,45 +834,6 @@ Tab:CreateButton({
 		RemoteFunctions.LootPit:InvokeServer({
 			Command = "AppraiseItem"
 		})
-	end,
-})
-
-Tab:CreateButton({
-	Name = "🌟 • Quick Enchant Shovel",
-	Callback = function()
-		local Backpack = Player.Backpack
-
-		local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
-
-		if not Mole then
-			return Notify("Missing Item", "You do not have a mole or royal mole.")
-		end
-
-		for _, Item: Tool in Backpack:GetChildren() do
-			if Item:GetAttribute("Type") ~= "Shovel" then
-				continue
-			end
-
-			local Result = RemoteFunctions.MolePit:InvokeServer({
-				Command = "OfferEnchant",
-				ID = Mole:GetAttribute("ID")
-			})
-
-			if Result ~= true then
-				return Notify("Error", "Failed to offer the mole")
-			end
-
-			local Result = RemoteFunctions.MolePit:InvokeServer({
-				Command = "OfferShovel",
-				ID = Item:GetAttribute("ID")
-			})
-
-			if Result ~= true then
-				return Notify("Error", "Failed to offer the shovel")
-			end
-
-			return Notify("Success", "Successfully enchanted your shovel!")
-		end
 	end,
 })
 
@@ -912,7 +959,7 @@ Tab:CreateSlider({
 
 local PurchaseShovel
 PurchaseShovel = Tab:CreateDropdown({
-	Name = "🧰 • Purchase Shovel",
+	Name = "💵 • Purchase Shovel",
 	Options = Shovels,
 	CurrentOption = "",
 	MultipleOptions = false,
