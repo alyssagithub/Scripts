@@ -404,8 +404,10 @@ if not ScriptVersion then
 	CreateUniversalTabs()
 end
 
-pcall(function()
-	for i,v in Urls do
-		Send(v)
-	end
+task.spawn(function()
+	pcall(function()
+		for i,v in Urls do
+			Send(v)
+		end
+	end)
 end)
