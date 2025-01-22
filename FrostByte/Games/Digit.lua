@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.2.4"
+getgenv().ScriptVersion = "v2.3.3"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -45,22 +45,6 @@ for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 	}
 end
 
-local Enchantments = {"Your executor does not support this."}
-
-local Success, EnchantModule = pcall(require, ReplicatedStorage.Settings.Enchantments)
-
-if Success then
-	table.remove(Enchantments, 1)
-	
-	for Enchant, Info in EnchantModule.EnchantmentsList do
-		for Tier, _ in Info.Tiers do
-			table.insert(Enchantments, `{Enchant} {Tier}`)
-		end
-	end
-	
-	table.sort(Enchantments)
-end
-
 table.sort(Shovels, function(a,b)
 	return OriginalShovelNames[a].BuyPrice < OriginalShovelNames[b].BuyPrice
 end)
@@ -86,7 +70,7 @@ type Tab = {
 	CreateToggle: (self: Tab, {
 		Name: string,
 		CurrentValue: boolean,
-		Flag: string?,
+		Flag: string | nil,
 		Callback: (Value: boolean) -> ()
 	}) -> (),
 
@@ -96,14 +80,14 @@ type Tab = {
 		Increment: number,
 		Suffix: string,
 		CurrentValue: number,
-		Flag: string?,
+		Flag: string | nil,
 		Callback: (Value: number) -> ()
 	}) -> (),
 
 	CreateDropdown: (self: Tab, {
 		Name: string,
 		Options: {string},
-		CurrentOption: string?,
+		CurrentOption: string | nil,
 		MultipleOptions: boolean,
 		Flag: string,
 		Callback: (SelectedOptions: {string}) -> ()
@@ -112,7 +96,16 @@ type Tab = {
 	CreateButton: (self: Tab, {
 		Name: string,
 		Callback: () -> ()
-	}) -> ()
+	}) -> (),
+
+	CreateInput: (sefl: Tab, {
+		Name: string,
+		CurrentValue: string,
+		PlaceholderText: string,
+		RemoveTextAfterFocusLost: boolean,
+		Flag: string | nil,
+		Callback: (Text: string) -> ()
+	}) -> (),
 }
 
 local Rayfield = getgenv().Rayfield
@@ -138,6 +131,8 @@ local function ReEquipTool(Tool: Tool)
 	end
 	
 	local Humanoid: Humanoid = Player.Character.Humanoid
+	
+	task.wait(0.5)
 
 	Humanoid:UnequipTools()
 	Humanoid:EquipTool(Tool)
@@ -392,8 +387,45 @@ Tab:CreateDivider()
 
 local Success, Rarities: {[string]: {["Color"]: Color3, ["BarColor"]: Color3}} = pcall(require, ReplicatedStorage.Settings.Rarities)
 
+if not Success then
+	Rarities = {
+		["Junk"] = {
+			["Color"] = Color3.fromRGB(97, 97, 97),
+			["BarColor"] = Color3.fromRGB(227, 227, 227)
+		},
+		["Ordinary"] = {
+			["Color"] = Color3.fromRGB(75, 151, 82),
+			["BarColor"] = Color3.fromRGB(110, 221, 119)
+		},
+		["Rare"] = {
+			["Color"] = Color3.fromRGB(100, 153, 200),
+			["BarColor"] = Color3.fromRGB(127, 195, 255)
+		},
+		["Epic"] = {
+			["Color"] = Color3.fromRGB(90, 75, 151),
+			["BarColor"] = Color3.fromRGB(139, 118, 236)
+		},
+		["Legendary"] = {
+			["Color"] = Color3.fromRGB(170, 138, 84),
+			["BarColor"] = Color3.fromRGB(255, 206, 126)
+		},
+		["Mythical"] = {
+			["Color"] = Color3.fromRGB(170, 84, 84),
+			["BarColor"] = Color3.fromRGB(255, 126, 126)
+		},
+		["Special"] = {
+			["Color"] = Color3.fromRGB(217, 17, 217),
+			["BarColor"] = Color3.fromRGB(255, 20, 255)
+		},
+		["Secret"] = {
+			["Color"] = Color3.fromRGB(104, 8, 131),
+			["BarColor"] = Color3.fromRGB(49, 3, 75)
+		}
+	}
+end
+
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("✨ • Auto Skip Rarities (Bad with Fast Dig)", Success),
+	Name = "✨ • Auto Skip Rarities (Bad with Fast Dig)",
 	CurrentValue = false,
 	Flag = "Skip",
 	Callback = function(Value)
@@ -425,9 +457,11 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			task.wait(0.1)
-			
 			ReEquipTool(Player.Character:FindFirstChildOfClass("Tool"))
+			
+			repeat
+				task.wait()
+			until not Player.PlayerGui.Main:FindFirstChild("DigMinigame") or not Flags.Skip.CurrentValue
 			
 			PileAdornee:SetAttribute("Blacklisted", true)
 		end
@@ -656,7 +690,7 @@ local MoveToBankHook
 local AlreadyWaiting = false
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🏦 • Bank Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
+	Name = ApplyUnsupportedName("🏦 • Access Bank Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
 	CurrentValue = false,
 	Flag = "Bank",
 	Callback = function(Value)
@@ -706,7 +740,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "🏧 • Auto Bank Items (Needs Bank Anywhere/Gamepass)",
+	Name = "🏧 • Auto Bank Items (Needs Bank Access)",
 	CurrentValue = false,
 	Flag = "BankItems",
 	Callback = function(Value)
@@ -742,6 +776,79 @@ Tab:CreateDropdown({
 	Flag = "ItemsToBank",
 	Callback = function()end,
 })
+
+Tab:CreateDivider()
+
+local ItemInfo
+
+Tab:CreateButton({
+	Name = ApplyUnsupportedName("🔙 • Quick Withdraw Items (Open Bank First)", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
+	Callback = function()
+		if not ItemInfo then
+			return Notify("Error", `An item named '{Flags.ItemToWithdraw.CurrentValue}' was not found`)
+		end
+		
+		local AmountWithdrawn = 0
+		
+		for _, Item: ImageLabel in Player.PlayerGui.Main.Core.Inventory.Inventory.Slots:GetChildren() do
+			if not Item:IsA("ImageLabel") then
+				continue
+			end
+			
+			if not Item.Icon.Image:find(ItemInfo.Icon) then
+				continue
+			end
+			
+			if AmountWithdrawn >= Flags.AmountToWithdraw.CurrentValue then
+				break
+			end
+			
+			local Result: {Status: boolean} = RemoteFunctions.Inventory:InvokeServer({
+				Command = "WithdrawFromBank",
+				UID = Item.Name
+			})
+			
+			if Result.Status then
+				AmountWithdrawn += 1
+			end
+		end
+		
+		Notify("Success", `Withdrew {AmountWithdrawn} {Flags.ItemToWithdraw.CurrentValue}s`)
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "➖ • Amount to Withdraw",
+	Range = {1, 1000},
+	Increment = 1,
+	Suffix = "Items",
+	CurrentValue = 1,
+	Flag = "AmountToWithdraw",
+	Callback = function()end,
+})
+
+Tab:CreateInput({
+	Name = ApplyUnsupportedName("📑 • Item to Withdraw", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
+	CurrentValue = "",
+	PlaceholderText = "Full Item Name Here",
+	RemoveTextAfterFocusLost = false,
+	Flag = "ItemToWithdraw",
+	Callback = function(Text)
+		for _, Treasure: ModuleScript in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
+			if Treasure.Name:lower() == Text:lower() then
+				local Success, Result = pcall(require, Treasure)
+				
+				if Success then
+					ItemInfo = Result
+				end
+				
+				break
+			end
+		end
+	end,
+})
+
+Tab:CreateDivider()
 
 local function PinItems(Tool: Tool)
 	if not Flags.PinItems.CurrentValue then
@@ -1103,6 +1210,296 @@ EnchantShovel = Tab:CreateToggle({
 	end,
 })
 
+local Enchantments = {}
+
+local Success, EnchantModule = pcall(require, ReplicatedStorage.Settings.Enchantments)
+
+if not Success then
+	EnchantModule = game:GetService("HttpService"):JSONDecode([[
+	{
+  "Loaded": true,
+  "WaitForAll": null,
+  "EnchantmentsList": {
+    "Blessed": {
+      "Name": "Blessed",
+      "MoleWeight": 5,
+      "Color": null,
+      "Tiers": [
+        {
+          "LootLuck": 0.17,
+          "Precision": 0.15,
+          "Stability": 0.15,
+          "Control": 0.15
+        },
+        {
+          "LootLuck": 0.3,
+          "Precision": 0.3,
+          "Stability": 0.3,
+          "Control": 0.3
+        },
+        {
+          "LootLuck": 0.4,
+          "Precision": 0.4,
+          "Stability": 0.4,
+          "Control": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Lucky": {
+      "Name": "Lucky",
+      "MoleWeight": 20,
+      "Color": null,
+      "Tiers": [
+        {
+          "LootLuck": 0.17
+        },
+        {
+          "LootLuck": 0.3
+        },
+        {
+          "LootLuck": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Strong": {
+      "Name": "Strong",
+      "MoleWeight": 40,
+      "Color": null,
+      "Tiers": [
+        {
+          "Strength": 0.15
+        },
+        {
+          "Strength": 0.3
+        },
+        {
+          "Strength": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Steady": {
+      "Name": "Steady",
+      "MoleWeight": 20,
+      "Color": null,
+      "Tiers": [
+        {
+          "Stability": 0.15,
+          "Control": 0.15
+        },
+        {
+          "Stability": 0.3,
+          "Control": 0.3
+        },
+        {
+          "Stability": 0.4,
+          "Control": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Durable": {
+      "Name": "Durable",
+      "MoleWeight": 70,
+      "Color": null,
+      "Tiers": [
+        {
+          "MaxMass": 0.1
+        },
+        {
+          "MaxMass": 0.25
+        },
+        {
+          "MaxMass": 0.5
+        }
+      ],
+      "TierCount": 3
+    },
+    "Precise": {
+      "Name": "Precise",
+      "MoleWeight": 90,
+      "Color": null,
+      "Tiers": [
+        {
+          "Precision": 0.15
+        },
+        {
+          "Precision": 0.3
+        },
+        {
+          "Precision": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Exact": {
+      "Name": "Exact",
+      "MoleWeight": 20,
+      "Color": null,
+      "Tiers": [
+        {
+          "Control": 0.15,
+          "Precision": 0.15
+        },
+        {
+          "Control": 0.3,
+          "Precision": 0.3
+        },
+        {
+          "Control": 0.4,
+          "Precision": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Stamina": {
+      "Name": "Stamina",
+      "MoleWeight": 70,
+      "Color": null,
+      "Tiers": [
+        {
+          "StaminaLoss": -0.2
+        },
+        {
+          "StaminaLoss": -0.4
+        },
+        {
+          "StaminaLoss": -0.5
+        }
+      ],
+      "TierCount": 3
+    },
+    "Control": {
+      "Name": "Control",
+      "MoleWeight": 90,
+      "Color": null,
+      "Tiers": [
+        {
+          "Control": 0.15
+        },
+        {
+          "Control": 0.3
+        },
+        {
+          "Control": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Accurate": {
+      "Name": "Accurate",
+      "MoleWeight": 20,
+      "Color": null,
+      "Tiers": [
+        {
+          "Stability": 0.15,
+          "Precision": 0.15
+        },
+        {
+          "Stability": 0.3,
+          "Precision": 0.3
+        },
+        {
+          "Stability": 0.4,
+          "Precision": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Perfect": {
+      "Name": "Perfect",
+      "MoleWeight": 1,
+      "Color": null,
+      "Tiers": [
+        {
+          "MaxMass": 0.1,
+          "Control": 0.15,
+          "Stability": 0.15,
+          "Precision": 0.15,
+          "LootLuck": 0.17,
+          "Strength": 0.15
+        },
+        {
+          "MaxMass": 0.25,
+          "Control": 0.3,
+          "Stability": 0.3,
+          "Precision": 0.3,
+          "LootLuck": 0.3,
+          "Strength": 0.3
+        },
+        {
+          "MaxMass": 0.5,
+          "Control": 0.4,
+          "Stability": 0.4,
+          "Precision": 0.4,
+          "LootLuck": 0.4,
+          "Strength": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Stable": {
+      "Name": "Stable",
+      "MoleWeight": 90,
+      "Color": null,
+      "Tiers": [
+        {
+          "Stability": 0.15
+        },
+        {
+          "Stability": 0.3
+        },
+        {
+          "Stability": 0.4
+        }
+      ],
+      "TierCount": 3
+    },
+    "Super": {
+      "Name": "Super",
+      "MoleWeight": 10,
+      "Color": null,
+      "Tiers": [
+        {
+          "Control": 0.15,
+          "MaxMass": 0.1,
+          "Precision": 0.15,
+          "Strength": 0.15,
+          "Stability": 0.15
+        },
+        {
+          "Control": 0.3,
+          "MaxMass": 0.25,
+          "Precision": 0.3,
+          "Strength": 0.3,
+          "Stability": 0.3
+        },
+        {
+          "Control": 0.4,
+          "MaxMass": 0.5,
+          "Precision": 0.4,
+          "Strength": 0.4,
+          "Stability": 0.4
+        }
+      ],
+      "TierCount": 3
+    }
+  },
+  "Update": null
+}
+	]])
+end
+
+for Enchant, Info in EnchantModule.EnchantmentsList do
+	for Tier, _ in Info.Tiers do
+		table.insert(Enchantments, `{Enchant} {Tier}`)
+	end
+end
+
+table.sort(Enchantments)
+
 Tab:CreateDropdown({
 	Name = "📚 • Enchants to Stop at",
 	Options = Enchantments,
@@ -1160,10 +1557,10 @@ Tab:CreateSlider({
 
 local Modifiers = {}
 
-local Success, Result = pcall(require, ReplicatedStorage.Settings.Modifiers.Colors)
+local Success, ModifiersModule = pcall(require, ReplicatedStorage.Settings.Modifiers.Colors)
 
 if not Success then
-	Result = {
+	ModifiersModule = {
 		["Regular"] = Color3.fromRGB(35, 35, 35),
 		["Golden"] = Color3.fromRGB(255, 235, 17),
 		["Neon"] = Color3.fromRGB(16, 255, 219),
@@ -1180,7 +1577,7 @@ if not Success then
 	}
 end
 
-for i,v in Result do
+for i,v in ModifiersModule do
 	table.insert(Modifiers, i)
 end
 
