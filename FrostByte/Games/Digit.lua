@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.3"
+getgenv().ScriptVersion = "v2.3.4"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -470,10 +470,8 @@ Tab:CreateToggle({
 
 local RarityList = {}
 
-if Success then
-	for Name: string, _ in Rarities do
-		table.insert(RarityList, Name)
-	end
+for Name: string, _ in Rarities do
+	table.insert(RarityList, Name)
 end
 
 Tab:CreateDropdown({
