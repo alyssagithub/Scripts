@@ -226,7 +226,19 @@ function CreateUniversalTabs()
 		CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
 		Flag = "FPS",
 		Callback = function(Value)
-			Player.Character.Humanoid.WalkSpeed = Value
+			local Character = Player.Character or Player.CharacterAdded:Wait()
+			
+			if not Character then
+				return
+			end
+			
+			local Humanoid = Character:WaitForChild("Humanoid", 5)
+			
+			if not Humanoid then
+				return
+			end
+			
+			Humanoid.WalkSpeed = Value
 		end,
 	})
 	
