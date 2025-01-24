@@ -1,6 +1,7 @@
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 
-local Player = game:GetService("Players").LocalPlayer
+local Player = Players.LocalPlayer
 
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
@@ -88,12 +89,12 @@ task.spawn(function()
 end)
 
 Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua"))()
-local Flags = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
 getgenv().Rayfield = Rayfield
 
 Window = Rayfield:CreateWindow({
-	Name = `FrostByte | {getgenv().PlaceName or PlaceName} | {ScriptVersion or identifyexecutor()}`,
+	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
 	Icon = "snowflake",
 	LoadingTitle = "❄ Brought to you by FrostByte ❄",
 	LoadingSubtitle = PlaceName,
@@ -120,6 +121,8 @@ getgenv().Window = Window
 function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
 	local VirtualInputManager = game:GetService("VirtualInputManager")
+	local TeleportService = game:GetService("TeleportService")
+	local RunService = game:GetService("RunService")
 	
 	local Tab = Window:CreateTab("Client", "user")
 	
@@ -204,11 +207,11 @@ function CreateUniversalTabs()
 				
 				PreviousValue = CurrentValue
 				
-				game:GetService("RunService"):Set3dRenderingEnabled(CurrentValue)
+				RunService:Set3dRenderingEnabled(CurrentValue)
 			end
 			
 			if Value then
-				game:GetService("RunService"):Set3dRenderingEnabled(true)
+				RunService:Set3dRenderingEnabled(true)
 			end
 		end,
 	})
@@ -226,13 +229,75 @@ function CreateUniversalTabs()
 			Player.Character.Humanoid.WalkSpeed = Value
 		end,
 	})
+	
+	Tab:CreateSection("Safety")
+	
+	local StaffRoleNames = {
+		"mod",
+		"dev",
+		"admin",
+		"owner",
+		"founder",
+		"manag",
+	}
+	
+	local function CheckIfStaff(CheckPlayer: Player)
+		if not Flags.StaffJoin.CurrentValue then
+			return
+		end
+		
+		local StaffRole
+		
+		if CheckPlayer:IsInGroup(1200769) then
+			StaffRole = "Roblox Admin"
+		end
+		
+		if game.CreatorType ~= Enum.CreatorType.Group then
+			return
+		end
+		
+		local CreatorId = game.CreatorId
+		
+		local Role = CheckPlayer:GetRoleInGroup(CreatorId)
+		
+		for _, Name in StaffRoleNames do
+			if Role:lower():find(Name) then
+				StaffRole = Role
+			end
+		end
+		
+		if CheckPlayer:GetRankInGroup(CreatorId) == 255 then
+			StaffRole = "Group Owner"
+		end
+		
+		if StaffRole then
+			Player:Kick(`The player '{CheckPlayer.Name}' was detected to be a staff member, their role is '{StaffRole}'.\n\nIf you believe this is false, contact the dev of FrostByte.`)
+		end
+	end
+	
+	Tab:CreateToggle({
+		Name = "🚪 • Auto Leave When Staff Joins",
+		CurrentValue = false,
+		Flag = "StaffJoin",
+		Callback = function(Value)
+			if not Value then
+				return
+			end
+			
+			for _, CheckPlayer in Players:GetPlayers() do
+				CheckIfStaff(CheckPlayer)
+			end
+		end,
+	})
+	
+	HandleConnection(Players.PlayerAdded:Connect(CheckIfStaff), "StaffJoin")
 
 	Tab:CreateSection("Development")
 
 	Tab:CreateButton({
 		Name = "⚙️ • Rejoin",
 		Callback = function()
-			game:GetService("TeleportService"):Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
+			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
 	
@@ -247,6 +312,6 @@ end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
 
-if not ScriptVersion then
+if not ScriptVersion or ScriptVersion == "Universal" then
 	CreateUniversalTabs()
 end
