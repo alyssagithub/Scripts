@@ -15,9 +15,9 @@ local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.Plac
 PlaceName = PlaceName:gsub("%b[]", "")
 PlaceName = PlaceName:gsub("[^%a]", "")
 
-local Code = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
+local Code: string = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
 
-if Code then
+if Code ~= "404: Not Found" then
 	Notify("Game found, the script is loading")
 	loadstring(Code)()
 else
