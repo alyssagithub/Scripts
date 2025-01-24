@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.4.9"
+getgenv().ScriptVersion = "v1.5.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -11,7 +11,6 @@ local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?
 local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
 local checkcaller: () -> (boolean) = getfenv().checkcaller
 
-local UnsupportedName: string = getgenv().UnsupportedName
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
@@ -190,7 +189,7 @@ Tab:CreateToggle({
 Tab:CreateDivider()
 
 Tab:CreateToggle({
-	Name = if firetouchinterest then "💎 • Auto Collect Drops" else UnsupportedName,
+	Name = ApplyUnsupportedName("💎 • Auto Collect Drops", firetouchinterest),
 	CurrentValue = false,
 	Flag = "Collect",
 	Callback = CollectDrops,
@@ -452,7 +451,7 @@ local Tab = Window:CreateTab("QOL", "leaf")
 Tab:CreateSection("UI")
 
 Tab:CreateToggle({
-	Name = if firesignal then "📦 • Auto Keep/Replace Equipment (Based on Tiers)" else UnsupportedName,
+	Name = ApplyUnsupportedName("📦 • Auto Keep/Replace Equipment (Based on Tiers)", firesignal),
 	CurrentValue = false,
 	Flag = "KeepReplace",
 	Callback = function()
@@ -515,7 +514,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = if firesignal then "✅ • Auto Keep Equipment" else UnsupportedName,
+	Name = ApplyUnsupportedName("✅ • Auto Keep Equipment", firesignal),
 	CurrentValue = false,
 	Flag = "Keep",
 	Callback = function()
