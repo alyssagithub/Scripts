@@ -1,8 +1,9 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.4"
+getgenv().ScriptVersion = "v2.3.5"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MarketplaceService = game:GetService("MarketplaceService")
 
 local Shovels = {}
 local OriginalShovelNames = {}
@@ -58,7 +59,6 @@ local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?
 local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
 local checkcaller: () -> (boolean) = getfenv().checkcaller
 
-local UnsupportedName: string = getgenv().UnsupportedName
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
@@ -1040,7 +1040,10 @@ function SellInventory()
 	local StartTime = tick()
 
 	repeat
-		Player.Character:PivotTo(Merchant:GetPivot())
+		if not MarketplaceService:UserOwnsGamePassAsync(Player.UserId, 1003325804) then
+			Player.Character:PivotTo(Merchant:GetPivot())
+			Teleported = true
+		end
 
 		task.wait(1)
 
@@ -1048,8 +1051,6 @@ function SellInventory()
 			Command = "SellAllTreasures",
 			Merchant = Merchant
 		})
-
-		Teleported = true
 	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled or tick() - StartTime >= 3
 
 	if Teleported then
