@@ -18,11 +18,10 @@ PlaceName = PlaceName:gsub("[^%a]", "")
 local Code: string = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
 
 if Code ~= "404: Not Found" then
-	Notify("Game found, the script is loading")
+	Notify("Game found, the script is loading.")
 	loadstring(Code)()
 else
-	Notify("Could not find a script for this game, loading the universal")
-	getgenv().PlaceName = "Universal"
+	Notify("Game not found, loading universal.")
 	getgenv().ScriptVersion = "Universal"
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 end
