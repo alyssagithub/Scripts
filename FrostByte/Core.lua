@@ -4,7 +4,7 @@ local Player = game:GetService("Players").LocalPlayer
 
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
-local getgenv = getfenv().getgenv
+local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
 local getexecutorname = getfenv().getexecutorname
 local identifyexecutor: () -> (string) = getfenv().identifyexecutor
@@ -93,7 +93,7 @@ local Flags = Rayfield.Flags
 getgenv().Rayfield = Rayfield
 
 Window = Rayfield:CreateWindow({
-	Name = `FrostByte | {PlaceName} | {ScriptVersion or identifyexecutor()}`,
+	Name = `FrostByte | {getgenv().PlaceName or PlaceName} | {ScriptVersion or identifyexecutor()}`,
 	Icon = "snowflake",
 	LoadingTitle = "❄ Brought to you by FrostByte ❄",
 	LoadingSubtitle = PlaceName,
