@@ -105,8 +105,8 @@ Window = Rayfield:CreateWindow({
 
 	ConfigurationSaving = {
 		Enabled = true,
-		FolderName = nil,
-		FileName = `FrostByte-{game.PlaceId}`
+		FolderName = "FrostByte",
+		FileName = `{getgenv().PlaceFileName or `DevMode-{game.PlaceId}`}-{Player.Name}`
 	},
 
 	Discord = {
@@ -162,8 +162,7 @@ function CreateUniversalTabs()
 		Name = "🔒 • Anti AFK Disconnection",
 		CurrentValue = true,
 		Flag = "AntiAFK",
-		Callback = function(Value)
-		end,
+		Callback = function()end,
 	})
 	
 	getgenv().HandleConnection(Player.Idled:Connect(function()
