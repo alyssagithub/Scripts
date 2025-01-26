@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.6"
+getgenv().ScriptVersion = "v2.3.7"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -226,6 +226,25 @@ Tab:CreateToggle({
 				continue
 			end
 			
+			RemoteFunctions.Digging:InvokeServer({
+				Command = "CreatePile"
+			})
+		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "🏞️ • Auto Fast Create Piles on Any Terrain (May make you fly)",
+	CurrentValue = false,
+	Flag = "FastCreatePiles",
+	Callback = function(Value)
+		while Flags.FastCreatePiles.CurrentValue and task.wait() do
+			if Player:GetAttribute("PileCount") ~= 0 then
+				continue
+			end
+
+			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
+
 			RemoteFunctions.Digging:InvokeServer({
 				Command = "CreatePile"
 			})
