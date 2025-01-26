@@ -243,8 +243,6 @@ Tab:CreateToggle({
 				continue
 			end
 
-			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
-
 			RemoteFunctions.Digging:InvokeServer({
 				Command = "CreatePile"
 			})
