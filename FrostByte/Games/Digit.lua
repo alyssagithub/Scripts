@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.7"
+getgenv().ScriptVersion = "v2.3.8"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -1593,7 +1593,9 @@ if not Success then
 		["Biodegradable"] = Color3.fromRGB(9, 198, 38),
 		["Magma"] = Color3.fromRGB(255, 1, 1),
 		["Evil"] = Color3.fromRGB(149, 1, 1),
-		["Rainbow"] = Color3.fromRGB(0, 0, 0)
+		["Rainbow"] = Color3.fromRGB(0, 0, 0),
+		["Solar"] = Color3.fromRGB(),
+		["Venom"] = Color3.fromRGB()
 	}
 end
 
