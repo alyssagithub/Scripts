@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.5"
+getgenv().ScriptVersion = "v2.3.6"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -144,6 +144,8 @@ HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message
 	end
 end), "ShovelError")
 
+local TreasurePiles = workspace.TreasurePiles
+
 Tab:CreateToggle({
 	Name = "⚡ • Auto Fast Dig (Combinable with Legit)",
 	CurrentValue = false,
@@ -156,7 +158,7 @@ Tab:CreateToggle({
 			
 			local Adornee: Model? = Player.Character.Shovel.Highlight.Adornee
 			
-			if not Adornee or Adornee.Parent ~= workspace.Map.TreasurePiles or Adornee:GetAttribute("Blacklisted") then
+			if not Adornee or Adornee.Parent ~= TreasurePiles or Adornee:GetAttribute("Blacklisted") then
 				continue
 			end
 			
@@ -220,7 +222,7 @@ Tab:CreateToggle({
 			
 			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
 
-			if PileAdornee and (PileAdornee.Parent ~= workspace.Map.TreasurePiles or PileAdornee:GetAttribute("Completed") or PileAdornee:GetAttribute("Destroying")) then
+			if PileAdornee and (PileAdornee.Parent ~= TreasurePiles or PileAdornee:GetAttribute("Completed") or PileAdornee:GetAttribute("Destroying")) then
 				continue
 			end
 			
@@ -245,7 +247,7 @@ Tab:CreateToggle({
 			
 			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
 
-			if PileAdornee and (PileAdornee.Parent ~= workspace.Map.TreasurePiles or PileAdornee:GetAttribute("Blacklisted") or PileAdornee:GetAttribute("Completed") or PileAdornee:GetAttribute("Destroying")) then
+			if PileAdornee and (PileAdornee.Parent ~= TreasurePiles or PileAdornee:GetAttribute("Blacklisted") or PileAdornee:GetAttribute("Completed") or PileAdornee:GetAttribute("Destroying")) then
 				continue
 			end
 			
@@ -322,7 +324,7 @@ Tab:CreateToggle({
 
 			local FoundPile = false
 
-			for _, Pile: Model in workspace.Map.TreasurePiles:GetChildren() do
+			for _, Pile: Model in TreasurePiles:GetChildren() do
 				if Pile:GetAttribute("Owner") ~= Player.UserId or Pile:GetAttribute("Blacklisted") then
 					continue
 				end
@@ -498,13 +500,15 @@ local function MeteorIslandTeleport(Meteor: Model?)
 	Character:PivotTo(Meteor:GetPivot() + Vector3.yAxis * Meteor:GetExtentsSize().Y / 2)
 end
 
+local Temporary: Folder = workspace.Temporary
+
 Tab:CreateToggle({
 	Name = "🌠 • Auto Teleport to Meteor Islands",
 	CurrentValue = false,
 	Flag = "Meteor",
 	Callback = function(Value)
 		if Value then
-			for i,v in workspace.Map.Temporary:GetChildren() do
+			for i,v in Temporary:GetChildren() do
 				MeteorIslandTeleport(v)
 			end
 		elseif PreviousLocation then
@@ -514,8 +518,8 @@ Tab:CreateToggle({
 	end,
 })
 
-HandleConnection(workspace.Map.Temporary.ChildAdded:Connect(MeteorIslandTeleport), "Meteor")
-HandleConnection(workspace.Map.Temporary.ChildRemoved:Connect(function(Child: Model?)
+HandleConnection(Temporary.ChildAdded:Connect(MeteorIslandTeleport), "Meteor")
+HandleConnection(Temporary.ChildRemoved:Connect(function(Child: Model?)
 	if Child.Name == "Meteor Island" and PreviousLocation and Flags.Meteor.CurrentValue then
 		Player.Character:PivotTo(PreviousLocation)
 		PreviousLocation = nil
