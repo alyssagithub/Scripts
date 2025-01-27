@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.8"
+getgenv().ScriptVersion = "v2.3.9"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -675,7 +675,7 @@ local Codes = {
 	"SECRET",
 	"300KLIKES",
 	"12MVISITS",
-	"ROYAL_SECRET",
+	"PLS_FALLEN_STAR",
 }
 
 Tab:CreateButton({
@@ -690,13 +690,15 @@ Tab:CreateButton({
 			if Result.Status then
 				continue
 			elseif Result.AlreadyRedeemed then
-				Notify("Failed!", `The code '{Code}' has already been redeemed.`)
+				continue
 			elseif Result.NotValid then
 				Notify("Failed!", `The code '{Code}' is not valid anymore.`)
 			else
 				Notify("Error", `The code '{Code}' has had an internal error while redeeming.`)
 			end
 		end
+		
+		Notify("Completed", "Applied all the known codes.")
 	end,
 })
 
