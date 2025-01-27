@@ -88,6 +88,10 @@ task.spawn(function()
 	end
 end)
 
+if getgenv().Rayfield then
+	getgenv().Rayfield:Destroy()
+end
+
 Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua"))()
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
