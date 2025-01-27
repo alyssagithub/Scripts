@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.3.9"
+getgenv().ScriptVersion = "v2.4.0"
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -234,7 +234,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "🏞️ • Auto Fast Create Piles on Any Terrain (May make you fly)",
+	Name = "🏖️ • Auto Fast Create Piles on Any Terrain (BLATANT)",
 	CurrentValue = false,
 	Flag = "FastCreatePiles",
 	Callback = function(Value)
