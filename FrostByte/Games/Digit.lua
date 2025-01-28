@@ -1,54 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.0"
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local MarketplaceService = game:GetService("MarketplaceService")
-
-local Shovels = {}
-local OriginalShovelNames = {}
-
-local function AddComma(amount: number)
-	local formatted = amount
-	local k
-	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-		if (k==0) then
-			break
-		end
-	end
-	return formatted
-end
-
-for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
-	local Success, ItemInfo = pcall(require, v)
-
-	local BuyPrice = 0
-	
-	local NewName
-
-	if Success and ItemInfo then
-		if not ItemInfo.BuyPrice then
-			continue
-		end
-		
-		BuyPrice = ItemInfo.BuyPrice
-		
-		NewName = `{v.Name} (${AddComma(BuyPrice)})`
-	else
-		NewName = `{v.Name} (Can't See Price)`
-	end
-	
-	table.insert(Shovels, NewName)
-	OriginalShovelNames[NewName] = {
-		Name = v.Name,
-		BuyPrice = BuyPrice
-	}
-end
-
-table.sort(Shovels, function(a,b)
-	return OriginalShovelNames[a].BuyPrice < OriginalShovelNames[b].BuyPrice
-end)
+getgenv().ScriptVersion = "v2.4.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -64,14 +16,32 @@ local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = 
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 type Tab = {
-	CreateSection: (self: Tab, Name: string) -> (),
-	CreateDivider: (self: Tab) -> (),
+	CreateSection: (self: Tab, Name: string) -> (Section),
+	CreateDivider: (self: Tab) -> (Divider),
+
+	CreateLabel: (self: Tab, Content: string, Icon: string | number, Color: Color3?, IgnoreTheme: boolean?) -> (Label),
+	CreateParagraph: (self: Tab, {
+		Title: string,
+		Content: string
+	}) -> (Paragraph),
+
+	CreateButton: (self: Tab, {
+		Name: string,
+		Callback: () -> ()
+	}) -> (),
 
 	CreateToggle: (self: Tab, {
 		Name: string,
 		CurrentValue: boolean,
 		Flag: string | nil,
 		Callback: (Value: boolean) -> ()
+	}) -> (Toggle),
+
+	CreateColorPicker: (self: Tab, {
+		Name: string,
+		Color: Color3,
+		Flag: string | nil,
+		Callback: (Value: Color3) -> ()
 	}) -> (),
 
 	CreateSlider: (self: Tab, {
@@ -82,7 +52,16 @@ type Tab = {
 		CurrentValue: number,
 		Flag: string | nil,
 		Callback: (Value: number) -> ()
-	}) -> (),
+	}) -> (Slider),
+
+	CreateInput: (self: Tab, {
+		Name: string,
+		CurrentValue: string,
+		PlaceholderText: string,
+		RemoveTextAfterFocusLost: boolean,
+		Flag: string | nil,
+		Callback: (Text: string) -> ()
+	}) -> (Input),
 
 	CreateDropdown: (self: Tab, {
 		Name: string,
@@ -91,27 +70,22 @@ type Tab = {
 		MultipleOptions: boolean,
 		Flag: string,
 		Callback: (SelectedOptions: {string}) -> ()
-	}) -> (),
+	}) -> (Dropdown),
 
-	CreateButton: (self: Tab, {
+	CreateKeybind: (self: Tab, {
 		Name: string,
-		Callback: () -> ()
-	}) -> (),
-
-	CreateInput: (sefl: Tab, {
-		Name: string,
-		CurrentValue: string,
-		PlaceholderText: string,
-		RemoveTextAfterFocusLost: boolean,
+		CurrentKeybind: string,
+		HoldToInteract: boolean,
 		Flag: string | nil,
-		Callback: (Text: string) -> ()
-	}) -> (),
+		Callback: () -> ()
+	}) -> (Keybind),
 }
 
 local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
-local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MarketplaceService = game:GetService("MarketplaceService")
 
 local Player = game:GetService("Players").LocalPlayer
 
@@ -1123,6 +1097,51 @@ Tab:CreateSlider({
 	Callback = function()end,
 })
 
+local Shovels = {}
+local OriginalShovelNames = {}
+
+local function AddComma(amount: number)
+	local formatted = amount
+	local k
+	while true do
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k==0) then
+			break
+		end
+	end
+	return formatted
+end
+
+for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
+	local Success, ItemInfo = pcall(require, v)
+
+	local BuyPrice = 0
+
+	local NewName
+
+	if Success and ItemInfo then
+		if not ItemInfo.BuyPrice then
+			continue
+		end
+
+		BuyPrice = ItemInfo.BuyPrice
+
+		NewName = `{v.Name} (${AddComma(BuyPrice)})`
+	else
+		NewName = `{v.Name} (Can't See Price)`
+	end
+
+	table.insert(Shovels, NewName)
+	OriginalShovelNames[NewName] = {
+		Name = v.Name,
+		BuyPrice = BuyPrice
+	}
+end
+
+table.sort(Shovels, function(a,b)
+	return OriginalShovelNames[a].BuyPrice < OriginalShovelNames[b].BuyPrice
+end)
+
 local PurchaseShovel
 PurchaseShovel = Tab:CreateDropdown({
 	Name = "💵 • Purchase Shovel",
@@ -1231,8 +1250,6 @@ EnchantShovel = Tab:CreateToggle({
 		end
 	end,
 })
-
-local Enchantments = {}
 
 local Success, EnchantModule = pcall(require, ReplicatedStorage.Settings.Enchantments)
 
@@ -1512,10 +1529,16 @@ if not Success then
   "Update": null
 }
 	]])
+	
+	EnchantModule.EnchantmentsList.Secret = {
+		TierCount = 3
+	}
 end
 
+local Enchantments = {}
+
 for Enchant, Info in EnchantModule.EnchantmentsList do
-	for Tier, _ in Info.Tiers do
+	for Tier = 1, Info.TierCount do
 		table.insert(Enchantments, `{Enchant} {Tier}`)
 	end
 end
