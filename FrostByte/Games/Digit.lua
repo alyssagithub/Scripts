@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.5"
+getgenv().ScriptVersion = "v2.4.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -69,7 +69,13 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			local Adornee: Model? = Player.Character.Shovel.Highlight.Adornee
+			local Shovel = Player.Character:FindFirstChild("Shovel")
+
+			if not Shovel then
+				continue
+			end
+			
+			local Adornee: Model? = Shovel.Highlight.Adornee
 			
 			if not Adornee or Adornee.Parent ~= TreasurePiles or Adornee:GetAttribute("Blacklisted") then
 				continue
