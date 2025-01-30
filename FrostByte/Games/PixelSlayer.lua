@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.6"
+getgenv().ScriptVersion = "v1.0.7"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -113,18 +113,31 @@ Tab:CreateToggle({
 			local DidTP = false
 
 			for _, Mob: Model? in workspace.World.Mobs:GetChildren() do
-				if not Mob:FindFirstChild("Head") or Mob.Head.Transparency == 1 or not Mob.HumanoidRootPart.Hitbox.Health.Enabled then
+				local Head: Part = Mob:FindFirstChild("Head")
+				local MobHumanoidRootPart: Part = Mob:FindFirstChild("HumanoidRootPart")
+				
+				if not Head or not MobHumanoidRootPart then
+					continue
+				end
+				
+				if Head.Transparency == 1 or not MobHumanoidRootPart.Hitbox.Health.Enabled then
+					continue
+				end
+				
+				local HumanoidRootPart: Part = Player.Character:FindFirstChild("HumanoidRootPart")
+				
+				if not HumanoidRootPart then
 					continue
 				end
 
-				local BodyGyro = Player.Character.HumanoidRootPart:FindFirstChild("BodyGyro")
+				local BodyGyro = HumanoidRootPart:FindFirstChild("BodyGyro")
 
 				if BodyGyro then
 					BodyGyro:Destroy()
 				end
 				
 				DidTP = true
-				LastTPLocation = Mob.HumanoidRootPart.CFrame + Vector3.new(Flags.OffsetX.CurrentValue, Flags.OffsetY.CurrentValue, Flags.OffsetZ.CurrentValue)
+				LastTPLocation = MobHumanoidRootPart.CFrame + Vector3.new(Flags.OffsetX.CurrentValue, Flags.OffsetY.CurrentValue, Flags.OffsetZ.CurrentValue)
 
 				Player.Character:PivotTo(LastTPLocation)
 				break
