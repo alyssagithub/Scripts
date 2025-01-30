@@ -22,6 +22,10 @@ local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 local ScriptVersion = getgenv().ScriptVersion
 
 function Notify(Title: string, Content: string, Image: string)
+	if not Rayfield then
+		return
+	end
+	
 	Rayfield:Notify({
 		Title = Title,
 		Content = Content,
@@ -151,10 +155,6 @@ if PlaceFileName then
 				Button2 = Button2,
 				Callback = BindableFunction,
 			})
-
-			repeat
-				task.wait()
-			until Response or getgenv().ScriptVersion ~= ScriptVersion
 
 			break
 		end
@@ -320,22 +320,20 @@ function CreateUniversalTabs()
 		"manag",
 	}
 	
+	local function IsInGroup(CheckPlayer: Player, GroupId: number)
+		local Success, Result = pcall(CheckPlayer.IsInGroup, CheckPlayer, GroupId)
+		
+		return Success and Result
+	end
+	
 	local function CheckIfStaff(CheckPlayer: Player)
 		if not Flags.StaffJoin.CurrentValue then
 			return
 		end
 		
-		if not CheckPlayer:IsDescendantOf(Players) then
-			return
-		end
-		
-		if not pcall(CheckPlayer.IsInGroup, CheckPlayer, 1) then
-			return
-		end
-		
 		local StaffRole
 		
-		if CheckPlayer:IsInGroup(1200769) then
+		if IsInGroup(CheckPlayer, 1200769) then
 			StaffRole = "Roblox Admin"
 		end
 		
@@ -348,7 +346,7 @@ function CreateUniversalTabs()
 		local Role = CheckPlayer:GetRoleInGroup(CreatorId)
 		
 		for _, Name in StaffRoleNames do
-			if Role:lower():find(Name) then
+			if typeof(Role) == "string" and Role:lower():find(Name) then
 				StaffRole = Role
 			end
 		end
@@ -396,11 +394,8 @@ function CreateUniversalTabs()
 	
 	if OriginalFlags then
 		for i,v in OriginalFlags do
-			print("setting value for:", i, "to:", v)
 			Flags[i]:Set(v)
 		end
-		
-		print("loaded original flags")
 	end
 	
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
