@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.0"
+getgenv().ScriptVersion = "v1.5.5"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -23,9 +23,10 @@ local BinderEvent: RemoteEvent = ReplicatedStorage._Binder_Event
 local BinderFunction: RemoteFunction = ReplicatedStorage._Binder_Function
 
 local UpgradeTreeImages = ReplicatedStorage.Assets.UpgradeTreeImages
-local InteractZones = ReplicatedStorage.InteractZones
+local InteractZones: Folder = ReplicatedStorage.InteractZones
 
 local GiantOreSummary = Player.PlayerGui.GameGui.GiantOreSummary
+local Quests: Frame = Player.PlayerGui.InventoryGui.Inventory.Inventory.Inner.Content["2"].Inner
 
 local OresFolder = workspace:WaitForChild("Ores")
 
@@ -46,6 +47,10 @@ for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
 end
 
 local function CollectDrops(Enabled: boolean)
+	if not firetouchinterest then
+		return
+	end
+	
 	if not Enabled then
 		return
 	end
@@ -294,7 +299,10 @@ Tab:CreateSlider({
 Tab:CreateSection("Rolling")
 
 local function Roll(Dispenser, Empowered)
-	pcall(fireclickdetector, workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
+	pcall(function()
+		fireclickdetector(workspace.Map["The Part That Doesn't Do Anything"].ClickDetector)
+	end)
+	
 	BinderFunction:InvokeServer("Roll_RollItem", Dispenser, Empowered)
 end
 
@@ -335,19 +343,35 @@ Tab:CreateToggle({
 	Flag = "RollQuest",
 	Callback = function(Value)
 		while Flags.RollQuest.CurrentValue and task.wait() do
-			local QuestElem = Player.PlayerGui.StartGui.Quests.Inner:FindFirstChild("QuestElem")
-
-			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
-				for _, Quest: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
-					if not Quest:IsA("TextLabel") or Quest.FontFace.Bold then
+			for _, SideBarQuestElem: Frame? in Quests:GetChildren() do
+				if not SideBarQuestElem:IsA("Frame") then
+					continue
+				end
+				
+				for _, SideBarQuestReq: Frame in SideBarQuestElem.Inner.Req:GetChildren() do
+					local Title: TextLabel = SideBarQuestReq:FindFirstChild("Title")
+					
+					if not Title then
 						continue
 					end
 					
 					for _, Dispenser: string in Dispensers do
 						local ItemName = Dispenser:gsub("Dispenser ", "")
-						if Quest.Text:find(ItemName) then
-							Roll(Dispenser, if Quest.Text:find("Empowered") then true else false)
+						
+						if not Title.Text:find(ItemName) then
+							continue
 						end
+						
+						local Start = Title.Text:split("[")[2]
+						local Between = Start:split("]")[1]
+						
+						local Numbers = Between:split("/")
+						
+						if Numbers[1] == Numbers[2] then
+							continue
+						end
+						
+						Roll(Dispenser, if Title.Text:find("Empowered") then true else false)
 					end
 				end
 			end
@@ -389,58 +413,57 @@ Tab:CreateToggle({
 	end,
 })
 
+local LastCompletedQuest
+
 Tab:CreateToggle({
-	Name = "📜 • Auto Mouse Quests",
+	Name = "📜 • Auto Quests",
 	CurrentValue = false,
 	Flag = "Quests",
 	Callback = function(Value)
 		while Flags.Quests.CurrentValue and task.wait(1) do
-			local QuestElem
-			
-			for i,v: Frame in Player.PlayerGui.StartGui.Quests.Inner:GetChildren() do
-				if not v:FindFirstChild("Inner") then
+			for _, SideBarQuestElem: Frame? in Quests:GetChildren() do
+				if not SideBarQuestElem:IsA("Frame") then
 					continue
 				end
 				
-				local Title = v.Inner.TextArea.Title
+				local Top: Frame = SideBarQuestElem.Inner.Req.Top
+				local QuestName: TextLabel = Top.QuestName
+				local NpcName: TextLabel = Top.NpcName
 				
-				if Title.Text:find("Mouse") then
-					QuestElem = v
-					break
+				if not QuestName.Text:find("Completed") then
+					if NpcName.Text == LastCompletedQuest or not LastCompletedQuest then
+						LastCompletedQuest = nil
+						QuestTPing = false
+					end
+					
+					continue
 				end
-			end
-
-			QuestTPing = false
-
-			if QuestElem and not QuestElem.Inner.TextArea.Title.Text:lower():find("complete") then
-				local CompletedAllQuests = true
-
-				for _, Task: TextLabel in QuestElem.Inner.TextArea:GetChildren() do
-					if not Task:IsA("TextLabel") then
+				
+				local Zone
+				
+				for _, CurrentZone: Part in InteractZones:GetChildren() do
+					if not NpcName.Text:lower():find(CurrentZone.Name:lower()) then
 						continue
 					end
 					
-					if not Task.FontFace.Bold then
-						CompletedAllQuests = false
-						break
-					end
+					Zone = CurrentZone
+					break
 				end
-
-				if not CompletedAllQuests then
+				
+				if not Zone then
 					continue
 				end
-			end
-
-			QuestTPing = true
-
-			local Mouse = InteractZones.Mouse
-			
-			if (Player.Character:GetPivot().Position - Mouse.Position).Magnitude > 10 then
-				Player.Character:PivotTo(Mouse:GetPivot())
-			end
-
-			for _, QuestRemotes in {{"Dialog_Start", "Mouse"}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
-				BinderEvent:FireServer(QuestRemotes[1], QuestRemotes[2])
+				
+				QuestTPing = true
+				LastCompletedQuest = NpcName.Text
+				
+				if Player:DistanceFromCharacter(Zone.Position) >= 15 then
+					Player.Character:PivotTo(Zone.CFrame)
+				end
+				
+				for _, QuestRemotes in {{"Dialog_Start", Zone.Name}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
+					BinderEvent:FireServer(QuestRemotes[1], QuestRemotes[2])
+				end
 			end
 		end
 	end,
@@ -456,7 +479,11 @@ Tab:CreateToggle({
 	Flag = "KeepReplace",
 	Callback = function()
 		while Flags.KeepReplace.CurrentValue and task.wait() do
-			local Roll = Player.PlayerGui.StartGui.Roll
+			local Roll: Frame = Player.PlayerGui.StartGui.Roll
+			
+			if not Roll:FindFirstChild("Old") then
+				continue
+			end
 			
 			if not Roll.Visible or not Roll.Old.Stat:FindFirstChild("Frame") then
 				continue
@@ -519,7 +546,11 @@ Tab:CreateToggle({
 	Flag = "Keep",
 	Callback = function()
 		while Flags.Keep.CurrentValue and task.wait() do
-			local Roll = Player.PlayerGui.StartGui.Roll
+			local Roll: Frame = Player.PlayerGui.StartGui.Roll
+			
+			if not Roll:FindFirstChild("Old") then
+				continue
+			end
 
 			if not Roll.Visible or not Roll.Old.Stat:FindFirstChild("Frame") then
 				continue
@@ -535,25 +566,6 @@ Tab:CreateToggle({
 		end
 	end,
 })
-
-Tab:CreateDivider()
-
-Tab:CreateToggle({
-	Name = "❌ • Remove Giant Ore Summary",
-	CurrentValue = false,
-	Flag = "GiantSummary",
-	Callback = function(Value)
-		if GiantOreSummary.Visible and Value then
-			GiantOreSummary.Visible = false
-		end
-	end,
-})
-
-HandleConnection(GiantOreSummary:GetPropertyChangedSignal("Visible"):Connect(function()
-	if GiantOreSummary.Visible and Flags.GiantSummary.CurrentValue then
-		GiantOreSummary.Visible = false
-	end
-end), "GiantSummary")
 
 Tab:CreateSection("Transport")
 
