@@ -32,6 +32,8 @@ local Network = ReplicatedStorage:WaitForChild("Source"):WaitForChild("Network")
 local RemoteFunctions: {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
 local RemoteEvents: {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents")
 
+local CanRequireModules = pcall(require, ReplicatedStorage.Settings.Modifiers.Colors)
+
 local Window = getgenv().Window
 
 local Tab: Tab = Window:CreateTab("Automation", "repeat")
@@ -716,7 +718,7 @@ Tab:CreateDivider()
 local ItemInfo
 
 Tab:CreateButton({
-	Name = ApplyUnsupportedName("🔙 • Quick Withdraw Items (Open Bank First)", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
+	Name = ApplyUnsupportedName("🔙 • Quick Withdraw Items (Open Bank First)", CanRequireModules),
 	Callback = function()
 		if not ItemInfo then
 			return Notify("Error", `An item named '{Flags.ItemToWithdraw.CurrentValue}' was not found`)
@@ -762,15 +764,19 @@ Tab:CreateSlider({
 })
 
 Tab:CreateInput({
-	Name = ApplyUnsupportedName("📑 • Item to Withdraw", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
+	Name = ApplyUnsupportedName("📑 • Item to Withdraw", CanRequireModules),
 	CurrentValue = "",
 	PlaceholderText = "Full Item Name Here",
 	RemoveTextAfterFocusLost = false,
 	Flag = "ItemToWithdraw",
 	Callback = function(Text)
+		if not CanRequireModules then
+			return
+		end
+		
 		for _, Treasure: ModuleScript in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
 			if Treasure.Name:lower() == Text:lower() then
-				local Success, Result = pcall(require, Treasure)
+				local Success, Result = require(Treasure)
 				
 				if Success then
 					ItemInfo = Result
@@ -869,10 +875,10 @@ local function OpenContainer(Tool: Tool)
 	if not Module then
 		return
 	end
-
-	local Success, Info = pcall(require, Module)
-
-	if Success then
+	
+	if CanRequireModules then
+		local _, Info = require(Module)
+		
 		if not Info.ContainerType then
 			return
 		end
@@ -1052,17 +1058,16 @@ local function AddComma(amount: number)
 end
 
 for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
-	local Success, ItemInfo = pcall(require, v)
-
 	local BuyPrice = 0
-
 	local NewName
-
-	if Success and ItemInfo then
+	
+	if CanRequireModules then
+		local _, ItemInfo = require(v)
+		
 		if not ItemInfo.BuyPrice then
 			continue
 		end
-
+		
 		BuyPrice = ItemInfo.BuyPrice
 
 		NewName = `{v.Name} (${AddComma(BuyPrice)})`
