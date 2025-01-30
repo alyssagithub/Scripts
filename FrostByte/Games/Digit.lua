@@ -721,8 +721,14 @@ Tab:CreateToggle({
 	Flag = "BankItems",
 	Callback = function(Value)
 		while Flags.BankItems.CurrentValue and task.wait() do	
+			local Backpack: Backpack = Player:FindFirstChild("Backpack")
+
+			if not Backpack then
+				continue
+			end
+			
 			for _, Item: string in Flags.ItemsToBank.CurrentOption do
-				local Tool = Player.Backpack:FindFirstChild(Item)
+				local Tool = Backpack:FindFirstChild(Item)
 
 				if not Tool then
 					continue
