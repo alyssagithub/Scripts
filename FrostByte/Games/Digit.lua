@@ -1232,7 +1232,7 @@ EnchantShovel = Tab:CreateToggle({
 				continue
 			end
 
-			local ShovelInfo
+			local ShovelInfo: {Enchantments: {[string]: number}}
 
 			repeat
 				local Equipment = RemoteFunctions.Player:InvokeServer({
@@ -1248,6 +1248,10 @@ EnchantShovel = Tab:CreateToggle({
 				end
 				task.wait()
 			until ShovelInfo
+			
+			if not ShovelInfo.Enchantments then
+				continue
+			end
 
 			for Name, Level in ShovelInfo.Enchantments do
 				local Enchant = `{Name} {Level}`
