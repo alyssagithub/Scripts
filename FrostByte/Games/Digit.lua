@@ -1008,13 +1008,7 @@ function SellInventory()
 	end
 	
 	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-
-	local Merchant: Model = workspace:FindFirstChild("ElfMerchant", true)
 	
-	if not Merchant then
-		return
-	end
-
 	local SellEnabled = Flags.Sell.CurrentValue
 	local PreviousPosition = Player.Character:GetPivot()
 	local PreviousSize = GetInventorySize()
@@ -1024,6 +1018,12 @@ function SellInventory()
 	local StartTime = tick()
 
 	repeat
+		local Merchant: Model = workspace:FindFirstChild("ElfMerchant", true)
+		
+		if not Merchant then
+			continue
+		end
+		
 		if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
 			Player.Character:PivotTo(Merchant:GetPivot())
 			Teleported = true
