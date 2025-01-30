@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.5.0"
+getgenv().ScriptVersion = "v2.5.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1178,7 +1178,7 @@ EnchantShovel = Tab:CreateToggle({
 	Name = "🌟 • Auto Enchant Shovel",
 	CurrentValue = false,
 	Flag = "EnchantShovel",
-	Callback = function(Value)	
+	Callback = function(Value)
 		while Flags.EnchantShovel.CurrentValue and task.wait() do
 			local Backpack: Backpack = Player:FindFirstChild("Backpack")
 			
@@ -1570,7 +1570,7 @@ AutoAppraise = Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Appraise",
 	Callback = function(Value)	
-		while Flags.Appraise.CurrentValue and task.wait() do
+		while AutoAppraise.CurrentValue and task.wait() do
 			local Tool = Player.Character:FindFirstChildOfClass("Tool")
 
 			if not Tool then
