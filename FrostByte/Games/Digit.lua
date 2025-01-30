@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.9"
+getgenv().ScriptVersion = "v2.5.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -771,7 +771,9 @@ Tab:CreateButton({
 				continue
 			end
 			
-			if not Item.Icon.Image:find(ItemInfo.Icon) then
+			local Icon: ImageLabel = Item:FindFirstChild("Icon")
+			
+			if not Icon or not Icon.Image:find(ItemInfo.Icon) then
 				continue
 			end
 			
@@ -1007,6 +1009,28 @@ function SellInventory()
 		return
 	end
 	
+	local Merchant: Model
+	
+	for _,v: TextLabel in workspace.Map.Islands:GetDescendants() do
+		if v.Name ~= "Title" or not v:IsA("TextLabel") or v.Text ~= "Merchant" then
+			continue
+		end
+		
+		Merchant = v:FindFirstAncestorOfClass("Model")
+
+		if not Merchant then
+			continue
+		end
+		
+		break
+	end
+	
+	if not Merchant then
+		Notify("Sell Inventory Error", "Couldn't find any merchants, try being closer to one")
+		task.wait(10)
+		return
+	end
+	
 	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 	
 	local SellEnabled = Flags.Sell.CurrentValue
@@ -1018,12 +1042,6 @@ function SellInventory()
 	local StartTime = tick()
 
 	repeat
-		local Merchant: Model = workspace:FindFirstChild("ElfMerchant", true)
-		
-		if not Merchant then
-			continue
-		end
-		
 		if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
 			Player.Character:PivotTo(Merchant:GetPivot())
 			Teleported = true
