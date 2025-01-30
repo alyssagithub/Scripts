@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.5.1b"
+getgenv().ScriptVersion = "v2.5.5"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -39,7 +39,7 @@ local Tab: Tab = Window:CreateTab("Automation", "repeat")
 Tab:CreateSection("Digging")
 
 local function ReEquipTool(Tool: Tool)
-	if not Tool then
+	if not Tool or not Tool.Parent then
 		return
 	end
 	
@@ -65,11 +65,17 @@ Tab:CreateToggle({
 	Flag = "Dig",
 	Callback = function(Value)
 		while Flags.Dig.CurrentValue and task.wait() do
-			if not Player.Character:FindFirstChildOfClass("Tool") then
+			local Character: Model? = Player.Character
+			
+			if not Character then
 				continue
 			end
 			
-			local Shovel = Player.Character:FindFirstChild("Shovel")
+			if not Character:FindFirstChildOfClass("Tool") then
+				continue
+			end
+			
+			local Shovel = Character:FindFirstChild("Shovel")
 
 			if not Shovel then
 				continue
@@ -181,13 +187,19 @@ Tab:CreateToggle({
 	Flag = "LegitPiles",
 	Callback = function(Value)	
 		while Flags.LegitPiles.CurrentValue and task.wait() do
-			local Tool = Player.Character:FindFirstChildOfClass("Tool")
+			local Character: Model? = Player.Character
+
+			if not Character then
+				continue
+			end
+			
+			local Tool = Character:FindFirstChildOfClass("Tool")
 			
 			if not Tool or Tool:GetAttribute("Type") ~= "Shovel" then
 				continue
 			end
 			
-			local Shovel = Player.Character:FindFirstChild("Shovel")
+			local Shovel = Character:FindFirstChild("Shovel")
 
 			if not Shovel then
 				continue
@@ -233,7 +245,8 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
 		local Character = Player.Character
-		local StartPos = Character:GetPivot().Position - Vector3.yAxis * Character.HumanoidRootPart.Size.Y
+		local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+		local StartPos = Character:GetPivot().Position - Vector3.yAxis * HumanoidRootPart.Size.Y
 
 		while Flags.DigWalk.CurrentValue and task.wait() do	
 			if Player:GetAttribute("IsDigging") then
@@ -316,7 +329,13 @@ Tab:CreateToggle({
 
 		if Value then
 			ChosenPosition = nil
-			Player.Character.Humanoid:MoveTo(Player.Character.HumanoidRootPart.Position)
+			
+			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
+
+			if Humanoid and HumanoidRootPart then
+				Humanoid:MoveTo(HumanoidRootPart.Position)
+			end
 		end
 
 		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
@@ -843,7 +862,7 @@ local function PinItems(Tool: Tool)
 		return
 	end
 
-	if Tool:GetAttribute("Pinned") then
+	if Tool:GetAttribute("Pinned") or not Tool:GetAttribute("ID") then
 		return
 	end
 
@@ -1067,12 +1086,12 @@ function SellInventory()
 end
 
 Tab:CreateToggle({
-	Name = "💰 • Auto Sell Inventory at Max Capacity",
+	Name = "💰 • Auto Sell Inventory at Capacity",
 	CurrentValue = false,
 	Flag = "Sell",
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
-			if GetInventorySize() < Player:GetAttribute("MaxInventorySize") + 9 then
+			if GetInventorySize() < Flags.Capacity.CurrentValue then
 				continue
 			end
 
@@ -1081,10 +1100,29 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateSlider({
+	Name = "🛒 • Capacity to Sell at",
+	Range = {0, 250},
+	Increment = 1,
+	Suffix = "Items",
+	CurrentValue = (Player:GetAttribute("MaxInventorySize") or 1) + 9,
+	Flag = "Capacity",
+	Callback = function()end,
+})
+
+Tab:CreateButton({
+	Name = "💯 • Set to Max Capacity",
+	Callback = function()
+		Flags.Capacity:Set(Player:GetAttribute("MaxInventorySize") + 9)
+	end,
+})
+
 Tab:CreateButton({
 	Name = "💰 • Quick Sell Inventory",
 	Callback = SellInventory,
 })
+
+Tab:CreateDivider()
 
 Tab:CreateButton({
 	Name = "🧲 • Purchase Magnet Box(es)",
@@ -1194,7 +1232,7 @@ EnchantShovel = Tab:CreateToggle({
 
 			local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
 
-			if not Mole then
+			if not Mole or not Mole:GetAttribute("ID") then
 				continue
 			end
 
@@ -1210,7 +1248,7 @@ EnchantShovel = Tab:CreateToggle({
 				Shovel = Player.Character:FindFirstChildOfClass("Tool")
 			end
 
-			if not Shovel or Shovel:GetAttribute("Type") ~= "Shovel" then
+			if not Shovel or Shovel:GetAttribute("Type") ~= "Shovel" or not Shovel:GetAttribute("ID") then
 				continue
 			end
 
@@ -1576,7 +1614,7 @@ Tab:CreateDivider()
 local AutoAppraise
 
 AutoAppraise = Tab:CreateToggle({
-	Name = `🔍 • Auto Appraise Held Item [${RemoteFunctions.LootPit:InvokeServer({Command = "GetPlayerPrice"})}]`,
+	Name = `🔍 • Auto Appraise Held Item [${RemoteFunctions.LootPit:InvokeServer({Command = "GetPlayerPrice"}) or 500}]`,
 	CurrentValue = false,
 	Flag = "Appraise",
 	Callback = function(Value)	
