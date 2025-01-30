@@ -263,6 +263,10 @@ function CreateUniversalTabs()
 			return
 		end
 		
+		if not CheckPlayer:IsDescendantOf(Players) then
+			return
+		end
+		
 		local StaffRole
 		
 		if CheckPlayer:IsInGroup(1200769) then
@@ -318,11 +322,7 @@ function CreateUniversalTabs()
 		end,
 	})
 	
-	task.spawn(function()
-		pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
-		end)
-	end)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 	
 	Rayfield:LoadConfiguration()
 	
