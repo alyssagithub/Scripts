@@ -326,6 +326,18 @@ function CreateUniversalTabs()
 		return Success and Result
 	end
 	
+	local function GetRoleInGroup(CheckPlayer: Player, GroupId: number)
+		local Success, Result = pcall(CheckPlayer.GetRoleInGroup, CheckPlayer, GroupId)
+		
+		return if Success then Result else "Guest"
+	end
+	
+	local function GetRankInGroup(CheckPlayer: Player, GroupId: number)
+		local Success, Result = pcall(CheckPlayer.GetRankInGroup, CheckPlayer, GroupId)
+		
+		return if Success then Result else 0
+	end
+	
 	local function CheckIfStaff(CheckPlayer: Player)
 		if not Flags.StaffJoin.CurrentValue then
 			return
@@ -343,7 +355,7 @@ function CreateUniversalTabs()
 		
 		local CreatorId = game.CreatorId
 		
-		local Role = CheckPlayer:GetRoleInGroup(CreatorId)
+		local Role = GetRoleInGroup(CheckPlayer, CreatorId)
 		
 		for _, Name in StaffRoleNames do
 			if typeof(Role) == "string" and Role:lower():find(Name) then
@@ -351,7 +363,7 @@ function CreateUniversalTabs()
 			end
 		end
 		
-		if CheckPlayer:GetRankInGroup(CreatorId) == 255 then
+		if GetRankInGroup(CheckPlayer, CreatorId) == 255 then
 			StaffRole = "Group Owner"
 		end
 		
