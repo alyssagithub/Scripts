@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.1"
+getgenv().ScriptVersion = "v2.4.3"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -18,67 +18,6 @@ local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> (Section),
 	CreateDivider: (self: Tab) -> (Divider),
-
-	CreateLabel: (self: Tab, Content: string, Icon: string | number, Color: Color3?, IgnoreTheme: boolean?) -> (Label),
-	CreateParagraph: (self: Tab, {
-		Title: string,
-		Content: string
-	}) -> (Paragraph),
-
-	CreateButton: (self: Tab, {
-		Name: string,
-		Callback: () -> ()
-	}) -> (),
-
-	CreateToggle: (self: Tab, {
-		Name: string,
-		CurrentValue: boolean,
-		Flag: string | nil,
-		Callback: (Value: boolean) -> ()
-	}) -> (Toggle),
-
-	CreateColorPicker: (self: Tab, {
-		Name: string,
-		Color: Color3,
-		Flag: string | nil,
-		Callback: (Value: Color3) -> ()
-	}) -> (),
-
-	CreateSlider: (self: Tab, {
-		Name: string,
-		Range: {number},
-		Increment: number,
-		Suffix: string,
-		CurrentValue: number,
-		Flag: string | nil,
-		Callback: (Value: number) -> ()
-	}) -> (Slider),
-
-	CreateInput: (self: Tab, {
-		Name: string,
-		CurrentValue: string,
-		PlaceholderText: string,
-		RemoveTextAfterFocusLost: boolean,
-		Flag: string | nil,
-		Callback: (Text: string) -> ()
-	}) -> (Input),
-
-	CreateDropdown: (self: Tab, {
-		Name: string,
-		Options: {string},
-		CurrentOption: string | nil,
-		MultipleOptions: boolean,
-		Flag: string,
-		Callback: (SelectedOptions: {string}) -> ()
-	}) -> (Dropdown),
-
-	CreateKeybind: (self: Tab, {
-		Name: string,
-		CurrentKeybind: string,
-		HoldToInteract: boolean,
-		Flag: string | nil,
-		Callback: () -> ()
-	}) -> (Keybind),
 }
 
 local Rayfield = getgenv().Rayfield
@@ -1553,6 +1492,8 @@ Tab:CreateDropdown({
 	Callback = function()end,
 })
 
+Tab:CreateDivider()
+
 local AutoAppraise
 
 AutoAppraise = Tab:CreateToggle({
@@ -1576,7 +1517,7 @@ AutoAppraise = Tab:CreateToggle({
 					if NewTool:GetAttribute("Weight") >= Flags.Weight.CurrentValue then
 						Notify("Auto Appraise", "Stopped because the selected weight was achieved")
 						AutoAppraise:Set(false)
-					elseif table.find(Flags.Modifiers.CurrentOption, NewTool:GetAttribute("Modifier")) then
+					elseif NewTool:GetAttribute("Modifier") and table.find(Flags.Modifiers.CurrentOption, NewTool:GetAttribute("Modifier")) then
 						Notify("Auto Appraise", "Stopped because a selected modifier was received")
 						AutoAppraise:Set(false)
 					else
