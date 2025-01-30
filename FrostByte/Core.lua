@@ -99,6 +99,68 @@ local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = 
 
 getgenv().Rayfield = Rayfield
 
+local PlaceFileName = getgenv().PlaceFileName
+
+if PlaceFileName then
+	task.spawn(function()
+		local BindableFunction = Instance.new("BindableFunction")
+
+		local Response = false
+
+		local Button1 = "✅ Yes" 
+		local Button2 = "❌ No"
+
+		local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.lua`
+
+		BindableFunction.OnInvoke = function(Button: string)
+			Response = true
+
+			if Button == Button1 then
+				local OriginalFlags = {}
+
+				for i,v in Flags do
+					if typeof(v.CurrentValue) ~= "boolean" then
+						continue
+					end
+					
+					OriginalFlags[i] = v.CurrentValue
+					v.CurrentValue = false
+				end
+				
+				getgenv().OriginalFlags = OriginalFlags
+
+				loadstring(game:HttpGet(File))()
+			end
+		end
+
+		while task.wait(60) do
+			local Result = game:HttpGet(File)
+
+			Result = Result:split('getgenv().ScriptVersion = "')[2]
+			Result = Result:split('"')[1]
+
+			if Result == ScriptVersion then
+				continue
+			end
+
+			game:GetService("StarterGui"):SetCore("SendNotification", {
+				Title = "A new FrostByte version has been detected!",
+				Text = "Would you like to load it?",
+				Duration = math.huge,
+				Button1 = Button1,
+				Button2 = Button2,
+				Callback = BindableFunction,
+			})
+
+			repeat
+				task.wait()
+			until Response or getgenv().ScriptVersion ~= ScriptVersion
+
+			break
+		end
+	end)
+end
+
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
 	Icon = "snowflake",
@@ -267,6 +329,10 @@ function CreateUniversalTabs()
 			return
 		end
 		
+		if not pcall(CheckPlayer.IsInGroup, CheckPlayer, 1) then
+			return
+		end
+		
 		local StaffRole
 		
 		if CheckPlayer:IsInGroup(1200769) then
@@ -325,6 +391,17 @@ function CreateUniversalTabs()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 	
 	Rayfield:LoadConfiguration()
+	
+	local OriginalFlags = getgenv().OriginalFlags
+	
+	if OriginalFlags then
+		for i,v in OriginalFlags do
+			print("setting value for:", i, "to:", v)
+			Flags[i]:Set(v)
+		end
+		
+		print("loaded original flags")
+	end
 	
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
