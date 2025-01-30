@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.6"
+getgenv().ScriptVersion = "v2.4.7"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -262,7 +262,11 @@ Tab:CreateToggle({
 				Visualizer.Parent = workspace
 			end
 
-			local Humanoid: Humanoid = Character.Humanoid
+			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			
+			if not Humanoid then
+				continue
+			end
 
 			local FoundPile = false
 
@@ -374,7 +378,13 @@ Tab:CreateToggle({
 	Flag = "Skip",
 	Callback = function(Value)
 		while Flags.Skip.CurrentValue and task.wait() do
-			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
+			local Shovel = Player.Character:FindFirstChild("Shovel")
+
+			if not Shovel then
+				continue
+			end
+			
+			local PileAdornee: Model? = Shovel.Highlight.Adornee
 
 			if not PileAdornee then
 				continue
@@ -571,6 +581,10 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "AFKTag",
 	Callback = function(Value)
+		if not hookmetamethod and getnamecallmethod and checkcaller then
+			return
+		end
+		
 		if Value and not AFKHook then
 			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
 				local Method = getnamecallmethod()
@@ -640,6 +654,10 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Bank",
 	Callback = function(Value)
+		if not hookmetamethod and getnamecallmethod and checkcaller then
+			return
+		end
+		
 		if Value and not OpenBankHook then
 			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
 				local method = getnamecallmethod()
@@ -964,8 +982,20 @@ local function GetInventorySize()
 	return InventorySize
 end
 
+local function UserOwnsGamePassAsync(UserId: number, GamePassId: number)
+	local Success, Result = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, UserId, GamePassId)
+	
+	return Success and Result
+end
+
 function SellInventory()
-	Player.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+	local Humanoid = Player.Character:FindFirstChild("Humanoid")
+	
+	if not Humanoid then
+		return
+	end
+	
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 
 	local Merchant: Model
 
@@ -974,7 +1004,11 @@ function SellInventory()
 			continue
 		end
 
-		Merchant = v.Parent.Parent
+		Merchant = v:FindFirstAncestorOfClass("Model")
+		
+		if not Merchant then
+			continue
+		end
 
 		break
 	end
@@ -988,7 +1022,7 @@ function SellInventory()
 	local StartTime = tick()
 
 	repeat
-		if not MarketplaceService:UserOwnsGamePassAsync(Player.UserId, 1003325804) then
+		if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
 			Player.Character:PivotTo(Merchant:GetPivot())
 			Teleported = true
 		end
@@ -1524,11 +1558,14 @@ AutoAppraise = Tab:CreateToggle({
 			})
 
 			for _, NewTool: Tool in Player.Backpack:GetChildren() do
-				if NewTool:GetAttribute("Serial") == Tool:GetAttribute("Serial") and NewTool.Name == Tool.Name then			
-					if NewTool:GetAttribute("Weight") >= Flags.Weight.CurrentValue then
+				if NewTool:GetAttribute("Serial") == Tool:GetAttribute("Serial") and NewTool.Name == Tool.Name then	
+					local Weight = NewTool:GetAttribute("Weight")
+					local Modifier = NewTool:GetAttribute("Modifier")
+					
+					if Weight and Weight >= Flags.Weight.CurrentValue then
 						Notify("Auto Appraise", "Stopped because the selected weight was achieved")
 						AutoAppraise:Set(false)
-					elseif NewTool:GetAttribute("Modifier") and table.find(Flags.Modifiers.CurrentOption, NewTool:GetAttribute("Modifier")) then
+					elseif Modifier and table.find(Flags.Modifiers.CurrentOption, Modifier) then
 						Notify("Auto Appraise", "Stopped because a selected modifier was received")
 						AutoAppraise:Set(false)
 					else
