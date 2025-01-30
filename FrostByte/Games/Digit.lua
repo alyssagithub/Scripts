@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.8"
+getgenv().ScriptVersion = "v2.4.9"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1009,7 +1009,11 @@ function SellInventory()
 	
 	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 
-	local Merchant: Model = workspace.Map.Islands.Permafrost.ElfMerchant
+	local Merchant: Model = workspace:FindFirstChild("ElfMerchant", true)
+	
+	if not Merchant then
+		return
+	end
 
 	local SellEnabled = Flags.Sell.CurrentValue
 	local PreviousPosition = Player.Character:GetPivot()
