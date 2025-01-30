@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.4.7"
+getgenv().ScriptVersion = "v2.4.8"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -187,7 +187,13 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			local PileAdornee: Model? = Player.Character.Shovel.Highlight.Adornee
+			local Shovel = Player.Character:FindFirstChild("Shovel")
+
+			if not Shovel then
+				continue
+			end
+			
+			local PileAdornee: Model? = Shovel.Highlight.Adornee
 
 			if PileAdornee and (PileAdornee.Parent ~= TreasurePiles or PileAdornee:GetAttribute("Blacklisted") or PileAdornee:GetAttribute("Completed") or PileAdornee:GetAttribute("Destroying")) then
 				continue
@@ -581,7 +587,7 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "AFKTag",
 	Callback = function(Value)
-		if not hookmetamethod and getnamecallmethod and checkcaller then
+		if not (hookmetamethod and getnamecallmethod and checkcaller) then
 			return
 		end
 		
@@ -654,7 +660,7 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Bank",
 	Callback = function(Value)
-		if not hookmetamethod and getnamecallmethod and checkcaller then
+		if not (hookmetamethod and getnamecallmethod and checkcaller) then
 			return
 		end
 		
@@ -677,6 +683,12 @@ Tab:CreateToggle({
 				local args = {...}
 
 				if method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
+					local Ronald = workspace.Map.Islands.Nookville.BackpackIsland:FindFirstChild("Ronald")
+					
+					if not Ronald then
+						return
+					end
+					
 					local Result: {["Status"]: boolean}
 
 					AlreadyWaiting = true
@@ -686,7 +698,7 @@ Tab:CreateToggle({
 					local PreviousPosition = Character:GetPivot()
 
 					repeat
-						Character:PivotTo(workspace.Map.Islands.Nookville.BackpackIsland.Ronald:GetPivot())
+						Character:PivotTo(Ronald:GetPivot())
 						Result = self:InvokeServer(args[1])
 					until (Result and Result.Status) or not Flags.Bank.CurrentValue
 
@@ -997,21 +1009,7 @@ function SellInventory()
 	
 	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 
-	local Merchant: Model
-
-	for _,v: TextLabel in workspace.Map.Islands:GetDescendants() do
-		if v.Name ~= "Title" or not v:IsA("TextLabel") or v.Text ~= "Merchant" then
-			continue
-		end
-
-		Merchant = v:FindFirstAncestorOfClass("Model")
-		
-		if not Merchant then
-			continue
-		end
-
-		break
-	end
+	local Merchant: Model = workspace.Map.Islands.Permafrost.ElfMerchant
 
 	local SellEnabled = Flags.Sell.CurrentValue
 	local PreviousPosition = Player.Character:GetPivot()
