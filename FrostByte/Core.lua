@@ -1,3 +1,5 @@
+local StartLoadTime = tick()
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
@@ -323,6 +325,8 @@ function CreateUniversalTabs()
 	end)
 	
 	Rayfield:LoadConfiguration()
+	
+	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
