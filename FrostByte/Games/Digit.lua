@@ -1180,7 +1180,11 @@ EnchantShovel = Tab:CreateToggle({
 	Flag = "EnchantShovel",
 	Callback = function(Value)	
 		while Flags.EnchantShovel.CurrentValue and task.wait() do
-			local Backpack = Player.Backpack
+			local Backpack: Backpack = Player:FindFirstChild("Backpack")
+			
+			if not Backpack then
+				continue
+			end
 
 			local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
 
