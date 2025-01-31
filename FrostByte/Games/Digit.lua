@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.5.5"
+getgenv().ScriptVersion = "v2.5.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1102,10 +1102,10 @@ Tab:CreateToggle({
 
 Tab:CreateSlider({
 	Name = "🛒 • Capacity to Sell at",
-	Range = {0, 250},
+	Range = {0, 1000},
 	Increment = 1,
 	Suffix = "Items",
-	CurrentValue = (Player:GetAttribute("MaxInventorySize") or 1) + 9,
+	CurrentValue = math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000),
 	Flag = "Capacity",
 	Callback = function()end,
 })
@@ -1113,7 +1113,7 @@ Tab:CreateSlider({
 Tab:CreateButton({
 	Name = "💯 • Set to Max Capacity",
 	Callback = function()
-		Flags.Capacity:Set(Player:GetAttribute("MaxInventorySize") + 9)
+		Flags.Capacity:Set(math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000))
 	end,
 })
 
