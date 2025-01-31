@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.5.6"
+getgenv().ScriptVersion = "v2.6.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -34,7 +34,7 @@ local RemoteEvents: {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents
 
 local Window = getgenv().Window
 
-local Tab: Tab = Window:CreateTab("Automation", "repeat")
+local Tab: Tab = Window:CreateTab("Digging", "shovel")
 
 Tab:CreateSection("Digging")
 
@@ -133,7 +133,7 @@ Tab:CreateToggle({
 
 HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
 
-Tab:CreateDivider()
+Tab:CreateSection("Piles")
 
 Tab:CreateToggle({
 	Name = "🏞️ • Auto Create Piles on Any Terrain",
@@ -181,6 +181,8 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateDivider()
+
 Tab:CreateToggle({
 	Name = "🕳️ • Auto Legit Create Piles (Needed for Legit Dig)",
 	CurrentValue = false,
@@ -216,7 +218,7 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateDivider()
+Tab:CreateSection("Movement")
 
 local function RandomVector(Size: Vector3, Position: Vector3)
 
@@ -356,7 +358,7 @@ Tab:CreateSlider({
 	Callback = function()end,
 })
 
-Tab:CreateDivider()
+Tab:CreateSection("Efficiency")
 
 local Success, Rarities: {[string]: {["Color"]: Color3, ["BarColor"]: Color3}} = pcall(require, ReplicatedStorage.Settings.Rarities)
 
@@ -461,6 +463,694 @@ Tab:CreateDropdown({
 	Callback = function()end,
 })
 
+local Tab: Tab = Window:CreateTab("Storage", "warehouse")
+
+Tab:CreateSection("Access")
+
+local OpenBankHook
+local MoveToBankHook
+local AlreadyWaiting = false
+
+Tab:CreateToggle({
+	Name = ApplyUnsupportedName("🏦 • Access Bank Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
+	CurrentValue = false,
+	Flag = "Bank",
+	Callback = function(Value)
+		if not (hookmetamethod and getnamecallmethod and checkcaller) then
+			return
+		end
+
+		if Value and not OpenBankHook then
+			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
+				local method = getnamecallmethod()
+				local args = {...}
+
+				if not checkcaller() and method == "InvokeServer" and args[1].Command == "OwnsProduct" and args[1].Product == "Store Anywhere" and Flags.Bank.CurrentValue then
+					return true
+				end
+
+				return OpenBankHook(self, ...)
+			end)
+		end
+
+		if Value and not MoveToBankHook then
+			MoveToBankHook = hookmetamethod(RemoteFunctions.Inventory, "__namecall", function(self, ...)
+				local method = getnamecallmethod()
+				local args = {...}
+
+				if method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
+					local Ronald = workspace.Map.Islands.Nookville.BackpackIsland:FindFirstChild("Ronald")
+
+					if not Ronald then
+						return
+					end
+
+					local Result: {["Status"]: boolean}
+
+					AlreadyWaiting = true
+
+					local Character = Player.Character
+
+					local PreviousPosition = Character:GetPivot()
+
+					repeat
+						Character:PivotTo(Ronald:GetPivot())
+						Result = self:InvokeServer(args[1])
+					until (Result and Result.Status) or not Flags.Bank.CurrentValue
+
+					AlreadyWaiting = false
+
+					Character:PivotTo(PreviousPosition)
+				end
+
+				local Success, Result = pcall(MoveToBankHook, self, ...)
+
+				return if Success then Result else {Status = true}
+			end)
+		end
+	end,
+})
+
+Tab:CreateSection("Depositing")
+
+Tab:CreateToggle({
+	Name = "🏧 • Auto Bank Items (Needs Bank Access)",
+	CurrentValue = false,
+	Flag = "BankItems",
+	Callback = function(Value)
+		while Flags.BankItems.CurrentValue and task.wait() do	
+			local Backpack: Backpack = Player:FindFirstChild("Backpack")
+
+			if not Backpack then
+				continue
+			end
+
+			for _, Item: string in Flags.ItemsToBank.CurrentOption do
+				local Tool = Backpack:FindFirstChild(Item)
+
+				if not Tool then
+					continue
+				end
+
+				RemoteFunctions.Inventory:InvokeServer({
+					Command = "MoveToBank",
+					UID = Tool:GetAttribute("ID")
+				})
+			end
+		end
+	end,
+})
+
+local Items = {}
+
+for i,v in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
+	table.insert(Items, v.Name)
+end
+
+table.sort(Items)
+
+Tab:CreateDropdown({
+	Name = "🧰 • Items to Bank",
+	Options = Items,
+	MultipleOptions = true,
+	Flag = "ItemsToBank",
+	Callback = function()end,
+})
+
+Tab:CreateSection("Withdrawing")
+
+local ItemInfo
+
+Tab:CreateButton({
+	Name = ApplyUnsupportedName("🔙 • Quick Withdraw Items (Open Bank First)", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
+	Callback = function()
+		if not ItemInfo then
+			return Notify("Error", `An item named '{Flags.ItemToWithdraw.CurrentValue}' was not found`)
+		end
+
+		local AmountWithdrawn = 0
+
+		for _, Item: ImageLabel in Player.PlayerGui.Main.Core.Inventory.Inventory.Slots:GetChildren() do
+			if not Item:IsA("ImageLabel") then
+				continue
+			end
+
+			local Icon: ImageLabel = Item:FindFirstChild("Icon")
+
+			if not Icon or not Icon.Image:find(ItemInfo.Icon) then
+				continue
+			end
+
+			if AmountWithdrawn >= Flags.AmountToWithdraw.CurrentValue then
+				break
+			end
+
+			local Result: {Status: boolean} = RemoteFunctions.Inventory:InvokeServer({
+				Command = "WithdrawFromBank",
+				UID = Item.Name
+			})
+
+			if Result.Status then
+				AmountWithdrawn += 1
+			end
+		end
+
+		Notify("Success", `Withdrew {AmountWithdrawn} {Flags.ItemToWithdraw.CurrentValue}s`)
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "➖ • Amount to Withdraw",
+	Range = {1, 1000},
+	Increment = 1,
+	Suffix = "Items",
+	CurrentValue = 1,
+	Flag = "AmountToWithdraw",
+	Callback = function()end,
+})
+
+Tab:CreateInput({
+	Name = ApplyUnsupportedName("📑 • Item to Withdraw", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
+	CurrentValue = "",
+	PlaceholderText = "Full Item Name Here",
+	RemoveTextAfterFocusLost = false,
+	Flag = "ItemToWithdraw",
+	Callback = function(Text)
+		for _, Treasure: ModuleScript in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
+			if Treasure.Name:lower() == Text:lower() then
+				local Success, Result = pcall(require, Treasure)
+
+				if Success then
+					ItemInfo = Result
+				end
+
+				break
+			end
+		end
+	end,
+})
+
+Tab:CreateSection("Pinning")
+
+local function PinItems(Tool: Tool)
+	if not Flags.PinItems.CurrentValue then
+		return
+	end
+
+	if not table.find(Flags.ItemsToPin.CurrentOption, Tool.Name) then
+		return
+	end
+
+	if Tool:GetAttribute("Pinned") or not Tool:GetAttribute("ID") then
+		return
+	end
+
+	task.wait(1)
+
+	local Result = RemoteFunctions.Inventory:InvokeServer({
+		Command = "ToggleSlotPin",
+		UID = Tool:GetAttribute("ID")
+	})
+
+	if Result then
+		Tool:SetAttribute("Pinned", not Tool:GetAttribute("Pinned"))
+	end
+end
+
+Tab:CreateToggle({
+	Name = "📌 • Auto Pin Items",
+	CurrentValue = false,
+	Flag = "PinItems",
+	Callback = function(Value)
+		if Value then
+			for _, Tool: Tool in Player.Backpack:GetChildren() do
+				PinItems(Tool)
+			end
+		end
+	end,
+})
+
+HandleConnection(Player.Backpack.ChildAdded:Connect(PinItems), "PinItems")
+
+Tab:CreateDropdown({
+	Name = "🖼️ • Items to Pin",
+	Options = Items,
+	MultipleOptions = true,
+	Flag = "ItemsToPin",
+	Callback = function()end,
+})
+
+local Tab: Tab = Window:CreateTab("Shop", "shopping-basket")
+
+Tab:CreateSection("Selling")
+
+local function GetInventorySize()
+	local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
+		Command = "GetInventory"
+	})
+
+	local InventorySize = 0
+
+	for ID, Object in Inventory do
+		InventorySize += 1
+	end
+
+	return InventorySize
+end
+
+local function UserOwnsGamePassAsync(UserId: number, GamePassId: number)
+	local Success, Result = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, UserId, GamePassId)
+
+	return Success and Result
+end
+
+function SellInventory()
+	local Humanoid = Player.Character:FindFirstChild("Humanoid")
+
+	if not Humanoid then
+		return
+	end
+
+	local Merchant: Model
+
+	for _,v: TextLabel in workspace.Map.Islands:GetDescendants() do
+		if v.Name ~= "Title" or not v:IsA("TextLabel") or v.Text ~= "Merchant" then
+			continue
+		end
+
+		Merchant = v:FindFirstAncestorOfClass("Model")
+
+		if not Merchant then
+			continue
+		end
+
+		break
+	end
+
+	if not Merchant then
+		Notify("Sell Inventory Error", "Couldn't find any merchants, try being closer to one")
+		task.wait(10)
+		return
+	end
+
+	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+
+	local SellEnabled = Flags.Sell.CurrentValue
+	local PreviousPosition = Player.Character:GetPivot()
+	local PreviousSize = GetInventorySize()
+
+	local Teleported = false
+
+	local StartTime = tick()
+
+	repeat
+		if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
+			Player.Character:PivotTo(Merchant:GetPivot())
+			Teleported = true
+		end
+
+		task.wait(1)
+
+		RemoteEvents.Merchant:FireServer({
+			Command = "SellAllTreasures",
+			Merchant = Merchant
+		})
+	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled or tick() - StartTime >= 3
+
+	if Teleported then
+		Player.Character:PivotTo(PreviousPosition)
+	end
+end
+
+Tab:CreateToggle({
+	Name = "💰 • Auto Sell Inventory at Capacity",
+	CurrentValue = false,
+	Flag = "Sell",
+	Callback = function(Value)	
+		while Flags.Sell.CurrentValue and task.wait() do
+			if GetInventorySize() < Flags.Capacity.CurrentValue then
+				continue
+			end
+
+			SellInventory()
+		end
+	end,
+})
+
+local Capacity = Tab:CreateSlider({
+	Name = "🛒 • Capacity to Sell at",
+	Range = {0, 1000},
+	Increment = 1,
+	Suffix = "Items",
+	CurrentValue = math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000),
+	Flag = "Capacity",
+	Callback = function()end,
+})
+
+Tab:CreateButton({
+	Name = "💯 • Set to Your Max Capacity",
+	Callback = function()
+		Capacity:Set(math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000))
+	end,
+})
+
+Tab:CreateDivider()
+
+Tab:CreateButton({
+	Name = "💰 • Quick Sell Inventory",
+	Callback = SellInventory,
+})
+
+Tab:CreateSection("Purchasing")
+
+Tab:CreateButton({
+	Name = "🧲 • Purchase Magnet Box(es)",
+	Callback = function()
+		RemoteFunctions.Shop:InvokeServer({
+			Command = "Buy",
+			Type = "Item",
+			Product = "Magnet Box",
+			Amount = Flags.MagnetBoxes.CurrentValue
+		})
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "🗃 • Amount of Magnet Boxes to Purchase",
+	Range = {1, 100},
+	Increment = 1,
+	Suffix = "Magnet Box(es)",
+	CurrentValue = 1,
+	Flag = "MagnetBoxes",
+	Callback = function()end,
+})
+
+Tab:CreateDivider()
+
+local Shovels = {}
+local OriginalShovelNames = {}
+
+local function AddComma(amount: number)
+	local formatted = amount
+	local k
+	while true do
+		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k==0) then
+			break
+		end
+	end
+	return formatted
+end
+
+for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
+	local Success, ItemInfo = pcall(require, v)
+
+	local BuyPrice = 0
+	local NewName
+
+	if Success and ItemInfo then
+		if not ItemInfo.BuyPrice then
+			continue
+		end
+
+		BuyPrice = ItemInfo.BuyPrice
+
+		NewName = `{v.Name} (${AddComma(BuyPrice)})`
+	else
+		NewName = `{v.Name} (Can't See Price)`
+	end
+
+	table.insert(Shovels, NewName)
+	OriginalShovelNames[NewName] = {
+		Name = v.Name,
+		BuyPrice = BuyPrice
+	}
+end
+
+table.sort(Shovels, function(a,b)
+	return OriginalShovelNames[a].BuyPrice < OriginalShovelNames[b].BuyPrice
+end)
+
+local PurchaseShovel
+PurchaseShovel = Tab:CreateDropdown({
+	Name = "💵 • Purchase Shovel",
+	Options = Shovels,
+	CurrentOption = "",
+	MultipleOptions = false,
+	Callback = function(CurrentOption)
+		CurrentOption = CurrentOption[1]
+
+		if CurrentOption == "" then
+			return
+		end
+
+		RemoteFunctions.Shop:InvokeServer({
+			Command = "Buy",
+			Type = "Item",
+			Product = OriginalShovelNames[CurrentOption].Name,
+			Amount = 1
+		})
+
+		PurchaseShovel:Set({""})
+	end,
+})
+
+local Tab: Tab = Window:CreateTab("Upgrades", "circle-plus")
+
+Tab:CreateSection("Enchanting")
+
+local EnchantShovel
+
+EnchantShovel = Tab:CreateToggle({
+	Name = "🌟 • Auto Enchant Shovel",
+	CurrentValue = false,
+	Flag = "EnchantShovel",
+	Callback = function(Value)
+		while Flags.EnchantShovel.CurrentValue and task.wait() do
+			local Backpack: Backpack = Player:FindFirstChild("Backpack")
+
+			if not Backpack then
+				continue
+			end
+
+			local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
+
+			if not Mole or not Mole:GetAttribute("ID") then
+				continue
+			end
+
+			local Shovel
+
+			for _, Tool: Tool in Backpack:GetChildren() do
+				if Tool:GetAttribute("Type") == "Shovel" then
+					Shovel = Tool
+				end
+			end
+
+			if not Shovel then
+				Shovel = Player.Character:FindFirstChildOfClass("Tool")
+			end
+
+			if not Shovel or Shovel:GetAttribute("Type") ~= "Shovel" or not Shovel:GetAttribute("ID") then
+				continue
+			end
+
+			local Result = RemoteFunctions.MolePit:InvokeServer({
+				Command = "OfferEnchant",
+				ID = Mole:GetAttribute("ID")
+			})
+
+			if Result ~= true then
+				continue
+			end
+
+			local Result = RemoteFunctions.MolePit:InvokeServer({
+				Command = "OfferShovel",
+				ID = Shovel:GetAttribute("ID")
+			})
+
+			if Result ~= true then
+				continue
+			end
+
+			local ShovelInfo: {Enchantments: {[string]: number}}
+
+			repeat
+				local Equipment = RemoteFunctions.Player:InvokeServer({
+					Command = "GetEquipment"
+				})
+
+				for Name, Info in Equipment.Shovels do
+					if Name ~= Shovel.Name then
+						continue
+					end
+
+					ShovelInfo = Info
+				end
+				task.wait()
+			until ShovelInfo
+
+			if not ShovelInfo.Enchantments then
+				continue
+			end
+
+			for Name, Level in ShovelInfo.Enchantments do
+				if not Name or not Level then
+					continue
+				end
+
+				local Enchant = `{Name} {Level}`
+
+				print("New Enchant:", Enchant)
+
+				Notify("New Enchant", Enchant, "book")
+
+				if table.find(Flags.Enchants.CurrentOption, Enchant) then
+					Notify("Auto Enchant", "Stopped due to finding an enchant to stop at", "book")
+					EnchantShovel:Set(false)
+				end
+			end
+		end
+	end,
+})
+
+local Success, EnchantModule = pcall(require, ReplicatedStorage.Settings.Enchantments)
+
+if not Success then
+	EnchantModule = {EnchantmentsList = {}}
+
+	local Enchants = {
+		"Blessed",
+		"Lucky",
+		"Strong",
+		"Steady",
+		"Durable",
+		"Precise",
+		"Exact",
+		"Stamina",
+		"Control",
+		"Accurate",
+		"Perfect",
+		"Stable",
+		"Super",
+		"Secret",
+	}
+
+	for _, Enchant in Enchants do
+		EnchantModule.EnchantmentsList[Enchant] = {
+			TierCount = 3
+		}
+	end
+end
+
+local Enchantments = {}
+
+for Enchant, Info in EnchantModule.EnchantmentsList do
+	for Tier = 1, Info.TierCount do
+		table.insert(Enchantments, `{Enchant} {Tier}`)
+	end
+end
+
+table.sort(Enchantments)
+
+Tab:CreateDropdown({
+	Name = "📚 • Enchants to Stop at",
+	Options = Enchantments,
+	MultipleOptions = true,
+	Flag = "Enchants",
+	Callback = function()end,
+})
+
+Tab:CreateSection("Appraising")
+
+local AutoAppraise
+
+AutoAppraise = Tab:CreateToggle({
+	Name = `🔍 • Auto Appraise Held Item [${RemoteFunctions.LootPit:InvokeServer({Command = "GetPlayerPrice"}) or 500}]`,
+	CurrentValue = false,
+	Flag = "Appraise",
+	Callback = function(Value)	
+		while AutoAppraise.CurrentValue and task.wait() do
+			local Tool = Player.Character:FindFirstChildOfClass("Tool")
+
+			if not Tool then
+				return
+			end
+
+			local Result = RemoteFunctions.LootPit:InvokeServer({
+				Command = "AppraiseItem"
+			})
+
+			for _, NewTool: Tool in Player.Backpack:GetChildren() do
+				if NewTool:GetAttribute("Serial") == Tool:GetAttribute("Serial") and NewTool.Name == Tool.Name then	
+					local Weight = NewTool:GetAttribute("Weight")
+					local Modifier = NewTool:GetAttribute("Modifier")
+
+					if Weight and Weight >= Flags.Weight.CurrentValue then
+						Notify("Auto Appraise", "Stopped because the selected weight was achieved")
+						AutoAppraise:Set(false)
+					elseif Modifier and table.find(Flags.Modifiers.CurrentOption, Modifier) then
+						Notify("Auto Appraise", "Stopped because a selected modifier was received")
+						AutoAppraise:Set(false)
+					else
+						Player.Character.Humanoid:EquipTool(NewTool)
+					end
+
+					break
+				end
+			end
+		end
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "⚖ • Minimum Weight to Stop at",
+	Range = {1, 10000},
+	Increment = 5,
+	Suffix = "kg",
+	CurrentValue = 1,
+	Flag = "Weight",
+	Callback = function()end,
+})
+
+local Modifiers = {}
+
+local Success, ModifiersModule = pcall(require, ReplicatedStorage.Settings.Modifiers.Colors)
+
+if not Success then
+	ModifiersModule = {
+		["Regular"] = Color3.fromRGB(35, 35, 35),
+		["Golden"] = Color3.fromRGB(255, 235, 17),
+		["Neon"] = Color3.fromRGB(16, 255, 219),
+		["Quantum"] = Color3.fromRGB(186, 24, 255),
+		["Festive"] = Color3.fromRGB(255, 143, 167),
+		["Wooden"] = Color3.fromRGB(125, 62, 17),
+		["Rusty"] = Color3.fromRGB(141, 18, 18),
+		["Holy"] = Color3.fromRGB(255, 255, 255),
+		["Hot"] = Color3.fromRGB(255, 0, 0),
+		["Biodegradable"] = Color3.fromRGB(9, 198, 38),
+		["Magma"] = Color3.fromRGB(255, 1, 1),
+		["Evil"] = Color3.fromRGB(149, 1, 1),
+		["Rainbow"] = Color3.fromRGB(0, 0, 0),
+		["Solar"] = Color3.fromRGB(),
+		["Venom"] = Color3.fromRGB()
+	}
+end
+
+for i,v in ModifiersModule do
+	table.insert(Modifiers, i)
+end
+
+Tab:CreateDropdown({
+	Name = "🧬 • Modifiers to Stop at",
+	Options = Modifiers,
+	MultipleOptions = true,
+	Flag = "Modifiers",
+	Callback = function()end,
+})
+
+local Tab: Tab = Window:CreateTab("Transport", "sailboat")
+
 Tab:CreateSection("Events")
 
 local PreviousLocation
@@ -541,9 +1231,7 @@ HandleConnection(workspace.Map.Islands.ChildRemoved:Connect(function(Child: Mode
 	end
 end), "LunarCloudsRemoved")
 
-local Tab: Tab = Window:CreateTab("Shortcuts", "square-slash")
-
-Tab:CreateSection("Transport")
+Tab:CreateSection("Islands")
 
 local Islands = {}
 
@@ -597,311 +1285,9 @@ TeleporttoIsland = Tab:CreateDropdown({
 	end,
 })
 
-Tab:CreateSection("UI")
+local Tab: Tab = Window:CreateTab("Containers", "container")
 
-local AFKHook
-
-Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🏷️ • Disable [AFK] Tag", hookmetamethod and getnamecallmethod and checkcaller),
-	CurrentValue = false,
-	Flag = "AFKTag",
-	Callback = function(Value)
-		if not (hookmetamethod and getnamecallmethod and checkcaller) then
-			return
-		end
-		
-		if Value and not AFKHook then
-			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
-				local Method = getnamecallmethod()
-				local Args = {...}
-				
-				if not checkcaller() and Method == "FireServer" and Args[1].Command == "SetAFK" and Args[1].State and Flags.AFKTag.CurrentValue then
-					local NewArgs = {}
-					NewArgs.Command = Args[1].Command
-					NewArgs.State = false
-					self:FireServer(NewArgs)
-					return
-				end
-				
-				return AFKHook(self, ...)
-			end)
-		end
-	end,
-})
-
-Tab:CreateSection("Miscellaneous")
-
-local Codes = {
-	"PLSMOLE",
-	"LUNARV2",
-	"TWITTER_DIGITRBLX",
-	"5MILLION",
-	"SECRET",
-	"300KLIKES",
-	"12MVISITS",
-	"PLS_FALLEN_STAR",
-}
-
-Tab:CreateButton({
-	Name = "🐦 • Redeem Known Codes",
-	Callback = function()
-		for _, Code: string in Codes do
-			local Result = RemoteFunctions.Codes:InvokeServer({
-				Command = "Redeem",
-				Code = Code
-			})
-			
-			if Result.Status then
-				continue
-			elseif Result.AlreadyRedeemed then
-				continue
-			elseif Result.NotValid then
-				Notify("Failed!", `The code '{Code}' is not valid anymore.`)
-			else
-				Notify("Error", `The code '{Code}' has had an internal error while redeeming.`)
-			end
-		end
-		
-		Notify("Completed", "Applied all the known codes.")
-	end,
-})
-
-local Tab: Tab = Window:CreateTab("Items", "shovel")
-
-Tab:CreateSection("Safekeeping")
-
-local OpenBankHook
-local MoveToBankHook
-local AlreadyWaiting = false
-
-Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🏦 • Access Bank Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
-	CurrentValue = false,
-	Flag = "Bank",
-	Callback = function(Value)
-		if not (hookmetamethod and getnamecallmethod and checkcaller) then
-			return
-		end
-		
-		if Value and not OpenBankHook then
-			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
-				local method = getnamecallmethod()
-				local args = {...}
-
-				if not checkcaller() and method == "InvokeServer" and args[1].Command == "OwnsProduct" and args[1].Product == "Store Anywhere" and Flags.Bank.CurrentValue then
-					return true
-				end
-
-				return OpenBankHook(self, ...)
-			end)
-		end
-
-		if Value and not MoveToBankHook then
-			MoveToBankHook = hookmetamethod(RemoteFunctions.Inventory, "__namecall", function(self, ...)
-				local method = getnamecallmethod()
-				local args = {...}
-
-				if method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
-					local Ronald = workspace.Map.Islands.Nookville.BackpackIsland:FindFirstChild("Ronald")
-					
-					if not Ronald then
-						return
-					end
-					
-					local Result: {["Status"]: boolean}
-
-					AlreadyWaiting = true
-
-					local Character = Player.Character
-
-					local PreviousPosition = Character:GetPivot()
-
-					repeat
-						Character:PivotTo(Ronald:GetPivot())
-						Result = self:InvokeServer(args[1])
-					until (Result and Result.Status) or not Flags.Bank.CurrentValue
-
-					AlreadyWaiting = false
-
-					Character:PivotTo(PreviousPosition)
-				end
-
-				local Success, Result = pcall(MoveToBankHook, self, ...)
-
-				return if Success then Result else {Status = true}
-			end)
-		end
-	end,
-})
-
-Tab:CreateToggle({
-	Name = "🏧 • Auto Bank Items (Needs Bank Access)",
-	CurrentValue = false,
-	Flag = "BankItems",
-	Callback = function(Value)
-		while Flags.BankItems.CurrentValue and task.wait() do	
-			local Backpack: Backpack = Player:FindFirstChild("Backpack")
-
-			if not Backpack then
-				continue
-			end
-			
-			for _, Item: string in Flags.ItemsToBank.CurrentOption do
-				local Tool = Backpack:FindFirstChild(Item)
-
-				if not Tool then
-					continue
-				end
-
-				RemoteFunctions.Inventory:InvokeServer({
-					Command = "MoveToBank",
-					UID = Tool:GetAttribute("ID")
-				})
-			end
-		end
-	end,
-})
-
-local Items = {}
-
-for i,v in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
-	table.insert(Items, v.Name)
-end
-
-table.sort(Items)
-
-Tab:CreateDropdown({
-	Name = "🧰 • Items to Bank",
-	Options = Items,
-	MultipleOptions = true,
-	Flag = "ItemsToBank",
-	Callback = function()end,
-})
-
-Tab:CreateDivider()
-
-local ItemInfo
-
-Tab:CreateButton({
-	Name = ApplyUnsupportedName("🔙 • Quick Withdraw Items (Open Bank First)", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
-	Callback = function()
-		if not ItemInfo then
-			return Notify("Error", `An item named '{Flags.ItemToWithdraw.CurrentValue}' was not found`)
-		end
-		
-		local AmountWithdrawn = 0
-		
-		for _, Item: ImageLabel in Player.PlayerGui.Main.Core.Inventory.Inventory.Slots:GetChildren() do
-			if not Item:IsA("ImageLabel") then
-				continue
-			end
-			
-			local Icon: ImageLabel = Item:FindFirstChild("Icon")
-			
-			if not Icon or not Icon.Image:find(ItemInfo.Icon) then
-				continue
-			end
-			
-			if AmountWithdrawn >= Flags.AmountToWithdraw.CurrentValue then
-				break
-			end
-			
-			local Result: {Status: boolean} = RemoteFunctions.Inventory:InvokeServer({
-				Command = "WithdrawFromBank",
-				UID = Item.Name
-			})
-			
-			if Result.Status then
-				AmountWithdrawn += 1
-			end
-		end
-		
-		Notify("Success", `Withdrew {AmountWithdrawn} {Flags.ItemToWithdraw.CurrentValue}s`)
-	end,
-})
-
-Tab:CreateSlider({
-	Name = "➖ • Amount to Withdraw",
-	Range = {1, 1000},
-	Increment = 1,
-	Suffix = "Items",
-	CurrentValue = 1,
-	Flag = "AmountToWithdraw",
-	Callback = function()end,
-})
-
-Tab:CreateInput({
-	Name = ApplyUnsupportedName("📑 • Item to Withdraw", pcall(require, ReplicatedStorage.Settings.Items.Treasures:FindFirstChildOfClass("ModuleScript"))),
-	CurrentValue = "",
-	PlaceholderText = "Full Item Name Here",
-	RemoveTextAfterFocusLost = false,
-	Flag = "ItemToWithdraw",
-	Callback = function(Text)
-		for _, Treasure: ModuleScript in ReplicatedStorage.Settings.Items.Treasures:GetChildren() do
-			if Treasure.Name:lower() == Text:lower() then
-				local Success, Result = pcall(require, Treasure)
-				
-				if Success then
-					ItemInfo = Result
-				end
-				
-				break
-			end
-		end
-	end,
-})
-
-Tab:CreateDivider()
-
-local function PinItems(Tool: Tool)
-	if not Flags.PinItems.CurrentValue then
-		return
-	end
-
-	if not table.find(Flags.ItemsToPin.CurrentOption, Tool.Name) then
-		return
-	end
-
-	if Tool:GetAttribute("Pinned") or not Tool:GetAttribute("ID") then
-		return
-	end
-
-	task.wait(1)
-
-	local Result = RemoteFunctions.Inventory:InvokeServer({
-		Command = "ToggleSlotPin",
-		UID = Tool:GetAttribute("ID")
-	})
-
-	if Result then
-		Tool:SetAttribute("Pinned", not Tool:GetAttribute("Pinned"))
-	end
-end
-
-Tab:CreateToggle({
-	Name = "📌 • Auto Pin Items",
-	CurrentValue = false,
-	Flag = "PinItems",
-	Callback = function(Value)
-		if Value then
-			for _, Tool: Tool in Player.Backpack:GetChildren() do
-				PinItems(Tool)
-			end
-		end
-	end,
-})
-
-HandleConnection(Player.Backpack.ChildAdded:Connect(PinItems), "PinItems")
-
-Tab:CreateDropdown({
-	Name = "🖼️ • Items to Pin",
-	Options = Items,
-	MultipleOptions = true,
-	Flag = "ItemsToPin",
-	Callback = function()end,
-})
-
-Tab:CreateSection("Containers")
+Tab:CreateSection("Opening")
 
 local Treasures = ReplicatedStorage.Settings.Items.Treasures
 
@@ -938,9 +1324,9 @@ local function OpenContainer(Tool: Tool)
 	if not Module then
 		return
 	end
-	
+
 	local Success, Info = pcall(require, Module)
-	
+
 	if Success then
 		if not Info.ContainerType then
 			return
@@ -969,6 +1355,8 @@ Tab:CreateToggle({
 })
 
 HandleConnection(Player.Backpack.ChildAdded:Connect(OpenContainer), "OpenContainers")
+
+Tab:CreateSection("Collecting")
 
 local CollectedRewards = {}
 
@@ -1005,699 +1393,80 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateSection("Shop")
+local Tab: Tab = Window:CreateTab("UI", "webhook")
 
-local function GetInventorySize()
-	local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
-		Command = "GetInventory"
-	})
+Tab:CreateSection("Security")
 
-	local InventorySize = 0
-
-	for ID, Object in Inventory do
-		InventorySize += 1
-	end
-
-	return InventorySize
-end
-
-local function UserOwnsGamePassAsync(UserId: number, GamePassId: number)
-	local Success, Result = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, UserId, GamePassId)
-	
-	return Success and Result
-end
-
-function SellInventory()
-	local Humanoid = Player.Character:FindFirstChild("Humanoid")
-	
-	if not Humanoid then
-		return
-	end
-	
-	local Merchant: Model
-	
-	for _,v: TextLabel in workspace.Map.Islands:GetDescendants() do
-		if v.Name ~= "Title" or not v:IsA("TextLabel") or v.Text ~= "Merchant" then
-			continue
-		end
-		
-		Merchant = v:FindFirstAncestorOfClass("Model")
-
-		if not Merchant then
-			continue
-		end
-		
-		break
-	end
-	
-	if not Merchant then
-		Notify("Sell Inventory Error", "Couldn't find any merchants, try being closer to one")
-		task.wait(10)
-		return
-	end
-	
-	Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-	
-	local SellEnabled = Flags.Sell.CurrentValue
-	local PreviousPosition = Player.Character:GetPivot()
-	local PreviousSize = GetInventorySize()
-
-	local Teleported = false
-
-	local StartTime = tick()
-
-	repeat
-		if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
-			Player.Character:PivotTo(Merchant:GetPivot())
-			Teleported = true
-		end
-
-		task.wait(1)
-
-		RemoteEvents.Merchant:FireServer({
-			Command = "SellAllTreasures",
-			Merchant = Merchant
-		})
-	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled or tick() - StartTime >= 3
-
-	if Teleported then
-		Player.Character:PivotTo(PreviousPosition)
-	end
-end
+local AFKHook
 
 Tab:CreateToggle({
-	Name = "💰 • Auto Sell Inventory at Capacity",
+	Name = ApplyUnsupportedName("🏷️ • Disable [AFK] Tag", hookmetamethod and getnamecallmethod and checkcaller),
 	CurrentValue = false,
-	Flag = "Sell",
-	Callback = function(Value)	
-		while Flags.Sell.CurrentValue and task.wait() do
-			if GetInventorySize() < Flags.Capacity.CurrentValue then
-				continue
-			end
-
-			SellInventory()
-		end
-	end,
-})
-
-Tab:CreateSlider({
-	Name = "🛒 • Capacity to Sell at",
-	Range = {0, 1000},
-	Increment = 1,
-	Suffix = "Items",
-	CurrentValue = math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000),
-	Flag = "Capacity",
-	Callback = function()end,
-})
-
-Tab:CreateButton({
-	Name = "💯 • Set to Max Capacity",
-	Callback = function()
-		Flags.Capacity:Set(math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000))
-	end,
-})
-
-Tab:CreateButton({
-	Name = "💰 • Quick Sell Inventory",
-	Callback = SellInventory,
-})
-
-Tab:CreateDivider()
-
-Tab:CreateButton({
-	Name = "🧲 • Purchase Magnet Box(es)",
-	Callback = function()
-		RemoteFunctions.Shop:InvokeServer({
-			Command = "Buy",
-			Type = "Item",
-			Product = "Magnet Box",
-			Amount = Flags.MagnetBoxes.CurrentValue
-		})
-	end,
-})
-
-Tab:CreateSlider({
-	Name = "🗃 • Amount of Magnet Boxes to Purchase",
-	Range = {1, 100},
-	Increment = 1,
-	Suffix = "Magnet Box(es)",
-	CurrentValue = 1,
-	Flag = "MagnetBoxes",
-	Callback = function()end,
-})
-
-local Shovels = {}
-local OriginalShovelNames = {}
-
-local function AddComma(amount: number)
-	local formatted = amount
-	local k
-	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-		if (k==0) then
-			break
-		end
-	end
-	return formatted
-end
-
-for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
-	local Success, ItemInfo = pcall(require, v)
-	
-	local BuyPrice = 0
-	local NewName
-	
-	if Success and ItemInfo then
-		if not ItemInfo.BuyPrice then
-			continue
-		end
-		
-		BuyPrice = ItemInfo.BuyPrice
-
-		NewName = `{v.Name} (${AddComma(BuyPrice)})`
-	else
-		NewName = `{v.Name} (Can't See Price)`
-	end
-
-	table.insert(Shovels, NewName)
-	OriginalShovelNames[NewName] = {
-		Name = v.Name,
-		BuyPrice = BuyPrice
-	}
-end
-
-table.sort(Shovels, function(a,b)
-	return OriginalShovelNames[a].BuyPrice < OriginalShovelNames[b].BuyPrice
-end)
-
-local PurchaseShovel
-PurchaseShovel = Tab:CreateDropdown({
-	Name = "💵 • Purchase Shovel",
-	Options = Shovels,
-	CurrentOption = "",
-	MultipleOptions = false,
-	Callback = function(CurrentOption)
-		CurrentOption = CurrentOption[1]
-
-		if CurrentOption == "" then
+	Flag = "AFKTag",
+	Callback = function(Value)
+		if not (hookmetamethod and getnamecallmethod and checkcaller) then
 			return
 		end
-
-		RemoteFunctions.Shop:InvokeServer({
-			Command = "Buy",
-			Type = "Item",
-			Product = OriginalShovelNames[CurrentOption].Name,
-			Amount = 1
-		})
-
-		PurchaseShovel:Set({""})
-	end,
-})
-
-Tab:CreateSection("Upgrading")
-
-local EnchantShovel
-
-EnchantShovel = Tab:CreateToggle({
-	Name = "🌟 • Auto Enchant Shovel",
-	CurrentValue = false,
-	Flag = "EnchantShovel",
-	Callback = function(Value)
-		while Flags.EnchantShovel.CurrentValue and task.wait() do
-			local Backpack: Backpack = Player:FindFirstChild("Backpack")
-			
-			if not Backpack then
-				continue
-			end
-
-			local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
-
-			if not Mole or not Mole:GetAttribute("ID") then
-				continue
-			end
-
-			local Shovel
-
-			for _, Tool: Tool in Backpack:GetChildren() do
-				if Tool:GetAttribute("Type") == "Shovel" then
-					Shovel = Tool
+		
+		if Value and not AFKHook then
+			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
+				local Method = getnamecallmethod()
+				local Args = {...}
+				
+				if not checkcaller() and Method == "FireServer" and Args[1].Command == "SetAFK" and Args[1].State and Flags.AFKTag.CurrentValue then
+					local NewArgs = {}
+					NewArgs.Command = Args[1].Command
+					NewArgs.State = false
+					self:FireServer(NewArgs)
+					return
 				end
-			end
-
-			if not Shovel then
-				Shovel = Player.Character:FindFirstChildOfClass("Tool")
-			end
-
-			if not Shovel or Shovel:GetAttribute("Type") ~= "Shovel" or not Shovel:GetAttribute("ID") then
-				continue
-			end
-
-			local Result = RemoteFunctions.MolePit:InvokeServer({
-				Command = "OfferEnchant",
-				ID = Mole:GetAttribute("ID")
-			})
-
-			if Result ~= true then
-				continue
-			end
-
-			local Result = RemoteFunctions.MolePit:InvokeServer({
-				Command = "OfferShovel",
-				ID = Shovel:GetAttribute("ID")
-			})
-
-			if Result ~= true then
-				continue
-			end
-
-			local ShovelInfo: {Enchantments: {[string]: number}}
-
-			repeat
-				local Equipment = RemoteFunctions.Player:InvokeServer({
-					Command = "GetEquipment"
-				})
-
-				for Name, Info in Equipment.Shovels do
-					if Name ~= Shovel.Name then
-						continue
-					end
-
-					ShovelInfo = Info
-				end
-				task.wait()
-			until ShovelInfo
-			
-			if not ShovelInfo.Enchantments then
-				continue
-			end
-
-			for Name, Level in ShovelInfo.Enchantments do
-				local Enchant = `{Name} {Level}`
-
-				print("New Enchant:", Enchant)
-
-				Notify("New Enchant", Enchant, "book")
-
-				if table.find(Flags.Enchants.CurrentOption, Enchant) then
-					Notify("Auto Enchant", "Stopped due to finding an enchant to stop at", "book")
-					EnchantShovel:Set(false)
-				end
-			end
+				
+				return AFKHook(self, ...)
+			end)
 		end
 	end,
 })
 
-local Success, EnchantModule = pcall(require, ReplicatedStorage.Settings.Enchantments)
+Tab:CreateSection("Codes")
 
-if not Success then
-	EnchantModule = game:GetService("HttpService"):JSONDecode([[
-	{
-  "Loaded": true,
-  "WaitForAll": null,
-  "EnchantmentsList": {
-    "Blessed": {
-      "Name": "Blessed",
-      "MoleWeight": 5,
-      "Color": null,
-      "Tiers": [
-        {
-          "LootLuck": 0.17,
-          "Precision": 0.15,
-          "Stability": 0.15,
-          "Control": 0.15
-        },
-        {
-          "LootLuck": 0.3,
-          "Precision": 0.3,
-          "Stability": 0.3,
-          "Control": 0.3
-        },
-        {
-          "LootLuck": 0.4,
-          "Precision": 0.4,
-          "Stability": 0.4,
-          "Control": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Lucky": {
-      "Name": "Lucky",
-      "MoleWeight": 20,
-      "Color": null,
-      "Tiers": [
-        {
-          "LootLuck": 0.17
-        },
-        {
-          "LootLuck": 0.3
-        },
-        {
-          "LootLuck": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Strong": {
-      "Name": "Strong",
-      "MoleWeight": 40,
-      "Color": null,
-      "Tiers": [
-        {
-          "Strength": 0.15
-        },
-        {
-          "Strength": 0.3
-        },
-        {
-          "Strength": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Steady": {
-      "Name": "Steady",
-      "MoleWeight": 20,
-      "Color": null,
-      "Tiers": [
-        {
-          "Stability": 0.15,
-          "Control": 0.15
-        },
-        {
-          "Stability": 0.3,
-          "Control": 0.3
-        },
-        {
-          "Stability": 0.4,
-          "Control": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Durable": {
-      "Name": "Durable",
-      "MoleWeight": 70,
-      "Color": null,
-      "Tiers": [
-        {
-          "MaxMass": 0.1
-        },
-        {
-          "MaxMass": 0.25
-        },
-        {
-          "MaxMass": 0.5
-        }
-      ],
-      "TierCount": 3
-    },
-    "Precise": {
-      "Name": "Precise",
-      "MoleWeight": 90,
-      "Color": null,
-      "Tiers": [
-        {
-          "Precision": 0.15
-        },
-        {
-          "Precision": 0.3
-        },
-        {
-          "Precision": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Exact": {
-      "Name": "Exact",
-      "MoleWeight": 20,
-      "Color": null,
-      "Tiers": [
-        {
-          "Control": 0.15,
-          "Precision": 0.15
-        },
-        {
-          "Control": 0.3,
-          "Precision": 0.3
-        },
-        {
-          "Control": 0.4,
-          "Precision": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Stamina": {
-      "Name": "Stamina",
-      "MoleWeight": 70,
-      "Color": null,
-      "Tiers": [
-        {
-          "StaminaLoss": -0.2
-        },
-        {
-          "StaminaLoss": -0.4
-        },
-        {
-          "StaminaLoss": -0.5
-        }
-      ],
-      "TierCount": 3
-    },
-    "Control": {
-      "Name": "Control",
-      "MoleWeight": 90,
-      "Color": null,
-      "Tiers": [
-        {
-          "Control": 0.15
-        },
-        {
-          "Control": 0.3
-        },
-        {
-          "Control": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Accurate": {
-      "Name": "Accurate",
-      "MoleWeight": 20,
-      "Color": null,
-      "Tiers": [
-        {
-          "Stability": 0.15,
-          "Precision": 0.15
-        },
-        {
-          "Stability": 0.3,
-          "Precision": 0.3
-        },
-        {
-          "Stability": 0.4,
-          "Precision": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Perfect": {
-      "Name": "Perfect",
-      "MoleWeight": 1,
-      "Color": null,
-      "Tiers": [
-        {
-          "MaxMass": 0.1,
-          "Control": 0.15,
-          "Stability": 0.15,
-          "Precision": 0.15,
-          "LootLuck": 0.17,
-          "Strength": 0.15
-        },
-        {
-          "MaxMass": 0.25,
-          "Control": 0.3,
-          "Stability": 0.3,
-          "Precision": 0.3,
-          "LootLuck": 0.3,
-          "Strength": 0.3
-        },
-        {
-          "MaxMass": 0.5,
-          "Control": 0.4,
-          "Stability": 0.4,
-          "Precision": 0.4,
-          "LootLuck": 0.4,
-          "Strength": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Stable": {
-      "Name": "Stable",
-      "MoleWeight": 90,
-      "Color": null,
-      "Tiers": [
-        {
-          "Stability": 0.15
-        },
-        {
-          "Stability": 0.3
-        },
-        {
-          "Stability": 0.4
-        }
-      ],
-      "TierCount": 3
-    },
-    "Super": {
-      "Name": "Super",
-      "MoleWeight": 10,
-      "Color": null,
-      "Tiers": [
-        {
-          "Control": 0.15,
-          "MaxMass": 0.1,
-          "Precision": 0.15,
-          "Strength": 0.15,
-          "Stability": 0.15
-        },
-        {
-          "Control": 0.3,
-          "MaxMass": 0.25,
-          "Precision": 0.3,
-          "Strength": 0.3,
-          "Stability": 0.3
-        },
-        {
-          "Control": 0.4,
-          "MaxMass": 0.5,
-          "Precision": 0.4,
-          "Strength": 0.4,
-          "Stability": 0.4
-        }
-      ],
-      "TierCount": 3
-    }
-  },
-  "Update": null
+local Codes = {
+	"PLSMOLE",
+	"LUNARV2",
+	"TWITTER_DIGITRBLX",
+	"5MILLION",
+	"SECRET",
+	"300KLIKES",
+	"12MVISITS",
+	"PLS_FALLEN_STAR",
 }
-	]])
-	
-	EnchantModule.EnchantmentsList.Secret = {
-		TierCount = 3
-	}
-end
 
-local Enchantments = {}
-
-for Enchant, Info in EnchantModule.EnchantmentsList do
-	for Tier = 1, Info.TierCount do
-		table.insert(Enchantments, `{Enchant} {Tier}`)
-	end
-end
-
-table.sort(Enchantments)
-
-Tab:CreateDropdown({
-	Name = "📚 • Enchants to Stop at",
-	Options = Enchantments,
-	MultipleOptions = true,
-	Flag = "Enchants",
-	Callback = function()end,
-})
-
-Tab:CreateDivider()
-
-local AutoAppraise
-
-AutoAppraise = Tab:CreateToggle({
-	Name = `🔍 • Auto Appraise Held Item [${RemoteFunctions.LootPit:InvokeServer({Command = "GetPlayerPrice"}) or 500}]`,
-	CurrentValue = false,
-	Flag = "Appraise",
-	Callback = function(Value)	
-		while AutoAppraise.CurrentValue and task.wait() do
-			local Tool = Player.Character:FindFirstChildOfClass("Tool")
-
-			if not Tool then
-				return
-			end
-
-			local Result = RemoteFunctions.LootPit:InvokeServer({
-				Command = "AppraiseItem"
+Tab:CreateButton({
+	Name = "🐦 • Redeem Known Codes",
+	Callback = function()
+		for _, Code: string in Codes do
+			local Result = RemoteFunctions.Codes:InvokeServer({
+				Command = "Redeem",
+				Code = Code
 			})
-
-			for _, NewTool: Tool in Player.Backpack:GetChildren() do
-				if NewTool:GetAttribute("Serial") == Tool:GetAttribute("Serial") and NewTool.Name == Tool.Name then	
-					local Weight = NewTool:GetAttribute("Weight")
-					local Modifier = NewTool:GetAttribute("Modifier")
-					
-					if Weight and Weight >= Flags.Weight.CurrentValue then
-						Notify("Auto Appraise", "Stopped because the selected weight was achieved")
-						AutoAppraise:Set(false)
-					elseif Modifier and table.find(Flags.Modifiers.CurrentOption, Modifier) then
-						Notify("Auto Appraise", "Stopped because a selected modifier was received")
-						AutoAppraise:Set(false)
-					else
-						Player.Character.Humanoid:EquipTool(NewTool)
-					end
-					
-					break
-				end
+			
+			if Result.Status then
+				continue
+			elseif Result.AlreadyRedeemed then
+				continue
+			elseif Result.NotValid then
+				Notify("Failed!", `The code '{Code}' is not valid anymore.`)
+			else
+				Notify("Error", `The code '{Code}' has had an internal error while redeeming.`)
 			end
 		end
+		
+		Notify("Completed", "Applied all the known codes.")
 	end,
 })
 
-Tab:CreateSlider({
-	Name = "⚖ • Minimum Weight to Stop at",
-	Range = {1, 10000},
-	Increment = 5,
-	Suffix = "kg",
-	CurrentValue = 1,
-	Flag = "Weight",
-	Callback = function()end,
-})
+local Tab: Tab = Window:CreateTab("Info", "info")
 
-local Modifiers = {}
-
-local Success, ModifiersModule = pcall(require, ReplicatedStorage.Settings.Modifiers.Colors)
-
-if not Success then
-	ModifiersModule = {
-		["Regular"] = Color3.fromRGB(35, 35, 35),
-		["Golden"] = Color3.fromRGB(255, 235, 17),
-		["Neon"] = Color3.fromRGB(16, 255, 219),
-		["Quantum"] = Color3.fromRGB(186, 24, 255),
-		["Festive"] = Color3.fromRGB(255, 143, 167),
-		["Wooden"] = Color3.fromRGB(125, 62, 17),
-		["Rusty"] = Color3.fromRGB(141, 18, 18),
-		["Holy"] = Color3.fromRGB(255, 255, 255),
-		["Hot"] = Color3.fromRGB(255, 0, 0),
-		["Biodegradable"] = Color3.fromRGB(9, 198, 38),
-		["Magma"] = Color3.fromRGB(255, 1, 1),
-		["Evil"] = Color3.fromRGB(149, 1, 1),
-		["Rainbow"] = Color3.fromRGB(0, 0, 0),
-		["Solar"] = Color3.fromRGB(),
-		["Venom"] = Color3.fromRGB()
-	}
-end
-
-for i,v in ModifiersModule do
-	table.insert(Modifiers, i)
-end
-
-Tab:CreateDropdown({
-	Name = "🧬 • Modifiers to Stop at",
-	Options = Modifiers,
-	MultipleOptions = true,
-	Flag = "Modifiers",
-	Callback = function()end,
-})
-
-Tab:CreateSection("Information")
+Tab:CreateSection("Inventory")
 
 local Icons = {
 	Mole = "rbxassetid://71479472086037",
