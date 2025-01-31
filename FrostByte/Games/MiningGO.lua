@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.5a"
+getgenv().ScriptVersion = "v1.5.5b"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -55,13 +55,15 @@ local function CollectDrops(Enabled: boolean)
 		return
 	end
 
-	for i,v: BasePart in workspace.Drops:GetChildren() do
-		if not v:FindFirstChild("Frame") then -- i fixed it blob are you happy
+	for _, Drop: Model in workspace.Drops:GetChildren() do
+		local Frame = Drop:FindFirstChild("Frame")
+		
+		if not Frame then
 			continue
 		end
 		
-		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 0)
-		firetouchinterest(v.Frame, Player.Character.HumanoidRootPart, 1)
+		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 0)
+		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 1)
 	end
 end
 
@@ -214,8 +216,8 @@ Tab:CreateToggle({
 	Flag = "Marketplace",
 	Callback = function(Value)
 		while Flags.Marketplace.CurrentValue and task.wait(1) do
-			for _, Element: Frame in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
-				if not Element:IsA("Frame") then
+			for _, OreMarketplaceElem: Frame in Player.PlayerGui.GameGui.OreMarketplace.Content.Deals.Inner:GetChildren() do
+				if not OreMarketplaceElem:IsA("Frame") then
 					continue
 				end
 				
@@ -223,17 +225,17 @@ Tab:CreateToggle({
 					return
 				end
 				
-				if Flags.Free.CurrentValue then
-					if Element.Inner.Cost.Title.Text ~= "0" then
+				if Flags.Free.CurrentValue and OreMarketplaceElem:FindFirstChild("Inner") then
+					if OreMarketplaceElem.Inner.Cost.Title.Text ~= "0" then
 						continue
 					end
 
-					if Element.Inner.Center.Purchased2.Visible then
+					if OreMarketplaceElem.Inner.Center.Purchased2.Visible then
 						continue
 					end
 				end
 
-				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(Element.LayoutOrder))
+				BinderFunction:InvokeServer("Marketplace_Purchase", tostring(OreMarketplaceElem.LayoutOrder))
 			end
 		end
 	end,
