@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.5"
+getgenv().ScriptVersion = "v1.5.5a"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -348,7 +348,13 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				for _, SideBarQuestReq: Frame in SideBarQuestElem.Inner.Req:GetChildren() do
+				local Inner: Frame = SideBarQuestElem:FindFirstChild("Inner")
+				
+				if not Inner then
+					continue
+				end
+				
+				for _, SideBarQuestReq: Frame in Inner.Req:GetChildren() do
 					local Title: TextLabel = SideBarQuestReq:FindFirstChild("Title")
 					
 					if not Title then
