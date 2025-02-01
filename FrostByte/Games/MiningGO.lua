@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.5c"
+getgenv().ScriptVersion = "v1.5.5d"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -264,8 +264,10 @@ Tab:CreateToggle({
 			if Title.Text:find("k") then
 				Numbers ..= "000"
 			end
+			
+			Numbers = tonumber(Numbers)
 
-			if tonumber(Numbers) > Flags.MaxRefresh.CurrentValue then
+			if Numbers and Numbers > Flags.MaxRefresh.CurrentValue then
 				continue
 			end
 
@@ -374,10 +376,14 @@ Tab:CreateToggle({
 							continue
 						end
 						
-						local Start = Title.Text:split("[")[2]
-						local Between = Start:split("]")[1]
+						local Numbers = Title.Text:split("[")[2]
+						Numbers = Numbers:split("]")[1]
 						
-						local Numbers = Between:split("/")
+						if not Numbers then
+							continue
+						end
+						
+						Numbers = Numbers:split("/")
 						
 						if Numbers[1] == Numbers[2] then
 							continue
@@ -598,8 +604,14 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		while Flags.Ticket.CurrentValue and task.wait() do
 			local Mouse = InteractZones.Mouse
+			
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
 
-			local Distance = (Player.Character:GetPivot().Position - Mouse.Position).Magnitude
+			local Distance = (Character:GetPivot().Position - Mouse.Position).Magnitude
 
 			if Distance > 300 then
 				QuestTPing = false
@@ -623,11 +635,11 @@ Tab:CreateToggle({
 				
 				if tonumber(Numbers) and tonumber(Numbers) <= 5 then
 					QuestTPing = true
-					Player.Character:PivotTo(InteractZones.Roach2:GetPivot())
+					Character:PivotTo(InteractZones.Roach2:GetPivot())
 					
 					repeat
 						task.wait()
-					until (Player.Character:GetPivot().Position - Mouse.Position).Magnitude >= 300 or not Flags.Ticket.CurrentValue
+					until (Character:GetPivot().Position - Mouse.Position).Magnitude >= 300 or not Flags.Ticket.CurrentValue
 				end
 				
 				Purchased = true
