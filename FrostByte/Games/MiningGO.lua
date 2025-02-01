@@ -1,19 +1,15 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.5b"
+getgenv().ScriptVersion = "v1.5.5c"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
 local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
-local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
-local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
-local checkcaller: () -> (boolean) = getfenv().checkcaller
 
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
-local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -156,6 +152,10 @@ Tab:CreateToggle({
 			end
 			
 			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
 
 			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 
@@ -249,10 +249,14 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "🔁 • Auto Refresh Ore Marketplace",
+	Name = ApplyUnsupportedName("🔁 • Auto Refresh Ore Marketplace", firesignal),
 	CurrentValue = false,
 	Flag = "Refresh",
 	Callback = function(Value)
+		if not firesignal then
+			return
+		end
+		
 		while Flags.Refresh.CurrentValue and task.wait(1) do
 			local Title = Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.Cost.Title
 			local Numbers = Title.Text:gsub("%D", "")
@@ -281,7 +285,7 @@ Tab:CreateToggle({
 			end
 
 			if SuccessfulPurchases == ElementNumber then
-				firesignal(Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.MouseButton1Click) -- switch back to remote
+				firesignal(Player.PlayerGui.GameGui.OreMarketplace.Refresh.RefreshButton.MouseButton1Click)
 				task.wait(5)
 			end
 		end
@@ -486,6 +490,10 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "KeepReplace",
 	Callback = function()
+		if not firesignal then
+			return
+		end
+		
 		while Flags.KeepReplace.CurrentValue and task.wait() do
 			local Roll: Frame = Player.PlayerGui.StartGui.Roll
 			
@@ -553,6 +561,10 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Keep",
 	Callback = function()
+		if not firesignal then
+			return
+		end
+		
 		while Flags.Keep.CurrentValue and task.wait() do
 			local Roll: Frame = Player.PlayerGui.StartGui.Roll
 			
