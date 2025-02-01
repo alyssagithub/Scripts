@@ -29,8 +29,8 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Player = game:GetService("Players").LocalPlayer
 
 local Network = ReplicatedStorage:WaitForChild("Source"):WaitForChild("Network")
-local RemoteFunctions: {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
-local RemoteEvents: {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents")
+local RemoteFunctions: Folder & {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
+local RemoteEvents: Folder & {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents")
 
 local Window = getgenv().Window
 
@@ -1429,7 +1429,7 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Codes")
 
-local Codes = {
+local CodesList = {
 	"PLSMOLE",
 	"LUNARV2",
 	"TWITTER_DIGITRBLX",
@@ -1443,8 +1443,14 @@ local Codes = {
 Tab:CreateButton({
 	Name = "🐦 • Redeem Known Codes",
 	Callback = function()
-		for _, Code: string in Codes do
-			local Result = RemoteFunctions.Codes:InvokeServer({
+		local CodesRemote = RemoteFunctions:FindFirstChild("Codes")
+		
+		if not CodesRemote then
+			return Notify("Error", "Couldn't find the 'Codes' RemoteFunction")
+		end
+		
+		for _, Code: string in CodesList do
+			local Result = CodesRemote:InvokeServer({
 				Command = "Redeem",
 				Code = Code
 			})
