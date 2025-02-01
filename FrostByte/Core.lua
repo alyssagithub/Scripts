@@ -139,6 +139,10 @@ if PlaceFileName then
 
 		while task.wait(60) do
 			local Result = game:HttpGet(File)
+			
+			if not Result then
+				continue
+			end
 
 			Result = Result:split('getgenv().ScriptVersion = "')[2]
 			Result = Result:split('"')[1]
