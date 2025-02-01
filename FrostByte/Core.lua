@@ -128,7 +128,7 @@ if PlaceFileName then
 					end
 					
 					OriginalFlags[i] = v.CurrentValue
-					v.CurrentValue = false
+					v:Set(false)
 				end
 				
 				getgenv().OriginalFlags = OriginalFlags
