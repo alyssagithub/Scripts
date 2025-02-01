@@ -4,9 +4,6 @@ getgenv().ScriptVersion = "v2.6.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
-local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
-local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
-local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
 local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
 local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
 local checkcaller: () -> (boolean) = getfenv().checkcaller
@@ -48,7 +45,7 @@ local function ReEquipTool(Tool: Tool)
 	task.wait(0.5)
 
 	Humanoid:UnequipTools()
-	Humanoid:EquipTool(Tool)
+	pcall(Humanoid.EquipTool, Humanoid, Tool)
 end
 
 HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message, StackTrace, CallingScript)
