@@ -402,8 +402,6 @@ function CreateUniversalTabs()
 		end,
 	})
 	
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
-	
 	Rayfield:LoadConfiguration()
 	
 	local OriginalFlags = getgenv().OriginalFlags
@@ -416,7 +414,11 @@ function CreateUniversalTabs()
 	
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 	
-	getgenv().FrostByteStarted()
+	task.spawn(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+
+		getgenv().FrostByteStarted()
+	end)
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
