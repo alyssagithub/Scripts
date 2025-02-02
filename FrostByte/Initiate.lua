@@ -10,6 +10,8 @@ local function Notify(Text)
 	})
 end
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+
 local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 PlaceName = PlaceName:gsub("%b[]", "")
@@ -20,9 +22,10 @@ local Code: string = game:HttpGet(`https://raw.githubusercontent.com/alyssagithu
 if Code ~= "404: Not Found" then
 	Notify("Game found, the script is loading.")
 	getgenv().PlaceFileName = PlaceName
-	loadstring(Code)()
 else
 	Notify("Game not found, loading universal.")
 	getgenv().ScriptVersion = "Universal"
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+	Code = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua")
 end
+
+getgenv().FrostByteHandleFunction(loadstring(Code))
