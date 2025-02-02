@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.7"
+getgenv().ScriptVersion = "v1.0.7a"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -100,13 +100,15 @@ Tab:CreateDivider()
 
 local LastTPLocation
 
+local DungeonDirectory = workspace:WaitForChild("DungeonDirectory")
+
 Tab:CreateToggle({
 	Name = "🌀 • Teleport to Mobs",
 	CurrentValue = false,
 	Flag = "Teleport",
 	Callback = function(Value)
 		while Flags.Teleport.CurrentValue and task.wait() do
-			if not workspace.DungeonDirectory:GetChildren()[1] then
+			if not DungeonDirectory:GetChildren()[1] then
 				continue
 			end
 			
@@ -336,7 +338,7 @@ Tab:CreateToggle({
 	Flag = "Magicbound",
 	Callback = function(Value)
 		while Flags.Magicbound.CurrentValue and task.wait() do
-			if workspace.DungeonDirectory:GetChildren()[1] or not Player.Character or not Player.Character:FindFirstChild("Equipped") then
+			if DungeonDirectory:GetChildren()[1] or not Player.Character or not Player.Character:FindFirstChild("Equipped") then
 				continue
 			end
 			
@@ -344,7 +346,7 @@ Tab:CreateToggle({
 			
 			repeat
 				task.wait()
-			until workspace.DungeonDirectory:GetChildren()[1]
+			until DungeonDirectory:GetChildren()[1]
 		end
 	end,
 })
