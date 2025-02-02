@@ -94,8 +94,6 @@ task.spawn(function()
 	end
 end)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
-
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
@@ -403,6 +401,8 @@ function CreateUniversalTabs()
 			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
+	
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 	
 	Rayfield:LoadConfiguration()
 	
