@@ -1,20 +1,10 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.1"
+getgenv().ScriptVersion = "v1.0.4"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
-local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
-local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
-local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
-local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
-local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
-local checkcaller: () -> (boolean) = getfenv().checkcaller
-
-local UnsupportedName: string = getgenv().UnsupportedName
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
-local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
-local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local Rayfield = getgenv().Rayfield
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
@@ -44,7 +34,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = "🔀 • Auto Merge Buildings",
+	Name = ApplyUnsupportedName("🔀 • Auto Merge Buildings", pcall(require, ReplicatedStorage.ClientSystems.Inventory)),
 	CurrentValue = false,
 	Flag = "Merge",
 	Callback = function(Value)	
@@ -67,52 +57,6 @@ Tab:CreateToggle({
 })
 
 Tab:CreateSection("Items")
-
-local function PickupDrops()
-	if not Flags.Pickup.CurrentValue then
-		return
-	end
-	
-	for _, Drop: BasePart in workspace.PotionEntityFolder:GetChildren() do
-		while Drop.Parent and Flags.Pickup.CurrentValue and task.wait() do
-			Player.Character:PivotTo(Drop:GetPivot())
-		end
-	end
-end
-
-local function PickupFlamethrowers()
-	if not Flags.Flamethrower.CurrentValue then
-		return
-	end
-	
-	for _, Drop: BasePart in workspace.FlamethrowerEntityFolder:GetChildren() do
-		while Drop.Parent and Flags.Flamethrower.CurrentValue and task.wait() do
-			Player.Character:PivotTo(Drop:GetPivot())
-		end
-	end
-end
-
-Tab:CreateToggle({
-	Name = "🎒 • Auto Pickup Dice & Potions",
-	CurrentValue = false,
-	Flag = "Pickup",
-	Callback = function(Value)	
-		PickupDrops()
-	end,
-})
-
-HandleConnection(workspace.PotionEntityFolder.ChildAdded:Connect(PickupDrops), "Pickup")
-
-Tab:CreateToggle({
-	Name = "🔥 • Auto Pickup Flamethrower",
-	CurrentValue = false,
-	Flag = "Flamethrower",
-	Callback = function(Value)	
-		PickupFlamethrowers()
-	end,
-})
-
-HandleConnection(workspace.FlamethrowerEntityFolder.ChildAdded:Connect(PickupFlamethrowers), "Flamethrower")
 
 Tab:CreateToggle({
 	Name = "🔁 • Auto Use Items",
