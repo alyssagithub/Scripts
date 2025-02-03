@@ -94,7 +94,11 @@ task.spawn(function()
 	end
 end)
 
-task.spawn(pcall, loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua")))
+task.spawn(function()
+	pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+	end)
+end)
 
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
