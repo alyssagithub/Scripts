@@ -94,7 +94,7 @@ task.spawn(function()
 	end
 end)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+task.spawn(pcall, loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua")))
 
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
@@ -480,7 +480,10 @@ function CreateUniversalTabs()
 	
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 	
-	getgenv().FrostByteStarted()
+	local FrostByteStarted = getgenv().FrostByteStarted
+	if FrostByteStarted then
+		FrostByteStarted()
+	end
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
