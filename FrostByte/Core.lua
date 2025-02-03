@@ -394,6 +394,70 @@ function CreateUniversalTabs()
 	})
 	
 	HandleConnection(Players.PlayerAdded:Connect(CheckIfStaff), "StaffJoin")
+	
+	Tab:CreateSection("UI")
+	
+	local CustomThemes = {
+		BlackHistoryMonth = {
+			TextColor = Color3.fromRGB(),
+
+			Background = Color3.fromRGB(),
+			Topbar = Color3.fromRGB(),
+			Shadow = Color3.fromRGB(),
+
+			NotificationBackground = Color3.fromRGB(),
+			NotificationActionsBackground = Color3.fromRGB(),
+
+			TabBackground = Color3.fromRGB(),
+			TabStroke = Color3.fromRGB(),
+			TabBackgroundSelected = Color3.fromRGB(),
+			TabTextColor = Color3.fromRGB(),
+			SelectedTabTextColor = Color3.fromRGB(),
+
+			ElementBackground = Color3.fromRGB(),
+			ElementBackgroundHover = Color3.fromRGB(),
+			SecondaryElementBackground = Color3.fromRGB(),
+			ElementStroke = Color3.fromRGB(),
+			SecondaryElementStroke = Color3.fromRGB(),
+
+			SliderBackground = Color3.fromRGB(),
+			SliderProgress = Color3.fromRGB(),
+			SliderStroke = Color3.fromRGB(),
+
+			ToggleBackground = Color3.fromRGB(),
+			ToggleEnabled = Color3.fromRGB(),
+			ToggleDisabled = Color3.fromRGB(),
+			ToggleEnabledStroke = Color3.fromRGB(),
+			ToggleDisabledStroke = Color3.fromRGB(),
+			ToggleEnabledOuterStroke = Color3.fromRGB(),
+			ToggleDisabledOuterStroke = Color3.fromRGB(),
+
+			DropdownSelected = Color3.fromRGB(),
+			DropdownUnselected = Color3.fromRGB(),
+
+			InputBackground = Color3.fromRGB(),
+			InputStroke = Color3.fromRGB(),
+			PlaceholderColor = Color3.fromRGB()
+		},
+		Default = "DarkBlue",
+		Dark = "Default"
+	}
+	
+	Tab:CreateDropdown({
+		Name = "🖼 • Change Theme",
+		Options = {"BlackHistoryMonth", "Default", "Dark", "AmberGlow", "Amethyst", "Ocean", "Light", "Bloom", "Green", "Serenity"},
+		MultipleOptions = false,
+		Flag = "Theme",
+		Callback = function(CurrentOption)
+			CurrentOption = CurrentOption[1]
+
+			if CurrentOption == "" then
+				return
+			end
+			
+			Window.ModifyTheme(CustomThemes[CurrentOption] or CurrentOption)
+		end,
+	})
 
 	Tab:CreateSection("Development")
 
