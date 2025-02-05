@@ -39,7 +39,11 @@ Tab:CreateToggle({
 	Flag = "Merge",
 	Callback = function(Value)	
 		while Flags.Merge.CurrentValue and task.wait() do
-			local Module = require(ReplicatedStorage.ClientSystems.Inventory)
+			local Success, Module = pcall(require, ReplicatedStorage.ClientSystems.Inventory)
+			
+			if not Success then
+				continue
+			end
 			
 			for Name, Building in Module._Inventory.All do
 				for Level, Info in Building do
