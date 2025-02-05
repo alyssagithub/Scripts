@@ -8,7 +8,7 @@ local Player = Players.LocalPlayer
 
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-local PlaceName: string = getgenv().PlaceName
+local PlaceName: string = getgenv().PlaceName or game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 local getexecutorname = getfenv().getexecutorname
 local identifyexecutor: () -> (string) = getfenv().identifyexecutor
