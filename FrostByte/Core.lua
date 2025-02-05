@@ -79,7 +79,7 @@ if getgenv().Rayfield then
 end
 
 local Success, Rayfield = pcall(function()
-	loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+	return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 end)
 
 local function SendNotification(Title: string, Text: string, Duration: number?, Button1: string?, Button2: string?, Callback: BindableFunction?)
