@@ -16,8 +16,7 @@ local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = get
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
-local Rayfield = getgenv().Rayfield
-local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
 local Player = game:GetService("Players").LocalPlayer
 
