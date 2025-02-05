@@ -96,7 +96,6 @@ Tab:CreateDropdown({
 	Options = NPCs,
 	CurrentOption = "None",
 	MultipleOptions = false,
-	--Flag = "Flag",
 	Callback = function(CurrentOption)
 		CurrentOption = CurrentOption[1]
 		
@@ -123,7 +122,6 @@ Tab:CreateDropdown({
 	Options = Tycoons,
 	CurrentOption = "None",
 	MultipleOptions = false,
-	--Flag = "Flag",
 	Callback = function(CurrentOption)
 		CurrentOption = CurrentOption[1]
 
