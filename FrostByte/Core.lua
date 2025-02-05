@@ -174,15 +174,8 @@ if PlaceFileName then
 			if Result == ScriptVersion then
 				continue
 			end
-
-			game:GetService("StarterGui"):SetCore("SendNotification", {
-				Title = "A new FrostByte version has been detected!",
-				Text = "Would you like to load it?",
-				Duration = math.huge,
-				Button1 = Button1,
-				Button2 = Button2,
-				Callback = BindableFunction,
-			})
+			
+			SendNotification("A new FrostByte version has been detected!", "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
 
 			break
 		end
