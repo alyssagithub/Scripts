@@ -17,8 +17,7 @@ type Tab = {
 	CreateDivider: (self: Tab) -> (Divider),
 }
 
-local Rayfield = getgenv().Rayfield
-local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
@@ -402,6 +401,12 @@ Tab:CreateToggle({
 	Flag = "Skip",
 	Callback = function(Value)
 		while Flags.Skip.CurrentValue and task.wait() do
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
+			
 			local Shovel = Player.Character:FindFirstChild("Shovel")
 
 			if not Shovel then
@@ -794,12 +799,16 @@ Tab:CreateToggle({
 	end,
 })
 
+local function GetLimitedMaxInventorySize()
+	return math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000)
+end
+
 local Capacity = Tab:CreateSlider({
 	Name = "🛒 • Capacity to Sell at",
 	Range = {0, 1000},
 	Increment = 1,
 	Suffix = "Items",
-	CurrentValue = math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000),
+	CurrentValue = GetLimitedMaxInventorySize(),
 	Flag = "Capacity",
 	Callback = function()end,
 })
@@ -807,7 +816,7 @@ local Capacity = Tab:CreateSlider({
 Tab:CreateButton({
 	Name = "💯 • Set to Your Max Capacity",
 	Callback = function()
-		Capacity:Set(math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000))
+		Capacity:Set(GetLimitedMaxInventorySize())
 	end,
 })
 
@@ -1090,7 +1099,13 @@ AutoAppraise = Tab:CreateToggle({
 						Notify("Auto Appraise", "Stopped because a selected modifier was received")
 						AutoAppraise:Set(false)
 					else
-						Player.Character.Humanoid:EquipTool(NewTool)
+						local Humanoid: Humanoid = Player.Character:FindFirstChild("Humanoid")
+						
+						if not Humanoid then
+							continue
+						end
+						
+						Humanoid:EquipTool(NewTool)
 					end
 
 					break
