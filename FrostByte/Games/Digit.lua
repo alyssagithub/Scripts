@@ -1071,8 +1071,10 @@ Tab:CreateSection("Appraising")
 
 local AutoAppraise
 
+local Success, Result = pcall(RemoteFunctions.LootPit.InvokeServer, RemoteFunctions.LootPit, {Command = "GetPlayerPrice"})
+
 AutoAppraise = Tab:CreateToggle({
-	Name = `🔍 • Auto Appraise Held Item [${RemoteFunctions.LootPit:InvokeServer({Command = "GetPlayerPrice"}) or 500}]`,
+	Name = `🔍 • Auto Appraise Held Item [${if Success and Result then Result else 500}]`,
 	CurrentValue = false,
 	Flag = "Appraise",
 	Callback = function(Value)	
