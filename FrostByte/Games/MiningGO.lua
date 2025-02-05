@@ -10,6 +10,7 @@ local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
 
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -26,45 +27,9 @@ local Quests: Frame = Player.PlayerGui.InventoryGui.Inventory.Inventory.Inner.Co
 
 local OresFolder = workspace:WaitForChild("Ores")
 
-local BoughtUpgrades = {}
 local QuestTPing = false
-local TierValues = {
-	C = 1,
-	B = 2,
-	A = 3,
-	S = 4,
-	X = 5
-}
 
-local Dispensers = {}
-
-for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
-	table.insert(Dispensers, v.Name)
-end
-
-local function CollectDrops(Enabled: boolean)
-	if not firetouchinterest then
-		return
-	end
-	
-	if not Enabled then
-		return
-	end
-
-	for _, Drop: Model in workspace.Drops:GetChildren() do
-		local Frame = Drop:FindFirstChild("Frame")
-		
-		if not Frame then
-			continue
-		end
-		
-		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 0)
-		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 1)
-	end
-end
-
-local Rayfield = getgenv().Rayfield
-local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
 local Window = getgenv().Window
 
@@ -194,6 +159,27 @@ Tab:CreateToggle({
 })
 
 Tab:CreateDivider()
+
+local function CollectDrops(Enabled: boolean)
+	if not firetouchinterest then
+		return
+	end
+
+	if not Enabled then
+		return
+	end
+
+	for _, Drop: Model in workspace.Drops:GetChildren() do
+		local Frame = Drop:FindFirstChild("Frame")
+
+		if not Frame then
+			continue
+		end
+
+		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 0)
+		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 1)
+	end
+end
 
 Tab:CreateToggle({
 	Name = ApplyUnsupportedName("💎 • Auto Collect Drops", firetouchinterest),
@@ -336,6 +322,12 @@ Tab:CreateToggle({
 	Callback = function()end,
 })
 
+local Dispensers = {}
+
+for i,v in ReplicatedStorage.DispenserFrames:GetChildren() do
+	table.insert(Dispensers, v.Name)
+end
+
 Tab:CreateDropdown({
 	Name = "⚒ • Equipment Dispenser",
 	Options = Dispensers,
@@ -377,6 +369,11 @@ Tab:CreateToggle({
 						end
 						
 						local Numbers = Title.Text:split("[")[2]
+						
+						if not Numbers then
+							continue
+						end
+						
 						Numbers = Numbers:split("]")[1]
 						
 						if not Numbers then
@@ -403,13 +400,15 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Upgrades")
 
+local BoughtUpgrades = {}
+
 Tab:CreateToggle({
 	Name = "📈 • Auto Upgrade",
 	CurrentValue = false,
 	Flag = "Upgrade",
 	Callback = function(Value)
 		while Flags.Upgrade.CurrentValue and task.wait(1) do
-			for _, Upgrade in UpgradeTreeImages:GetChildren() do
+			for _, Upgrade: Instance in UpgradeTreeImages:GetChildren() do
 				if BoughtUpgrades[Upgrade.Name] then
 					continue
 				end
@@ -418,12 +417,7 @@ Tab:CreateToggle({
 					if BinderFunction:InvokeServer("Tree_Upgrade", Upgrade.Name) then
 						BoughtUpgrades[Upgrade.Name] = true
 
-						Rayfield:Notify({
-							Title = Upgrade.Name,
-							Content = "Bought by Auto Upgrade!",
-							Duration = 10,
-							Image = "book-plus",
-						})
+						Notify(Upgrade.Name, "Bought by Auto Upgrade!", "book-plus")
 					end
 				end)
 			end
@@ -490,6 +484,14 @@ Tab:CreateToggle({
 local Tab = Window:CreateTab("QOL", "leaf")
 
 Tab:CreateSection("UI")
+
+local TierValues = {
+	C = 1,
+	B = 2,
+	A = 3,
+	S = 4,
+	X = 5
+}
 
 Tab:CreateToggle({
 	Name = ApplyUnsupportedName("📦 • Auto Keep/Replace Equipment (Based on Tiers)", firesignal),
