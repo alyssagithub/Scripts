@@ -78,7 +78,9 @@ if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
 
-local Success, Rayfield = pcall(loadstring(game:HttpGet("https://sirius.menu/rayfield")))
+local Success, Rayfield = pcall(function()
+	loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+end)
 
 local function SendNotification(Title: string, Text: string, Duration: number?, Button1: string?, Button2: string?, Callback: BindableFunction?)
 	StarterGui:SetCore("SendNotification", {
