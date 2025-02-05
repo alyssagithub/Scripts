@@ -95,7 +95,6 @@ end
 
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
-getgenv().Rayfield = Rayfield
 getgenv().Flags = Flags
 
 local function Notify(Title: string, Content: string, Image: string)
