@@ -20,7 +20,7 @@ local isrbxactive: () -> (boolean) = getfenv().isrbxactive
 local setclipboard: (Text: string) -> () = getfenv().setclipboard
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 
-local ScriptVersion = getgenv().ScriptVersion or "DevMode"
+local ScriptVersion = getgenv().ScriptVersion
 
 getgenv().gethui = function()
 	return game:GetService("CoreGui")
@@ -73,6 +73,12 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	
 	]])
 end
+
+task.spawn(function()
+	pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+	end)
+end)
 
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
@@ -177,7 +183,7 @@ if PlaceFileName then
 end
 
 Window = Rayfield:CreateWindow({
-	Name = `FrostByte | {PlaceName} | {ScriptVersion}`,
+	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
 	Icon = "snowflake",
 	LoadingTitle = "❄ Brought to you by FrostByte ❄",
 	LoadingSubtitle = PlaceName,
@@ -508,6 +514,6 @@ end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
 
-if ScriptVersion:sub(1, 1) ~= "v" then
+if not ScriptVersion or ScriptVersion == "Universal" then
 	CreateUniversalTabs()
 end
