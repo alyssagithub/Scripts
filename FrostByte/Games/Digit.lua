@@ -816,7 +816,7 @@ local Capacity = Tab:CreateSlider({
 Tab:CreateButton({
 	Name = "💯 • Set to Your Max Capacity",
 	Callback = function()
-		Capacity:Set(GetLimitedMaxInventorySize())
+		pcall(Capacity.Set, Capacity, GetLimitedMaxInventorySize())
 	end,
 })
 
