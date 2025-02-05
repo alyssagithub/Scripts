@@ -21,21 +21,6 @@ local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 
 local ScriptVersion = getgenv().ScriptVersion
 
-function Notify(Title: string, Content: string, Image: string)
-	if not Rayfield then
-		return
-	end
-	
-	Rayfield:Notify({
-		Title = Title,
-		Content = Content,
-		Duration = 10,
-		Image = Image or "info",
-	})
-end
-
-getgenv().Notify = Notify
-
 getgenv().gethui = function()
 	return game:GetService("CoreGui")
 end
@@ -89,12 +74,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 end
 
 task.spawn(function()
-	while task.wait(Random.new():NextNumber(5 * 60, 10 * 60)) do
-		Notify("Enjoying this script?", "Join the discord at discord.gg/sS3tDP6FSB", "heart")
-	end
-end)
-
-task.spawn(function()
 	pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 	end)
@@ -104,10 +83,41 @@ if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
 
-Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Success, Rayfield = pcall(loadstring(game:HttpGet("https://sirius.menu/rayfield")))
+
+if not Success or not Rayfield then
+	return game:GetService("StarterGui"):SetCore("SendNotification", {
+		Title = "Error while loading Rayfield",
+		Text = "Try re-executing or rejoining.",
+		Duration = 10,
+	})
+end
+
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
 
 getgenv().Rayfield = Rayfield
+getgenv().Flags = Flags
+
+local function Notify(Title: string, Content: string, Image: string)
+	if not Rayfield then
+		return
+	end
+
+	Rayfield:Notify({
+		Title = Title,
+		Content = Content,
+		Duration = 10,
+		Image = Image or "info",
+	})
+end
+
+getgenv().Notify = Notify
+
+task.spawn(function()
+	while task.wait(Random.new():NextNumber(5 * 60, 10 * 60)) do
+		Notify("Enjoying this script?", "Join the discord at discord.gg/sS3tDP6FSB", "heart")
+	end
+end)
 
 local PlaceFileName = getgenv().PlaceFileName
 
@@ -348,38 +358,46 @@ function CreateUniversalTabs()
 		return if Success then Result else 0
 	end
 	
-	local function CheckIfStaff(CheckPlayer: Player)
-		if not Flags.StaffJoin.CurrentValue then
-			return
-		end
-		
+	local function GetStaffRole(CheckPlayer: Player)
 		local StaffRole
-		
+
 		if IsInGroup(CheckPlayer, 1200769) then
 			StaffRole = "Roblox Admin"
 		end
-		
+
 		if game.CreatorType ~= Enum.CreatorType.Group then
 			return
 		end
-		
+
 		local CreatorId = game.CreatorId
-		
+
 		local Role = GetRoleInGroup(CheckPlayer, CreatorId)
-		
+
 		for _, Name in StaffRoleNames do
 			if typeof(Role) == "string" and Role:lower():find(Name) then
 				StaffRole = Role
 			end
 		end
-		
+
 		if GetRankInGroup(CheckPlayer, CreatorId) == 255 then
 			StaffRole = "Group Owner"
 		end
 		
-		if StaffRole then
-			Player:Kick(`The player '{CheckPlayer.Name}' was detected to be a staff member, their role is '{StaffRole}'.\n\nIf you believe this is false, contact the dev of FrostByte.`)
+		return StaffRole
+	end
+	
+	local function CheckIfStaff(CheckPlayer: Player)
+		if not Flags.StaffJoin.CurrentValue then
+			return
 		end
+		
+		local StaffRole = GetStaffRole(CheckPlayer)
+		
+		if not StaffRole then
+			return
+		end
+		
+		Player:Kick(`The player '{CheckPlayer.Name}' was detected to be a staff member, their role is '{StaffRole}'.\n\nIf you believe this is false, contact the dev of FrostByte.`)
 	end
 	
 	Tab:CreateToggle({
@@ -398,6 +416,8 @@ function CreateUniversalTabs()
 	})
 	
 	HandleConnection(Players.PlayerAdded:Connect(CheckIfStaff), "StaffJoin")
+	
+	getgenv().Role = GetStaffRole(Player)
 	
 	Tab:CreateSection("UI")
 	
@@ -485,6 +505,7 @@ function CreateUniversalTabs()
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 	
 	local FrostByteStarted = getgenv().FrostByteStarted
+	
 	if FrostByteStarted then
 		FrostByteStarted()
 	end
