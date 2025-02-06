@@ -74,6 +74,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	]])
 end
 
+task.wait(1)
+
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
