@@ -501,7 +501,13 @@ Tab:CreateToggle({
 				local args = {...}
 
 				if method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
-					local Ronald = workspace.Map.Islands.Nookville.BackpackIsland:FindFirstChild("Ronald")
+					local Nookville = workspace.Map.Islands:FindFirstChild("Nookville")
+					
+					if not Nookville then
+						return
+					end
+					
+					local Ronald = Nookville.BackpackIsland:FindFirstChild("Ronald")
 
 					if not Ronald then
 						return
