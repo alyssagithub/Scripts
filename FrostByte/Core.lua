@@ -179,8 +179,6 @@ if PlaceFileName then
 	end)
 end
 
-task.wait(1)
-
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
 	Icon = "snowflake",
