@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.6.6"
+getgenv().ScriptVersion = "v2.6.6a"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1556,7 +1556,7 @@ Tab:CreateToggle({
 	Name = "🔴 • Disable Features When Another Player is Near",
 	CurrentValue = false,
 	Flag = "Disable",
-	Callback = function(Value)	
+	Callback = function(Value)
 		while Flags.Disable.CurrentValue and task.wait() do
 			local FoundAnyNear = false
 			
@@ -1571,7 +1571,25 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				if (OtherCharacter.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude > Flags.Distance.CurrentValue then
+				local OtherHumanoidRootPart: BasePart? = OtherCharacter:FindFirstChild("HumanoidRootPart")
+				
+				if not OtherHumanoidRootPart then
+					continue
+				end
+				
+				local Character = Player.Character
+				
+				if not Character then
+					continue
+				end
+				
+				local HumanoidRootPart: BasePart? = Character:FindFirstChild("HumanoidRootPart")
+				
+				if not HumanoidRootPart then
+					continue
+				end
+				
+				if (OtherHumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude > Flags.Distance.CurrentValue then
 					continue
 				end
 				
