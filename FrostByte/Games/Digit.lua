@@ -244,7 +244,7 @@ Tab:CreateToggle({
 		local Visualizer = workspace:FindFirstChild("FrostByteVisualizer")
 		local Character = Player.Character
 		local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-		local StartPos = Character:GetPivot().Position - Vector3.yAxis * HumanoidRootPart.Size.Y
+		local StartPos = Character:GetPivot().Position
 
 		while Flags.DigWalk.CurrentValue and task.wait() do	
 			if Player:GetAttribute("IsDigging") then
