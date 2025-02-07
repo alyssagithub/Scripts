@@ -74,8 +74,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	]])
 end
 
-task.wait(1)
-
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
@@ -180,6 +178,8 @@ if PlaceFileName then
 		end
 	end)
 end
+
+task.wait(1)
 
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
