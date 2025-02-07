@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.6.0"
+getgenv().ScriptVersion = "v2.6.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -21,8 +21,9 @@ local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = 
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 
-local Player = game:GetService("Players").LocalPlayer
+local Player = Players.LocalPlayer
 
 local Network = ReplicatedStorage:WaitForChild("Source"):WaitForChild("Network")
 local RemoteFunctions: Folder & {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
@@ -352,6 +353,15 @@ Tab:CreateSlider({
 	CurrentValue = 20,
 	Flag = "ZoneSize",
 	Callback = function()end,
+})
+
+Tab:CreateToggle({
+	Name = "⚓ • Anchor Character",
+	CurrentValue = false,
+	Flag = "Anchor",
+	Callback = function(Value)	
+		Player.Character.HumanoidRootPart.Anchored = Value
+	end,
 })
 
 Tab:CreateSection("Efficiency")
@@ -927,6 +937,36 @@ PurchaseShovel = Tab:CreateDropdown({
 	end,
 })
 
+local Backpacks = {}
+
+for i,v in ReplicatedStorage.Assets.Models.Backpacks:GetChildren() do
+	table.insert(Backpacks, v.Name)
+end
+
+local PurchaseBackpack
+PurchaseBackpack = Tab:CreateDropdown({
+	Name = "🎒 • Purchase Backpack",
+	Options = Backpacks,
+	CurrentOption = "",
+	MultipleOptions = false,
+	Callback = function(CurrentOption)
+		CurrentOption = CurrentOption[1]
+
+		if CurrentOption == "" then
+			return
+		end
+
+		RemoteFunctions.Shop:InvokeServer({
+			Command = "Buy",
+			Type = "Backpack",
+			Product = CurrentOption,
+			Amount = 1
+		})
+
+		PurchaseBackpack:Set({""})
+	end,
+})
+
 local Tab: Tab = Window:CreateTab("Upgrades", "circle-plus")
 
 Tab:CreateSection("Enchanting")
@@ -1488,6 +1528,91 @@ Tab:CreateButton({
 		
 		Notify("Completed", "Applied all the known codes.")
 	end,
+})
+
+local Tab: Tab = Window:CreateTab("Safety", "shield")
+
+Tab:CreateSection("Disabling")
+
+local OriginalFlags = {}
+local Disabled = false
+
+local function ReEnableFeatures()
+	if not Disabled then
+		return
+	end
+	
+	print('re-enabling')
+	
+	for Name, CurrentValue in OriginalFlags do
+		Flags[Name]:Set(CurrentValue)
+	end
+
+	OriginalFlags = {}
+	Disabled = false
+end
+
+Tab:CreateToggle({
+	Name = "🔴 • Disable Features When Another Player is Near",
+	CurrentValue = false,
+	Flag = "Disable",
+	Callback = function(Value)	
+		while Flags.Disable.CurrentValue and task.wait() do
+			local FoundAnyNear = false
+			
+			for _, OtherPlayer in Players:GetPlayers() do
+				if OtherPlayer == Player then
+					continue
+				end
+				
+				local OtherCharacter = OtherPlayer.Character
+				
+				if not OtherCharacter then
+					continue
+				end
+				
+				if (OtherCharacter.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude > Flags.Distance.CurrentValue then
+					continue
+				end
+				
+				FoundAnyNear = true
+				
+				if Disabled then
+					continue
+				end
+				
+				for Name, Flag in Flags do
+					if not Flag.CurrentValue or typeof(Flag.CurrentValue) ~= "boolean" or Name == "Disable" then
+						continue
+					end
+					
+					OriginalFlags[Name] = Flag.CurrentValue
+					Flag:Set(false)
+					Disabled = true
+				end
+			end
+			
+			if FoundAnyNear then
+				continue
+			end
+			
+			ReEnableFeatures()
+		end
+		
+		if Value then
+			ReEnableFeatures()
+		end
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "📏 • Minimum Distance",
+	Range = {0, 500},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 100,
+	Flag = "Distance",
+	Callback = function()end,
 })
 
 local Tab: Tab = Window:CreateTab("Info", "info")
