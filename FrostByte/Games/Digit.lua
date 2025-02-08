@@ -31,6 +31,10 @@ local RemoteEvents: Folder & {[string]: RemoteEvent} = Network:WaitForChild("Rem
 
 local Window = getgenv().Window
 
+if not Window then
+	return
+end
+
 local Tab: Tab = Window:CreateTab("Digging", "shovel")
 
 Tab:CreateSection("Digging")
