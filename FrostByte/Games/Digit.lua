@@ -917,7 +917,7 @@ for i,v in ReplicatedStorage.Settings.Items.Shovels:GetChildren() do
 	local BuyPrice = 0
 	local NewName
 
-	if Success and ItemInfo then
+	if Success and ItemInfo and typeof(ItemInfo) == "table" then
 		if not ItemInfo.BuyPrice then
 			continue
 		end
