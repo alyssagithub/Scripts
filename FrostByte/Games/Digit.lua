@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.6.6a"
+getgenv().ScriptVersion = "v2.6.7"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -359,8 +359,20 @@ Tab:CreateToggle({
 	Name = "⚓ • Anchor Character",
 	CurrentValue = false,
 	Flag = "Anchor",
-	Callback = function(Value)	
-		Player.Character.HumanoidRootPart.Anchored = Value
+	Callback = function(Value)
+		local Character = Player.Character
+		
+		if not Character then
+			return
+		end
+		
+		local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
+		
+		if not HumanoidRootPart then
+			return
+		end
+		
+		HumanoidRootPart.Anchored = Value
 	end,
 })
 
@@ -670,16 +682,20 @@ Tab:CreateInput({
 
 Tab:CreateSection("Pinning")
 
-local function PinItems(Tool: Tool)
-	if not Flags.PinItems.CurrentValue then
+local function PinItems(Tool: Tool, Unpin: boolean?)
+	if not Unpin and not Flags.PinItems.CurrentValue then
 		return
 	end
 
 	if not table.find(Flags.ItemsToPin.CurrentOption, Tool.Name) then
 		return
 	end
+	
+	if not Unpin and Tool:GetAttribute("Pinned") then
+		return
+	end
 
-	if Tool:GetAttribute("Pinned") or not Tool:GetAttribute("ID") then
+	if not Tool:GetAttribute("ID") then
 		return
 	end
 
@@ -717,6 +733,19 @@ Tab:CreateDropdown({
 	Flag = "ItemsToPin",
 	Callback = function()end,
 })
+
+Tab:CreateDivider()
+
+Tab:CreateButton({
+	Name = "🔓 • Quick Unpin All Items",
+	Callback = function()
+		for _, Tool: Tool in Player.Backpack:GetChildren() do
+			PinItems(Tool, true)
+		end
+	end,
+})
+
+HandleConnection(Player.Backpack.ChildAdded:Connect(PinItems), "PinItems")
 
 local Tab: Tab = Window:CreateTab("Shop", "shopping-basket")
 
