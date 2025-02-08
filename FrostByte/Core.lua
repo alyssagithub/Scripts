@@ -417,6 +417,62 @@ function CreateUniversalTabs()
 	
 	getgenv().Role = GetStaffRole(Player)
 	
+	local Connections = {}
+
+	local function HandleUsernameChange(Object: Instance)
+		if not Flags.HideName.CurrentValue then
+			return
+		end
+
+		if not Object:IsA("TextLabel") and not Object:IsA("TextBox") and not Object:IsA("TextButton") then
+			return
+		end
+
+		local NameReplacement = Flags.NameReplacement.CurrentValue
+
+		if not Connections[Object] then
+			Connections[Object] = true
+			Object:GetPropertyChangedSignal("Text"):Connect(HandleUsernameChange)
+		end
+
+		if Object.Text:find(Player.Name) then
+			Object.Text = Object.Text:gsub(Player.Name, NameReplacement)
+		elseif Object.Text:find(Player.DisplayName) then
+			Object.Text = Object.Text:gsub(Player.DisplayName, NameReplacement)
+		end
+	end
+	
+	local DescendantAddedConnection
+	
+	Tab:CreateToggle({
+		Name = "🛡 • Hide Username and Display Name (Client-Sided)",
+		CurrentValue = false,
+		Flag = "HideName",
+		Callback = function(Value)
+			if Value and not DescendantAddedConnection then
+				for i,v in game:GetDescendants() do
+					HandleUsernameChange(v)
+				end
+				
+				DescendantAddedConnection = game.DescendantAdded:Connect(HandleUsernameChange)
+				
+				HandleConnection(DescendantAddedConnection, "HideName")
+			elseif DescendantAddedConnection then
+				DescendantAddedConnection:Disconnect()
+				DescendantAddedConnection = nil
+			end
+		end,
+	})
+	
+	Tab:CreateInput({
+		Name = "💬 • Name To Replace With",
+		CurrentValue = "",
+		PlaceholderText = "FrostByte",
+		RemoveTextAfterFocusLost = false,
+		Flag = "NameReplacement",
+		Callback = function()end,
+	})
+	
 	Tab:CreateSection("UI")
 	
 	local CustomThemes = {
