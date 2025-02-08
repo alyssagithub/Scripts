@@ -47,8 +47,6 @@ end
 
 local UnsupportedName = " (Executor Unsupported)"
 
-getgenv().UnsupportedName = UnsupportedName
-
 local function ApplyUnsupportedName(Name: string, Condition: boolean)
 	return Name..if Condition then "" else UnsupportedName
 end
@@ -95,7 +93,6 @@ end
 
 if not Success or not Rayfield or not Rayfield.CreateWindow then
 	SendNotification("Error while loading Rayfield", "Try re-executing or rejoining.")
-	error("Error while loading Rayfield")
 	return
 end
 
