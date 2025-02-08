@@ -121,14 +121,14 @@ task.spawn(function()
 	end
 end)
 
-local PlaceFileName = getgenv().PlaceFileName
+if ScriptVersion and ScriptVersion ~= "Universal" then
+	local PlaceFileName = getgenv().PlaceFileName
 
-if not PlaceFileName then
-	PlaceFileName = PlaceName:gsub("%b[]", "")
-	PlaceFileName = PlaceFileName:gsub("[^%a]", "")
-end
-
-task.spawn(function()
+	if not PlaceFileName then
+		PlaceFileName = PlaceName:gsub("%b[]", "")
+		PlaceFileName = PlaceFileName:gsub("[^%a]", "")
+	end
+	
 	local BindableFunction = Instance.new("BindableFunction")
 
 	local Response = false
@@ -158,26 +158,28 @@ task.spawn(function()
 			loadstring(game:HttpGet(File))()
 		end
 	end
+	
+	task.spawn(function()
+		while task.wait(60) do
+			local Result = game:HttpGet(File)
 
-	while task.wait(60) do
-		local Result = game:HttpGet(File)
+			if not Result then
+				continue
+			end
 
-		if not Result then
-			continue
+			Result = Result:split('getgenv().ScriptVersion = "')[2]
+			Result = Result:split('"')[1]
+
+			if Result == ScriptVersion then
+				continue
+			end
+
+			SendNotification("A new FrostByte version has been detected!", "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
+
+			break
 		end
-
-		Result = Result:split('getgenv().ScriptVersion = "')[2]
-		Result = Result:split('"')[1]
-
-		if Result == ScriptVersion then
-			continue
-		end
-
-		SendNotification("A new FrostByte version has been detected!", "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
-
-		break
-	end
-end)
+	end)
+end
 
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
