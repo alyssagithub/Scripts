@@ -1573,10 +1573,9 @@ local function ReEnableFeatures()
 		return
 	end
 	
-	print('re-enabling')
-	
 	for Name, CurrentValue in OriginalFlags do
-		Flags[Name]:Set(CurrentValue)
+		local Flag = Flags[Name]
+		pcall(Flag.Set, Flag, CurrentValue)
 	end
 
 	OriginalFlags = {}
@@ -1636,7 +1635,7 @@ Tab:CreateToggle({
 					end
 					
 					OriginalFlags[Name] = Flag.CurrentValue
-					Flag:Set(false)
+					pcall(Flag.Set, Flag, false)
 					Disabled = true
 				end
 			end
