@@ -123,58 +123,61 @@ end)
 
 local PlaceFileName = getgenv().PlaceFileName
 
-if PlaceFileName then
-	task.spawn(function()
-		local BindableFunction = Instance.new("BindableFunction")
-
-		local Response = false
-
-		local Button1 = "✅ Yes" 
-		local Button2 = "❌ No"
-
-		local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.lua`
-
-		BindableFunction.OnInvoke = function(Button: string)
-			Response = true
-
-			if Button == Button1 then
-				local OriginalFlags = {}
-
-				for i,v in Flags do
-					if typeof(v.CurrentValue) ~= "boolean" then
-						continue
-					end
-					
-					OriginalFlags[i] = v.CurrentValue
-					v:Set(false)
-				end
-				
-				getgenv().OriginalFlags = OriginalFlags
-
-				loadstring(game:HttpGet(File))()
-			end
-		end
-
-		while task.wait(60) do
-			local Result = game:HttpGet(File)
-			
-			if not Result then
-				continue
-			end
-
-			Result = Result:split('getgenv().ScriptVersion = "')[2]
-			Result = Result:split('"')[1]
-
-			if Result == ScriptVersion then
-				continue
-			end
-			
-			SendNotification("A new FrostByte version has been detected!", "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
-
-			break
-		end
-	end)
+if not PlaceFileName then
+	PlaceFileName = PlaceName:gsub("%b[]", "")
+	PlaceFileName = PlaceFileName:gsub("[^%a]", "")
 end
+
+task.spawn(function()
+	local BindableFunction = Instance.new("BindableFunction")
+
+	local Response = false
+
+	local Button1 = "✅ Yes" 
+	local Button2 = "❌ No"
+
+	local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.lua`
+
+	BindableFunction.OnInvoke = function(Button: string)
+		Response = true
+
+		if Button == Button1 then
+			local OriginalFlags = {}
+
+			for i,v in Flags do
+				if typeof(v.CurrentValue) ~= "boolean" then
+					continue
+				end
+
+				OriginalFlags[i] = v.CurrentValue
+				v:Set(false)
+			end
+
+			getgenv().OriginalFlags = OriginalFlags
+
+			loadstring(game:HttpGet(File))()
+		end
+	end
+
+	while task.wait(60) do
+		local Result = game:HttpGet(File)
+
+		if not Result then
+			continue
+		end
+
+		Result = Result:split('getgenv().ScriptVersion = "')[2]
+		Result = Result:split('"')[1]
+
+		if Result == ScriptVersion then
+			continue
+		end
+
+		SendNotification("A new FrostByte version has been detected!", "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
+
+		break
+	end
+end)
 
 Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
