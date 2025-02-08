@@ -745,8 +745,6 @@ Tab:CreateButton({
 	end,
 })
 
-HandleConnection(Player.Backpack.ChildAdded:Connect(PinItems), "PinItems")
-
 local Tab: Tab = Window:CreateTab("Shop", "shopping-basket")
 
 Tab:CreateSection("Selling")
