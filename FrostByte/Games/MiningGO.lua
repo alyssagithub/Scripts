@@ -33,6 +33,10 @@ local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = 
 
 local Window = getgenv().Window
 
+if not Window then
+	return
+end
+
 local Tab = Window:CreateTab("Automation", "repeat")
 
 Tab:CreateSection("Ores")
