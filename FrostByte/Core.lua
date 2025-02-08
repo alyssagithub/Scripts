@@ -181,30 +181,34 @@ if ScriptVersion and ScriptVersion ~= "Universal" then
 	end)
 end
 
-Window = Rayfield:CreateWindow({
-	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
-	Icon = "snowflake",
-	LoadingTitle = "❄ Brought to you by FrostByte ❄",
-	LoadingSubtitle = PlaceName,
-	Theme = "DarkBlue",
+local Window
 
-	DisableRayfieldPrompts = false,
-	DisableBuildWarnings = false,
+pcall(function()
+	Window = Rayfield:CreateWindow({
+		Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
+		Icon = "snowflake",
+		LoadingTitle = "❄ Brought to you by FrostByte ❄",
+		LoadingSubtitle = PlaceName,
+		Theme = "DarkBlue",
 
-	ConfigurationSaving = {
-		Enabled = true,
-		FolderName = "FrostByte",
-		FileName = `{getgenv().PlaceFileName or `DevMode-{game.PlaceId}`}-{Player.Name}`
-	},
+		DisableRayfieldPrompts = false,
+		DisableBuildWarnings = false,
 
-	Discord = {
-		Enabled = true,
-		Invite = "sS3tDP6FSB",
-		RememberJoins = true
-	},
-})
+		ConfigurationSaving = {
+			Enabled = true,
+			FolderName = "FrostByte",
+			FileName = `{getgenv().PlaceFileName or `DevMode-{game.PlaceId}`}-{Player.Name}`
+		},
 
-getgenv().Window = Window
+		Discord = {
+			Enabled = true,
+			Invite = "sS3tDP6FSB",
+			RememberJoins = true
+		},
+	})
+	
+	getgenv().Window = Window
+end)
 
 function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
