@@ -17,6 +17,10 @@ local RemoteEvents: {[string]: RemoteEvent} = ReplicatedStorage.RemoteEvents
 
 local Window = getgenv().Window
 
+if not Window then
+	return
+end
+
 local Tab = Window:CreateTab("Automatics", "repeat")
 
 Tab:CreateSection("Buildings")
