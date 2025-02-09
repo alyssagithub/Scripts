@@ -424,6 +424,8 @@ function CreateUniversalTabs()
 	getgenv().Role = GetStaffRole(Player)
 	
 	local Connections = {}
+	
+	local OriginalText = {}
 
 	local function HandleUsernameChange(Object: Instance)
 		if not Flags.HideName.CurrentValue then
@@ -442,8 +444,10 @@ function CreateUniversalTabs()
 		end
 
 		if Object.Text:find(Player.Name) then
+			OriginalText[Object] = Object.Text
 			Object.Text = Object.Text:gsub(Player.Name, NameReplacement)
 		elseif Object.Text:find(Player.DisplayName) then
+			OriginalText[Object] = Object.Text
 			Object.Text = Object.Text:gsub(Player.DisplayName, NameReplacement)
 		end
 	end
@@ -466,14 +470,20 @@ function CreateUniversalTabs()
 			elseif DescendantAddedConnection then
 				DescendantAddedConnection:Disconnect()
 				DescendantAddedConnection = nil
+				
+				for Object: TextLabel?, Text in OriginalText do
+					Object.Text = Text
+				end
+				
+				OriginalText = {}
 			end
 		end,
 	})
 	
 	Tab:CreateInput({
 		Name = "💬 • Name To Replace With",
-		CurrentValue = "",
-		PlaceholderText = "FrostByte",
+		CurrentValue = "FrostByte",
+		PlaceholderText = "New Name Here",
 		RemoveTextAfterFocusLost = false,
 		Flag = "NameReplacement",
 		Callback = function()end,
