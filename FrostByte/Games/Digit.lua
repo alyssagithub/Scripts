@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.6.7"
+getgenv().ScriptVersion = "v2.6.8"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1210,21 +1210,23 @@ local Success, ModifiersModule = pcall(require, ReplicatedStorage.Settings.Modif
 
 if not Success then
 	ModifiersModule = {
-		["Regular"] = Color3.fromRGB(35, 35, 35),
-		["Golden"] = Color3.fromRGB(255, 235, 17),
-		["Neon"] = Color3.fromRGB(16, 255, 219),
-		["Quantum"] = Color3.fromRGB(186, 24, 255),
-		["Festive"] = Color3.fromRGB(255, 143, 167),
-		["Wooden"] = Color3.fromRGB(125, 62, 17),
-		["Rusty"] = Color3.fromRGB(141, 18, 18),
-		["Holy"] = Color3.fromRGB(255, 255, 255),
-		["Hot"] = Color3.fromRGB(255, 0, 0),
-		["Biodegradable"] = Color3.fromRGB(9, 198, 38),
-		["Magma"] = Color3.fromRGB(255, 1, 1),
-		["Evil"] = Color3.fromRGB(149, 1, 1),
-		["Rainbow"] = Color3.fromRGB(0, 0, 0),
-		["Solar"] = Color3.fromRGB(),
-		["Venom"] = Color3.fromRGB()
+		Regular = Color3.fromRGB(35, 35, 35);
+		Golden = Color3.fromRGB(255, 160, 7);
+		Neon = Color3.fromRGB(16, 255, 219);
+		Quantum = Color3.fromRGB(186, 24, 255);
+		Festive = Color3.fromRGB(255, 143, 167);
+		Wooden = Color3.fromRGB(125, 62, 17);
+		Rusty = Color3.fromRGB(141, 18, 18);
+		Holy = Color3.fromRGB(255, 255, 255);
+		Hot = Color3.fromRGB(255, 0, 0);
+		Biodegradable = Color3.fromRGB(9, 198, 38);
+		Magma = Color3.fromRGB(255, 1, 1);
+		Evil = Color3.fromRGB(149, 1, 1);
+		Rainbow = Color3.fromRGB(0, 0, 0);
+		Solar = Color3.fromRGB(251, 255, 0);
+		Venom = Color3.fromRGB(26, 255, 0);
+		Hydrated = Color3.fromRGB(0, 115, 255);
+		Lovely = Color3.fromRGB(255, 0, 136);
 	}
 end
 
