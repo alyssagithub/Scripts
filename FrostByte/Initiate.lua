@@ -21,7 +21,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 
 local Code: string = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
 
-if Code ~= "404: Not Found" then
+if Code:find("getgenv().ScriptVersion") then
 	Notify("Game found, the script is loading.")
 	getgenv().PlaceFileName = PlaceName
 else
