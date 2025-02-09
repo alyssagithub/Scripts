@@ -1022,18 +1022,22 @@ EnchantShovel = Tab:CreateToggle({
 				continue
 			end
 			
-			local Inventory = RemoteFunctions.Player:InvokeServer({
+			local Inventory: {[string]: {Name: string}} = RemoteFunctions.Player:InvokeServer({
 				Command = "GetInventory"
 			})
-			
+
 			local MoleID: string
-			
+
 			for ID, Item in Inventory do
+				if typeof(Item) ~= "table" or not Item.Name then
+					continue
+				end
+				
 				if Item.Name:find("Mole") then
 					MoleID = ID 
 				end
 			end
-			
+
 			if not MoleID then
 				continue
 			end
