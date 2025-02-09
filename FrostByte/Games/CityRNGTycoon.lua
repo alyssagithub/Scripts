@@ -48,7 +48,13 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			for Name, Building in Module._Inventory.All do
+			local InventoryAll = Module._Inventory.All
+			
+			if not InventoryAll then
+				continue
+			end
+			
+			for Name, Building in InventoryAll do
 				for Level, Info in Building do
 					local Count = Info.Count
 					
