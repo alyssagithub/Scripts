@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.6.9"
+getgenv().ScriptVersion = "v2.7.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -976,7 +976,7 @@ end
 
 local PurchaseBackpack
 PurchaseBackpack = Tab:CreateDropdown({
-	Name = "🎒 • Purchase Backpack",
+	Name = "🎒 • Purchase/Equip Backpack",
 	Options = Backpacks,
 	CurrentOption = "",
 	MultipleOptions = false,
@@ -992,6 +992,12 @@ PurchaseBackpack = Tab:CreateDropdown({
 			Type = "Backpack",
 			Product = CurrentOption,
 			Amount = 1
+		})
+		
+		RemoteFunctions.Inventory:InvokeServer({
+			Command = "SetEquipmentEquip",
+			Type = "Backpack",
+			EquipmentName = CurrentOption
 		})
 
 		PurchaseBackpack:Set({""})
