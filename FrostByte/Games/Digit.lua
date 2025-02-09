@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.6.8"
+getgenv().ScriptVersion = "v2.6.9"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1011,14 +1011,24 @@ EnchantShovel = Tab:CreateToggle({
 	Callback = function(Value)
 		while Flags.EnchantShovel.CurrentValue and task.wait() do
 			local Backpack: Backpack = Player:FindFirstChild("Backpack")
-
+			
 			if not Backpack then
 				continue
 			end
-
-			local Mole = Backpack:FindFirstChild("Mole") or Backpack:FindFirstChild("Royal Mole")
-
-			if not Mole or not Mole:GetAttribute("ID") then
+			
+			local Inventory = RemoteFunctions.Player:InvokeServer({
+				Command = "GetInventory"
+			})
+			
+			local MoleID: string
+			
+			for ID, Item in Inventory do
+				if Item.Name:find("Mole") then
+					MoleID = ID 
+				end
+			end
+			
+			if not MoleID then
 				continue
 			end
 
@@ -1040,7 +1050,7 @@ EnchantShovel = Tab:CreateToggle({
 
 			local Result = RemoteFunctions.MolePit:InvokeServer({
 				Command = "OfferEnchant",
-				ID = Mole:GetAttribute("ID")
+				ID = MoleID
 			})
 
 			if Result ~= true then
