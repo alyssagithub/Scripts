@@ -561,7 +561,7 @@ Tab:CreateToggle({
 					})
 					
 					task.wait()
-				until Result.Status
+				until Result and Result.Status
 			end
 			
 			Character:PivotTo(SavedPosition)
@@ -859,7 +859,7 @@ Tab:CreateToggle({
 	Flag = "Sell",
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
-			if GetInventorySize() < tonumber(Flags.Capacity.CurrentValue) then
+			if GetInventorySize() < (tonumber(Flags.Capacity.CurrentValue) or math.huge) then
 				continue
 			end
 
