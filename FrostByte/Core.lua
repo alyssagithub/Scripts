@@ -216,6 +216,10 @@ function CreateUniversalTabs()
 	local TeleportService = game:GetService("TeleportService")
 	local RunService = game:GetService("RunService")
 	
+	if not Window then
+		return
+	end
+	
 	local Tab = Window:CreateTab("Client", "user")
 	
 	Tab:CreateSection("Discord")
