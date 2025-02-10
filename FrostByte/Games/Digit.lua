@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.7.0"
+getgenv().ScriptVersion = "v2.8.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -15,6 +15,19 @@ local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> (Section),
 	CreateDivider: (self: Tab) -> (Divider),
+}
+
+type Inventory = {
+	[string]: {
+		ModelName: string,
+		Quantity: number,
+		Name: string,
+		OriginalOwner: number,
+		Attributes: {},
+		CreationTime: number,
+		OwnerHistory: {},
+		HotbarSlot: number
+	}
 }
 
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
@@ -239,6 +252,16 @@ local function IsPointInVolume(point: Vector3, volumeCenter: CFrame, volumeSize:
 		and volumeSpacePoint.Z <= volumeSize.Z/2
 end
 
+local function DisablePileCollisions(Pile: Model)
+	for _, Descendant: BasePart in Pile:GetDescendants() do
+		if not Descendant:IsA("BasePart") then
+			continue
+		end
+
+		Descendant.CanCollide = false
+	end
+end
+
 local ChosenPosition
 
 Tab:CreateToggle({
@@ -303,13 +326,7 @@ Tab:CreateToggle({
 
 				FoundPile = true
 
-				for _, Descendant: BasePart in Pile:GetDescendants() do
-					if not Descendant:IsA("BasePart") then
-						continue
-					end
-
-					Descendant.CanCollide = false
-				end
+				DisablePileCollisions(Pile)
 
 				Humanoid:MoveTo(Pile:GetPivot().Position)
 				break
@@ -351,7 +368,7 @@ Tab:CreateToggle({
 
 Tab:CreateSlider({
 	Name = "🟩 • Auto Walk Zone Size",
-	Range = {5, 100},
+	Range = {1, 100},
 	Increment = 1,
 	Suffix = "Studs",
 	CurrentValue = 20,
@@ -360,25 +377,19 @@ Tab:CreateSlider({
 })
 
 Tab:CreateToggle({
-	Name = "⚓ • Anchor Character",
+	Name = "🗻 • Disable Pile Collisions",
 	CurrentValue = false,
-	Flag = "Anchor",
+	Flag = "Collisions",
 	Callback = function(Value)
-		local Character = Player.Character
-		
-		if not Character then
-			return
+		if Value then
+			for _, Pile: Model in TreasurePiles:GetChildren() do
+				DisablePileCollisions(Pile)
+			end
 		end
-		
-		local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
-		
-		if not HumanoidRootPart then
-			return
-		end
-		
-		HumanoidRootPart.Anchored = Value
 	end,
 })
+
+HandleConnection(TreasurePiles.ChildAdded:Connect(DisablePileCollisions), "Collisions")
 
 Tab:CreateSection("Efficiency")
 
@@ -493,104 +504,67 @@ Tab:CreateDropdown({
 
 local Tab: Tab = Window:CreateTab("Storage", "warehouse")
 
-Tab:CreateSection("Access")
-
-local OpenBankHook
-local MoveToBankHook
-local AlreadyWaiting = false
-
-Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🏦 • Access Bank Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
-	CurrentValue = false,
-	Flag = "Bank",
-	Callback = function(Value)
-		if not (hookmetamethod and getnamecallmethod and checkcaller) then
-			return
-		end
-
-		if Value and not OpenBankHook then
-			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
-				local method = getnamecallmethod()
-				local args = {...}
-
-				if not checkcaller() and method == "InvokeServer" and args[1].Command == "OwnsProduct" and args[1].Product == "Store Anywhere" and Flags.Bank.CurrentValue then
-					return true
-				end
-
-				return OpenBankHook(self, ...)
-			end)
-		end
-
-		if Value and not MoveToBankHook then
-			MoveToBankHook = hookmetamethod(RemoteFunctions.Inventory, "__namecall", function(self, ...)
-				local method = getnamecallmethod()
-				local args = {...}
-
-				if method == "InvokeServer" and args[1].Command == "MoveToBank" and Flags.Bank.CurrentValue and not AlreadyWaiting then
-					local Nookville = workspace.Map.Islands:FindFirstChild("Nookville")
-					
-					if not Nookville then
-						return
-					end
-					
-					local Ronald = Nookville.BackpackIsland:FindFirstChild("Ronald")
-
-					if not Ronald then
-						return
-					end
-
-					local Result: {["Status"]: boolean}
-
-					AlreadyWaiting = true
-
-					local Character = Player.Character
-
-					local PreviousPosition = Character:GetPivot()
-
-					repeat
-						Character:PivotTo(Ronald:GetPivot())
-						Result = self:InvokeServer(args[1])
-					until (Result and Result.Status) or not Flags.Bank.CurrentValue
-
-					AlreadyWaiting = false
-
-					Character:PivotTo(PreviousPosition)
-				end
-
-				local Success, Result = pcall(MoveToBankHook, self, ...)
-
-				return if Success then Result else {Status = true}
-			end)
-		end
-	end,
-})
-
 Tab:CreateSection("Depositing")
 
+local OwnsStoreAnywhere = RemoteFunctions.Marketplace:InvokeServer({
+	Command = "OwnsProduct",
+	UserId = Player.UserId,
+	Product = "Store Anywhere"
+})
+
 Tab:CreateToggle({
-	Name = "🏧 • Auto Bank Items (Needs Bank Access)",
+	Name = "🏧 • Auto Bank Items",
 	CurrentValue = false,
 	Flag = "BankItems",
 	Callback = function(Value)
-		while Flags.BankItems.CurrentValue and task.wait() do	
-			local Backpack: Backpack = Player:FindFirstChild("Backpack")
+		while Flags.BankItems.CurrentValue and task.wait() do
+			local Character = Player.Character
 
-			if not Backpack then
+			if not Character then
 				continue
 			end
-
-			for _, Item: string in Flags.ItemsToBank.CurrentOption do
-				local Tool = Backpack:FindFirstChild(Item)
-
-				if not Tool then
+			
+			local Inventory: Inventory = RemoteFunctions.Player:InvokeServer({
+				Command = "GetInventory"
+			})
+			
+			local SavedPosition = Character:GetPivot()
+			
+			for ID, ItemInfo in Inventory do
+				if not table.find(Flags.ItemsToBank.CurrentOption, ItemInfo.Name) then
 					continue
 				end
+				
+				local Result: {Status: boolean}?
+				
+				repeat
+					if not OwnsStoreAnywhere then
+						local Nookville: Folder? = workspace.Map.Islands:FindFirstChild("Nookville")
 
-				RemoteFunctions.Inventory:InvokeServer({
-					Command = "MoveToBank",
-					UID = Tool:GetAttribute("ID")
-				})
+						if not Nookville then
+							continue
+						end
+
+						local Ronald: Model? = Nookville.BackpackIsland:FindFirstChild("Ronald")
+
+						if not Ronald then
+							continue
+						end
+
+						Character:PivotTo(Ronald:GetPivot())
+						--task.wait(0.1)
+					end
+					
+					Result = RemoteFunctions.Inventory:InvokeServer({
+						Command = "MoveToBank",
+						UID = ID
+					})
+					
+					task.wait()
+				until Result.Status
 			end
+			
+			Character:PivotTo(SavedPosition)
 		end
 	end,
 })
@@ -611,7 +585,49 @@ Tab:CreateDropdown({
 	Callback = function()end,
 })
 
+Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "💔 • Auto Deposit Broken Hearts",
+	CurrentValue = false,
+	Flag = "DepositBrokenHearts",
+	Callback = function(Value)
+		while Flags.DepositBrokenHearts.CurrentValue do
+			RemoteFunctions.Valentines:InvokeServer({
+				Command = "Deposit"
+			})
+			task.wait(1)
+		end
+	end,
+})
+
 Tab:CreateSection("Withdrawing")
+
+local OpenBankHook
+
+Tab:CreateToggle({
+	Name = ApplyUnsupportedName("🏦 • Bank Withdraw Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
+	CurrentValue = false,
+	Flag = "Bank",
+	Callback = function(Value)
+		if not (hookmetamethod and getnamecallmethod and checkcaller) then
+			return
+		end
+
+		if Value and not OpenBankHook then
+			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
+				local method = getnamecallmethod()
+				local args = {...}
+
+				if not checkcaller() and method == "InvokeServer" and args[1].Command == "OwnsProduct" and args[1].Product == "Store Anywhere" and Flags.Bank.CurrentValue then
+					return true
+				end
+
+				return OpenBankHook(self, ...)
+			end)
+		end
+	end,
+})
 
 local ItemInfo
 
@@ -698,6 +714,10 @@ local function PinItems(Tool: Tool, Unpin: boolean?)
 	if not Unpin and Tool:GetAttribute("Pinned") then
 		return
 	end
+	
+	if Unpin and not Tool:GetAttribute("Pinned") then
+		return
+	end
 
 	if not Tool:GetAttribute("ID") then
 		return
@@ -754,7 +774,7 @@ local Tab: Tab = Window:CreateTab("Shop", "shopping-basket")
 Tab:CreateSection("Selling")
 
 local function GetInventorySize()
-	local Inventory: {[string]: {["Attributes"]: {["Weight"]: number}}} = RemoteFunctions.Player:InvokeServer({
+	local Inventory: Inventory = RemoteFunctions.Player:InvokeServer({
 		Command = "GetInventory"
 	})
 
@@ -811,19 +831,21 @@ function SellInventory()
 	local Teleported = false
 
 	local StartTime = tick()
+	
+	if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
+		Player.Character:PivotTo(Merchant:GetPivot())
+		Teleported = true
+	end
+
+	task.wait(1)
+
+	RemoteEvents.Merchant:FireServer({
+		Command = "SellAllTreasures",
+		Merchant = Merchant
+	})
 
 	repeat
-		if not UserOwnsGamePassAsync(Player.UserId, 1003325804) then
-			Player.Character:PivotTo(Merchant:GetPivot())
-			Teleported = true
-		end
-
-		task.wait(1)
-
-		RemoteEvents.Merchant:FireServer({
-			Command = "SellAllTreasures",
-			Merchant = Merchant
-		})
+		task.wait()
 	until GetInventorySize() ~= PreviousSize or Flags.Sell.CurrentValue ~= SellEnabled or tick() - StartTime >= 3
 
 	if Teleported then
@@ -837,7 +859,7 @@ Tab:CreateToggle({
 	Flag = "Sell",
 	Callback = function(Value)	
 		while Flags.Sell.CurrentValue and task.wait() do
-			if GetInventorySize() < Flags.Capacity.CurrentValue then
+			if GetInventorySize() < tonumber(Flags.Capacity.CurrentValue) then
 				continue
 			end
 
@@ -850,12 +872,11 @@ local function GetLimitedMaxInventorySize()
 	return math.min((Player:GetAttribute("MaxInventorySize") or 1) + 9, 1000)
 end
 
-local Capacity = Tab:CreateSlider({
+local Capacity = Tab:CreateInput({
 	Name = "🛒 • Capacity to Sell at",
-	Range = {0, 1000},
-	Increment = 1,
-	Suffix = "Items",
 	CurrentValue = GetLimitedMaxInventorySize(),
+	PlaceholderText = "Capacity",
+	RemoveTextAfterFocusLost = false,
 	Flag = "Capacity",
 	Callback = function()end,
 })
@@ -1022,7 +1043,7 @@ EnchantShovel = Tab:CreateToggle({
 				continue
 			end
 			
-			local Inventory: {[string]: {Name: string}} = RemoteFunctions.Player:InvokeServer({
+			local Inventory: Inventory = RemoteFunctions.Player:InvokeServer({
 				Command = "GetInventory"
 			})
 
