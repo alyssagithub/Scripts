@@ -1214,10 +1214,10 @@ AutoAppraise = Tab:CreateToggle({
 
 					if Weight and Weight >= Flags.Weight.CurrentValue then
 						Notify("Auto Appraise", "Stopped because the selected weight was achieved")
-						AutoAppraise:Set(false)
+						pcall(AutoAppraise.Set, AutoAppraise, false)
 					elseif Modifier and table.find(Flags.Modifiers.CurrentOption, Modifier) then
 						Notify("Auto Appraise", "Stopped because a selected modifier was received")
-						AutoAppraise:Set(false)
+						pcall(AutoAppraise.Set, AutoAppraise, false)
 					else
 						local Humanoid: Humanoid = Player.Character:FindFirstChild("Humanoid")
 						
