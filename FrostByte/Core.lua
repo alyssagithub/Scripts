@@ -282,6 +282,10 @@ function CreateUniversalTabs()
 		CurrentValue = 0,
 		Flag = "FPS",
 		Callback = function(Value)
+			if not setfpscap then
+				return
+			end
+			
 			setfpscap(Value)
 		end,
 	})
