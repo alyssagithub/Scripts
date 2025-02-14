@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.8.1"
+getgenv().ScriptVersion = "v2.8.2"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -1243,7 +1243,7 @@ AutoAppraise = Tab:CreateToggle({
 
 Tab:CreateSlider({
 	Name = "⚖ • Minimum Weight to Stop at",
-	Range = {1, 10000},
+	Range = {1, 100000},
 	Increment = 5,
 	Suffix = "kg",
 	CurrentValue = 1,
