@@ -159,7 +159,13 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			local Shovel = Player.Character:FindFirstChild("Shovel")
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
+			
+			local Shovel = Character:FindFirstChild("Shovel")
 			
 			if not Shovel then
 				continue
@@ -1131,7 +1137,7 @@ EnchantShovel = Tab:CreateToggle({
 
 				if table.find(Flags.Enchants.CurrentOption, Enchant) then
 					Notify("Auto Enchant", "Stopped due to finding an enchant to stop at", "book")
-					EnchantShovel:Set(false)
+					pcall(EnchantShovel.Set, EnchantShovel, false)
 				end
 			end
 		end
@@ -1329,7 +1335,7 @@ end), "MeteorRemoved")
 
 local PreviousLocation
 
-local function LunarCloudsTeleport(Lunar: Model?)
+local function LunarCloudsTeleport(Lunar: Model)
 	if Lunar.Name ~= "Lunar Clouds" or not Flags.LunarClouds.CurrentValue then
 		return
 	end
