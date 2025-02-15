@@ -4,8 +4,6 @@ getgenv().ScriptVersion = "v1.0.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
-local Remotes: Folder & {[string]: RemoteEvent & RemoteFunction} = game:GetService("ReplicatedStorage").Remotes
-
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> Section,
 	CreateDivider: (self: Tab) -> Divider,
@@ -13,6 +11,8 @@ type Tab = {
 
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
+
+local Remotes: Folder & {[string]: RemoteEvent & RemoteFunction} = game:GetService("ReplicatedStorage").Remotes
 
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
@@ -263,7 +263,15 @@ TeleportWardenShrine = Tab:CreateDropdown({
 			return
 		end
 		
+		if not CurrentOption then
+			return
+		end
+		
 		local Tablet: MeshPart = workspace.Interactions["Warden Shrines"]:FindFirstChild(CurrentOption, true)
+		
+		if not Tablet then
+			return Notify("Error", "Couldn't find the tablet for the selected Warden Shrine.")
+		end
 
 		Player.Character:PivotTo(Tablet:GetPivot() + Tablet:GetPivot().LookVector * 5)
 		TeleportWardenShrine:Set("")
