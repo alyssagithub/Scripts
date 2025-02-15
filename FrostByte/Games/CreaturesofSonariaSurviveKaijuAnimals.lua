@@ -226,12 +226,18 @@ Tab:CreateButton({
 	Callback = function()
 		local Teleported = false
 		
+		local Character = Player.Character
+		
+		if not Character then
+			return Notify("Error", "You do not have a character, please spawn in first.")
+		end
+		
 		for _, Egg: Model in workspace.Interactions.AbandonedEggs:GetChildren() do
 			if not Egg:GetChildren()[1] then
 				continue
 			end
 			
-			Player.Character:PivotTo(Egg:GetPivot())
+			Character:PivotTo(Egg:GetPivot())
 			Teleported = true
 			break
 		end
