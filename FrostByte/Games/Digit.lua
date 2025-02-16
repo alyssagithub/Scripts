@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.0"
+getgenv().ScriptVersion = "v2.9.0a"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -14,8 +14,9 @@ local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().
 local GetClosestChild: (Children: {PVInstance}, Callback: (Child: PVInstance) -> boolean) -> (PVInstance?) = getgenv().GetClosestChild
 
 type Tab = {
-	CreateSection: (self: Tab, Name: string) -> (Section),
-	CreateDivider: (self: Tab) -> (Divider),
+	CreateSection: (self: Tab, Name: string) -> any,
+	CreateDivider: (self: Tab) -> any,
+	[any]: any
 }
 
 type Inventory = {
@@ -389,7 +390,17 @@ Tab:CreateToggle({
 	Flag = "Ancient",
 	Callback = function(Value)	
 		while Flags.Ancient.CurrentValue and task.wait() do
-			local Humanoid: Humanoid = Player.Character.Humanoid
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
+			
+			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			
+			if not Humanoid then
+				continue
+			end
 			
 			for _, DigSpot: Model in workspace.Temporary:GetChildren() do
 				if DigSpot.Name ~= "AncientDigSpot" or DigSpot:GetAttribute("Owner") ~= Player.UserId then
@@ -409,7 +420,13 @@ Tab:CreateToggle({
 	Flag = "MagmatarArms",
 	Callback = function(Value)
 		while Flags.MagmatarArms.CurrentValue and task.wait() do
-			local Arm = GetClosestChild(workspace.Map.MagnetarArena.Arms:GetChildren())
+			local MagnetarArena: Model? = workspace.Map:FindFirstChild("MagnetarArena")
+			
+			if not MagnetarArena then
+				continue
+			end
+			
+			local Arm = GetClosestChild(MagnetarArena.Arms:GetChildren())
 			
 			if not Arm then
 				continue
@@ -1385,7 +1402,13 @@ Tab:CreateToggle({
 	Flag = "MagmatarBattle",
 	Callback = function(Value)	
 		while Flags.MagmatarBattle.CurrentValue and task.wait() do
-			if workspace.Map.MagnetarArena.Magnetar:GetAttribute("Health") <= 0 then
+			local Magnetar = workspace.Map.MagnetarArena:FindFirstChild("Magnetar")
+			
+			if not Magnetar then
+				continue
+			end
+			
+			if Magnetar:GetAttribute("Health") <= 0 then
 				continue
 			end
 
@@ -1807,7 +1830,7 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				if Part.Name == "ArenaTeleporter" then
+				if Part.Name == "ArenaTeleporter" or Part.Name:find("Shockwave") or Part.Name:find("{") then
 					continue
 				end
 				
