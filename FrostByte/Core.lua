@@ -607,8 +607,14 @@ function CreateUniversalTabs()
 	local OriginalFlags = getgenv().OriginalFlags
 	
 	if OriginalFlags then
-		for i,v in OriginalFlags do
-			Flags[i]:Set(v)
+		for Name: string, Flag in Flags do
+			local Value = OriginalFlags[Name]
+			
+			if Value == nil then
+				continue
+			end
+			
+			Flag:Set(Value)
 		end
 	end
 	
