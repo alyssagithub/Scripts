@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.8.2"
+getgenv().ScriptVersion = "v2.9.0"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -11,6 +11,7 @@ local checkcaller: () -> (boolean) = getfenv().checkcaller
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
+local GetClosestChild: (Children: {PVInstance}, Callback: (Child: PVInstance) -> boolean) -> (PVInstance?) = getgenv().GetClosestChild
 
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> (Section),
@@ -381,6 +382,57 @@ Tab:CreateSlider({
 	Flag = "ZoneSize",
 	Callback = function()end,
 })
+
+Tab:CreateToggle({
+	Name = "🔴 • Auto Walk To Ancient Dig Spots",
+	CurrentValue = false,
+	Flag = "Ancient",
+	Callback = function(Value)	
+		while Flags.Ancient.CurrentValue and task.wait() do
+			local Humanoid: Humanoid = Player.Character.Humanoid
+			
+			for _, DigSpot: Model in workspace.Temporary:GetChildren() do
+				if DigSpot.Name ~= "AncientDigSpot" or DigSpot:GetAttribute("Owner") ~= Player.UserId then
+					continue
+				end
+				
+				Humanoid:MoveTo(DigSpot:GetPivot().Position)
+				break
+			end
+		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "🔥 • Auto Walk To Closest Magmatar Arm",
+	CurrentValue = false,
+	Flag = "MagmatarArms",
+	Callback = function(Value)
+		while Flags.MagmatarArms.CurrentValue and task.wait() do
+			local Arm = GetClosestChild(workspace.Map.MagnetarArena.Arms:GetChildren())
+			
+			if not Arm then
+				continue
+			end
+			
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
+			
+			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			
+			if not Humanoid then
+				continue
+			end
+			
+			Humanoid:MoveTo(Arm:GetPivot().Position)
+		end
+	end,
+})
+
+Tab:CreateDivider()
 
 Tab:CreateToggle({
 	Name = "🗻 • Disable Pile Collisions",
@@ -1325,6 +1377,28 @@ Tab:CreateToggle({
 	end,
 })
 
+local BattleCharacter = nil
+
+Tab:CreateToggle({
+	Name = "⚔ • Auto Teleport to Magmatar Battle",
+	CurrentValue = false,
+	Flag = "MagmatarBattle",
+	Callback = function(Value)	
+		while Flags.MagmatarBattle.CurrentValue and task.wait() do
+			if workspace.Map.MagnetarArena.Magnetar:GetAttribute("Health") <= 0 then
+				continue
+			end
+
+			if BattleCharacter and BattleCharacter.Parent then
+				continue
+			end
+
+			BattleCharacter = Player.Character
+			BattleCharacter:PivotTo(workspace.Map.MagnetarArena.Entrance.ArenaTeleporter:GetPivot())
+		end
+	end,
+})
+
 HandleConnection(Temporary.ChildAdded:Connect(MeteorIslandTeleport), "Meteor")
 HandleConnection(Temporary.ChildRemoved:Connect(function(Child: Model?)
 	if Child.Name == "Meteor Island" and PreviousLocation and Flags.Meteor.CurrentValue then
@@ -1535,38 +1609,6 @@ Tab:CreateToggle({
 
 local Tab: Tab = Window:CreateTab("UI", "webhook")
 
-Tab:CreateSection("Security")
-
-local AFKHook
-
-Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🏷️ • Disable [AFK] Tag", hookmetamethod and getnamecallmethod and checkcaller),
-	CurrentValue = false,
-	Flag = "AFKTag",
-	Callback = function(Value)
-		if not (hookmetamethod and getnamecallmethod and checkcaller) then
-			return
-		end
-		
-		if Value and not AFKHook then
-			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
-				local Method = getnamecallmethod()
-				local Args = {...}
-				
-				if not checkcaller() and Method == "FireServer" and Args[1].Command == "SetAFK" and Args[1].State and Flags.AFKTag.CurrentValue then
-					local NewArgs = {}
-					NewArgs.Command = Args[1].Command
-					NewArgs.State = false
-					self:FireServer(NewArgs)
-					return
-				end
-				
-				return AFKHook(self, ...)
-			end)
-		end
-	end,
-})
-
 Tab:CreateSection("Codes")
 
 local CodesList = {
@@ -1632,7 +1674,7 @@ local function ReEnableFeatures()
 end
 
 Tab:CreateToggle({
-	Name = "🔴 • Disable Features When Another Player is Near",
+	Name = "🛠 • Disable Features When Another Player is Near",
 	CurrentValue = false,
 	Flag = "Disable",
 	Callback = function(Value)
@@ -1711,6 +1753,103 @@ Tab:CreateSlider({
 	Flag = "Distance",
 	Callback = function()end,
 })
+
+Tab:CreateSection("AFK")
+
+local AFKHook
+
+Tab:CreateToggle({
+	Name = ApplyUnsupportedName("🏷️ • Disable [AFK] Tag", hookmetamethod and getnamecallmethod and checkcaller),
+	CurrentValue = false,
+	Flag = "AFKTag",
+	Callback = function(Value)
+		if not (hookmetamethod and getnamecallmethod and checkcaller) then
+			return
+		end
+
+		if Value and not AFKHook then
+			AFKHook = hookmetamethod(RemoteEvents.Player, "__namecall", function(self, ...)
+				local Method = getnamecallmethod()
+				local Args = {...}
+
+				if not checkcaller() and Method == "FireServer" and Args[1].Command == "SetAFK" and Args[1].State and Flags.AFKTag.CurrentValue then
+					local NewArgs = {}
+					NewArgs.Command = Args[1].Command
+					NewArgs.State = false
+					self:FireServer(NewArgs)
+					return
+				end
+
+				return AFKHook(self, ...)
+			end)
+		end
+	end,
+})
+
+Tab:CreateSection("Damage")
+
+local RemovedParts = {}
+
+Tab:CreateToggle({
+	Name = "🌋 • Remove Lava Parts",
+	CurrentValue = false,
+	Flag = "Lava",
+	Callback = function(Value)	
+		if Value then
+			for _, TouchInterest: TouchTransmitter in workspace.Map:GetDescendants() do
+				if not TouchInterest:IsA("TouchTransmitter") then
+					continue
+				end
+				
+				local Part: BasePart = TouchInterest.Parent
+				
+				if not Part:FindFirstAncestor("Volkayno") and not Part:FindFirstAncestor("UndergroundVolcano") and not Part:FindFirstAncestor("MagnetarArena") then
+					continue
+				end
+				
+				if Part.Name == "ArenaTeleporter" then
+					continue
+				end
+				
+				RemovedParts[Part] = Part.Parent
+				Part.Parent = nil
+			end
+		else
+			for Part: BasePart, Parent: BasePart in RemovedParts do
+				Part.Parent = Parent
+			end
+			
+			RemovedParts = {}
+		end
+	end,
+})
+
+local function RemoveMagmatarShockwaves(Child: Model?)
+	if not Flags.Shockwaves.CurrentValue then
+		return
+	end
+	
+	if Child.Name:find("Shockwave") then
+		Child:Destroy()
+	end
+end
+
+Tab:CreateToggle({
+	Name = "💥 • Remove Magmatar Shockwaves",
+	CurrentValue = false,
+	Flag = "Shockwaves",
+	Callback = function(Value)
+		if not Value then
+			return
+		end
+		
+		for _, Child in workspace.Map.MagnetarArena:GetChildren() do
+			RemoveMagmatarShockwaves(Child)
+		end
+	end,
+})
+
+HandleConnection(workspace.Map.MagnetarArena.ChildAdded:Connect(RemoveMagmatarShockwaves), "MagmatarAttacks")
 
 local Tab: Tab = Window:CreateTab("Info", "info")
 
