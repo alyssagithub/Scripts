@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.4"
+getgenv().ScriptVersion = "v1.0.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -30,11 +30,11 @@ local Tab: Tab = Window:CreateTab("Combat", "swords")
 Tab:CreateSection("Attacking")
 
 Tab:CreateToggle({
-	Name = "⚔ • Killaura",
+	Name = "⚔ • Kill Aura",
 	CurrentValue = false,
-	Flag = "Killaura",
+	Flag = "KillAura",
 	Callback = function(Value)	
-		while Flags.Killaura.CurrentValue and task.wait() do
+		while Flags.KillAura.CurrentValue and task.wait() do
 			local Closest = GetClosestChild(workspace.Characters:GetChildren(), function(Child)
 				if Child == Player.Character then
 					return true
@@ -46,6 +46,27 @@ Tab:CreateToggle({
 			end
 			
 			Remotes.CharactersDamageRemote:FireServer({Closest})
+		end
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "🔥 • Breath Aura (Needs Breath On)",
+	CurrentValue = false,
+	Flag = "BreathAura",
+	Callback = function(Value)	
+		while Flags.BreathAura.CurrentValue and task.wait() do
+			local Closest = GetClosestChild(workspace.Characters:GetChildren(), function(Child)
+				if Child == Player.Character then
+					return true
+				end
+			end)
+
+			if not Closest then
+				continue
+			end
+
+			Remotes.CharactersDamageRemoteBreath:FireServer({Closest})
 		end
 	end,
 })
@@ -252,7 +273,7 @@ local Tab: Tab = Window:CreateTab("Safety", "shield")
 Tab:CreateSection("Damage")
 
 Tab:CreateToggle({
-	Name = "🔥 • Delete All Lava Pools",
+	Name = "🌋 • Delete All Lava Pools",
 	CurrentValue = false,
 	Flag = "DeleteLava",
 	Callback = function(Value)	
