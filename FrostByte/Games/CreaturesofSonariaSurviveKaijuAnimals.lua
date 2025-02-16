@@ -175,7 +175,7 @@ ResourcesDropdown = Tab:CreateDropdown({
 		end
 		
 		Remotes.PickupResource:FireServer(Resource)
-		ResourcesDropdown:Set("")
+		ResourcesDropdown:Set({""})
 	end,
 })
 
@@ -239,10 +239,6 @@ TeleportWardenShrine = Tab:CreateDropdown({
 			return
 		end
 		
-		if not CurrentOption then
-			return
-		end
-		
 		local Tablet: MeshPart = workspace.Interactions["Warden Shrines"]:FindFirstChild(CurrentOption, true)
 		
 		if not Tablet then
@@ -250,7 +246,7 @@ TeleportWardenShrine = Tab:CreateDropdown({
 		end
 
 		Player.Character:PivotTo(Tablet:GetPivot() + Tablet:GetPivot().LookVector * 5)
-		TeleportWardenShrine:Set("")
+		TeleportWardenShrine:Set({""})
 	end,
 })
 
