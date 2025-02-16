@@ -38,6 +38,38 @@ end
 
 getgenv().HandleConnection = HandleConnection
 
+getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: (Child: PVInstance) -> (boolean))
+	for i, Child in Children do
+		if Callback and not Callback(Child) then
+			continue
+		end
+
+		table.remove(Children, i)
+	end
+
+	local Character = Player.Character
+
+	if not Character then
+		return
+	end
+
+	local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
+
+	if not HumanoidRootPart then
+		return
+	end
+
+	local CurrentPosition: Vector3 = HumanoidRootPart.Position
+
+	table.sort(Children, function(a: Model, b: Model)
+		return (a:GetPivot().Position - CurrentPosition).Magnitude < (b:GetPivot().Position - CurrentPosition).Magnitude
+	end)
+
+	local Closest = Children[1]
+
+	return Closest
+end
+
 if not firesignal and getconnections then
 	firesignal = function(Signal: RBXScriptSignal)
 		local Connections = getconnections(Signal)
