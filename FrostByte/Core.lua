@@ -206,7 +206,7 @@ if ScriptVersion and ScriptVersion ~= "Universal" then
 				continue
 			end
 
-			SendNotification("A new FrostByte version has been detected!", "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
+			SendNotification(`A new FrostByte version {Result} has been detected!`, "Would you like to load it?", math.huge, Button1, Button2, BindableFunction)
 
 			break
 		end
