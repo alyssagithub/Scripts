@@ -1402,7 +1402,13 @@ Tab:CreateToggle({
 	Flag = "MagmatarBattle",
 	Callback = function(Value)	
 		while Flags.MagmatarBattle.CurrentValue and task.wait() do
-			local Magnetar = workspace.Map.MagnetarArena:FindFirstChild("Magnetar")
+			local MagnetarArena = workspace.Map:FindFirstChild("MagnetarArena")
+			
+			if not MagnetarArena then
+				continue
+			end
+			
+			local Magnetar = MagnetarArena:FindFirstChild("Magnetar")
 			
 			if not Magnetar then
 				continue
@@ -1830,7 +1836,7 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				if Part.Name == "ArenaTeleporter" or Part.Name:find("Shockwave") or Part.Name:find("{") then
+				if Part.Name ~= "Part" then
 					continue
 				end
 				
