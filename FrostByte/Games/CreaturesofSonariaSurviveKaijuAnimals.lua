@@ -187,22 +187,6 @@ Tab:CreateButton({
 	end,
 })
 
-HandleConnection(workspace.Interactions.DroppedResources.ChildAdded:Connect(function(Child: PVInstance)
-	table.insert(DroppedResources, Child.Name)
-	ResourcesDropdown:Refresh(DroppedResources)
-end), "ResourceAdded")
-
-HandleConnection(workspace.Interactions.DroppedResources.ChildRemoved:Connect(function(Child: PVInstance)
-	local Index = table.find(DroppedResources, Child.Name)
-	
-	if not Index then
-		return
-	end
-	
-	table.remove(DroppedResources, Index)
-	ResourcesDropdown:Refresh(DroppedResources)
-end), "ResourceRemoved")
-
 local Tab: Tab = Window:CreateTab("Transport", "wind")
 
 Tab:CreateSection("Teleportation")
