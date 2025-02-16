@@ -1414,6 +1414,12 @@ Tab:CreateToggle({
 				continue
 			end
 			
+			local Entrance = MagnetarArena:FindFirstChild("Entrance")
+			
+			if not Entrance then
+				continue
+			end
+			
 			if Magnetar:GetAttribute("Health") <= 0 then
 				continue
 			end
@@ -1423,7 +1429,7 @@ Tab:CreateToggle({
 			end
 
 			BattleCharacter = Player.Character
-			BattleCharacter:PivotTo(workspace.Map.MagnetarArena.Entrance.ArenaTeleporter:GetPivot())
+			BattleCharacter:PivotTo(Entrance.ArenaTeleporter:GetPivot())
 		end
 	end,
 })
@@ -1872,7 +1878,13 @@ Tab:CreateToggle({
 			return
 		end
 		
-		for _, Child in workspace.Map.MagnetarArena:GetChildren() do
+		local MagnetarArena = workspace.Map:FindFirstChild("MagnetarArena")
+		
+		if not MagnetarArena then
+			return
+		end
+		
+		for _, Child in MagnetarArena:GetChildren() do
 			RemoveMagmatarShockwaves(Child)
 		end
 	end,
