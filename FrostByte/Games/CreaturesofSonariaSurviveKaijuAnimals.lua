@@ -143,22 +143,20 @@ Tab:CreateToggle({
 	end,
 })
 
-local DroppedResources = {}
+local function GetResourcesTable()
+	local DroppedResources = {}
 
-local function RefreshResourcesTable()
-	DroppedResources = {}
-	
 	for _, Resource: PVInstance in workspace.Interactions.DroppedResources:GetChildren() do
 		table.insert(DroppedResources, Resource.Name)
 	end
+	
+	return DroppedResources
 end
-
-RefreshResourcesTable()
 
 local ResourcesDropdown
 ResourcesDropdown = Tab:CreateDropdown({
 	Name = "💎 • Quick Pick Up Resources",
-	Options = DroppedResources,
+	Options = GetResourcesTable(),
 	CurrentOption = "",
 	MultipleOptions = false,
 	Callback = function(CurrentOption)
@@ -182,8 +180,7 @@ ResourcesDropdown = Tab:CreateDropdown({
 Tab:CreateButton({
 	Name = "🔃 • Refresh Dropdown",
 	Callback = function()
-		RefreshResourcesTable()
-		ResourcesDropdown:Refresh(DroppedResources)
+		ResourcesDropdown:Refresh(GetResourcesTable())
 	end,
 })
 
