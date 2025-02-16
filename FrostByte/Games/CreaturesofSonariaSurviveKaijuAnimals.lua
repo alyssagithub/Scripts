@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.3"
+getgenv().ScriptVersion = "v1.0.4"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -248,15 +248,6 @@ TeleportWardenShrine = Tab:CreateDropdown({
 })
 
 local Tab: Tab = Window:CreateTab("Safety", "shield")
-
-Tab:CreateSection("Shelter")
-
-Tab:CreateButton({
-	Name = "🧱 • Quick Fake Shelter",
-	Callback = function()
-		Remotes.Sheltered:FireServer(true)
-	end,
-})
 
 Tab:CreateSection("Damage")
 
