@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.0"
+getgenv().ScriptVersion = "v1.0.3"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -11,6 +11,7 @@ type Tab = {
 
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
+local GetClosestChild: (Children: {PVInstance}, Callback: (Child: PVInstance) -> boolean) -> (PVInstance?) = getgenv().GetClosestChild
 
 local Remotes: Folder & {[string]: RemoteEvent & RemoteFunction} = game:GetService("ReplicatedStorage").Remotes
 
@@ -28,45 +29,13 @@ local Tab: Tab = Window:CreateTab("Combat", "swords")
 
 Tab:CreateSection("Attacking")
 
-local function GetClosestChildCallback(Children: {PVInstance}, Callback: (Child: PVInstance) -> (boolean))
-	for i, Child in Children do
-		if Callback and not Callback(Child) then
-			continue
-		end
-		
-		table.remove(Children, i)
-	end
-	
-	local Character = Player.Character
-	
-	if not Character then
-		return
-	end
-	
-	local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
-	
-	if not HumanoidRootPart then
-		return
-	end
-	
-	local CurrentPosition: Vector3 = HumanoidRootPart.Position
-
-	table.sort(Children, function(a: Model, b: Model)
-		return (a:GetPivot().Position - CurrentPosition).Magnitude < (b:GetPivot().Position - CurrentPosition).Magnitude
-	end)
-
-	local Closest = Children[1]
-	
-	return Closest
-end
-
 Tab:CreateToggle({
 	Name = "⚔ • Killaura",
 	CurrentValue = false,
 	Flag = "Killaura",
 	Callback = function(Value)	
 		while Flags.Killaura.CurrentValue and task.wait() do
-			local Closest = GetClosestChildCallback(workspace.Characters:GetChildren(), function(Child)
+			local Closest = GetClosestChild(workspace.Characters:GetChildren(), function(Child)
 				if Child == Player.Character then
 					return true
 				end
@@ -91,7 +60,7 @@ Tab:CreateToggle({
 	Flag = "Eat",
 	Callback = function(Value)	
 		while Flags.Eat.CurrentValue and task.wait() do
-			local Closest = GetClosestChildCallback(workspace.Interactions.Food:GetChildren(), function(Child: PVInstance)
+			local Closest = GetClosestChild(workspace.Interactions.Food:GetChildren(), function(Child: PVInstance)
 				if not Child:GetChildren()[1] then
 					return true
 				end
@@ -118,7 +87,7 @@ Tab:CreateToggle({
 	Flag = "Drink",
 	Callback = function(Value)	
 		while Flags.Drink.CurrentValue and task.wait() do
-			local Closest = GetClosestChildCallback(workspace.Interactions.Lakes:GetChildren(), function(Child)
+			local Closest = GetClosestChild(workspace.Interactions.Lakes:GetChildren(), function(Child)
 				if Child:GetAttribute("Sickly") then
 					return true
 				end
@@ -139,9 +108,9 @@ Tab:CreateToggle({
 	Name = "💨 • Auto Use Closest Mud Pile",
 	CurrentValue = false,
 	Flag = "Mud",
-	Callback = function(Value)	
+	Callback = function(Value)
 		while Flags.Mud.CurrentValue and task.wait() do
-			local Closest = GetClosestChildCallback(workspace.Interactions.Mud:GetChildren())
+			local Closest = GetClosestChild(workspace.Interactions.Mud:GetChildren())
 
 			if not Closest then
 				continue
@@ -176,13 +145,21 @@ Tab:CreateToggle({
 
 local DroppedResources = {}
 
-for _, Resource: PVInstance in workspace.Interactions.DroppedResources:GetChildren() do
-	table.insert(DroppedResources, Resource.Name)
+local function RefreshResourcesTable()
+	DroppedResources = {}
+	
+	for _, Resource: PVInstance in workspace.Interactions.DroppedResources:GetChildren() do
+		table.insert(DroppedResources, Resource.Name)
+	end
 end
 
-local Resources = Tab:CreateDropdown({
+RefreshResourcesTable()
+
+local ResourcesDropdown
+ResourcesDropdown = Tab:CreateDropdown({
 	Name = "💎 • Quick Pick Up Resources",
 	Options = DroppedResources,
+	CurrentOption = "",
 	MultipleOptions = false,
 	Callback = function(CurrentOption)
 		CurrentOption = CurrentOption[1]
@@ -198,12 +175,21 @@ local Resources = Tab:CreateDropdown({
 		end
 		
 		Remotes.PickupResource:FireServer(Resource)
+		ResourcesDropdown:Set("")
+	end,
+})
+
+Tab:CreateButton({
+	Name = "🔃 • Refresh Dropdown",
+	Callback = function()
+		RefreshResourcesTable()
+		ResourcesDropdown:Refresh(DroppedResources)
 	end,
 })
 
 HandleConnection(workspace.Interactions.DroppedResources.ChildAdded:Connect(function(Child: PVInstance)
 	table.insert(DroppedResources, Child.Name)
-	Resources:Refresh(DroppedResources)
+	ResourcesDropdown:Refresh(DroppedResources)
 end), "ResourceAdded")
 
 HandleConnection(workspace.Interactions.DroppedResources.ChildRemoved:Connect(function(Child: PVInstance)
@@ -214,7 +200,7 @@ HandleConnection(workspace.Interactions.DroppedResources.ChildRemoved:Connect(fu
 	end
 	
 	table.remove(DroppedResources, Index)
-	Resources:Refresh(DroppedResources)
+	ResourcesDropdown:Refresh(DroppedResources)
 end), "ResourceRemoved")
 
 local Tab: Tab = Window:CreateTab("Transport", "wind")
@@ -330,8 +316,8 @@ local Tab: Tab = Window:CreateTab("Reset", "rotate-ccw")
 Tab:CreateSection("Suicide")
 
 local Suicide = false
-
-Tab:CreateToggle({
+local Toggle
+Toggle = Tab:CreateToggle({
 	Name = "🩸 • Suicide (KILLS YOUR CREATURE)",
 	CurrentValue = false,
 	Callback = function(Value)
@@ -349,8 +335,13 @@ Tab:CreateToggle({
 			end
 		end
 		
-		while Suicide and task.wait() do
+		while Suicide and task.wait() and Player.Character do
 			Remotes.LavaSelfDamage:FireServer()
+		end
+		
+		if Suicide then
+			Toggle:Set(false)
+			Notify("Suicide Disabled", "Detected your death, disabled suicide.")
 		end
 	end,
 })
