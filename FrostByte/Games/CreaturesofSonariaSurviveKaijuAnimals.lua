@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.0.6"
+getgenv().ScriptVersion = "v1.0.9"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -9,6 +9,7 @@ type Tab = {
 	CreateDivider: (self: Tab) -> Divider,
 }
 
+local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 local GetClosestChild: (Children: {PVInstance}, Callback: (Child: PVInstance) -> boolean) -> (PVInstance?) = getgenv().GetClosestChild
@@ -297,6 +298,60 @@ Tab:CreateToggle({
 			
 			task.wait(5)
 		end
+	end,
+})
+
+local Tab: Tab = Window:CreateTab("Boost", "arrow-big-up-dash")
+
+Tab:CreateSection("Oxygen")
+
+local InfiniteNumber = 1e9
+
+local function SetModuleFunctions(Value: boolean, BoostName: string, Module, OriginalFunctions: {[string]: () -> ()})
+	if Value then
+		for _, FunctionName in {`GetMax{BoostName}`, `Get{BoostName}`} do
+			OriginalFunctions[FunctionName] = Module[FunctionName]
+			print("set function for:", FunctionName, "Existing function:", Module[FunctionName])
+			Module[FunctionName] = function(Data)
+				local PropertyName = FunctionName:gsub("Get", "")
+				
+				if Data[PropertyName] then
+					Data[PropertyName] = InfiniteNumber
+				end
+				
+				return 1e9
+			end
+		end
+	else
+		for Name, Function in OriginalFunctions do
+			Module[Name] = Function
+		end
+	end
+end
+
+local CanUseModules, OxygenModule = pcall(require, game:GetService("ReplicatedStorage")._replicationFolder.OxygenTracker)
+
+local OxygenFunctions = {}
+
+Tab:CreateToggle({
+	Name =  ApplyUnsupportedName("🌊 • Infinite Oxygen", CanUseModules),
+	CurrentValue = false,
+	Flag = "Oxygen",
+	Callback = function(Value)
+		SetModuleFunctions(Value, "Oxygen", OxygenModule, OxygenFunctions)
+	end,
+})
+
+local _, StaminaModule = pcall(require, game:GetService("ReplicatedStorage")._replicationFolder.StaminaTracker)
+
+local StaminaFunctions = {}
+
+Tab:CreateToggle({
+	Name =  ApplyUnsupportedName("⚡ • Infinite Stamina", CanUseModules),
+	CurrentValue = false,
+	Flag = "Stamina",
+	Callback = function(Value)
+		SetModuleFunctions(Value, "Stamina", StaminaModule, StaminaFunctions)
 	end,
 })
 
