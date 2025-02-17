@@ -338,6 +338,10 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Oxygen",
 	Callback = function(Value)
+		if not CanUseModules then
+			return
+		end
+		
 		SetModuleFunctions(Value, "Oxygen", OxygenModule, OxygenFunctions)
 	end,
 })
@@ -351,6 +355,10 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Stamina",
 	Callback = function(Value)
+		if not CanUseModules then
+			return
+		end
+		
 		SetModuleFunctions(Value, "Stamina", StaminaModule, StaminaFunctions)
 	end,
 })
