@@ -104,6 +104,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	]])
 end
 
+if not getgenv().FrostByteHandleFunction then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+end
+
 if getgenv().Flags then
 	local OriginalFlags = {}
 
