@@ -151,16 +151,24 @@ HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
 
 Tab:CreateSection("Piles")
 
+local function CreatePile()
+	if Player:GetAttribute("PileCount") ~= 0 then
+		return
+	end
+	
+	pcall(function()
+		RemoteFunctions.Digging:InvokeServer({
+			Command = "CreatePile"
+		})
+	end)
+end
+
 Tab:CreateToggle({
 	Name = "🏞️ • Auto Create Piles on Any Terrain",
 	CurrentValue = false,
 	Flag = "CreatePiles",
 	Callback = function(Value)
 		while Flags.CreatePiles.CurrentValue and task.wait() do
-			if Player:GetAttribute("PileCount") ~= 0 then
-				continue
-			end
-			
 			local Character = Player.Character
 			
 			if not Character then
@@ -179,9 +187,7 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			RemoteFunctions.Digging:InvokeServer({
-				Command = "CreatePile"
-			})
+			CreatePile()
 		end
 	end,
 })
@@ -192,13 +198,7 @@ Tab:CreateToggle({
 	Flag = "FastCreatePiles",
 	Callback = function(Value)
 		while Flags.FastCreatePiles.CurrentValue and task.wait() do
-			if Player:GetAttribute("PileCount") ~= 0 then
-				continue
-			end
-
-			RemoteFunctions.Digging:InvokeServer({
-				Command = "CreatePile"
-			})
+			CreatePile()
 		end
 	end,
 })
