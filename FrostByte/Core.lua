@@ -104,6 +104,21 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	]])
 end
 
+if getgenv().Flags then
+	local OriginalFlags = {}
+
+	for i,v in getgenv().Flags do
+		if typeof(v.CurrentValue) ~= "boolean" then
+			continue
+		end
+
+		OriginalFlags[i] = v.CurrentValue
+		v:Set(false)
+	end
+
+	getgenv().OriginalFlags = OriginalFlags
+end
+
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
@@ -174,19 +189,6 @@ if ScriptVersion and ScriptVersion ~= "Universal" then
 		Response = true
 
 		if Button == Button1 then
-			local OriginalFlags = {}
-
-			for i,v in Flags do
-				if typeof(v.CurrentValue) ~= "boolean" then
-					continue
-				end
-
-				OriginalFlags[i] = v.CurrentValue
-				v:Set(false)
-			end
-
-			getgenv().OriginalFlags = OriginalFlags
-
 			loadstring(game:HttpGet(File))()
 		end
 	end
@@ -601,34 +603,34 @@ function CreateUniversalTabs()
 			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
-	
-	Rayfield:LoadConfiguration()
-	
-	local OriginalFlags = getgenv().OriginalFlags
-	
-	if OriginalFlags then
-		for Name: string, Flag in Flags do
-			local Value = OriginalFlags[Name]
-			
-			if Value == nil then
-				continue
-			end
-			
-			Flag:Set(Value)
-		end
-	end
-	
-	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
-	
-	local FrostByteStarted = getgenv().FrostByteStarted
-	
-	if FrostByteStarted then
-		FrostByteStarted()
-	end
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
 
 if not ScriptVersion or ScriptVersion == "Universal" then
 	CreateUniversalTabs()
+end
+
+Rayfield:LoadConfiguration()
+
+local OriginalFlags = getgenv().OriginalFlags
+
+if OriginalFlags then
+	for Name: string, Flag in Flags do
+		local Value = OriginalFlags[Name]
+
+		if Value == nil then
+			continue
+		end
+
+		Flag:Set(Value)
+	end
+end
+
+Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
+
+local FrostByteStarted = getgenv().FrostByteStarted
+
+if FrostByteStarted then
+	FrostByteStarted()
 end
