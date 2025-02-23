@@ -660,22 +660,6 @@ Tab:CreateDropdown({
 	Callback = function()end,
 })
 
-Tab:CreateDivider()
-
-Tab:CreateToggle({
-	Name = "💔 • Auto Deposit Broken Hearts",
-	CurrentValue = false,
-	Flag = "DepositBrokenHearts",
-	Callback = function(Value)
-		while Flags.DepositBrokenHearts.CurrentValue do
-			RemoteFunctions.Valentines:InvokeServer({
-				Command = "Deposit"
-			})
-			task.wait(1)
-		end
-	end,
-})
-
 Tab:CreateSection("Withdrawing")
 
 local OpenBankHook
