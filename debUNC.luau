@@ -749,6 +749,8 @@ end
 local TotalTests = 0
 local CompletedTests = 0
 local FailedTests = 0
+local ThoroughTests = 0
+local NonThoroughTests = 0
 
 local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), LibraryName: string?)
 	TotalTests += 1
@@ -771,6 +773,12 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 		local FunctionType = typeof(Function)
 
 		assert(FunctionType == "function", "Does not have typeof 'function', typeof:", FunctionType)
+		
+		if Callback == Default then
+			NonThoroughTests += 1
+		else
+			ThoroughTests += 1
+		end
 
 		return Callback()
 	end)
@@ -828,7 +836,9 @@ local TestService = game:GetService("TestService")
 local identifyexecutor = getfenv().identifyexecutor
 local getexecutorname = getfenv().getexecutorname
 
-TestService:Message(`🔵 debUNC BETA Score for {if identifyexecutor then identifyexecutor() elseif getexecutorname then getexecutorname() else ""}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+TestService:Message(`🔵 debUNC BETA v0.0.1 Score for {if identifyexecutor then identifyexecutor() elseif getexecutorname then getexecutorname() else ""}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+TestService:Message(`⚪ Total tests: {TotalTests}`)
 TestService:Message(`🟢 Successful tests: {CompletedTests}`)
 TestService:Message(`🔴 Failed tests: {FailedTests}`)
-TestService:Message(`⚪ Total tests: {TotalTests}`)
+TestService:Message(`🟣 Thorough Tests: {ThoroughTests}`)
+TestService:Message(`🟠 Non-Thorough Tests: {NonThoroughTests}`)
