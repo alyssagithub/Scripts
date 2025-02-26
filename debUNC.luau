@@ -831,12 +831,28 @@ local TestService = game:GetService("TestService")
 local identifyexecutor = getfenv().identifyexecutor
 local getexecutorname = getfenv().getexecutorname
 
-TestService:Message(`🔵 debUNC BETA v0.0.2 Score for {if identifyexecutor then identifyexecutor() elseif getexecutorname then getexecutorname() else ""}: {math.floor(CompletedTests / TotalTests * 100)}%`)
-TestService:Message(`⚪ Total tests: {TotalTests}`)
-TestService:Message(`🟢 Successful tests: {CompletedTests}`)
-TestService:Message(`🔴 Failed tests: {FailedTests}`)
-TestService:Message(`🟣 Thorough tests: {ThoroughTests}`)
-TestService:Message(`🟠 Non-thorough tests: {NonThoroughTests}`)
+local ExecutorName = if identifyexecutor then identifyexecutor() elseif getexecutorname then getexecutorname() else "Unknown Executor"
+
+local function DisplayMessage(MessageToDisplay)
+	local DisplayFunction: (any?) -> ()
+	
+	if ExecutorName == "AWP" then
+		DisplayFunction = print
+	else
+		DisplayFunction = function(Message)
+			TestService:Message(Message)
+		end
+	end
+	
+	DisplayFunction(MessageToDisplay)
+end
+
+DisplayMessage(`🔵 debUNC BETA v0.0.2 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`⚪ Total tests: {TotalTests}`)
+DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
+DisplayMessage(`🔴 Failed tests: {FailedTests}`)
+DisplayMessage(`🟣 Thorough tests: {ThoroughTests}`)
+DisplayMessage(`🟠 Non-thorough tests: {NonThoroughTests}`)
 
 print("For development purposes, a list of stuff in getgenv() that isn't added to the test.")
 local getgenv = getfenv().getgenv
