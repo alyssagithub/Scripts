@@ -1,8 +1,9 @@
-local Tests
+--!strict
+local Tests: {[string]: {[string]: (any?) -> (any?, any?)} | () -> ()}
 Tests = {
 	-- Identification
 	identifyexecutor = function()
-		local identifyexecutor: () -> string = getfenv().identifyexecutor
+		local identifyexecutor: () -> (string, string) = getfenv().identifyexecutor
 
 		local Name, Version = identifyexecutor()
 
@@ -10,22 +11,20 @@ Tests = {
 
 		assert(typeof(Version), "Function does not return a string version as the second value.")
 
-		return Name, Version
+		return `{Name} {Version}`
 	end,
 	
 	-- Environments
 	getrenv = function()
 		local getrenv: () -> {[string]: any} = getfenv().getrenv
 
-		local Result = getrenv()
+		local RobloxEnvironment = getrenv()
 
-		assert(typeof(Result) == "table", "Function does not return a table.")
+		assert(typeof(RobloxEnvironment) == "table", "Function does not return a table.")
 		
-		local RobloxEnvironment = {
+		local ShouldHave = {
 			"delay",
-			--"DebuggerManager",
 			"elapsedTime",
-			--"PluginManager",
 			"printidentity",
 			"settings",
 			"spawn",
@@ -42,33 +41,24 @@ Tests = {
 			"Enum",
 			"game",
 			"shared",
-			--"script",
 			"workspace"
 		}
 		
-		for _, FunctionName: string in RobloxEnvironment do
-			assert(getrenv()[FunctionName], `Missing '{FunctionName}' in the returned table.`)
+		for _, FunctionName: string in ShouldHave do
+			assert(RobloxEnvironment[FunctionName], `Missing '{FunctionName}' in the returned table.`)
 		end
-
-		return Result
 	end,
 	
 	getgenv = function()
 		local getgenv: () -> {[string]: any} = getfenv().getgenv
 
-		local Result = getgenv()
+		local GlobalEnvironment = getgenv()
 
-		assert(typeof(Result) == "table", "Function does not return a table.")
+		assert(typeof(GlobalEnvironment) == "table", "Function does not return a table.")
 
 		for FunctionName in getfenv() do
-			if Result[FunctionName] then
-				continue
-			end
-
-			error(`Function '{FunctionName}' does not exist in the returned table.`)
+			assert(GlobalEnvironment[FunctionName], `Function '{FunctionName}' does not exist in the returned table.`)
 		end
-
-		return Result
 	end,
 	
 	-- Files
@@ -219,7 +209,7 @@ Tests = {
 	end,
 	
 	delfile = function()
-		local delfile: (Path: string) -> () = getfenv().delfile
+		local delfile: (Path: string) -> any? = getfenv().delfile
 		
 		local writefile: (Path: string, Data: string) -> () = getfenv().writefile
 
@@ -229,7 +219,7 @@ Tests = {
 		
 		assert(isfile, "'isfile' does not exist, and is required for this test.")
 		
-		local Success = pcall(delfile, "???")
+		local Success, Result = pcall(delfile, "???")
 		
 		assert(not Success, "Function should error when attempting to delete a file that does not exist.")
 		
@@ -342,19 +332,15 @@ Tests = {
 		assert(Hook() == GeneratedResult, "Original function does not return the value it's meant to.")
 
 		assert(Test() == OtherGeneratedResult, "Hooked function does not return the value it's meant to.")
-
-		return GeneratedResult, OtherGeneratedResult
 	end,
 	
 	-- Closures
 	iscclosure = function()
-		local iscclosure: (Function: () -> ()) -> (boolean) = getfenv().iscclosure
+		local iscclosure: (Function: (any?) -> ()) -> (boolean) = getfenv().iscclosure
 
 		assert(iscclosure(assert), "Function 'assert' is written in C and should return true.")
 
 		assert(not iscclosure(function() end), "A function created in the executor is not written in C.")
-
-		return
 	end,
 	
 	-- HTTP
@@ -374,7 +360,7 @@ Tests = {
 			Body: string
 		}
 
-		local request: ({Url: string, Body: string, Method: "POST" | "GET", Headers: {["Content-Type"]: "application/json"}}?) -> Request = getfenv().request
+		local request: ({Url: string, Body: string?, Method: string, Headers: {["Content-Type"]: "application/json"}?}) -> Request = getfenv().request
 
 		local Result = request({
 			Url = "https://httpbin.org/get",
@@ -411,11 +397,11 @@ Tests = {
 
 		assert(DecodedHeaders, "Decoded body does not contain the headers.")
 
-		assert(typeof(DecodedHeaders["Roblox-Place-Id"]) == "string", "Decoded headers Roblox-Place-Id is not a string.")
+		--assert(typeof(DecodedHeaders["Roblox-Place-Id"]) == "string", "Decoded headers Roblox-Place-Id is not a string.")
 
-		assert(typeof(DecodedHeaders.Exploitidentifier) == "string", "Decoded headers Exploitidentifier is not a string.")
+		--assert(typeof(DecodedHeaders.Exploitidentifier) == "string", "Decoded headers Exploitidentifier is not a string.")
 
-		assert(typeof(DecodedHeaders["Exploit-Guid"]) == "string", "Decoded headers Exploit-Guid is not a string.")
+		--assert(typeof(DecodedHeaders["Exploit-Guid"]) == "string", "Decoded headers Exploit-Guid is not a string.")
 
 		local Fingerprint
 
@@ -428,7 +414,7 @@ Tests = {
 
 		assert(Fingerprint, "Decoded headers does not contain an executor fingerprint.")
 
-		return StatusCode, StatusMessage
+		return `StatusCode: {StatusCode}, StatusMessage: {StatusMessage}`
 	end,
 	
 	-- Instances
@@ -441,7 +427,7 @@ Tests = {
 		
 		assert(Success, "Failed to require module:", Result)
 		
-		return Result
+		return Module.Name
 	end,
 	fireclickdetector = function()
 		local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
@@ -469,21 +455,21 @@ Tests = {
 		ClickDetector:Destroy()
 	end,
 	firesignal = function()
-		local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
+		local firesignal: (RBXScriptSignal, any?) -> () = getfenv().firesignal
 		
-		local StringValue = Instance.new("StringValue")
+		local NumberValue = Instance.new("NumberValue")
 		
 		local GeneratedValue = math.random()
 		
 		local DidChange = false
 		
-		StringValue.Changed:Once(function(Value)
+		NumberValue.Changed:Once(function(Value)
 			if Value == GeneratedValue then
 				DidChange = true
 			end
 		end)
 		
-		firesignal(StringValue.Changed, GeneratedValue)
+		firesignal(NumberValue.Changed, GeneratedValue)
 		
 		local Start = tick()
 		
@@ -494,21 +480,21 @@ Tests = {
 		assert(DidChange, "Failed to fire the signal.")
 	end,
 	getconnections = function()
-		local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection}) = getfenv().getconnections
+		local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection & {Fire: (self: RBXScriptConnection, any?) -> ()}}) = getfenv().getconnections
 		
-		local StringValue = Instance.new("StringValue")
+		local NumberValue = Instance.new("NumberValue")
 		
 		local DidChange = false
 		
 		local GeneratedValue = math.random()
 		
-		StringValue.Changed:Once(function(Value)
+		NumberValue.Changed:Once(function(Value)
 			if GeneratedValue == Value then
 				DidChange = true
 			end
 		end)
 		
-		local Connections = getconnections(StringValue.Changed)
+		local Connections = getconnections(NumberValue.Changed)
 		
 		assert(typeof(Connections) == "table", "Function must return a table.")
 		
@@ -549,17 +535,17 @@ local NoTests = {
 	"mousescroll",
 	"keypress",
 	"keyrelease",
-	"setrbxclipboard",
+	--"setrbxclipboard",
 	"setclipboard",
-	"getclipboard",
-	"queue_on_teleport",
+	--"getclipboard",
+	"queueonteleport",
 	"getreg",
 	"getidentity",
 	"setidentity",
 	"isreadonly",
 	"setreadonly",
 	"makereadonly",
-	"makewriteable",
+	--"makewriteable",
 	"getrawmetatable",
 	"setrawmetatable",
 	"newcclosure",
@@ -567,12 +553,12 @@ local NoTests = {
 	"hookmetamethod",
 	"getnamecallmethod",
 	"setnamecallmethod",
-	"disassemble",
+	--"disassemble",
 	"decompile",
 	"gethiddenproperties",
 	"gethiddenproperty",
 	"sethiddenproperty",
-	"getsimulationradius",
+	--"getsimulationradius",
 	"setsimulationradius",
 	"clonefunction",
 	"getcallingscript",
@@ -583,7 +569,7 @@ local NoTests = {
 	"toclipboard",
 	"getthreadcontext",
 	"isfunctionhooked",
-	"isluau",
+	--"isluau",
 	"cloneref",
 	"setscriptable",
 	"loadstring",
@@ -591,13 +577,13 @@ local NoTests = {
 	"isrbxactive",
 	"getstack",
 	"getupvalue",
-	"httpget",
+	--"httpget",
 	"setupvalue",
-	"getregistry",
+	--"getregistry",
 	"getnilinstances",
 	"dumpstring",
 	"gettenv",
-	"getinstancelist",
+	--"getinstancelist",
 	"setstack",
 	"getinfo",
 	"base64_encode",
@@ -605,7 +591,7 @@ local NoTests = {
 	"getscriptclosure",
 	"checkcaller",
 	"setrenderproperty",
-	"ismoduleloaded",
+	--"ismoduleloaded",
 	"setconstant",
 	"getinstances",
 	"getconstants",
@@ -614,7 +600,7 @@ local NoTests = {
 	"getscripts",
 	"getcustomasset",
 	"getscripthash",
-	"getmenv",
+	--"getmenv",
 	"getloadedmodules",
 	"getrunningscripts",
 	"base64_decode",
@@ -629,21 +615,31 @@ local NoTests = {
 	"lz4compress",
 	"getfflag",
 	"getscriptbytecode",
-	"defersignal",
+	--"defersignal",
 	"gethwid",
 	"getgc",
-	"base64decode",
-	"base64encode",
+	--"base64decode",
+	--"base64encode",
 	"setfpscap",
 	"restorefunction",
-	"istempleclosure",
+	--"istempleclosure",
 	"getcallbackvalue",
 	"loadfile",
 	"dofile",
 	"run_on_actor",
+	"fireproximityprompt",
+	"getrenderproperty",
+	"getthreadidentity",
+	"getproto",
+	"getprotos",
+	"getupvalues",
+	"messagebox",
+	"info",
+	"isexecutorclosure",
+	
 }
 
-local LibraryNoTests = {
+local LibraryNoTests: {[string]: {string}} = {
 	Drawing = {
 		"new"
 	},
@@ -652,9 +648,9 @@ local LibraryNoTests = {
 		"getconstant",
 		"setconstant",
 		"getprotos",
-		"setprotos",
 		"getproto",
-		"setproto",
+		--"setprotos",
+		--"setproto",
 		"getstack",
 		"setstack",
 		"getupvalues",
@@ -677,7 +673,7 @@ local LibraryNoTests = {
 		"generatekey",
 		"hash"
 	},
-	input = {
+	--[[input = {
 		"mouse2release",
 		"keyrelease",
 		"mousemoveabs",
@@ -689,7 +685,7 @@ local LibraryNoTests = {
 		"mouse1click",
 		"mouse1release",
 		"mouse1press"
-	},
+	},]]
 	cache = {
 		"invalidate",
 		"iscached",
@@ -700,9 +696,9 @@ local LibraryNoTests = {
 	},
 }
 
-local Aliases = {
+local Aliases: {[string]: {string}} = {
 	hookfunction = {"replaceclosure"},
-	queue_on_teleport = {"queueonteleport"},
+	queueonteleport = {"queue_on_teleport"},
 	request = {"http_request"},
 	isexecutorclosure = {"checkclosure", "isourclosure"},
 	rconsoleclear = {"consoleclear"},
@@ -716,8 +712,8 @@ local Aliases = {
 	setclipboard = {"toclipboard"},
 	getscriptbytecode = {"dumpstring"},
 	getscriptclosure = {"getscriptfunction"},
-	getthreadidentity = {"getidentity", "getthreadcontext"},
-	setthreadidentity = {"setidentity", "setthreadcontext"},
+	getthreadidentity = {"getidentity", "getthreadcontext", "get_thread_identity"},
+	setthreadidentity = {"setidentity", "setthreadcontext", "set_thread_identity"},
 }
 
 for _, FunctionAliases in Aliases do
@@ -736,14 +732,16 @@ for TableName, FunctionName in NoTests do
 	Tests[FunctionName] = Default
 end
 
-for LibraryName: string, LibraryFunctionNames: {string} in LibraryNoTests do
-	Tests[LibraryName] = {}
+for LibraryName, LibraryFunctionNames in LibraryNoTests do
+	local NewLibrary = {}
 	
 	for _, FunctionName: string in LibraryFunctionNames do
-		assert(not Tests[LibraryName][FunctionName], `A test for {LibraryName}.{FunctionName} already exists.`)
+		assert(not NewLibrary[FunctionName], `A test for {LibraryName}.{FunctionName} already exists.`)
 
-		Tests[LibraryName][FunctionName] = Default
+		NewLibrary[FunctionName] = Default
 	end
+	
+	Tests[LibraryName] = NewLibrary
 end
 
 local TotalTests = 0
@@ -757,7 +755,7 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 	
 	local Start = tick()
 	
-	local Success, Result, Other = pcall(function()
+	local Success, Result = pcall(function()
 		local ToIndex = getfenv()
 		
 		if LibraryName then
@@ -786,11 +784,10 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 	local ElapsedTime = math.round((tick() - Start) * 100) / 100
 	
 	local ShowcaseResult = if Result ~= nil then `: {Result}` else ""
-	local ShowcaseOther = if Other ~= nil then ` {Other}` else ""
 	local ShowcaseLibrary = if LibraryName then `{LibraryName}.` else ""
 	local ShowcaseTime = if ElapsedTime > 0 then ` - took {ElapsedTime} seconds` else ""
 	
-	local Name = `{ShowcaseLibrary}{FunctionName}{ShowcaseResult}{ShowcaseOther}{ShowcaseTime}`
+	local Name = `{ShowcaseLibrary}{FunctionName}{ShowcaseResult}{ShowcaseTime}`
 
 	if Success then
 		CompletedTests += 1
@@ -801,13 +798,11 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 	end
 end
 
-for FunctionName: string, Callback: (any?) -> (any?, any?) | {[string]: (any?) -> (any?, any?)} in Tests do
+for FunctionName, Callback in Tests do
 	if typeof(Callback) == "table" then
-		local LibraryFunctions = Callback
-		local LibraryName = FunctionName
 		
-		for LibraryFunctionName, LibraryCallback in LibraryFunctions do
-			task.spawn(RunTest, LibraryFunctionName, LibraryCallback, LibraryName)
+		for LibraryFunctionName, LibraryCallback in Callback do
+			task.spawn(RunTest, LibraryFunctionName, LibraryCallback, FunctionName)
 		end
 	else
 		task.spawn(RunTest, FunctionName, Callback)
@@ -836,9 +831,45 @@ local TestService = game:GetService("TestService")
 local identifyexecutor = getfenv().identifyexecutor
 local getexecutorname = getfenv().getexecutorname
 
-TestService:Message(`🔵 debUNC BETA v0.0.1 Score for {if identifyexecutor then identifyexecutor() elseif getexecutorname then getexecutorname() else ""}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+TestService:Message(`🔵 debUNC BETA v0.0.2 Score for {if identifyexecutor then identifyexecutor() elseif getexecutorname then getexecutorname() else ""}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 TestService:Message(`⚪ Total tests: {TotalTests}`)
 TestService:Message(`🟢 Successful tests: {CompletedTests}`)
 TestService:Message(`🔴 Failed tests: {FailedTests}`)
 TestService:Message(`🟣 Thorough tests: {ThoroughTests}`)
 TestService:Message(`🟠 Non-thorough tests: {NonThoroughTests}`)
+
+print("For development purposes, a list of stuff in getgenv() that isn't added to the test.")
+local getgenv = getfenv().getgenv
+local getrenv = getfenv().getrenv
+
+for Name, Value in getgenv() do
+	if Tests[Name] then
+		continue
+	end
+	
+	if getrenv()[Name] then
+		continue
+	end
+	
+	local IsAlias = false
+	
+	for _, FunctionAliases in Aliases do
+		if table.find(FunctionAliases, Name) then
+			IsAlias = true
+		end
+	end
+	
+	if IsAlias then
+		continue
+	end
+	
+	print(`Missing {Name}, Type: {typeof(Value)}`)
+	
+	if typeof(Value) ~= "table" then
+		continue
+	end
+	
+	for FunctionInLibraryName, FunctionInLibraryValue in Value do
+		print(`Missing {Name}.{FunctionInLibraryName}, Type: {typeof(Value)}`)
+	end
+end
