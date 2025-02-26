@@ -636,7 +636,41 @@ local NoTests = {
 	"messagebox",
 	"info",
 	"isexecutorclosure",
-	
+	"rconsolehide",
+	"getinstancecache",
+	"get_process_identifier",
+	"getmodules",
+	"rconsoleinfo",
+	"get_comm_channel",
+	"isvalidlevel",
+	"getproperties",
+	"dbg",
+	"get_hidden_gui",
+	"getcallbackmember",
+	"lift_closure",
+	"get_signal_cons",
+	"rconsoletop",
+	"getscriptfromthread",
+	"rconsolehidden",
+	"create_comm_channel",
+	"saveinstance",
+	"lift_and_load_closure",
+	"isnetworkowner",
+	"rconsoletoggle",
+	"iscustomcclosure",
+	"gethookcache",
+	"runfile",
+	"validlevel",
+	"getcallstack",
+	"keyclick",
+	"rconsolewarn",
+	"clearteleportqueue",
+	"iswriteble",
+	"makewritable",
+	"makewriteable",
+	"rconsoleshow",
+	"iswindowactive",
+	"rconsoleerr",
 }
 
 local LibraryNoTests: {[string]: {string}} = {
@@ -694,11 +728,32 @@ local LibraryNoTests: {[string]: {string}} = {
 	WebSocket = {
 		"connect"
 	},
+	websocket = {
+		"connect"
+	},
+	bit = {
+		"band",
+		"arshift",
+		"rshift",
+		"ror",
+		"bor",
+		"bnot",
+		"badd",
+		"bsub",
+		"bxor",
+		"tobit",
+		"bswap",
+		"rol",
+		"lshift",
+		"tohex",
+		"bdiv",
+		"bmul"
+	}
 }
 
 local Aliases: {[string]: {string}} = {
 	hookfunction = {"replaceclosure"},
-	queueonteleport = {"queue_on_teleport"},
+	queueonteleport = {"queue_on_teleport", "queueteleport"},
 	request = {"http_request"},
 	isexecutorclosure = {"checkclosure", "isourclosure"},
 	rconsoleclear = {"consoleclear"},
@@ -714,6 +769,9 @@ local Aliases: {[string]: {string}} = {
 	getscriptclosure = {"getscriptfunction"},
 	getthreadidentity = {"getidentity", "getthreadcontext", "get_thread_identity"},
 	setthreadidentity = {"setidentity", "setthreadcontext", "set_thread_identity"},
+	gethui = {"get_hidden_gui"},
+	saveinstance = {"saveplace"},
+	clearteleportqueue = {"clear_teleport_queue"},
 }
 
 for _, FunctionAliases in Aliases do
@@ -847,7 +905,7 @@ local function DisplayMessage(MessageToDisplay)
 	DisplayFunction(MessageToDisplay)
 end
 
-DisplayMessage(`🔵 debUNC BETA v0.0.2 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`🔵 debUNC BETA v0.0.3 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 DisplayMessage(`⚪ Total tests: {TotalTests}`)
 DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
 DisplayMessage(`🔴 Failed tests: {FailedTests}`)
