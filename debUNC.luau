@@ -840,5 +840,5 @@ TestService:Message(`🔵 debUNC BETA v0.0.1 Score for {if identifyexecutor then
 TestService:Message(`⚪ Total tests: {TotalTests}`)
 TestService:Message(`🟢 Successful tests: {CompletedTests}`)
 TestService:Message(`🔴 Failed tests: {FailedTests}`)
-TestService:Message(`🟣 Thorough Tests: {ThoroughTests}`)
-TestService:Message(`🟠 Non-Thorough Tests: {NonThoroughTests}`)
+TestService:Message(`🟣 Thorough tests: {ThoroughTests}`)
+TestService:Message(`🟠 Non-thorough tests: {NonThoroughTests}`)
