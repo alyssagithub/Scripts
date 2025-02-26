@@ -843,7 +843,7 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 	
 	local ShowcaseResult = if Result ~= nil then `: {Result}` else ""
 	local ShowcaseLibrary = if LibraryName then `{LibraryName}.` else ""
-	local ShowcaseTime = if ElapsedTime > 0 then ` - took {ElapsedTime} seconds` else ""
+	local ShowcaseTime = if ElapsedTime > 0 then ` - Took {ElapsedTime} seconds` else ""
 	
 	local Name = `{ShowcaseLibrary}{FunctionName}{ShowcaseResult}{ShowcaseTime}`
 
@@ -875,7 +875,7 @@ for FunctionName, Callback in Tests do
 	for _, Alias in FunctionAliases do
 		task.spawn(RunTest, Alias, function()
 			--assert(getfenv()[Alias] == getfenv()[FunctionName], "Alias does not point to the original function.")
-			return "Alias"
+			return `Alias for '{FunctionName}'`
 		end)
 	end
 end
