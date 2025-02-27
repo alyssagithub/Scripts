@@ -147,7 +147,9 @@ Tab:CreateToggle({
 	end,
 })
 
-HandleConnection(Player.PlayerGui.Main.ChildAdded:Connect(LegitDig), "LegitDig")
+task.spawn(function()
+	HandleConnection(Player.PlayerGui:WaitForChild("Main", math.huge).ChildAdded:Connect(LegitDig), "LegitDig")
+end)
 
 Tab:CreateSection("Piles")
 
