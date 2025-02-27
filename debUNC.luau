@@ -236,6 +236,43 @@ Tests = {
 		return FileName
 	end,
 	
+	dofile = function()
+		local dofile: (Path: string) -> any? = getfenv().dofile
+		
+		local writefile: (Path: string, Data: string) -> () = getfenv().writefile
+
+		assert(writefile, "'writefile' does not exist, and is required for this test.")
+		
+		local FileName = `File_{math.random()}.txt`
+		local GeneratedNumber = math.random()
+		
+		writefile(FileName, `return \{{GeneratedNumber}\}`)
+		
+		local Result = dofile(FileName)
+		
+		assert(typeof(Result) == "table", "Function test should've returned a table based on this test's given code.")
+		
+		assert(Result[1] == GeneratedNumber, "Function's table should've contained the test's randomly generated number.")
+	end,
+	
+	loadfile = function()
+		local loadfile: (Path: string, ChunkName: string?) -> ((any?) -> (any?)?, string?) = getfenv().loadfile
+		
+		local writefile: (Path: string, Data: string) -> () = getfenv().writefile
+
+		assert(writefile, "'writefile' does not exist, and is required for this test.")
+		
+		local FileName = `File_{math.random()}.txt`
+		local GeneratedNumber = math.random()
+		
+		writefile(FileName, "local number = ...; return number + 1")
+		
+		local LoadedFunction, Error = loadfile(FileName)
+		local Result = assert(LoadedFunction, Error)(GeneratedNumber)
+		
+		assert(Result == GeneratedNumber + 1, "Function did not return the correct number.")
+	end,
+	
 	-- Folders
 	makefolder = function()
 		local makefolder: (Path: string) -> () = getfenv().makefolder
@@ -429,6 +466,31 @@ Tests = {
 		
 		return Module.Name
 	end,
+	
+	ismoduleloaded = function()
+		local ismoduleloaded: (ModuleScript) -> boolean = getfenv().ismoduleloaded
+		
+		local Module = game:FindFirstChildWhichIsA("ModuleScript", true)
+
+		assert(Module, "Could not find a ModuleScript in this game, try another for accurate results.")
+		
+		assert(ismoduleloaded(Module), "Function returned false when the module is loaded.")
+	end,
+	
+	getloadedmodules = function()
+		local getloadedmodules: () -> {ModuleScript} = getfenv().getloadedmodules
+		
+		local Module = game:FindFirstChildWhichIsA("ModuleScript", true)
+
+		assert(Module, "Could not find a ModuleScript in this game, try another for accurate results.")
+		
+		local LoadedModules = getloadedmodules()
+		
+		assert(typeof(LoadedModules) == "table", "Function did not return a table.")
+		
+		assert(table.find(LoadedModules, Module), "Could not find a loaded module in the returned table.")
+	end,
+	
 	fireclickdetector = function()
 		local fireclickdetector: (ClickDetector) -> () = getfenv().fireclickdetector
 		
@@ -451,9 +513,38 @@ Tests = {
 		until WasClicked or tick() - Start >= 1
 		
 		assert(WasClicked, "Function did not fire the ClickDetector's MouseClick signal.")
-		
-		ClickDetector:Destroy()
 	end,
+	
+	fireproximityprompt = function()
+		local fireproximityprompt: (ProximityPrompt) -> () = getfenv().fireproximityprompt
+		
+		local Part = Instance.new("Part")
+		Part.Parent = workspace
+
+		local ProximityPrompt = Instance.new("ProximityPrompt")
+		ProximityPrompt.Parent = Part
+		
+		local WasTriggered = false
+		
+		ProximityPrompt.Triggered:Once(function(Player)
+			if Player == game:GetService("Players").LocalPlayer then
+				WasTriggered = true
+			end
+		end)
+		
+		fireproximityprompt(ProximityPrompt)
+		
+		local Start = tick()
+
+		repeat
+			task.wait()
+		until WasTriggered or tick() - Start >= 1
+		
+		Part:Destroy()
+
+		assert(WasTriggered, "Function did not fire the ProximityPrompt's Triggered signal.")
+	end,
+	
 	firesignal = function()
 		local firesignal: (RBXScriptSignal, any?) -> () = getfenv().firesignal
 		
@@ -479,6 +570,7 @@ Tests = {
 		
 		assert(DidChange, "Failed to fire the signal.")
 	end,
+	
 	getconnections = function()
 		local getconnections: (RBXScriptSignal) -> ({RBXScriptConnection & {Fire: (self: RBXScriptConnection, any?) -> ()}}) = getfenv().getconnections
 		
@@ -513,6 +605,13 @@ Tests = {
 		until DidChange or tick() - Start >= 1
 		
 		assert(DidChange, "Failed to fire the connection.")
+	end,
+	
+	-- Miscellaneous
+	isluau = function()
+		local isluau: () -> boolean = getfenv().isluau
+		
+		assert(isluau() == (_VERSION == "Luau"), "Did not properly check if the current function is running in Luau.")
 	end,
 }
 
@@ -601,7 +700,6 @@ local NoTests = {
 	"getcustomasset",
 	"getscripthash",
 	--"getmenv",
-	"getloadedmodules",
 	"getrunningscripts",
 	"base64_decode",
 	"getfpscap",
@@ -618,16 +716,13 @@ local NoTests = {
 	--"defersignal",
 	"gethwid",
 	"getgc",
-	--"base64decode",
-	--"base64encode",
+	"base64decode",
+	"base64encode",
 	"setfpscap",
 	"restorefunction",
 	--"istempleclosure",
 	"getcallbackvalue",
-	"loadfile",
-	"dofile",
 	"run_on_actor",
-	"fireproximityprompt",
 	"getrenderproperty",
 	"getthreadidentity",
 	"getproto",
@@ -707,7 +802,7 @@ local LibraryNoTests: {[string]: {string}} = {
 		"generatekey",
 		"hash"
 	},
-	--[[input = {
+	input = {
 		"mouse2release",
 		"keyrelease",
 		"mousemoveabs",
@@ -719,7 +814,7 @@ local LibraryNoTests: {[string]: {string}} = {
 		"mouse1click",
 		"mouse1release",
 		"mouse1press"
-	},]]
+	},
 	cache = {
 		"invalidate",
 		"iscached",
@@ -755,7 +850,15 @@ local Aliases: {[string]: {string}} = {
 	hookfunction = {"replaceclosure"},
 	queueonteleport = {"queue_on_teleport", "queueteleport"},
 	request = {"http_request"},
-	isexecutorclosure = {"checkclosure", "isourclosure"},
+	isexecutorclosure = {
+		"checkclosure",
+		"isourclosure",
+		"istempleclosure",
+		"is_synapse_function",
+		"issentinelclosure",
+		"is_sirhurt_closure",
+		"is_protosmasher_closure",
+	},
 	rconsoleclear = {"consoleclear"},
 	rconsolecreate = {"consolecreate"},
 	rconsoledestroy = {"consoledestroy"},
@@ -772,6 +875,11 @@ local Aliases: {[string]: {string}} = {
 	gethui = {"get_hidden_gui"},
 	saveinstance = {"saveplace"},
 	clearteleportqueue = {"clear_teleport_queue"},
+	getreg = {"getregistry"},
+	getinstances = {"getinstancelist"},
+	getrenv = {"getmenv"},
+	setthreadcontext = {"set_thread_context"},
+	getthreadcontext = {"get_thread_context"},
 }
 
 for _, FunctionAliases in Aliases do
@@ -905,23 +1013,25 @@ local function DisplayMessage(MessageToDisplay)
 	DisplayFunction(MessageToDisplay)
 end
 
-DisplayMessage(`🔵 debUNC BETA v0.0.3 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`🔵 debUNC BETA v0.0.4 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 DisplayMessage(`⚪ Total tests: {TotalTests}`)
 DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
 DisplayMessage(`🔴 Failed tests: {FailedTests}`)
 DisplayMessage(`🟣 Thorough tests: {ThoroughTests}`)
 DisplayMessage(`🟠 Non-thorough tests: {NonThoroughTests}`)
 
-print("For development purposes, a list of stuff in getgenv() that isn't added to the test.")
+print("------------------------------------------------------------------------------------------------")
+print("For development purposes, a list of stuff in getfenv() that isn't added to the test.")
+print("------------------------------------------------------------------------------------------------")
 local getgenv = getfenv().getgenv
 local getrenv = getfenv().getrenv
 
-for Name, Value in getgenv() do
+for Name, Value in getfenv() do
 	if Tests[Name] then
 		continue
 	end
 	
-	if getrenv()[Name] then
+	if getrenv()[Name] or Name == "shared" or Name == "_G" or Name == "script" then
 		continue
 	end
 	
@@ -947,3 +1057,4 @@ for Name, Value in getgenv() do
 		print(`Missing {Name}.{FunctionInLibraryName}, Type: {typeof(Value)}`)
 	end
 end
+print("------------------------------------------------------------------------------------------------")
