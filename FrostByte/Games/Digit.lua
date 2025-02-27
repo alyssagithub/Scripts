@@ -1874,7 +1874,9 @@ Tab:CreateToggle({
 	end,
 })
 
-HandleConnection(workspace.Map.MagnetarArena.ChildAdded:Connect(RemoveMagmatarShockwaves), "MagmatarAttacks")
+task.spawn(function()
+	HandleConnection(workspace.Map:WaitForChild("MagnetarArena", math.huge).ChildAdded:Connect(RemoveMagmatarShockwaves), "MagmatarAttacks")
+end)
 
 local Tab: Tab = Window:CreateTab("Info", "info")
 
