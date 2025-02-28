@@ -261,10 +261,16 @@ TeleportWardenShrine = Tab:CreateDropdown({
 		local Tablet: MeshPart = workspace.Interactions["Warden Shrines"]:FindFirstChild(CurrentOption, true)
 		
 		if not Tablet then
-			return Notify("Error", "Couldn't find the tablet for the selected Warden Shrine.")
+			return Notify("Error", `Couldn't find the tablet for the '{CurrentOption}' Warden Shrine.`)
+		end
+		
+		local Character = Player.Character
+		
+		if not Character then
+			return
 		end
 
-		Player.Character:PivotTo(Tablet:GetPivot() + Tablet:GetPivot().LookVector * 5)
+		Character:PivotTo(Tablet:GetPivot() + Tablet:GetPivot().LookVector * 5)
 		TeleportWardenShrine:Set({""})
 	end,
 })
