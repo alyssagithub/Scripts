@@ -115,8 +115,14 @@ local function LegitDig()
 	if not Flags.LegitDig.CurrentValue then
 		return
 	end
+	
+	local Main: Frame = Player.PlayerGui:FindFirstChild("Main")
+	
+	if not Main then
+		return
+	end
 
-	local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
+	local DigMinigame = Main:FindFirstChild("DigMinigame")
 
 	if not DigMinigame then
 		return
@@ -124,7 +130,13 @@ local function LegitDig()
 	
 	local Connection: RBXScriptConnection
 	Connection = game:GetService("RunService").Heartbeat:Connect(function()
-		local DigMinigame = Player.PlayerGui.Main:FindFirstChild("DigMinigame")
+		local Main: Frame = Player.PlayerGui:FindFirstChild("Main")
+
+		if not Main then
+			return Connection:Disconnect()
+		end
+		
+		local DigMinigame = Main:FindFirstChild("DigMinigame")
 		
 		if not DigMinigame or not Flags.LegitDig.CurrentValue then
 			return Connection:Disconnect()
