@@ -607,6 +607,8 @@ function CreateUniversalTabs()
 		end,
 	})
 	
+	Rayfield:LoadConfiguration()
+	
 	local OriginalFlags = getgenv().OriginalFlags
 
 	if OriginalFlags then
@@ -620,6 +622,8 @@ function CreateUniversalTabs()
 			FlagInfo:Set(CurrentValue)
 		end
 	end
+	
+	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
@@ -627,10 +631,6 @@ getgenv().CreateUniversalTabs = CreateUniversalTabs
 if not ScriptVersion or ScriptVersion == "Universal" then
 	CreateUniversalTabs()
 end
-
-Rayfield:LoadConfiguration()
-
-Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 
 local FrostByteStarted = getgenv().FrostByteStarted
 
