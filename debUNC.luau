@@ -957,7 +957,9 @@ local NoTests = {
 	"comparefunctions",
 	"httpget",
 	"messageboxasync",
-	
+	"setrbxclipboard",
+	"defersignal",
+	"abc_require",
 }
 
 local LibraryNoTests: {[string]: {string}} = {
@@ -1290,7 +1292,7 @@ local function Check(Name, Value)
 	AlreadyChecked[Name] = true
 	
 	if typeof(Value) == "function" then
-		Copy ..= `"{Name}"\n`
+		Copy ..= `"{Name}",\n`
 		return
 	end
 	
