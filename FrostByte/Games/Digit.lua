@@ -1573,12 +1573,8 @@ local function OpenContainer(Tool: Tool)
 	end
 
 	local Success, Info = pcall(require, Module)
-
-	if Success then
-		if not Info.ContainerType then
-			return
-		end
-	elseif not table.find(ContainerNames, Tool.Name) then
+	
+	if (Success and typeof(Info) == "table" and not Info.ContainerType) or not table.find(ContainerNames, Tool.Name) then
 		return
 	end
 
@@ -1588,6 +1584,8 @@ local function OpenContainer(Tool: Tool)
 		Command = "RedeemContainer",
 		Container = Tool
 	})
+	
+	print("Opening container:", Tool)
 end
 
 Tab:CreateToggle({
