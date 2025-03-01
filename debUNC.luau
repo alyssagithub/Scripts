@@ -350,7 +350,7 @@ Tests = {
 
 		makefolder(FolderName)
 
-		assert(isfolder(FolderName), "Folder was not found by 'isfolder' after it was made.")
+		assert(isfolder(FolderName), "Folder was not found after it was made.")
 
 		local delfolder: (Path: string) -> () = getfenv().delfolder
 
@@ -717,30 +717,44 @@ Tests = {
 	setfpscap = function()
 		local setfpscap: (FPSCap: number) -> () = getfenv().setfpscap
 		
-		task.wait(2)
-		
 		local function GetCurrentFPS(): number
 			return math.floor(1 / game:GetService("Stats").FrameTime)
 		end
 		
-		local FPS = GetCurrentFPS()
+		local HighestFPS = 0
+		local LastPeak = tick()
+		
+		while tick() - LastPeak <= 0.25 and task.wait() do
+			local FPS = GetCurrentFPS()
+			
+			if FPS == math.huge then
+				continue
+			end
+			
+			if FPS > HighestFPS then
+				HighestFPS = FPS
+				LastPeak = tick()
+			end
+		end
 
-		local FPSCap = math.floor(FPS / 4)
+		local FPSCap = math.floor(HighestFPS / 4)
 
 		setfpscap(FPSCap)
 
 		local StartLoop = tick()
+		
+		local FPS
 
 		repeat
 			FPS = GetCurrentFPS()
 			task.wait()
-		until FPS <= FPSCap or tick() - StartLoop >= 5
+		until FPS <= FPSCap or tick() - StartLoop >= 1
 
 		setfpscap(0)
 
 		assert(FPS <= FPSCap, `FPS was determined to still stay above the set FPS cap. FPS: {FPS}, FPS Cap: {FPSCap}`)
 
-		return `FPS: {FPS}, FPS Cap: {FPSCap}`
+		return `FPS: {FPS}, FPS Cap: {FPSCap}, Highest FPS: {HighestFPS}`
 	end,
 
 	-- Misc
@@ -1053,6 +1067,24 @@ for OriginalFunctioName, FunctionAliases in Aliases do
 	end
 end
 
+local getgenv = getfenv().getgenv
+
+local Settings: {[string]: boolean} = {
+	FakeFunctions = getgenv().FakeFunctions or false
+}
+
+if Settings.FakeFunctions then
+	for FunctionName in Tests do
+		if FunctionName == "getgenv" then
+			continue
+		end
+		
+		getgenv()[FunctionName] = function()
+			
+		end
+	end
+end
+
 local TotalTests = 0
 local CompletedTests = 0
 local FailedTests = 0
@@ -1094,7 +1126,7 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 
 	local ShowcaseResult = if Result ~= nil then `: {Result}` else ""
 	local ShowcaseLibrary = if LibraryName then `{LibraryName}.` else ""
-	local ShowcaseTime = if ElapsedTime > 0 then ` - Took {ElapsedTime} seconds` else ""
+	local ShowcaseTime = if ElapsedTime > 0 then ` - took {ElapsedTime} seconds` else ""
 
 	local Name = `{ShowcaseLibrary}{FunctionName}{ShowcaseResult}{ShowcaseTime}`
 
@@ -1125,7 +1157,11 @@ for FunctionName, Callback in Tests do
 
 	for _, Alias in FunctionAliases do
 		task.spawn(RunTest, Alias, function()
-			--assert(getfenv()[Alias] == getfenv()[FunctionName], "Alias does not point to the original function.")
+			if typeof(Callback) == "function" then
+				getfenv(Callback)[FunctionName] = getfenv()[Alias]
+				Callback()
+			end
+			
 			return `Alias for '{FunctionName}'`
 		end)
 	end
@@ -1157,7 +1193,7 @@ local function DisplayMessage(MessageToDisplay)
 end
 
 DisplayMessage(`❓ The score below is only for how many custom functions are supported.`)
-DisplayMessage(`🔵 debUNC BETA v0.0.5 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`🔵 debUNC BETA v0.0.6 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 DisplayMessage(`⚪ Total tests: {TotalTests}`)
 DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
 DisplayMessage(`🔴 Failed tests: {FailedTests}`)
@@ -1167,7 +1203,6 @@ DisplayMessage(`🟠 Non-thorough tests: {NonThoroughTests}`)
 print("------------------------------------------------------------------------------------------------")
 print("For development purposes, a list of stuff in getfenv() that isn't added to the test.")
 print("------------------------------------------------------------------------------------------------")
-local getgenv = getfenv().getgenv
 local getrenv = getfenv().getrenv
 
 for Name, Value in getfenv() do
@@ -1175,7 +1210,7 @@ for Name, Value in getfenv() do
 		continue
 	end
 
-	if getrenv()[Name] or Name == "shared" or Name == "_G" or Name == "script" then
+	if (typeof(getrenv) == "table" and getrenv()[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
 		continue
 	end
 
@@ -1200,5 +1235,11 @@ for Name, Value in getfenv() do
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
 		print(`Missing {Name}.{FunctionInLibraryName}, Type: {typeof(Value)}`)
 	end
+end
+print("------------------------------------------------------------------------------------------------")
+print("All enabled/disabled settings")
+print("------------------------------------------------------------------------------------------------")
+for SettingName: string, SettingEnabled: boolean in Settings do
+	print(`{SettingName}: {SettingEnabled}`)
 end
 print("------------------------------------------------------------------------------------------------")
