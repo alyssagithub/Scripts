@@ -1210,7 +1210,7 @@ for Name, Value in getfenv() do
 		continue
 	end
 
-	if (typeof(getrenv) == "table" and getrenv()[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
+	if (typeof(getrenv()) == "table" and getrenv()[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
 		continue
 	end
 
