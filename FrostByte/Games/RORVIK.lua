@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.5d"
+getgenv().ScriptVersion = "v1.5.6"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -429,14 +429,33 @@ Tab:CreateToggle({
 	end,
 })
 
+local CanUseModules, ReplicatorClient = pcall(require, game.ReplicatedStorage.Scripts.lib.ReplicatorClient)
+local PlayerData
+
+if CanUseModules then
+	PlayerData = ReplicatorClient.GetChannel("PlayerData"):GetIndex(Player.Name)
+	
+	PlayerData:BindTo("DialogContent", function(Info)
+		if not Info or not Flags.Quests.CurrentValue then
+			return
+		end
+		
+		BinderEvent:FireServer("Dialog_Next", Info.Index)
+	end)
+end
+
 local LastCompletedQuest
 
 Tab:CreateToggle({
-	Name = "📜 • Auto Quests",
+	Name = ApplyUnsupportedName("📜 • Auto Quests", CanUseModules),
 	CurrentValue = false,
 	Flag = "Quests",
 	Callback = function(Value)
-		while Flags.Quests.CurrentValue and task.wait(1) do
+		if not CanUseModules then
+			return
+		end
+		
+		while Flags.Quests.CurrentValue and task.wait() do
 			for _, SideBarQuestElem: Frame? in Quests:GetChildren() do
 				if not SideBarQuestElem:IsA("Frame") then
 					continue
@@ -477,11 +496,15 @@ Tab:CreateToggle({
 					Player.Character:PivotTo(Zone.CFrame)
 				end
 				
-				for _, QuestRemotes in {{"Dialog_Start", Zone.Name}, {"Dialog_Next", "Q11.1"}, {"Dialog_Next", "Q11.2"}, {"Dialog_Next", "Q11.4"}} do
-					BinderEvent:FireServer(QuestRemotes[1], QuestRemotes[2])
-				end
+				BinderEvent:FireServer("Dialog_Start", Zone.Name)
+				
+				task.wait(1)
+				
+				QuestTPing = false
 			end
 		end
+		
+		QuestTPing = false
 	end,
 })
 
