@@ -960,11 +960,14 @@ local NoTests = {
 	"setrbxclipboard",
 	"defersignal",
 	"abc_require",
+	
 }
 
 local LibraryNoTests: {[string]: {string}} = {
 	Drawing = {
-		"new"
+		"new",
+		"clear",
+		"Fonts",
 	},
 	debug = {
 		"getconstants",
@@ -979,6 +982,8 @@ local LibraryNoTests: {[string]: {string}} = {
 		"getupvalues",
 		"getupvalue",
 		"setupvalue",
+		"getinfo",
+		"getregistry",
 	},
 	base64 = {
 		"encode",
@@ -994,7 +999,10 @@ local LibraryNoTests: {[string]: {string}} = {
 		"decrypt",
 		"generatebytes",
 		"generatekey",
-		"hash"
+		"hash",
+		"base64_decode",
+		"base64",
+		"base64_encode",
 	},
 	input = {
 		"mouse2release",
@@ -1049,7 +1057,41 @@ local LibraryNoTests: {[string]: {string}} = {
 		"vector_dot_product",
 		"transform_translate",
 		"log1p",
-	}
+	},
+	DrawingImmediate = {
+		"GetPaint",
+		"Clear",
+		"New",
+	},
+	Duration = {
+		"FromMonths",
+		"FromMilliseconds",
+		"FromYears",
+		"TimeSinceEpoch",
+		"FromHours",
+		"FromNanoseconds",
+		"FromMicroseconds",
+		"FromSeconds",
+		"FromMinutes",
+		"FromDays",
+		"new",
+	},
+	Stopwatch = {
+		"new",
+	},
+	DirectoryWatcher = {
+		"new",
+	},
+	csv = {
+		"getRow",
+		"getField",
+		"stringify",
+		"parse",
+	},
+	Regex = {
+		"Escape",
+		"new",
+	},
 }
 
 local Aliases: {[string]: {string}} = {
@@ -1244,7 +1286,7 @@ local function DisplayMessage(MessageToDisplay)
 end
 
 DisplayMessage(`❓ The score below is only for how many custom functions are supported.`)
-DisplayMessage(`🔵 debUNC BETA v0.0.7 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`🔵 debUNC BETA v0.0.8 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 DisplayMessage(`⚪ Total tests: {TotalTests}`)
 DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
 DisplayMessage(`🔴 Failed tests: {FailedTests}`)
@@ -1260,12 +1302,14 @@ local Copy = ""
 
 local getrenv = getfenv().getrenv
 
-local function Check(Name, Value)
-	if Tests[Name] then
+local RobloxEnvironment = if typeof(getrenv()) == "table" then getrenv() else {}
+
+local function Check(Name: string, Value)
+	if Tests[Name] and typeof(Tests[Name]) ~= "table" then
 		return
 	end
 
-	if (typeof(getrenv()) == "table" and typeof(Value) == "function" and getrenv()[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
+	if (typeof(Value) == "function" and RobloxEnvironment[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
 		return
 	end
 	
@@ -1296,20 +1340,33 @@ local function Check(Name, Value)
 		return
 	end
 	
-	Copy ..= `{Name} = \{\n`
+	local AddedLibrary = false
 
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
-		if (typeof(getrenv()) == "table" and getrenv()[Name] and getrenv()[Name][FunctionInLibraryName]) then
+		if (RobloxEnvironment[Name] and RobloxEnvironment[Name][FunctionInLibraryName]) then
 			continue
+		end
+		
+		local LibraryTest = Tests[Name]
+		
+		if typeof(LibraryTest) == "table" and LibraryTest[FunctionInLibraryName] then
+			continue
+		end
+		
+		if not AddedLibrary then
+			Copy ..= `{Name} = \{\n`
+			AddedLibrary = true
 		end
 		
 		local PathName = `{Name}.{FunctionInLibraryName}`
 		AlreadyChecked[PathName] = true
 		
-		Copy ..= `"{FunctionInLibraryName}",\n`
+		Copy ..= `	"{FunctionInLibraryName}",\n`
 	end
 	
-	Copy ..= "}\n"
+	if AddedLibrary then
+		Copy ..= "},\n"
+	end
 end
 
 for Name, Value in getfenv() do
@@ -1320,13 +1377,17 @@ for Name, Value in getgenv() do
 	Check(Name, Value)
 end
 
-print(Copy)
-
-if Settings.CopyUnaddedTests then
+if Settings.CopyUnaddedTests and Copy ~= "" then
 	local setclipboard = getfenv().setclipboard
 	
 	setclipboard(Copy)
 end
+
+if Copy == "" then
+	Copy = "Could not find any functions/libraries, this executor is all caught up."
+end
+
+print(Copy)
 
 print("------------------------------------------------------------------------------------------------")
 print("All enabled/disabled settings")
