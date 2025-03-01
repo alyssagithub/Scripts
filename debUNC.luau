@@ -1240,6 +1240,6 @@ print("-------------------------------------------------------------------------
 print("All enabled/disabled settings")
 print("------------------------------------------------------------------------------------------------")
 for SettingName: string, SettingEnabled: boolean in Settings do
-	print(`{SettingName}: {SettingEnabled}`)
+	print(`getgenv().{SettingName} = {SettingEnabled}`)
 end
 print("------------------------------------------------------------------------------------------------")
