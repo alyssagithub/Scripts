@@ -485,8 +485,7 @@ function CreateUniversalTabs()
 		local NameReplacement = Flags.NameReplacement.CurrentValue
 
 		if not Connections[Object] then
-			Connections[Object] = true
-			Object:GetPropertyChangedSignal("Text"):Connect(HandleUsernameChange)
+			Connections[Object] = Object:GetPropertyChangedSignal("Text"):Connect(HandleUsernameChange)
 		end
 
 		if Object.Text:find(Player.Name) then
@@ -607,6 +606,20 @@ function CreateUniversalTabs()
 			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
+	
+	local OriginalFlags = getgenv().OriginalFlags
+
+	if OriginalFlags then
+		for FlagName: string, CurrentValue: boolean? in OriginalFlags do
+			local FlagInfo = Flags[FlagName]
+
+			if not FlagInfo then
+				continue
+			end
+
+			FlagInfo:Set(CurrentValue)
+		end
+	end
 end
 
 getgenv().CreateUniversalTabs = CreateUniversalTabs
@@ -616,20 +629,6 @@ if not ScriptVersion or ScriptVersion == "Universal" then
 end
 
 Rayfield:LoadConfiguration()
-
-local OriginalFlags = getgenv().OriginalFlags
-
-if OriginalFlags then
-	for Name: string, Flag in Flags do
-		local Value = OriginalFlags[Name]
-
-		if Value == nil then
-			continue
-		end
-
-		Flag:Set(Value)
-	end
-end
 
 Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 
