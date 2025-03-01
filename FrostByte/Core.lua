@@ -38,7 +38,7 @@ end
 
 getgenv().HandleConnection = HandleConnection
 
-getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: (Child: PVInstance) -> (boolean))
+getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?)
 	for i, Child in Children do
 		if Callback and not Callback(Child) then
 			continue
@@ -60,14 +60,20 @@ getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: (Child: P
 	end
 
 	local CurrentPosition: Vector3 = HumanoidRootPart.Position
+	
+	local ClosestMagnitude = MaxDistance or math.huge
+	local ClosestChild
+	
+	for _, Child in Children do
+		local Magnitude = (Child:GetPivot().Position - CurrentPosition).Magnitude
+		
+		if Magnitude < ClosestMagnitude then
+			ClosestMagnitude = Magnitude
+			ClosestChild = Child
+		end
+	end
 
-	table.sort(Children, function(a: Model, b: Model)
-		return (a:GetPivot().Position - CurrentPosition).Magnitude < (b:GetPivot().Position - CurrentPosition).Magnitude
-	end)
-
-	local Closest = Children[1]
-
-	return Closest
+	return ClosestChild
 end
 
 if not firesignal and getconnections then
