@@ -1201,17 +1201,24 @@ DisplayMessage(`🟣 Thorough tests: {ThoroughTests}`)
 DisplayMessage(`🟠 Non-thorough tests: {NonThoroughTests}`)
 
 print("------------------------------------------------------------------------------------------------")
-print("For development purposes, a list of stuff in getfenv() that isn't added to the test.")
+print("For development purposes, a list of stuff in getfenv() and getgenv() that isn't added to the test.")
 print("------------------------------------------------------------------------------------------------")
-local getrenv = getfenv().getrenv
 
-for Name, Value in getfenv() do
+local AlreadyChecked = {}
+
+local function Check(Name, Value)
 	if Tests[Name] then
-		continue
+		return
 	end
+	
+	if AlreadyChecked[Name] then
+		return
+	end
+	
+	AlreadyChecked[Name] = true
 
 	if Name == "shared" or Name == "_G" or Name == "script" then
-		continue
+		return
 	end
 
 	local IsAlias = false
@@ -1223,19 +1230,28 @@ for Name, Value in getfenv() do
 	end
 
 	if IsAlias then
-		continue
+		return
 	end
 
 	print(`Missing {Name}, Type: {typeof(Value)}`)
 
 	if typeof(Value) ~= "table" then
-		continue
+		return
 	end
 
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
 		print(`Missing {Name}.{FunctionInLibraryName}, Type: {typeof(Value)}`)
 	end
 end
+
+for Name, Value in getfenv() do
+	Check(Name, Value)
+end
+
+for Name, Value in getgenv() do
+	Check(Name, Value)
+end
+
 print("------------------------------------------------------------------------------------------------")
 print("All enabled/disabled settings")
 print("------------------------------------------------------------------------------------------------")
