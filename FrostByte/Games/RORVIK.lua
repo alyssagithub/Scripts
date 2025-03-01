@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.6"
+getgenv().ScriptVersion = "v1.5.5d"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -430,18 +430,19 @@ Tab:CreateToggle({
 })
 
 local CanUseModules, ReplicatorClient = pcall(require, game.ReplicatedStorage.Scripts.lib.ReplicatorClient)
-local PlayerData
 
 if CanUseModules then
-	PlayerData = ReplicatorClient.GetChannel("PlayerData"):GetIndex(Player.Name)
+	local PlayerData = ReplicatorClient.GetChannel("PlayerData"):GetIndex(Player.Name)
 	
-	PlayerData:BindTo("DialogContent", function(Info)
-		if not Info or not Flags.Quests.CurrentValue then
-			return
-		end
-		
-		BinderEvent:FireServer("Dialog_Next", Info.Index)
-	end)
+	if PlayerData then
+		PlayerData:BindTo("DialogContent", function(Info)
+			if not Info or not Flags.Quests.CurrentValue then
+				return
+			end
+
+			BinderEvent:FireServer("Dialog_Next", Info.Index)
+		end)
+	end
 end
 
 local LastCompletedQuest
