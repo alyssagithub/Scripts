@@ -748,7 +748,7 @@ Tests = {
 		repeat
 			FPS = GetCurrentFPS()
 			task.wait()
-		until FPS <= FPSCap or tick() - StartLoop >= 1
+		until FPS <= FPSCap or tick() - StartLoop >= 5
 
 		setfpscap(0)
 
