@@ -1070,7 +1070,8 @@ end
 local getgenv = getfenv().getgenv
 
 local Settings: {[string]: boolean} = {
-	FakeFunctions = getgenv().FakeFunctions or false
+	FakeFunctions = getgenv().FakeFunctions or false,
+	CopyUnaddedTests = getgenv().CopyUnaddedTests or false
 }
 
 if Settings.FakeFunctions then
@@ -1205,17 +1206,12 @@ print("For development purposes, a list of stuff in getfenv() and getgenv() that
 print("------------------------------------------------------------------------------------------------")
 
 local AlreadyChecked = {}
+local Copy = ""
 
 local function Check(Name, Value)
 	if Tests[Name] then
 		return
 	end
-	
-	if AlreadyChecked[Name] then
-		return
-	end
-	
-	AlreadyChecked[Name] = true
 
 	if Name == "shared" or Name == "_G" or Name == "script" then
 		return
@@ -1232,15 +1228,30 @@ local function Check(Name, Value)
 	if IsAlias then
 		return
 	end
+	
+	if AlreadyChecked[Name] then
+		return
+	end
 
-	print(`Missing {Name}, Type: {typeof(Value)}`)
+	AlreadyChecked[Name] = true
+	
+	local MissingMessage = `Missing {Name}, Type: {typeof(Value)}`
+
+	print(MissingMessage)
+	Copy ..= `{MissingMessage}\n`
 
 	if typeof(Value) ~= "table" then
 		return
 	end
 
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
-		print(`Missing {Name}.{FunctionInLibraryName}, Type: {typeof(Value)}`)
+		local PathName = `{Name}.{FunctionInLibraryName}`
+		AlreadyChecked[PathName] = true
+		
+		local MissingMessage = `Missing {PathName}, Type: {typeof(Value)}`
+		
+		print(MissingMessage)
+		Copy ..= `{MissingMessage}\n`
 	end
 end
 
@@ -1250,6 +1261,12 @@ end
 
 for Name, Value in getgenv() do
 	Check(Name, Value)
+end
+
+if Settings.CopyUnaddedTests then
+	local setclipboard = getfenv().setclipboard
+	
+	setclipboard(Copy)
 end
 
 print("------------------------------------------------------------------------------------------------")
