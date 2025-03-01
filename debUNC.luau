@@ -795,7 +795,7 @@ local NoTests = {
 	"rconsoledestroy",
 	"rconsoleinput",
 	"rconsoleprint",
-	"rconsolesettitle",
+	"rconsolename",
 	"mouse1click",
 	"mouse1press",
 	"mouse1release",
@@ -923,6 +923,41 @@ local NoTests = {
 	"rconsoleshow",
 	"iswindowactive",
 	"rconsoleerr",
+	"getbspval",
+	"detourfunction",
+	"clearimmediatecache",
+	"checkparallel",
+	"keytap",
+	"getallthreads",
+	"createsecurefolder",
+	"replacefunction",
+	"getrendersteppedlist",
+	"issecuredinstance",
+	"inparallel",
+	"checkpressedkey",
+	"decompilesync",
+	"iskeydown",
+	"getfunctionhash",
+	"filtergc",
+	"getnspval",
+	"executescript",
+	"disassociate_script",
+	"run_on_thread",
+	"getobjects",
+	"httppost",
+	"setsecureinstance",
+	"getthreadobject",
+	"getsafeenv",
+	"getunionassetid",
+	"getpcd",
+	"getactorthreads",
+	"setnormalinstance",
+	"setsafeenv",
+	"getsimulationradius",
+	"comparefunctions",
+	"httpget",
+	"messageboxasync",
+	
 }
 
 local LibraryNoTests: {[string]: {string}} = {
@@ -1000,6 +1035,18 @@ local LibraryNoTests: {[string]: {string}} = {
 		"tohex",
 		"bdiv",
 		"bmul"
+	},
+	SecureTable = {
+		"new"
+	},
+	math = {
+		"erf",
+		"dist",
+		"set_symmetric_difference",
+		"lgamma",
+		"vector_dot_product",
+		"transform_translate",
+		"log1p",
 	}
 }
 
@@ -1021,7 +1068,7 @@ local Aliases: {[string]: {string}} = {
 	rconsoledestroy = {"consoledestroy"},
 	rconsoleinput = {"consoleinput"},
 	rconsoleprint = {"consoleprint"},
-	rconsolesettitle = {"rconsolename", "consolesettitle"},
+	rconsolename = {"rconsolesettitle", "consolesettitle", "consolename"},
 	isrbxactive = {"isgameactive"},
 	identifyexecutor = {"getexecutorname"},
 	setclipboard = {"toclipboard"},
@@ -1035,6 +1082,7 @@ local Aliases: {[string]: {string}} = {
 	getreg = {"getregistry"},
 	getinstances = {"getinstancelist"},
 	getrenv = {"getmenv"},
+	gethiddenproperty = {"gethiddenprop"}
 }
 
 local function Default()
@@ -1194,7 +1242,7 @@ local function DisplayMessage(MessageToDisplay)
 end
 
 DisplayMessage(`❓ The score below is only for how many custom functions are supported.`)
-DisplayMessage(`🔵 debUNC BETA v0.0.6 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`🔵 debUNC BETA v0.0.7 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 DisplayMessage(`⚪ Total tests: {TotalTests}`)
 DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
 DisplayMessage(`🔴 Failed tests: {FailedTests}`)
@@ -1218,6 +1266,10 @@ local function Check(Name, Value)
 	if (typeof(getrenv()) == "table" and typeof(Value) == "function" and getrenv()[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
 		return
 	end
+	
+	if typeof(Value) ~= "table" and typeof(Value) ~= "function" then
+		return
+	end
 
 	local IsAlias = false
 
@@ -1237,14 +1289,12 @@ local function Check(Name, Value)
 
 	AlreadyChecked[Name] = true
 	
-	local MissingMessage = `Missing {Name}, Type: {typeof(Value)}`
-
-	print(MissingMessage)
-	Copy ..= `{MissingMessage}\n`
-
-	if typeof(Value) ~= "table" then
+	if typeof(Value) == "function" then
+		Copy ..= `"{Name}"\n`
 		return
 	end
+	
+	Copy ..= `{Name} = \{\n`
 
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
 		if (typeof(getrenv()) == "table" and getrenv()[Name] and getrenv()[Name][FunctionInLibraryName]) then
@@ -1254,11 +1304,10 @@ local function Check(Name, Value)
 		local PathName = `{Name}.{FunctionInLibraryName}`
 		AlreadyChecked[PathName] = true
 		
-		local MissingMessage = `Missing {PathName}, Type: {typeof(Value)}`
-		
-		print(MissingMessage)
-		Copy ..= `{MissingMessage}\n`
+		Copy ..= `"{FunctionInLibraryName}",\n`
 	end
+	
+	Copy ..= "}\n"
 end
 
 for Name, Value in getfenv() do
@@ -1268,6 +1317,8 @@ end
 for Name, Value in getgenv() do
 	Check(Name, Value)
 end
+
+print(Copy)
 
 if Settings.CopyUnaddedTests then
 	local setclipboard = getfenv().setclipboard
