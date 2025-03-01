@@ -1247,7 +1247,7 @@ local function Check(Name, Value)
 	end
 
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
-		if (typeof(getrenv()) == "table" and getrenv()[Name][FunctionInLibraryName]) then
+		if (typeof(getrenv()) == "table" and getrenv()[Name] and getrenv()[Name][FunctionInLibraryName]) then
 			continue
 		end
 		
