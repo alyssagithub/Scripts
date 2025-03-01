@@ -108,19 +108,18 @@ if not getgenv().FrostByteHandleFunction then
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 end
 
-if getgenv().Flags then
-	local OriginalFlags = {}
+local OriginalFlags = {}
 
-	for i,v in getgenv().Flags do
-		if typeof(v.CurrentValue) ~= "boolean" then
+if getgenv().Flags then
+	for FlagName: string, FlagInfo in getgenv().Flags do
+		if typeof(FlagInfo.CurrentValue) ~= "boolean" then
 			continue
 		end
-
-		OriginalFlags[i] = v.CurrentValue
-		v:Set(false)
+		
+		print("Saved Flag:", FlagName, "with Value:", FlagInfo.CurrentValue)
+		OriginalFlags[FlagName] = FlagInfo.CurrentValue
+		FlagInfo:Set(false)
 	end
-
-	getgenv().OriginalFlags = OriginalFlags
 end
 
 if getgenv().Rayfield then
@@ -219,6 +218,11 @@ if ScriptVersion and ScriptVersion ~= "Universal" then
 	end)
 end
 
+type Tab = {
+	CreateSection: (self: Tab, Name: string) -> Section,
+	CreateDivider: (self: Tab) -> Divider,
+}
+
 local Window
 
 pcall(function()
@@ -258,7 +262,7 @@ function CreateUniversalTabs()
 		return
 	end
 	
-	local Tab = Window:CreateTab("Client", "user")
+	local Tab: Tab = Window:CreateTab("Client", "user")
 	
 	Tab:CreateSection("Discord")
 
@@ -289,6 +293,20 @@ function CreateUniversalTabs()
 	})
 
 	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "link")
+	
+	Tab:CreateSection("Statistics")
+	
+	local PingLabel = Tab:CreateLabel("Ping: 0 ms", "wifi")
+	local FPSLabel = Tab:CreateLabel("FPS: 0/s", "monitor")
+
+	local Stats = game:GetService("Stats")
+	
+	task.spawn(function()
+		while getgenv().Flags == Flags and task.wait(0.25) do
+			PingLabel:Set(`Ping: {math.floor(Stats.PerformanceStats.Ping:GetValue() * 100)/ 100} ms`)
+			FPSLabel:Set(`FPS: {math.floor(1 / Stats.FrameTime * 10) / 10}/s`)
+		end
+	end)
 
 	Tab:CreateSection("AFK")
 
@@ -318,7 +336,7 @@ function CreateUniversalTabs()
 		Increment = 1,
 		Suffix = "FPS",
 		CurrentValue = 0,
-		Flag = "FPS",
+		Flag = "MaxFPS",
 		Callback = function(Value)
 			if not setfpscap then
 				return
@@ -355,13 +373,36 @@ function CreateUniversalTabs()
 	
 	Tab:CreateSection("Properties")
 	
+	Tab:CreateToggle({
+		Name = "⚡ • Enable WalkSpeed Changer",
+		CurrentValue = false,
+		Flag = "WalkSpeedChanger",
+		Callback = function(Value)
+			while Flags.WalkSpeedChanger.CurrentValue and task.wait() do
+				local Character = Player.Character
+				
+				if not Character then
+					continue
+				end
+				
+				local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+				
+				if not Humanoid then
+					continue
+				end
+				
+				Humanoid.WalkSpeed = Flags.WalkSpeed.CurrentValue
+			end
+		end,
+	})
+	
 	Tab:CreateSlider({
 		Name = "💨 • Set WalkSpeed",
 		Range = {0, 300},
 		Increment = 1,
 		Suffix = "Studs/s",
 		CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
-		Flag = "FPS",
+		Flag = "WalkSpeed",
 		Callback = function(Value)
 			local Character = Player.Character or Player.CharacterAdded:Wait()
 			
@@ -485,7 +526,9 @@ function CreateUniversalTabs()
 		local NameReplacement = Flags.NameReplacement.CurrentValue
 
 		if not Connections[Object] then
-			Connections[Object] = Object:GetPropertyChangedSignal("Text"):Connect(HandleUsernameChange)
+			Connections[Object] = Object:GetPropertyChangedSignal("Text"):Connect(function()
+				HandleUsernameChange(Object)
+			end)
 		end
 
 		if Object.Text:find(Player.Name) then
@@ -607,11 +650,7 @@ function CreateUniversalTabs()
 		end,
 	})
 	
-	Rayfield:LoadConfiguration()
-	
-	local OriginalFlags = getgenv().OriginalFlags
-
-	if OriginalFlags then
+	task.delay(1, function()
 		for FlagName: string, CurrentValue: boolean? in OriginalFlags do
 			local FlagInfo = Flags[FlagName]
 
@@ -619,9 +658,11 @@ function CreateUniversalTabs()
 				continue
 			end
 
+			print("Setting Flag:", FlagName, "to Value:", CurrentValue)
+
 			FlagInfo:Set(CurrentValue)
 		end
-	end
+	end)
 	
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
