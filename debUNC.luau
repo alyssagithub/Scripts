@@ -1208,12 +1208,14 @@ print("-------------------------------------------------------------------------
 local AlreadyChecked = {}
 local Copy = ""
 
+local getrenv = getfenv().getrenv
+
 local function Check(Name, Value)
 	if Tests[Name] then
 		return
 	end
 
-	if Name == "shared" or Name == "_G" or Name == "script" then
+	if (typeof(getrenv()) == "table" and typeof(Value) == "function" and getrenv()[Name]) or Name == "shared" or Name == "_G" or Name == "script" then
 		return
 	end
 
@@ -1245,6 +1247,10 @@ local function Check(Name, Value)
 	end
 
 	for FunctionInLibraryName, FunctionInLibraryValue in Value do
+		if (typeof(getrenv()) == "table" and getrenv()[Name][FunctionInLibraryName]) then
+			continue
+		end
+		
 		local PathName = `{Name}.{FunctionInLibraryName}`
 		AlreadyChecked[PathName] = true
 		
