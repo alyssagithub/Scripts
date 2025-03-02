@@ -122,7 +122,6 @@ if getgenv().Flags then
 			continue
 		end
 		
-		print("Saved Flag:", FlagName, "with Value:", FlagInfo.CurrentValue)
 		OriginalFlags[FlagName] = FlagInfo.CurrentValue
 		FlagInfo:Set(false)
 	end
@@ -379,25 +378,49 @@ function CreateUniversalTabs()
 	
 	Tab:CreateSection("Properties")
 	
+	local WalkSpeedConnection: RBXScriptConnection
+	local ConnectedHumanoid
+	
+	local function SetWalkSpeed()
+		local Character = Player.Character
+
+		if not Character then
+			return
+		end
+
+		local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+
+		if not Humanoid then
+			return
+		end
+		
+		if Flags.WalkSpeedChanger.CurrentValue then
+			Humanoid.WalkSpeed = Flags.WalkSpeed.CurrentValue
+		end
+		
+		if not WalkSpeedConnection then
+			WalkSpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetWalkSpeed)
+			ConnectedHumanoid = Humanoid
+			HandleConnection(WalkSpeedConnection, "WalkSpeedConnection")
+		end
+	end
+	
+	HandleConnection(Player.CharacterAdded:Connect(function()
+		if WalkSpeedConnection then
+			WalkSpeedConnection:Disconnect()
+			WalkSpeedConnection = nil
+		end
+		
+		SetWalkSpeed()
+	end), "WalkSpeedCharacterAdded")
+	
 	Tab:CreateToggle({
 		Name = "⚡ • Enable WalkSpeed Changer",
 		CurrentValue = false,
 		Flag = "WalkSpeedChanger",
 		Callback = function(Value)
-			while Flags.WalkSpeedChanger.CurrentValue and task.wait() do
-				local Character = Player.Character
-				
-				if not Character then
-					continue
-				end
-				
-				local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
-				
-				if not Humanoid then
-					continue
-				end
-				
-				Humanoid.WalkSpeed = Flags.WalkSpeed.CurrentValue
+			if Player.Character and Value then
+				SetWalkSpeed()
 			end
 		end,
 	})
@@ -410,19 +433,7 @@ function CreateUniversalTabs()
 		CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
 		Flag = "WalkSpeed",
 		Callback = function(Value)
-			local Character = Player.Character or Player.CharacterAdded:Wait()
-			
-			if not Character then
-				return
-			end
-			
-			local Humanoid = Character:WaitForChild("Humanoid", 5)
-			
-			if not Humanoid then
-				return
-			end
-			
-			Humanoid.WalkSpeed = Value
+			SetWalkSpeed()
 		end,
 	})
 	
@@ -663,8 +674,6 @@ function CreateUniversalTabs()
 			if not FlagInfo then
 				continue
 			end
-
-			print("Setting Flag:", FlagName, "to Value:", CurrentValue)
 
 			FlagInfo:Set(CurrentValue)
 		end
