@@ -183,14 +183,6 @@ local UserInputService = game:GetService("UserInputService")
 local SprintConnection: RBXScriptConnection
 
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
-local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
-
-local KeyCodes = {
-	Enum.KeyCode.W,
-	Enum.KeyCode.A,
-	Enum.KeyCode.S,
-	Enum.KeyCode.D
-}
 
 Tab:CreateToggle({
 	Name = ApplyUnsupportedName("⚡ • Auto Sprint", Success),
