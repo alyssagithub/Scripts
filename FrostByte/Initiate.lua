@@ -10,23 +10,16 @@ local function Notify(Text)
 	})
 end
 
-local PlaceName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+local UniverseIds = {
+	[3764534614] = "RuneSlayer"
+}
+
+local PlaceName = UniverseIds[game.GameId] or game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 getgenv().PlaceName = PlaceName
 
 PlaceName = PlaceName:gsub("%b[]", "")
 PlaceName = PlaceName:gsub("[^%a]", "")
-
-local UniverseIds = {
-	[3764534614] = "RuneSlayer"
-}
-
-local Universe = UniverseIds[game.GameId]
-
-if Universe then
-	PlaceName = Universe
-	getgenv().PlaceName = PlaceName
-end
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 
