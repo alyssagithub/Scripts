@@ -29,8 +29,12 @@ local Mouse = Player:GetMouse()
 
 local firesignal: (RBXScriptSignal, any?) -> () = getfenv().firesignal
 
+local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
+
+local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
+
 Tab:CreateToggle({
-	Name = "⚔ • Kill Aura",
+	Name = ApplyUnsupportedName("⚔ • Kill Aura", Success),
 	CurrentValue = false,
 	Flag = "KillAura",
 	Callback = function(Value)
@@ -45,8 +49,12 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			firesignal(Mouse.Button1Down)
-			firesignal(Mouse.Button1Up)
+			Network.connect("MouseInput", "Fire", Player.Character, {
+				["Config"] = "Button1Down"
+			})
+			Network.connect("MouseInput", "Fire", Player.Character, {
+				["Config"] = "Button1Up"
+			})
 		end
 	end,
 })
@@ -116,8 +124,6 @@ local Tab: Tab = Window:CreateTab("Resources", "apple")
 
 Tab:CreateSection("Gathering")
 
-local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
-
 Tab:CreateToggle({
 	Name = "🍎 • Auto Gather (No Tools Required)",
 	CurrentValue = false,
@@ -181,8 +187,6 @@ Tab:CreateSection("Sprinting")
 local UserInputService = game:GetService("UserInputService")
 
 local SprintConnection: RBXScriptConnection
-
-local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 
 Tab:CreateToggle({
 	Name = ApplyUnsupportedName("⚡ • Auto Sprint", Success),
