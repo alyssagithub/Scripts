@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.0a"
+getgenv().ScriptVersion = "v2.9.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -678,6 +678,23 @@ Tab:CreateDropdown({
 	MultipleOptions = true,
 	Flag = "ItemsToBank",
 	Callback = function()end,
+})
+
+Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "🌑 • Auto Deposit Ronks",
+	CurrentValue = false,
+	Flag = "Ronks",
+	Callback = function(Value)
+		while Flags.Ronks.CurrentValue and task.wait() do
+			RemoteFunctions.Ronks:InvokeServer({
+				Command = "Deposit",
+				Amount = 1
+			})
+			task.wait(1)
+		end
+	end,
 })
 
 Tab:CreateSection("Withdrawing")
