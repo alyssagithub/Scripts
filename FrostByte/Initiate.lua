@@ -21,11 +21,7 @@ local UniverseIds = {
 	[3764534614] = "RuneSlayer"
 }
 
-local JSONUniverseId = game:HttpGet(`https://apis.roproxy.com/universes/v1/places/{game.PlaceId}/universe`)
-
-local CurrentUniverseId = game:GetService("HttpService"):JSONDecode(JSONUniverseId).universeId
-
-local Universe = UniverseIds[CurrentUniverseId]
+local Universe = UniverseIds[game.GameId]
 
 if Universe then
 	PlaceName = Universe
