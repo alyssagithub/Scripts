@@ -557,19 +557,29 @@ Tests = {
 
 		assert(ismoduleloaded(Module), "Function returned false when the module is loaded.")
 	end,
-
-	getloadedmodules = function()
-		local getloadedmodules: () -> {ModuleScript} = getfenv().getloadedmodules
-
-		local Module = game:FindFirstChildWhichIsA("ModuleScript", true)
-
-		assert(Module, "Could not find a ModuleScript in this game, try another for accurate results.")
-
-		local LoadedModules = getloadedmodules()
-
-		assert(typeof(LoadedModules) == "table", "Function did not return a table.")
-
-		assert(table.find(LoadedModules, Module), "Could not find a loaded module in the returned table.")
+	
+	isnetworkowner = function()
+		local isnetworkowner: (BasePart | Model) -> boolean = getfenv().isnetworkowner
+		
+		local Success = pcall(isnetworkowner, Instance.new("Model"))
+		
+		assert(not Success, "Function should error when sending over a non BasePart object.")
+		
+		local Player = game:GetService("Players").LocalPlayer
+		
+		assert(Player, "The LocalPlayer does not exist, and is required for this test.")
+		
+		local Character = Player.Character
+		
+		assert(Character, "The LocalPlayer's Character does not exist, and is required for this test.")
+		
+		local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
+		
+		assert(HumanoidRootPart, "The Character's HumanoidRootPat does not exist, and is required for this test.")
+		
+		assert(isnetworkowner(HumanoidRootPart), "Function should return true on the Character's HumanoidRootPart")
+		
+		assert(not isnetworkowner(Instance.new("Part")), "Function should return false on a Part that does not have network ownership.")
 	end,
 
 	fireclickdetector = function()
@@ -651,6 +661,20 @@ Tests = {
 
 		assert(DidChange, "Failed to fire the signal.")
 	end,
+	
+	getloadedmodules = function()
+		local getloadedmodules: () -> {ModuleScript} = getfenv().getloadedmodules
+
+		local Module = game:FindFirstChildWhichIsA("ModuleScript", true)
+
+		assert(Module, "Could not find a ModuleScript in this game, try another for accurate results.")
+
+		local LoadedModules = getloadedmodules()
+
+		assert(typeof(LoadedModules) == "table", "Function did not return a table.")
+
+		assert(table.find(LoadedModules, Module), "Could not find a loaded module in the returned table.")
+	end,
 
 	getconnections = function()
 		type Connections = {
@@ -723,7 +747,7 @@ Tests = {
 			assert(ClassCheck, `The listed instance '{CurrentScript}' is not a script. ClassName: {CurrentScript.ClassName}`)
 		end
 	end,
-
+	
 	-- Client
 	setfpscap = function()
 		local setfpscap: (FPSCap: number) -> () = getfenv().setfpscap
@@ -796,10 +820,6 @@ Tests = {
 		assert(Decoded == GeneratedString, "Decoded version should return back to the original string.")
 
 		return `Encoded: {Encoded}, Decoded: {Decoded}`
-	end,
-	
-	testing = function()
-		return "test ing t h i s"
 	end,
 }
 
@@ -909,7 +929,6 @@ local NoTests = {
 	"create_comm_channel",
 	"saveinstance",
 	"lift_and_load_closure",
-	"isnetworkowner",
 	"rconsoletoggle",
 	"iscustomcclosure",
 	"gethookcache",
