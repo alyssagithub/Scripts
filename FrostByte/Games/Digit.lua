@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.1"
+getgenv().ScriptVersion = "v2.9.3"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -73,7 +73,7 @@ HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message
 	end
 end), "ShovelError")
 
-local TreasurePiles = workspace.TreasurePiles
+local TreasurePiles: Folder = workspace.TreasurePiles
 
 Tab:CreateToggle({
 	Name = "⚡ • Auto Fast Dig (Combinable with Legit)",
@@ -413,6 +413,18 @@ Tab:CreateToggle({
 			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
 			
 			if not Humanoid then
+				continue
+			end
+			
+			local FoundPile = false
+			
+			for _, Pile: Model in TreasurePiles:GetChildren() do
+				if Pile:GetAttribute("Owner") == Player.UserId and not Pile:GetAttribute("Completed") then
+					FoundPile = true
+				end
+			end
+			
+			if FoundPile then
 				continue
 			end
 			
@@ -1506,7 +1518,9 @@ Tab:CreateSection("Islands")
 local Islands = {}
 
 for i,v in workspace.Map.Islands:GetChildren() do
-	table.insert(Islands, v.Name)
+	if not table.find(Islands, v.Name) then
+		table.insert(Islands, v.Name)
+	end
 end
 
 for i,v in ReplicatedStorage.Assets.Sounds.Soundtrack.Locations:GetChildren() do
@@ -1521,9 +1535,9 @@ end
 
 table.sort(Islands)
 
-local TeleporttoIsland
+local TeleportToIsland
 
-TeleporttoIsland = Tab:CreateDropdown({
+TeleportToIsland = Tab:CreateDropdown({
 	Name = "🏝 • Teleport to Island",
 	Options = Islands,
 	CurrentOption = "",
@@ -1534,24 +1548,40 @@ TeleporttoIsland = Tab:CreateDropdown({
 		if CurrentOption == "" then
 			return
 		end
-		
-		TeleporttoIsland:Set({""})
 
 		local Island: Folder = workspace.Map.Islands:FindFirstChild(CurrentOption)
 
 		if not Island then
 			return Notify("Error", "That island doesn't currently exist.")
 		end
+		
+		local TeleportLocation
 
 		if Island:FindFirstChild("LocationSpawn") then
-			Player.Character:PivotTo(Island.LocationSpawn.CFrame)
+			TeleportLocation = Island.LocationSpawn.CFrame
 		elseif Island:FindFirstChild("SpawnPoint") then
-			Player.Character:PivotTo(Island.SpawnPoint.CFrame)
-		elseif CurrentOption ~= "Badlands" then
-			Player.Character:PivotTo(Island:GetAttribute("Pivot") --[[+ Vector3.yAxis * Island:GetAttribute("Size") / 2]])
+			TeleportLocation = Island.SpawnPoint.CFrame
+		elseif CurrentOption == "Badlands" then
+			TeleportLocation = CFrame.new(1085, 9, 334)
+		elseif CurrentOption == "Ancient Trial" then
+			TeleportLocation = CFrame.new(3766, -414, -453)
+		elseif CurrentOption == "Gorgon Maze" then
+			TeleportLocation = CFrame.new(1713, -454, 1176)
+		elseif CurrentOption == "Devil’s Pit" then
+			TeleportLocation = CFrame.new(3759, -421, -371)
+		elseif CurrentOption == "The Evil Hall" then
+			TeleportLocation = CFrame.new(1820, -471, 1373)
+		elseif CurrentOption == "The Oasis" then
+			TeleportLocation = CFrame.new(3765, -466, -745)
+		elseif CurrentOption == "Thunder Cave" then
+			TeleportLocation = CFrame.new(1973, -471, 1444)
 		else
-			Player.Character:PivotTo(Island:GetAttribute("Pivot") + Vector3.yAxis * Island:GetAttribute("Size") / 2)
+			TeleportLocation = Island:GetAttribute("Pivot")
 		end
+		
+		Player.Character:PivotTo(TeleportLocation)
+		
+		TeleportToIsland:Set({""})
 	end,
 })
 
