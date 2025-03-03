@@ -17,11 +17,26 @@ getgenv().PlaceName = PlaceName
 PlaceName = PlaceName:gsub("%b[]", "")
 PlaceName = PlaceName:gsub("[^%a]", "")
 
+local UniverseIds = {
+	[3764534614] = "RuneSlayer"
+}
+
+local JSONUniverseId = game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`)
+
+local CurrentUniverseId = game:GetService("HttpService"):JSONDecode(JSONUniverseId).universeId
+
+local Universe = UniverseIds[CurrentUniverseId]
+
+if Universe then
+	PlaceName = Universe
+	getgenv().PlaceName = PlaceName
+end
+
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
 
-local Code: string = game:HttpGet(`https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
+local Success, Code: string = pcall(game.HttpGet, game, `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
 
-if Code:find("ScriptVersion = ") then
+if Success and Code:find("ScriptVersion = ") then
 	Notify("Game found, the script is loading.")
 	getgenv().PlaceFileName = PlaceName
 else
