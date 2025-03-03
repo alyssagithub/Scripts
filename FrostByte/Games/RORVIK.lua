@@ -22,7 +22,6 @@ local BinderFunction: RemoteFunction = ReplicatedStorage._Binder_Function
 local UpgradeTreeImages = ReplicatedStorage.Assets.UpgradeTreeImages
 local InteractZones: Folder = ReplicatedStorage.InteractZones
 
-local GiantOreSummary = Player.PlayerGui.GameGui.GiantOreSummary
 local Quests: Frame = Player.PlayerGui.InventoryGui.Inventory.Inventory.Inner.Content["2"].Inner
 
 local OresFolder = workspace:WaitForChild("Ores")
@@ -126,9 +125,15 @@ Tab:CreateToggle({
 				continue
 			end
 
-			local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+			local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
 
 			if not HumanoidRootPart then
+				continue
+			end
+			
+			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			
+			if not Humanoid then
 				continue
 			end
 
