@@ -19,7 +19,9 @@ if not Window then
 	return
 end
 
-local Tab: Tab = Window:CreateTab("Name", "repeat")
+local Tab: Tab = Window:CreateTab("Combat", "swords")
+
+Tab:CreateSection("Attacking")
 
 local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?) -> (PVInstance?) = getgenv().GetClosestChild
 
@@ -48,6 +50,8 @@ Tab:CreateToggle({
 		end
 	end,
 })
+
+Tab:CreateSection("Aiming")
 
 Tab:CreateToggle({
 	Name = "🎯 • Look At Closest Enemy",
@@ -96,6 +100,8 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateSection("Configuration")
+
 Tab:CreateSlider({
 	Name = "📏 • Max Distance",
 	Range = {1, 100},
@@ -106,32 +112,9 @@ Tab:CreateSlider({
 	Callback = function()end,
 })
 
-local Interact: RemoteEvent = game:GetService("Players").LocalPlayer.Character.CharacterHandler.Input.Events.Interact
+local Tab: Tab = Window:CreateTab("Resources", "apple")
 
-Tab:CreateToggle({
-	Name = "🪓 • Auto Chop Closest Tree",
-	CurrentValue = false,
-	Flag = "Chop",
-	Callback = function(Value)
-		while Flags.Chop.CurrentValue and task.wait() do
-			local ClosestTree = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
-				if Child == Player.Character then
-					return true
-				end
-			end, 20)
-
-			if not ClosestTree then
-				continue
-			end
-			
-			Interact:FireServer({
-				player = Player,
-				Object = ClosestTree,
-				Action = "Chop"
-			})
-		end
-	end,
-})
+Tab:CreateSection("Gathering")
 
 local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 
@@ -140,9 +123,13 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Gather",
 	Callback = function(Value)
-		while Flags.Gather.CurrentValue and task.wait() do
+		while Flags.Gather.CurrentValue and task.wait(0.1) do
 			local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
 				if Child == Player.Character then
+					return true
+				end
+				
+				if Child:GetAttribute("SetRespawn") then
 					return true
 				end
 			end, 20)
@@ -156,10 +143,40 @@ Tab:CreateToggle({
 				Object = Closest,
 				Action = "Gather"
 			})
-			task.wait(0.1)
 		end
 	end,
 })
+
+Tab:CreateSection("Selling")
+
+Tab:CreateToggle({
+	Name = "💰 • Auto Sell All Unequipped Items",
+	CurrentValue = false,
+	Flag = "Sell",
+	Callback = function(Value)
+		while Flags.Sell.CurrentValue and task.wait(0.1) do
+			for _, Tool in Player.Backpack:GetChildren() do
+				if not Tool:IsA("Tool") then
+					continue
+				end
+				
+				if Tool:GetAttribute("Equipped") then
+					continue
+				end
+				
+				if not Tool:GetAttribute("Rarity") then
+					continue
+				end
+				
+				Network.connect("SellEvent", "FireServer", Player.Character, Tool)
+			end
+		end
+	end,
+})
+
+local Tab: Tab = Window:CreateTab("Movement", "keyboard")
+
+Tab:CreateSection("Sprinting")
 
 local UserInputService = game:GetService("UserInputService")
 
@@ -176,7 +193,7 @@ local KeyCodes = {
 }
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("💨 • Auto Sprint", Success),
+	Name = ApplyUnsupportedName("⚡ • Auto Sprint", Success),
 	CurrentValue = false,
 	Flag = "Sprint",
 	Callback = function(Value)
@@ -184,56 +201,49 @@ Tab:CreateToggle({
 			return
 		end
 		
-		if Value then
-			SprintConnection = UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)
-				if GameProcessedEvent then
-					return
-				end
-
-				if not table.find(KeyCodes, Input.KeyCode) then
-					return
-				end
-				
-				if not Flags.Sprint.CurrentValue then
-					return SprintConnection:Disconnect()
-				end
-
-				Network.connect("Sprint", "Fire", Player.Character, true)
-			end)
+		while Flags.Sprint.CurrentValue and task.wait() do
+			if Player.Character.Humanoid.MoveDirection.Magnitude == Vector3.zero then
+				continue
+			end
 			
-			HandleConnection(SprintConnection, "SprintConnection")
-		elseif SprintConnection then
-			SprintConnection:Disconnect()
+			Network.connect("Sprint", "Fire", Player.Character, true)
 		end
 	end,
 })
 
-local hookfunction: (FunctionToHook: () -> (), Hook: () -> ()) -> (() -> ()) = getfenv().hookfunction
+local Tab: Tab = Window:CreateTab("Safety", "shield")
+
+Tab:CreateSection("Falling")
 
 local Original
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🩸 • Remove Fall Damage", Success and hookfunction),
+	Name = ApplyUnsupportedName("🩸 • Remove Fall Damage", Success),
 	CurrentValue = false,
 	Flag = "FallDamage",
 	Callback = function(Value)
-		if not Success or not hookfunction then
+		if not Success then
 			return
 		end
 
 		if Value then
-			Original = hookfunction(Network.connect, function(RemoteName, Method, Character, Settings, ...)
+			Original = Network.connect
+			Network.connect = function(RemoteName, Method, Character, Settings, ...)
 				if Settings and typeof(Settings) == "table" and Settings.Config == "FallDamage" then
 					return
 				end
 
 				return Original(RemoteName, Method, Character, Settings, ...)
-			end)
+			end
 		elseif Original then
 			Network.connect = Original
 		end
 	end,
 })
+
+local Tab: Tab = Window:CreateTab("Effects", "sparkles")
+
+Tab:CreateSection("Fog")
 
 local Lighting = game:GetService("Lighting")
 
