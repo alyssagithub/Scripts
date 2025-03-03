@@ -577,7 +577,7 @@ Tests = {
 		
 		assert(HumanoidRootPart, "The Character's HumanoidRootPat does not exist, and is required for this test.")
 		
-		assert(isnetworkowner(HumanoidRootPart), "Function should return true on the Character's HumanoidRootPart")
+		assert(isnetworkowner(HumanoidRootPart), "Function should return true on the Character's HumanoidRootPart.")
 		
 		assert(not isnetworkowner(Instance.new("Part")), "Function should return false on a Part that does not have network ownership.")
 	end,
