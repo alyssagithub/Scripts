@@ -86,6 +86,23 @@ Tests = {
 			assert(getfenv()[FunctionName], `Function does not contain all values in getfenv(). Missing value: {FunctionName}`)
 		end
 	end,
+	
+	getfenv = function()
+		local Environment = getfenv()
+		assert(typeof(Environment) == "table", "Function should return a table.")
+		
+		local getgenv: () -> {[string]: any} = getfenv().getgenv
+		
+		assert(getgenv, "'getgenv' does not exist and is required for this test.")
+		
+		for Name, Value in getgenv() do
+			if typeof(Value) ~= "table" and typeof(Value) ~= "function" then
+				continue
+			end
+			
+			assert(Environment[Name], `Missing '{Name}' from the global environment in the function environment.`)
+		end
+	end,
 
 	-- Files
 	readfile = function()
@@ -504,12 +521,6 @@ Tests = {
 
 		assert(DecodedHeaders, "Decoded body does not contain the headers.")
 
-		--assert(typeof(DecodedHeaders["Roblox-Place-Id"]) == "string", "Decoded headers Roblox-Place-Id is not a string.")
-
-		--assert(typeof(DecodedHeaders.Exploitidentifier) == "string", "Decoded headers Exploitidentifier is not a string.")
-
-		--assert(typeof(DecodedHeaders["Exploit-Guid"]) == "string", "Decoded headers Exploit-Guid is not a string.")
-
 		local Fingerprint
 
 		for i,v in DecodedHeaders do
@@ -532,7 +543,7 @@ Tests = {
 
 		local Success, Result = pcall(require, Module)
 
-		assert(Success, "Failed to require module:", Result)
+		assert(Success, `Failed to require module '{Module.Name}' with error:`, Result)
 
 		return Module.Name
 	end,
@@ -786,6 +797,10 @@ Tests = {
 
 		return `Encoded: {Encoded}, Decoded: {Decoded}`
 	end,
+	
+	testing = function()
+		return "test ing t h i s"
+	end,
 }
 
 local NoTests = {
@@ -807,14 +822,11 @@ local NoTests = {
 	"mousescroll",
 	"keypress",
 	"keyrelease",
-	--"setrbxclipboard",
 	"setclipboard",
-	--"getclipboard",
 	"queueonteleport",
 	"isreadonly",
 	"setreadonly",
 	"makereadonly",
-	--"makewriteable",
 	"getrawmetatable",
 	"setrawmetatable",
 	"newcclosure",
@@ -822,19 +834,16 @@ local NoTests = {
 	"hookmetamethod",
 	"getnamecallmethod",
 	"setnamecallmethod",
-	--"disassemble",
 	"decompile",
 	"gethiddenproperties",
 	"gethiddenproperty",
 	"sethiddenproperty",
-	--"getsimulationradius",
 	"setsimulationradius",
 	"getcallingscript",
 	"isscriptable",
 	"lz4decompress",
 	"setfflag",
 	"isfunctionhooked",
-	--"isluau",
 	"cloneref",
 	"setscriptable",
 	"loadstring",
@@ -842,11 +851,8 @@ local NoTests = {
 	"isrbxactive",
 	"getstack",
 	"getupvalue",
-	--"httpget",
 	"setupvalue",
-	--"getregistry",
 	"getnilinstances",
-	--"getinstancelist",
 	"setstack",
 	"getinfo",
 	"base64_encode",
@@ -854,14 +860,12 @@ local NoTests = {
 	"getscriptclosure",
 	"checkcaller",
 	"setrenderproperty",
-	--"ismoduleloaded",
 	"setconstant",
 	"getinstances",
 	"getconstants",
 	"compareinstances",
 	"getcustomasset",
 	"getscripthash",
-	--"getmenv",
 	"getrunningscripts",
 	"base64_decode",
 	"getfpscap",
@@ -874,11 +878,9 @@ local NoTests = {
 	"lz4compress",
 	"getfflag",
 	"getscriptbytecode",
-	--"defersignal",
 	"getgc",
 	"base64decode",
 	"restorefunction",
-	--"istempleclosure",
 	"getcallbackvalue",
 	"run_on_actor",
 	"getrenderproperty",
@@ -959,8 +961,6 @@ local NoTests = {
 	"messageboxasync",
 	"setrbxclipboard",
 	"defersignal",
-	"abc_require",
-	
 }
 
 local LibraryNoTests: {[string]: {string}} = {
@@ -975,8 +975,6 @@ local LibraryNoTests: {[string]: {string}} = {
 		"setconstant",
 		"getprotos",
 		"getproto",
-		--"setprotos",
-		--"setproto",
 		"getstack",
 		"setstack",
 		"getupvalues",
@@ -984,13 +982,16 @@ local LibraryNoTests: {[string]: {string}} = {
 		"setupvalue",
 		"getinfo",
 		"getregistry",
+		"validlevel",
+		"isvalidlevel",
+		"setname",
 	},
 	base64 = {
 		"encode",
 		"decode",
 	},
 	http = {
-		"request"
+		"request",
 	},
 	crypt = {
 		"base64encode",
@@ -1003,6 +1004,12 @@ local LibraryNoTests: {[string]: {string}} = {
 		"base64_decode",
 		"base64",
 		"base64_encode",
+		"hex",
+		"rsa",
+		"derive",
+		"unwrap_key",
+		"wrap_key",
+		"hmac",
 	},
 	input = {
 		"mouse2release",
@@ -1015,18 +1022,21 @@ local LibraryNoTests: {[string]: {string}} = {
 		"mousescroll",
 		"mouse1click",
 		"mouse1release",
-		"mouse1press"
+		"mouse1press",
 	},
 	cache = {
 		"invalidate",
 		"iscached",
-		"replace"
+		"replace",
 	},
 	WebSocket = {
-		"connect"
+		"connect",
+		"Connect",
+		"new",
+		"New",
 	},
 	websocket = {
-		"connect"
+		"connect",
 	},
 	bit = {
 		"band",
@@ -1044,10 +1054,11 @@ local LibraryNoTests: {[string]: {string}} = {
 		"lshift",
 		"tohex",
 		"bdiv",
-		"bmul"
+		"bmul",
+		"bpopcount",
 	},
 	SecureTable = {
-		"new"
+		"new",
 	},
 	math = {
 		"erf",
@@ -1057,6 +1068,49 @@ local LibraryNoTests: {[string]: {string}} = {
 		"vector_dot_product",
 		"transform_translate",
 		"log1p",
+		"modular_inverse",
+		"next_prime",
+		"matrix_add",
+		"set_union",
+		"modular_exponentiation",
+		"transform_scale",
+		"matrix_multiply",
+		"isclose",
+		"gamma",
+		"atanh",
+		"matrix_inverse",
+		"comb",
+		"transform_rotate",
+		"acosh",
+		"matrix_determinant",
+		"set_contains",
+		"matrix_create",
+		"tau",
+		"vector_normalize",
+		"vector_add",
+		"e",
+		"log2",
+		"asinh",
+		"isfinite",
+		"expm1",
+		"sumprod",
+		"matrix_transpose",
+		"remainder",
+		"prod",
+		"nextafter",
+		"exp2",
+		"erfc",
+		"gcd",
+		"set_difference",
+		"vector_cross_product",
+		"set_cardinality",
+		"set_intersection",
+		"matrix_multiply_gemm",
+		"matrix_subtract",
+		"is_prime",
+		"lcm",
+		"vector_subtract",
+		"vector_magnitude",
 	},
 	DrawingImmediate = {
 		"GetPaint",
@@ -1129,6 +1183,10 @@ local Aliases: {[string]: {string}} = {
 	gethiddenproperty = {"gethiddenprop"}
 }
 
+local Documentation = {
+	Duration = "https://docs.zenith.win/API%20Reference/Duration/"
+}
+
 local function Default()
 	return "Non-thorough test"
 end
@@ -1159,7 +1217,7 @@ for OriginalFunctioName, FunctionAliases in Aliases do
 	end
 end
 
-local getgenv = getfenv().getgenv
+local getgenv = getfenv().getgenv or function() return {} end
 
 local Settings: {[string]: boolean} = {
 	FakeFunctions = getgenv().FakeFunctions or false,
@@ -1186,10 +1244,16 @@ local NonThoroughTests = 0
 
 local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), LibraryName: string?)
 	TotalTests += 1
+	
+	if Callback == Default then
+		NonThoroughTests += 1
+	else
+		ThoroughTests += 1
+	end
 
 	local Start = tick()
 
-	local Success, Result = pcall(function()
+	local Success, Result: string? = pcall(function()
 		local ToIndex = getfenv()
 
 		if LibraryName then
@@ -1206,22 +1270,33 @@ local function RunTest(FunctionName: string, Callback: (any) -> (any?, any?), Li
 
 		assert(FunctionType == "function", "Does not have typeof 'function', typeof:", FunctionType)
 
-		if Callback == Default then
-			NonThoroughTests += 1
-		else
-			ThoroughTests += 1
-		end
-
 		return Callback()
 	end)
 
 	local ElapsedTime = math.round((tick() - Start) * 100) / 100
-
-	local ShowcaseResult = if Result ~= nil then `: {Result}` else ""
+	
+	if not Success and Result and Result:find(":") then
+		local Split = Result:split(": ")
+		Result = Split[#Split]
+	end
+	
+	local AliasFor
+	
+	for OriginalFunctionName: string, FunctionAliases in Aliases do
+		for _, AliasFunctionName in FunctionAliases do
+			if AliasFunctionName == FunctionName then
+				AliasFor = OriginalFunctionName
+			end
+		end
+	end
+	
 	local ShowcaseLibrary = if LibraryName then `{LibraryName}.` else ""
+	local ShowcaseMainFunction = if AliasFor then ` ({AliasFor})` else ""
+	local ShowcaseResult = if Result ~= nil then `: {Result}` else ""
 	local ShowcaseTime = if ElapsedTime > 0 then ` - took {ElapsedTime} seconds` else ""
+	local ShowcaseDocs = if not Success and LibraryName and Documentation[LibraryName] then ` | Docs: {Documentation[LibraryName]}` else ""
 
-	local Name = `{ShowcaseLibrary}{FunctionName}{ShowcaseResult}{ShowcaseTime}`
+	local Name = `{ShowcaseLibrary}{FunctionName}{ShowcaseMainFunction}{ShowcaseResult}{ShowcaseTime}{ShowcaseDocs}`
 
 	if Success then
 		CompletedTests += 1
@@ -1248,14 +1323,12 @@ for FunctionName, Callback in Tests do
 		continue
 	end
 
-	for _, Alias in FunctionAliases do
+	for _, Alias in FunctionAliases do	
 		task.spawn(RunTest, Alias, function()
 			if typeof(Callback) == "function" then
 				getfenv(Callback)[FunctionName] = getfenv()[Alias]
 				Callback()
 			end
-			
-			return `Alias for '{FunctionName}'`
 		end)
 	end
 end
@@ -1286,7 +1359,7 @@ local function DisplayMessage(MessageToDisplay)
 end
 
 DisplayMessage(`❓ The score below is only for how many custom functions are supported.`)
-DisplayMessage(`🔵 debUNC BETA v0.0.8 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
+DisplayMessage(`🔵 debUNC BETA v0.0.9 Score for {ExecutorName}: {math.floor(CompletedTests / TotalTests * 100)}%`)
 DisplayMessage(`⚪ Total tests: {TotalTests}`)
 DisplayMessage(`🟢 Successful tests: {CompletedTests}`)
 DisplayMessage(`🔴 Failed tests: {FailedTests}`)
@@ -1300,7 +1373,7 @@ print("-------------------------------------------------------------------------
 local AlreadyChecked = {}
 local Copy = ""
 
-local getrenv = getfenv().getrenv
+local getrenv = getfenv().getrenv or function() return {} end
 
 local RobloxEnvironment = if typeof(getrenv()) == "table" then getrenv() else {}
 
