@@ -575,7 +575,7 @@ Tests = {
 		
 		local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
 		
-		assert(HumanoidRootPart, "The Character's HumanoidRootPat does not exist, and is required for this test.")
+		assert(HumanoidRootPart, "The Character's HumanoidRootPart does not exist, and is required for this test.")
 		
 		assert(isnetworkowner(HumanoidRootPart), "Function should return true on the Character's HumanoidRootPart.")
 		
