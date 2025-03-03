@@ -1180,7 +1180,8 @@ local Aliases: {[string]: {string}} = {
 	getreg = {"getregistry"},
 	getinstances = {"getinstancelist"},
 	getrenv = {"getmenv"},
-	gethiddenproperty = {"gethiddenprop"}
+	gethiddenproperty = {"gethiddenprop"},
+	firesignal = {"replicatesignal"},
 }
 
 local Documentation = {
