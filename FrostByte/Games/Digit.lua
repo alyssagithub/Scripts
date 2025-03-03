@@ -633,8 +633,14 @@ Tab:CreateToggle({
 						if not Nookville then
 							continue
 						end
+						
+						local BackpackIsland = Nookville:FindFirstChild("BackpackIsland")
+						
+						if not BackpackIsland then
+							continue
+						end
 
-						local Ronald: Model? = Nookville.BackpackIsland:FindFirstChild("Ronald")
+						local Ronald: Model? = BackpackIsland:FindFirstChild("Ronald")
 
 						if not Ronald then
 							continue
