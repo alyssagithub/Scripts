@@ -398,7 +398,8 @@ Toggle = Tab:CreateToggle({
 		end
 		
 		if Suicide then
-			Toggle:Set(false)
+			pcall(Toggle.Set, Toggle, false)
+			Suicide = false
 			Notify("Suicide Disabled", "Detected your death, disabled suicide.")
 		end
 	end,
