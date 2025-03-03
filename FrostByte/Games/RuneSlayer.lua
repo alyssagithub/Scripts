@@ -194,7 +194,19 @@ Tab:CreateToggle({
 		end
 		
 		while Flags.Sprint.CurrentValue and task.wait() do
-			if Player.Character.Humanoid.MoveDirection.Magnitude == Vector3.zero then
+			local Character = Player.Character
+			
+			if not Character then
+				continue
+			end
+			
+			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			
+			if not Humanoid then
+				continue
+			end
+			
+			if Humanoid.MoveDirection.Magnitude == Vector3.zero then
 				continue
 			end
 			
