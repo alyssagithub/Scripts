@@ -16,6 +16,8 @@ local GetClosestChild: (Children: {PVInstance}, Callback: (Child: PVInstance) ->
 
 local Remotes: Folder & {[string]: RemoteEvent & RemoteFunction} = game:GetService("ReplicatedStorage").Remotes
 
+local Interactions: Folder = workspace:WaitForChild("Interactions")
+
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
 local Player = game:GetService("Players").LocalPlayer
@@ -82,7 +84,7 @@ Tab:CreateToggle({
 	Flag = "Eat",
 	Callback = function(Value)	
 		while Flags.Eat.CurrentValue and task.wait() do
-			local Closest = GetClosestChild(workspace.Interactions.Food:GetChildren(), function(Child: PVInstance)
+			local Closest = GetClosestChild(Interactions.Food:GetChildren(), function(Child: PVInstance)
 				if not Child:GetChildren()[1] then
 					return true
 				end
@@ -109,7 +111,7 @@ Tab:CreateToggle({
 	Flag = "Drink",
 	Callback = function(Value)	
 		while Flags.Drink.CurrentValue and task.wait() do
-			local Closest = GetClosestChild(workspace.Interactions.Lakes:GetChildren(), function(Child)
+			local Closest = GetClosestChild(Interactions.Lakes:GetChildren(), function(Child)
 				if Child:GetAttribute("Sickly") then
 					return true
 				end
@@ -132,7 +134,7 @@ Tab:CreateToggle({
 	Flag = "Mud",
 	Callback = function(Value)
 		while Flags.Mud.CurrentValue and task.wait() do
-			local Closest = GetClosestChild(workspace.Interactions.Mud:GetChildren())
+			local Closest = GetClosestChild(Interactions.Mud:GetChildren())
 
 			if not Closest then
 				continue
@@ -152,7 +154,7 @@ Tab:CreateToggle({
 	Flag = "Tokens",
 	Callback = function(Value)	
 		while Flags.Tokens.CurrentValue and task.wait() do
-			local Token: MeshPart? = workspace.Interactions.SpawnedTokens:GetChildren()[1]
+			local Token: MeshPart? = Interactions.SpawnedTokens:GetChildren()[1]
 
 			if not Token then
 				continue
@@ -168,7 +170,7 @@ Tab:CreateToggle({
 local function GetResourcesTable()
 	local DroppedResources = {}
 
-	for _, Resource: PVInstance in workspace.Interactions.DroppedResources:GetChildren() do
+	for _, Resource: PVInstance in Interactions.DroppedResources:GetChildren() do
 		table.insert(DroppedResources, Resource.Name)
 	end
 	
@@ -188,7 +190,7 @@ ResourcesDropdown = Tab:CreateDropdown({
 			return
 		end
 		
-		local Resource = workspace.Interactions.DroppedResources:FindFirstChild(CurrentOption)
+		local Resource = Interactions.DroppedResources:FindFirstChild(CurrentOption)
 		
 		if not Resource then
 			return
@@ -221,7 +223,7 @@ Tab:CreateButton({
 			return Notify("Error", "You do not have a character, please spawn in first.")
 		end
 		
-		for _, Egg: Model in workspace.Interactions.AbandonedEggs:GetChildren() do
+		for _, Egg: Model in Interactions.AbandonedEggs:GetChildren() do
 			if not Egg:GetChildren()[1] then
 				continue
 			end
@@ -239,7 +241,7 @@ Tab:CreateButton({
 
 local WardenShrines = {}
 
-for _, Shrine: Folder in workspace.Interactions["Warden Shrines"]:GetChildren() do
+for _, Shrine: Folder in Interactions["Warden Shrines"]:GetChildren() do
 	for _, Tablet: MeshPart in Shrine:GetChildren() do
 		table.insert(WardenShrines, Tablet.Name)
 	end
@@ -258,7 +260,7 @@ TeleportWardenShrine = Tab:CreateDropdown({
 			return
 		end
 		
-		local Tablet: MeshPart = workspace.Interactions["Warden Shrines"]:FindFirstChild(CurrentOption, true)
+		local Tablet: MeshPart = Interactions["Warden Shrines"]:FindFirstChild(CurrentOption, true)
 		
 		if not Tablet then
 			return Notify("Error", `Couldn't find the tablet for the '{CurrentOption}' Warden Shrine.`)
@@ -288,7 +290,7 @@ Tab:CreateToggle({
 			return
 		end
 		
-		workspace.Interactions.LavaPools:ClearAllChildren()
+		Interactions.LavaPools:ClearAllChildren()
 	end,
 })
 
