@@ -180,8 +180,7 @@ if ScriptVersion and ScriptVersion ~= "Universal" then
 	local PlaceFileName = getgenv().PlaceFileName
 
 	if not PlaceFileName then
-		PlaceFileName = PlaceName:gsub("%b[]", "")
-		PlaceFileName = PlaceFileName:gsub("[^%a]", "")
+		return
 	end
 	
 	local BindableFunction = Instance.new("BindableFunction")
