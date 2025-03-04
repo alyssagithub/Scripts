@@ -60,13 +60,13 @@ getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: ((Child: 
 	end
 
 	local CurrentPosition: Vector3 = HumanoidRootPart.Position
-	
+
 	local ClosestMagnitude = MaxDistance or math.huge
 	local ClosestChild
-	
+
 	for _, Child in Children do
 		local Magnitude = (Child:GetPivot().Position - CurrentPosition).Magnitude
-		
+
 		if Magnitude < ClosestMagnitude then
 			ClosestMagnitude = Magnitude
 			ClosestChild = Child
@@ -121,7 +121,7 @@ if getgenv().Flags then
 		if typeof(FlagInfo.CurrentValue) ~= "boolean" then
 			continue
 		end
-		
+
 		OriginalFlags[FlagName] = FlagInfo.CurrentValue
 		FlagInfo:Set(false)
 	end
@@ -176,31 +176,31 @@ task.spawn(function()
 	end
 end)
 
-if ScriptVersion and ScriptVersion ~= "Universal" then
-	local PlaceFileName = getgenv().PlaceFileName
+task.spawn(function()
+	if ScriptVersion and ScriptVersion ~= "Universal" then
+		local PlaceFileName = getgenv().PlaceFileName
 
-	if not PlaceFileName then
-		return
-	end
-	
-	local BindableFunction = Instance.new("BindableFunction")
-
-	local Response = false
-
-	local Button1 = "✅ Yes" 
-	local Button2 = "❌ No"
-
-	local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.lua`
-
-	BindableFunction.OnInvoke = function(Button: string)
-		Response = true
-
-		if Button == Button1 then
-			loadstring(game:HttpGet(File))()
+		if not PlaceFileName then
+			return
 		end
-	end
-	
-	task.spawn(function()
+
+		local BindableFunction = Instance.new("BindableFunction")
+
+		local Response = false
+
+		local Button1 = "✅ Yes" 
+		local Button2 = "❌ No"
+
+		local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.lua`
+
+		BindableFunction.OnInvoke = function(Button: string)
+			Response = true
+
+			if Button == Button1 then
+				loadstring(game:HttpGet(File))()
+			end
+		end
+
 		while task.wait(60) do
 			local Result = game:HttpGet(File)
 
@@ -219,8 +219,8 @@ if ScriptVersion and ScriptVersion ~= "Universal" then
 
 			break
 		end
-	end)
-end
+	end
+end)
 
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> Section,
@@ -252,7 +252,7 @@ pcall(function()
 			RememberJoins = true
 		},
 	})
-	
+
 	getgenv().Window = Window
 end)
 
@@ -261,13 +261,13 @@ function CreateUniversalTabs()
 	local VirtualInputManager = game:GetService("VirtualInputManager")
 	local TeleportService = game:GetService("TeleportService")
 	local RunService = game:GetService("RunService")
-	
+
 	if not Window then
 		return
 	end
-	
+
 	local Tab: Tab = Window:CreateTab("Client", "user")
-	
+
 	Tab:CreateSection("Discord")
 
 	Tab:CreateButton({
@@ -297,14 +297,14 @@ function CreateUniversalTabs()
 	})
 
 	Tab:CreateLabel("https://discord.gg/sS3tDP6FSB", "link")
-	
+
 	Tab:CreateSection("Statistics")
-	
+
 	local PingLabel = Tab:CreateLabel("Ping: 0 ms", "wifi")
 	local FPSLabel = Tab:CreateLabel("FPS: 0/s", "monitor")
 
 	local Stats = game:GetService("Stats")
-	
+
 	task.spawn(function()
 		while getgenv().Flags == Flags and task.wait(0.25) do
 			PingLabel:Set(`Ping: {math.floor(Stats.PerformanceStats.Ping:GetValue() * 100)/ 100} ms`)
@@ -320,7 +320,7 @@ function CreateUniversalTabs()
 		Flag = "AntiAFK",
 		Callback = function()end,
 	})
-	
+
 	getgenv().HandleConnection(Player.Idled:Connect(function()
 		if not Flags.AntiAFK.CurrentValue then
 			return
@@ -331,9 +331,9 @@ function CreateUniversalTabs()
 		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightMeta, false, game)
 		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightMeta, false, game)
 	end), "AntiAFK")
-	
+
 	Tab:CreateSection("Performance")
-	
+
 	Tab:CreateSlider({
 		Name = ApplyUnsupportedName("🎮 • Max FPS (0 for Unlimited)", setfpscap),
 		Range = {0, 240},
@@ -345,13 +345,13 @@ function CreateUniversalTabs()
 			if not setfpscap then
 				return
 			end
-			
+
 			setfpscap(Value)
 		end,
 	})
-	
+
 	local PreviousValue
-	
+
 	Tab:CreateToggle({
 		Name = ApplyUnsupportedName("⬜ • Disable 3D Rendering When Tabbed Out", isrbxactive),
 		CurrentValue = false,
@@ -359,27 +359,27 @@ function CreateUniversalTabs()
 		Callback = function(Value)
 			while Flags.Rendering.CurrentValue and task.wait() do
 				local CurrentValue = isrbxactive()
-				
+
 				if PreviousValue == CurrentValue then
 					continue
 				end
-				
+
 				PreviousValue = CurrentValue
-				
+
 				RunService:Set3dRenderingEnabled(CurrentValue)
 			end
-			
+
 			if Value then
 				RunService:Set3dRenderingEnabled(true)
 			end
 		end,
 	})
-	
+
 	Tab:CreateSection("Properties")
-	
+
 	local WalkSpeedConnection: RBXScriptConnection
 	local ConnectedHumanoid
-	
+
 	local function SetWalkSpeed()
 		local Character = Player.Character
 
@@ -392,27 +392,27 @@ function CreateUniversalTabs()
 		if not Humanoid then
 			return
 		end
-		
+
 		if Flags.WalkSpeedChanger.CurrentValue then
 			Humanoid.WalkSpeed = Flags.WalkSpeed.CurrentValue
 		end
-		
+
 		if not WalkSpeedConnection then
 			WalkSpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetWalkSpeed)
 			ConnectedHumanoid = Humanoid
 			HandleConnection(WalkSpeedConnection, "WalkSpeedConnection")
 		end
 	end
-	
+
 	HandleConnection(Player.CharacterAdded:Connect(function()
 		if WalkSpeedConnection then
 			WalkSpeedConnection:Disconnect()
 			WalkSpeedConnection = nil
 		end
-		
+
 		SetWalkSpeed()
 	end), "WalkSpeedCharacterAdded")
-	
+
 	Tab:CreateToggle({
 		Name = "⚡ • Enable WalkSpeed Changer",
 		CurrentValue = false,
@@ -423,7 +423,7 @@ function CreateUniversalTabs()
 			end
 		end,
 	})
-	
+
 	Tab:CreateSlider({
 		Name = "💨 • Set WalkSpeed",
 		Range = {0, 300},
@@ -435,9 +435,9 @@ function CreateUniversalTabs()
 			SetWalkSpeed()
 		end,
 	})
-	
+
 	Tab:CreateSection("Safety")
-	
+
 	local StaffRoleNames = {
 		"mod",
 		"dev",
@@ -446,25 +446,25 @@ function CreateUniversalTabs()
 		"founder",
 		"manag",
 	}
-	
+
 	local function IsInGroup(CheckPlayer: Player, GroupId: number)
 		local Success, Result = pcall(CheckPlayer.IsInGroup, CheckPlayer, GroupId)
-		
+
 		return Success and Result
 	end
-	
+
 	local function GetRoleInGroup(CheckPlayer: Player, GroupId: number)
 		local Success, Result = pcall(CheckPlayer.GetRoleInGroup, CheckPlayer, GroupId)
-		
+
 		return if Success then Result else "Guest"
 	end
-	
+
 	local function GetRankInGroup(CheckPlayer: Player, GroupId: number)
 		local Success, Result = pcall(CheckPlayer.GetRankInGroup, CheckPlayer, GroupId)
-		
+
 		return if Success then Result else 0
 	end
-	
+
 	local function GetStaffRole(CheckPlayer: Player)
 		local StaffRole
 
@@ -489,24 +489,24 @@ function CreateUniversalTabs()
 		if GetRankInGroup(CheckPlayer, CreatorId) == 255 then
 			StaffRole = "Group Owner"
 		end
-		
+
 		return StaffRole
 	end
-	
+
 	local function CheckIfStaff(CheckPlayer: Player)
 		if not Flags.StaffJoin.CurrentValue then
 			return
 		end
-		
+
 		local StaffRole = GetStaffRole(CheckPlayer)
-		
+
 		if not StaffRole then
 			return
 		end
-		
+
 		Player:Kick(`The player '{CheckPlayer.Name}' was detected to be a staff member, their role is '{StaffRole}'.\n\nIf you believe this is false, contact the dev of FrostByte.`)
 	end
-	
+
 	Tab:CreateToggle({
 		Name = "🚪 • Auto Leave When Staff Joins",
 		CurrentValue = false,
@@ -515,19 +515,19 @@ function CreateUniversalTabs()
 			if not Value then
 				return
 			end
-			
+
 			for _, CheckPlayer in Players:GetPlayers() do
 				CheckIfStaff(CheckPlayer)
 			end
 		end,
 	})
-	
+
 	HandleConnection(Players.PlayerAdded:Connect(CheckIfStaff), "StaffJoin")
-	
+
 	getgenv().Role = GetStaffRole(Player)
-	
+
 	local Connections = {}
-	
+
 	local OriginalText = {}
 
 	local function HandleUsernameChange(Object: Instance)
@@ -555,9 +555,9 @@ function CreateUniversalTabs()
 			Object.Text = Object.Text:gsub(Player.DisplayName, NameReplacement)
 		end
 	end
-	
+
 	local DescendantAddedConnection
-	
+
 	Tab:CreateToggle({
 		Name = "🛡 • Hide Username and Display Name (Client-Sided)",
 		CurrentValue = false,
@@ -567,23 +567,23 @@ function CreateUniversalTabs()
 				for i,v in game:GetDescendants() do
 					HandleUsernameChange(v)
 				end
-				
+
 				DescendantAddedConnection = game.DescendantAdded:Connect(HandleUsernameChange)
-				
+
 				HandleConnection(DescendantAddedConnection, "HideName")
 			elseif DescendantAddedConnection then
 				DescendantAddedConnection:Disconnect()
 				DescendantAddedConnection = nil
-				
+
 				for Object: TextLabel?, Text in OriginalText do
 					Object.Text = Text
 				end
-				
+
 				OriginalText = {}
 			end
 		end,
 	})
-	
+
 	Tab:CreateInput({
 		Name = "💬 • Name To Replace With",
 		CurrentValue = "FrostByte",
@@ -592,9 +592,9 @@ function CreateUniversalTabs()
 		Flag = "NameReplacement",
 		Callback = function()end,
 	})
-	
+
 	Tab:CreateSection("UI")
-	
+
 	local CustomThemes = {
 		BlackHistoryMonth = {
 			TextColor = Color3.fromRGB(),
@@ -640,7 +640,7 @@ function CreateUniversalTabs()
 		Default = "DarkBlue",
 		Dark = "Default"
 	}
-	
+
 	Tab:CreateDropdown({
 		Name = "🖼 • Change Theme",
 		Options = {"BlackHistoryMonth", "Default", "Dark", "AmberGlow", "Amethyst", "Ocean", "Light", "Bloom", "Green", "Serenity"},
@@ -652,7 +652,7 @@ function CreateUniversalTabs()
 			if CurrentOption == "" then
 				return
 			end
-			
+
 			Window.ModifyTheme(CustomThemes[CurrentOption] or CurrentOption)
 		end,
 	})
@@ -665,7 +665,7 @@ function CreateUniversalTabs()
 			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
-	
+
 	task.delay(1, function()
 		for FlagName: string, CurrentValue: boolean? in OriginalFlags do
 			local FlagInfo = Flags[FlagName]
@@ -677,7 +677,7 @@ function CreateUniversalTabs()
 			FlagInfo:Set(CurrentValue)
 		end
 	end)
-	
+
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
 
