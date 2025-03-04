@@ -110,10 +110,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/
 	]])
 end
 
-if not getgenv().FrostByteHandleFunction then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
-end
-
 local OriginalFlags = {}
 
 if getgenv().Flags then
@@ -123,7 +119,7 @@ if getgenv().Flags then
 		end
 
 		OriginalFlags[FlagName] = FlagInfo.CurrentValue
-		FlagInfo:Set(false)
+		pcall(FlagInfo.Set, FlagInfo, false)
 	end
 end
 
@@ -307,8 +303,8 @@ function CreateUniversalTabs()
 
 	task.spawn(function()
 		while getgenv().Flags == Flags and task.wait(0.25) do
-			PingLabel:Set(`Ping: {math.floor(Stats.PerformanceStats.Ping:GetValue() * 100)/ 100} ms`)
-			FPSLabel:Set(`FPS: {math.floor(1 / Stats.FrameTime * 10) / 10}/s`)
+			pcall(PingLabel.Set, PingLabel, `Ping: {math.floor(Stats.PerformanceStats.Ping:GetValue() * 100)/ 100} ms`)
+			pcall(FPSLabel.Set, FPSLabel, `FPS: {math.floor(1 / Stats.FrameTime * 10) / 10}/s`)
 		end
 	end)
 
@@ -508,7 +504,7 @@ function CreateUniversalTabs()
 	end
 
 	Tab:CreateToggle({
-		Name = "🚪 • Auto Leave When Staff Joins",
+		Name = "🔔 • Auto Leave When Staff Joins",
 		CurrentValue = false,
 		Flag = "StaffJoin",
 		Callback = function(Value)
@@ -525,6 +521,8 @@ function CreateUniversalTabs()
 	HandleConnection(Players.PlayerAdded:Connect(CheckIfStaff), "StaffJoin")
 
 	getgenv().Role = GetStaffRole(Player)
+	
+	Tab:CreateDivider()
 
 	local Connections = {}
 
@@ -591,6 +589,30 @@ function CreateUniversalTabs()
 		RemoveTextAfterFocusLost = false,
 		Flag = "NameReplacement",
 		Callback = function()end,
+	})
+	
+	Tab:CreateDivider()
+	
+	Tab:CreateToggle({
+		Name = "🌀 • Noclip",
+		CurrentValue = false,
+		Flag = "Noclip",
+		Callback = function(Value)
+			local Character = Player.Character or Player.CharacterAdded:Wait()
+			
+			for _, Part: Part in Character:GetChildren() do
+				if not Part:IsA("BasePart") then
+					continue
+				end
+				
+				if Value then
+					Part:SetAttribute("OriginalCollide", Part.CanCollide)
+					Part.CanCollide = false
+				else
+					Part.CanCollide = Part:GetAttribute("OriginalCollide") or Part.CanCollide
+				end
+			end
+		end,
 	})
 
 	Tab:CreateSection("UI")
@@ -673,8 +695,8 @@ function CreateUniversalTabs()
 			if not FlagInfo then
 				continue
 			end
-
-			FlagInfo:Set(CurrentValue)
+			
+			pcall(FlagInfo.Set, FlagInfo, CurrentValue)
 		end
 	end)
 
