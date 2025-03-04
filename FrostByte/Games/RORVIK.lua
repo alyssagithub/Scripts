@@ -22,7 +22,7 @@ local BinderFunction: RemoteFunction = ReplicatedStorage._Binder_Function
 local UpgradeTreeImages = ReplicatedStorage.Assets.UpgradeTreeImages
 local InteractZones: Folder = ReplicatedStorage.InteractZones
 
-local Quests: Frame = Player.PlayerGui.InventoryGui.Inventory.Inventory.Inner.Content["2"].Inner
+local Quests: Frame = Player.PlayerGui:WaitForChild("InventoryGui").Inventory.Inventory.Inner.Content["2"].Inner
 
 local OresFolder = workspace:WaitForChild("Ores")
 
