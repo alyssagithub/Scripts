@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.0"
+getgenv().ScriptVersion = "v0.0.1"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -22,6 +22,18 @@ local Window = getgenv().Window
 
 if not Window then
 	return
+end
+
+local function GetChildInCharacter(ChildName: string)
+	local Character = Player.Character
+	
+	if not Character then
+		return
+	end
+	
+	local Child = Character:FindFirstChild(ChildName)
+	
+	return Child
 end
 
 local Tab: Tab = Window:CreateTab("Combat", "swords")
@@ -49,10 +61,10 @@ Tab:CreateToggle({
 			end
 			
 			Network.connect("MouseInput", "Fire", Player.Character, {
-				["Config"] = "Button1Down"
+				Config = "Button1Down"
 			})
 			Network.connect("MouseInput", "Fire", Player.Character, {
-				["Config"] = "Button1Up"
+				Config = "Button1Up"
 			})
 		end
 	end,
@@ -78,7 +90,7 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+			local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
 			
 			if not Humanoid then
 				continue
@@ -103,7 +115,11 @@ Tab:CreateToggle({
 			HumanoidRootPart.CFrame = CFrame.lookAt(Position, Vector3.new(ClosestPosition.X, Position.Y, ClosestPosition.Z))
 		end
 		
-		Player.Character.Humanoid.AutoRotate = true
+		local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
+		
+		if Humanoid then
+			Humanoid.AutoRotate = true
+		end
 	end,
 })
 
@@ -156,6 +172,41 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateToggle({
+	Name = ApplyUnsupportedName("🥚 • Auto Pick Up Items", Success),
+	CurrentValue = false,
+	Flag = "PickUp",
+	Callback = function(Value)
+		if not Success then
+			return
+		end
+
+		while Flags.PickUp.CurrentValue and task.wait(0.1) do
+			--[[local Closest = GetClosestChild(workspace.Effects:GetChildren(), function(Child)
+				if Child == Player.Character then
+					return true
+				end
+
+				if Child:GetAttribute("SetRespawn") then
+					return true
+				end
+			end, 20)]]
+			
+			for _, Item: Model? in workspace.Effects:GetChildren() do
+				if not Item:FindFirstChild("InteractPrompt") then
+					continue
+				end
+				
+				Network.connect("Interact", "FireServer", Player.Character, {
+					player = Player,
+					Object = Item,
+					Action = "Pick Up"
+				})
+			end
+		end
+	end,
+})
+
 Tab:CreateSection("Selling")
 
 Tab:CreateToggle({
@@ -185,6 +236,56 @@ Tab:CreateToggle({
 			end
 		end
 	end,
+})
+
+Tab:CreateSection("Buying")
+
+local Items = {}
+
+for _, Tool: Tool in game:GetService("ReplicatedStorage").Storage.Tools:GetChildren() do
+	if not Tool:FindFirstChild("SellValue") then
+		continue
+	end
+	
+	table.insert(Items, Tool.Name)
+end
+
+table.sort(Items)
+
+local Dropdown
+Dropdown = Tab:CreateDropdown({
+	Name = "🛠 • Craft Item",
+	Options = Items,
+	CurrentOption = "",
+	MultipleOptions = false,
+	Callback = function(CurrentOption)
+		CurrentOption = CurrentOption[1]
+		
+		if CurrentOption == "" then
+			return
+		end
+		
+		Player.PlayerGui.CraftingGui.LocalScript.RemoteEvent:FireServer({
+			AmountToCraft = Flags.Quantity.CurrentValue,
+			SelectedItem = {
+				ToolTip = "",
+				Station = "Buy",
+				Name = CurrentOption
+			}
+		})
+
+		Dropdown:Set({""})
+	end,
+})
+
+Tab:CreateSlider({
+	Name = "🔢 • Quantity",
+	Range = {1, 100},
+	Increment = 1,
+	Suffix = "Items",
+	CurrentValue = 1,
+	Flag = "Quantity",
+	Callback = function()end,
 })
 
 local Tab: Tab = Window:CreateTab("Movement", "keyboard")
@@ -217,14 +318,14 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			Network.connect("Sprint", "Fire", Player.Character, true)
+			Network.connect("Sprint", "Fire", Character, true)
 		end
 	end,
 })
 
 local Tab: Tab = Window:CreateTab("Safety", "shield")
 
-Tab:CreateSection("Falling")
+Tab:CreateSection("Damage")
 
 local Original
 
@@ -249,6 +350,19 @@ Tab:CreateToggle({
 		elseif Original then
 			Network.connect = Original
 		end
+	end,
+})
+
+Tab:CreateSection("Regeneration")
+
+Tab:CreateButton({
+	Name = "💤 • Quick Sleep Anywhere (Heal)",
+	Callback = function()
+		Network.connect("Interact", "FireServer", Player.Character, {
+			player = Player,
+			Object = workspace:WaitForChild("Map"):WaitForChild("Bed"),
+			Action = "Sleep"
+		})
 	end,
 })
 
