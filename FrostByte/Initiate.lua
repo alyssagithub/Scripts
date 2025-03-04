@@ -10,11 +10,7 @@ local function Notify(Text)
 	})
 end
 
-local UniverseIds = {
-	[3764534614] = "RuneSlayer"
-}
-
-local PlaceName = UniverseIds[game.GameId] or game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+local PlaceName = game:GetService("AssetService"):GetGamePlacesAsync(game.GameId):GetCurrentPage()[1].Name
 
 getgenv().PlaceName = PlaceName
 
