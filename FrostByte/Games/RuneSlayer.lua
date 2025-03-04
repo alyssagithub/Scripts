@@ -182,16 +182,6 @@ Tab:CreateToggle({
 		end
 
 		while Flags.PickUp.CurrentValue and task.wait(0.1) do
-			--[[local Closest = GetClosestChild(workspace.Effects:GetChildren(), function(Child)
-				if Child == Player.Character then
-					return true
-				end
-
-				if Child:GetAttribute("SetRespawn") then
-					return true
-				end
-			end, 20)]]
-			
 			for _, Item: Model? in workspace.Effects:GetChildren() do
 				if not Item:FindFirstChild("InteractPrompt") then
 					continue
@@ -356,8 +346,12 @@ Tab:CreateToggle({
 Tab:CreateSection("Regeneration")
 
 Tab:CreateButton({
-	Name = "💤 • Quick Sleep Anywhere (Heal)",
+	Name = ApplyUnsupportedName("💤 • Quick Sleep Anywhere (Heal)", Success),
 	Callback = function()
+		if not Success then
+			return
+		end
+		
 		Network.connect("Interact", "FireServer", Player.Character, {
 			player = Player,
 			Object = workspace:WaitForChild("Map"):WaitForChild("Bed"),
