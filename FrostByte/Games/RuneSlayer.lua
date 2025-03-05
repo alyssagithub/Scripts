@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.1"
+getgenv().ScriptVersion = "v0.0.2"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -41,15 +41,15 @@ local Tab: Tab = Window:CreateTab("Combat", "swords")
 Tab:CreateSection("Attacking")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("⚔ • Kill Aura", Success),
+	Name = ApplyUnsupportedName("⚔ • Auto Attack", Success),
 	CurrentValue = false,
-	Flag = "KillAura",
+	Flag = "Attack",
 	Callback = function(Value)
 		if not Success then
 			return
 		end
 		
-		while Flags.KillAura.CurrentValue and task.wait() do
+		while Flags.Attack.CurrentValue and task.wait() do
 			local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
 				if Child == Player.Character then
 					return true
@@ -157,7 +157,7 @@ Tab:CreateToggle({
 				if Child:GetAttribute("SetRespawn") then
 					return true
 				end
-			end, 20)
+			end)
 
 			if not Closest then
 				continue
@@ -200,7 +200,7 @@ Tab:CreateToggle({
 Tab:CreateSection("Selling")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("💰 • Auto Sell All Unequipped Items", Success),
+	Name = ApplyUnsupportedName("💰 • Auto Sell Unequipped Items", Success),
 	CurrentValue = false,
 	Flag = "Sell",
 	Callback = function(Value)
@@ -211,6 +211,10 @@ Tab:CreateToggle({
 		while Flags.Sell.CurrentValue and task.wait(0.1) do
 			for _, Tool in Player.Backpack:GetChildren() do
 				if not Tool:IsA("Tool") then
+					continue
+				end
+				
+				if table.find(Flags.Blacklist.CurrentOption, Tool.Name) then
 					continue
 				end
 				
@@ -228,19 +232,27 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateSection("Buying")
-
 local Items = {}
 
 for _, Tool: Tool in game:GetService("ReplicatedStorage").Storage.Tools:GetChildren() do
 	if not Tool:FindFirstChild("SellValue") then
 		continue
 	end
-	
+
 	table.insert(Items, Tool.Name)
 end
 
 table.sort(Items)
+
+Tab:CreateDropdown({
+	Name = "📃 • Sell Blacklist",
+	Options = Items,
+	MultipleOptions = true,
+	Flag = "Blacklist",
+	Callback = function()end,
+})
+
+Tab:CreateSection("Crafting")
 
 local Dropdown
 Dropdown = Tab:CreateDropdown({
@@ -339,6 +351,32 @@ Tab:CreateToggle({
 			end
 		elseif Original then
 			Network.connect = Original
+		end
+	end,
+})
+
+local LavaParts = {}
+
+Tab:CreateToggle({
+	Name = "🌋 • Remove Lava",
+	CurrentValue = false,
+	Flag = "Lava",
+	Callback = function(Value)
+		if Value then
+			for _, Part: Part in workspace:GetDescendants() do
+				if Part.Name ~= "lava" then
+					continue
+				end
+				
+				LavaParts[Part] = Part.Parent
+				Part.Parent = nil
+			end
+		else
+			for Part: Part, Parent: Part in LavaParts do
+				Part.Parent = Parent
+			end
+			
+			LavaParts = {}
 		end
 	end,
 })
