@@ -37,6 +37,36 @@ local function GetChildInCharacter(ChildName: string)
 	return Child
 end
 
+local function GetInputRemote(RemoteName: string): RemoteEvent
+	local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+	
+	local Character = Player.Character
+	
+	if not Character then
+		return
+	end
+	
+	local CharacterHandler: LocalScript = Character:FindFirstChild("CharacterHandler")
+	
+	if not CharacterHandler then
+		return
+	end
+	
+	local Input: Folder = CharacterHandler:FindFirstChild("Input")
+	
+	if not Input then
+		return
+	end
+	
+	local Events: Folder = Input:FindFirstChild("Events")
+	
+	if not Events then
+		return
+	end
+	
+	return Events:FindFirstChild(RemoteName)
+end
+
 local Tab: Tab = Window:CreateTab("Combat", "swords")
 
 Tab:CreateSection("Attacking")
@@ -164,7 +194,7 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+			local Interact = GetInputRemote("Interact")
 			
 			Interact:FireServer({
 				player = Player,
@@ -190,7 +220,7 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+				local Interact = GetInputRemote("Interact")
 				
 				Interact:FireServer({
 					player = Player,
@@ -231,7 +261,7 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				local SellEvent: RemoteEvent = Player.Character.CharacterHandler.Input.Events.SellEvent
+				local SellEvent = GetInputRemote("SellEvent")
 				
 				SellEvent:FireServer(Tool)
 			end
@@ -403,7 +433,7 @@ Tab:CreateButton({
 			return Notify("Error", "Could not find a bed to sleep in.")
 		end
 		
-		local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+		local Interact = GetInputRemote("Interact")
 		
 		Interact:FireServer({
 			player = Player,
