@@ -141,7 +141,7 @@ local Tab: Tab = Window:CreateTab("Resources", "apple")
 Tab:CreateSection("Gathering")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🍎 • Auto Gather (No Tools Required)", Success),
+	Name = "🍎 • Auto Gather (No Tools Required)",
 	CurrentValue = false,
 	Flag = "Gather",
 	Callback = function(Value)
@@ -176,7 +176,7 @@ Tab:CreateToggle({
 })
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🥚 • Auto Pick Up Items", Success),
+	Name = "🥚 • Auto Pick Up Items",
 	CurrentValue = false,
 	Flag = "PickUp",
 	Callback = function(Value)
@@ -205,7 +205,7 @@ Tab:CreateToggle({
 Tab:CreateSection("Selling")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("💰 • Auto Sell Unequipped Items", Success),
+	Name = "💰 • Auto Sell Unequipped Items",
 	CurrentValue = false,
 	Flag = "Sell",
 	Callback = function(Value)
@@ -391,7 +391,7 @@ Tab:CreateToggle({
 Tab:CreateSection("Regeneration")
 
 Tab:CreateButton({
-	Name = ApplyUnsupportedName("💤 • Quick Sleep Anywhere (Heal)", Success),
+	Name = "💤 • Quick Sleep Anywhere (Heal)",
 	Callback = function()
 		if not Success then
 			return
