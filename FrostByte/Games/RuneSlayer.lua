@@ -62,7 +62,7 @@ local function GetInputRemote(RemoteName: string): RemoteEvent
 		return
 	end
 	
-	return Events:WaitForChild(RemoteName, 5)
+	return Events:FindFirstChild(RemoteName)
 end
 
 local Tab: Tab = Window:CreateTab("Combat", "swords")
@@ -194,6 +194,10 @@ Tab:CreateToggle({
 			
 			local Interact = GetInputRemote("Interact")
 			
+			if not Interact then
+				continue
+			end
+			
 			Interact:FireServer({
 				player = Player,
 				Object = Closest,
@@ -219,6 +223,10 @@ Tab:CreateToggle({
 				end
 				
 				local Interact = GetInputRemote("Interact")
+				
+				if not Interact then
+					continue
+				end
 				
 				Interact:FireServer({
 					player = Player,
@@ -260,6 +268,10 @@ Tab:CreateToggle({
 				end
 				
 				local SellEvent = GetInputRemote("SellEvent")
+				
+				if not SellEvent then
+					continue
+				end
 				
 				SellEvent:FireServer(Tool)
 			end
@@ -432,6 +444,10 @@ Tab:CreateButton({
 		end
 		
 		local Interact = GetInputRemote("Interact")
+		
+		if not Interact then
+			return
+		end
 		
 		Interact:FireServer({
 			player = Player,
