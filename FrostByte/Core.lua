@@ -598,7 +598,11 @@ function CreateUniversalTabs()
 		CurrentValue = false,
 		Flag = "Noclip",
 		Callback = function(Value)
-			local Character = Player.Character or Player.CharacterAdded:Wait()
+			local Character = Player.Character
+			
+			if not Character then
+				return Notify("Error", "You do not have a character.")
+			end
 			
 			for _, Part: Part in Character:GetChildren() do
 				if not Part:IsA("BasePart") then
