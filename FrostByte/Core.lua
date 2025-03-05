@@ -652,7 +652,7 @@ function CreateUniversalTabs()
 
 		local BillboardGui = Instance.new("BillboardGui")
 		BillboardGui.Name = TargetPlayer.Name
-		BillboardGui.Adornee = TargetCharacter.Head
+		BillboardGui.Adornee = TargetCharacter:FindFirstChild("Head") or TargetCharacter:FindFirstChildWhichIsA("BasePart")
 		BillboardGui.Size = UDim2.new(0, 100, 0, 150)
 		BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
 		BillboardGui.AlwaysOnTop = true
