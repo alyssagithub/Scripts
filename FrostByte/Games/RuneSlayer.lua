@@ -11,6 +11,7 @@ type Tab = {
 
 local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
+local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 
 local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 
@@ -163,7 +164,9 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			Network.connect("Interact", "FireServer", Player.Character, {
+			local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+			
+			Interact:FireServer({
 				player = Player,
 				Object = Closest,
 				Action = "Gather"
@@ -187,7 +190,9 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				Network.connect("Interact", "FireServer", Player.Character, {
+				local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+				
+				Interact:FireServer({
 					player = Player,
 					Object = Item,
 					Action = "Pick Up"
@@ -226,7 +231,9 @@ Tab:CreateToggle({
 					continue
 				end
 				
-				Network.connect("SellEvent", "FireServer", Player.Character, Tool)
+				local SellEvent: RemoteEvent = Player.Character.CharacterHandler.Input.Events.SellEvent
+				
+				SellEvent:FireServer(Tool)
 			end
 		end
 	end,
@@ -390,9 +397,17 @@ Tab:CreateButton({
 			return
 		end
 		
-		Network.connect("Interact", "FireServer", Player.Character, {
+		local Bed = workspace.Map:FindFirstChild("Bed")
+		
+		if not Bed then
+			return Notify("Error", "Could not find a bed to sleep in.")
+		end
+		
+		local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
+		
+		Interact:FireServer({
 			player = Player,
-			Object = workspace:WaitForChild("Map"):WaitForChild("Bed"),
+			Object = Bed,
 			Action = "Sleep"
 		})
 	end,
