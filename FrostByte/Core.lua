@@ -667,30 +667,30 @@ function CreateUniversalTabs()
 		TextLabel.ZIndex = 10
 		TextLabel.Parent = BillboardGui
 		
-		local CharacterAddedConnection: RBXScriptConnection
-		local RenderSteppedConnection: RBXScriptConnection
-		
-		CharacterAddedConnection = Player.CharacterAdded:Connect(function()
-			if not Flags.ESP.CurrentValue then
-				CharacterAddedConnection:Disconnect()
+		TargetPlayer.CharacterAdded:Once(function()
+			if not Flags.ESP.CurrentValue or not Holder.Parent then
 				return
 			end
 			
-			Holder:Destroy()
-			ESP(Player)
+			if Holder.Parent then
+				Holder:Destroy()
+			end
 			
-			CharacterAddedConnection:Disconnect()
-			RenderSteppedConnection:Disconnect()
+			ESP(Player)
 		end)
 		
+		TargetPlayer.CharacterRemoving:Once(function()
+			Holder:Destroy()
+		end)
+		
+		local RenderSteppedConnection: RBXScriptConnection
 		RenderSteppedConnection = RunService.RenderStepped:Connect(function()
 			if not Flags.ESP.CurrentValue then
 				RenderSteppedConnection:Disconnect()
 				return
 			end
 			
-			if not CoreGui:FindFirstChild(FolderName) then
-				CharacterAddedConnection:Disconnect()
+			if not Holder.Parent then
 				RenderSteppedConnection:Disconnect()
 				return
 			end
