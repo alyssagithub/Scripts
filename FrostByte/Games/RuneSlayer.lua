@@ -38,8 +38,6 @@ local function GetChildInCharacter(ChildName: string)
 end
 
 local function GetInputRemote(RemoteName: string): RemoteEvent
-	local Interact: RemoteEvent = Player.Character.CharacterHandler.Input.Events.Interact
-	
 	local Character = Player.Character
 	
 	if not Character then
@@ -64,7 +62,7 @@ local function GetInputRemote(RemoteName: string): RemoteEvent
 		return
 	end
 	
-	return Events:FindFirstChild(RemoteName)
+	return Events:WaitForChild(RemoteName, 5)
 end
 
 local Tab: Tab = Window:CreateTab("Combat", "swords")
