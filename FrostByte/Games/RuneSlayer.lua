@@ -561,7 +561,11 @@ Dropdown = Tab:CreateDropdown({
 		
 		local SelectedArea: Part = WorldAreas[CurrentOption]
 		
-		local Result = workspace:Raycast(SelectedArea.Position, Vector3.yAxis * -10000)
+		local Success, Result = pcall(workspace.Raycast, workspace, SelectedArea.Position, Vector3.yAxis * -10000)
+		
+		if not Success then
+			return Notify("Error", "Errored while raycasting in this area.")
+		end
 		
 		if not Result.Instance then
 			return Notify("Failed", "Failed to raycast in this area.")
