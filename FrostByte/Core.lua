@@ -639,7 +639,7 @@ function CreateUniversalTabs()
 		Holder.Parent = CoreGui
 
 		for _, Part: Part in TargetCharacter:GetChildren() do
-			if not Part:IsA("BasePart") then
+			if not Part:IsA("PVInstance") then
 				continue
 			end
 
@@ -656,7 +656,7 @@ function CreateUniversalTabs()
 
 		local BillboardGui = Instance.new("BillboardGui")
 		BillboardGui.Name = TargetPlayer.Name
-		BillboardGui.Adornee = TargetCharacter:FindFirstChild("Head") or TargetCharacter:FindFirstChildWhichIsA("BasePart")
+		BillboardGui.Adornee = TargetCharacter:FindFirstChild("Head") or TargetCharacter:FindFirstChildWhichIsA("PVInstance")
 		BillboardGui.Size = UDim2.new(0, 100, 0, 150)
 		BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
 		BillboardGui.AlwaysOnTop = true
@@ -717,7 +717,7 @@ function CreateUniversalTabs()
 		CurrentValue = false,
 		Flag = "ESP",
 		Callback = function(Value)
-			for _, Object: Folder? in pairs(CoreGui:GetChildren()) do
+			for _, Object: Folder? in CoreGui:GetChildren() do
 				if not Object.Name:find("_ESP") then
 					continue
 				end
@@ -725,14 +725,16 @@ function CreateUniversalTabs()
 				Object:Destroy()
 			end
 			
-			if Value then
-				for _, TargetPlayer in Players:GetPlayers() do
-					if TargetPlayer == Player then
-						continue
-					end
-					
-					ESP(TargetPlayer)
+			if not Value then
+				return
+			end
+			
+			for _, TargetPlayer in Players:GetPlayers() do
+				if TargetPlayer == Player then
+					continue
 				end
+
+				ESP(TargetPlayer)
 			end
 		end,
 	})
