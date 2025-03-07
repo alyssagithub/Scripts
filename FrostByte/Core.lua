@@ -638,17 +638,17 @@ function CreateUniversalTabs()
 		Holder.Name = FolderName
 		Holder.Parent = CoreGui
 
-		for _, Part: Part in TargetCharacter:GetChildren() do
-			if not Part:IsA("PVInstance") then
+		for _, Object: BasePart | Model in TargetCharacter:GetChildren() do
+			if not Object:IsA("PVInstance") then
 				continue
 			end
 
 			local BoxHandleAdornment = Instance.new("BoxHandleAdornment")
 			BoxHandleAdornment.Name = TargetPlayer.Name
-			BoxHandleAdornment.Adornee = Part
+			BoxHandleAdornment.Adornee = Object
 			BoxHandleAdornment.AlwaysOnTop = true
 			BoxHandleAdornment.ZIndex = 10
-			BoxHandleAdornment.Size = Part.Size
+			BoxHandleAdornment.Size = if Object:IsA("BasePart") then Object.Size else Object:GetExtentsSize()
 			BoxHandleAdornment.Transparency = 0.5
 			BoxHandleAdornment.Color = BrickColor.White()
 			BoxHandleAdornment.Parent = Holder
