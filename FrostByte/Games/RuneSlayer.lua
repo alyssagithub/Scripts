@@ -553,29 +553,31 @@ Dropdown = Tab:CreateDropdown({
 	CurrentOption = "",
 	MultipleOptions = false,
 	Callback = function(CurrentOption)
-		CurrentOption = CurrentOption[1]
+		local Success = pcall(function()
+			CurrentOption = CurrentOption[1]
 
-		if CurrentOption == "" then
-			return
-		end
-		
-		local SelectedArea: Part = WorldAreas[CurrentOption]
-		
-		local Success, Result = pcall(workspace.Raycast, workspace, SelectedArea.Position, Vector3.yAxis * -10000)
+			if CurrentOption == "" then
+				return
+			end
+
+			local SelectedArea: Part = WorldAreas[CurrentOption]
+
+			local Result = workspace:Raycast(SelectedArea.Position, Vector3.yAxis * -10000)
+
+			if not Result then
+				return Notify("Failed", "Failed to raycast in this area.")
+			end
+
+			local GoTo = CFrame.new(Result.Position)
+
+			TeleportLocalCharacter(GoTo)
+
+			Dropdown:Set({""})
+		end)
 		
 		if not Success then
-			return Notify("Error", "Errored while raycasting in this area.")
+			return Notify("Error", "Failed to teleport.")
 		end
-		
-		if not Result.Instance then
-			return Notify("Failed", "Failed to raycast in this area.")
-		end
-		
-		local GoTo = CFrame.new(Result.Position)
-		
-		TeleportLocalCharacter(GoTo)
-
-		Dropdown:Set({""})
 	end,
 })
 
