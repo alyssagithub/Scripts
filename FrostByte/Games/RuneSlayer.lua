@@ -216,6 +216,8 @@ Tab:CreateToggle({
 			end)
 
 			if not Closest then
+				Notify("Failed", "Couldn't find anything, try getting closer to it so it can load.")
+				task.wait(5)
 				continue
 			end
 
@@ -353,6 +355,8 @@ Tab:CreateToggle({
 			end)
 
 			if not Closest then
+				Notify("Failed", "Couldn't find anything, try getting closer to it so it can load.")
+				task.wait(5)
 				continue
 			end
 
