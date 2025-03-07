@@ -39,14 +39,6 @@ end
 getgenv().HandleConnection = HandleConnection
 
 getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?)
-	for i, Child in Children do
-		if Callback and not Callback(Child) then
-			continue
-		end
-
-		table.remove(Children, i)
-	end
-
 	local Character = Player.Character
 
 	if not Character then
@@ -66,6 +58,10 @@ getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: ((Child: 
 
 	for _, Child in Children do
 		if not Child:IsA("PVInstance") then
+			continue
+		end
+		
+		if Callback and Callback(Child) then
 			continue
 		end
 		
