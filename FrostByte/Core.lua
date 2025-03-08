@@ -112,6 +112,7 @@ local Rayfield
 
 if getgenv().RayfieldTesting then
 	Rayfield = loadstring(getgenv().RayfieldTesting)()
+	print("Running Rayfield Testing")
 else
 	Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))()
 end
