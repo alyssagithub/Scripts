@@ -553,15 +553,15 @@ Dropdown = Tab:CreateDropdown({
 	CurrentOption = "",
 	MultipleOptions = false,
 	Callback = function(CurrentOption)
+		CurrentOption = CurrentOption[1]
+
+		if CurrentOption == "" then
+			return
+		end
+
+		local SelectedArea: Part = WorldAreas[CurrentOption]
+		
 		local Success = pcall(function()
-			CurrentOption = CurrentOption[1]
-
-			if CurrentOption == "" then
-				return
-			end
-
-			local SelectedArea: Part = WorldAreas[CurrentOption]
-
 			local Result = workspace:Raycast(SelectedArea.Position, Vector3.yAxis * -10000)
 
 			if not Result then
