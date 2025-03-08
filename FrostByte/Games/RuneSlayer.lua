@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.4"
+getgenv().ScriptVersion = "v0.0.4a"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -235,7 +235,7 @@ Tab:CreateToggle({
 	end,
 	Callback = function()
 		local Closest = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
-			if not table.find(Flags.SelectedMobs.CurrentOption, Child.Name:split(".")[1]) then
+			if not table.find(Flags.Mobs.CurrentOption, Child.Name:split(".")[1]) then
 				return true
 			end
 		end)
