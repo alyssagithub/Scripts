@@ -91,25 +91,6 @@ end
 
 getgenv().ApplyUnsupportedName = ApplyUnsupportedName
 
-if queue_on_teleport then
-	queue_on_teleport([[
-	
-	local TeleportService = game:GetService("TeleportService")
-local TeleportData = TeleportService:GetLocalPlayerTeleportData()
-
-if not TeleportData then
-	return
-end
-
-if typeof(TeleportData) == "table" and TeleportData.FrostByteRejoin then
-	return
-end
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Initiate.lua"))()
-	
-	]])
-end
-
 local OriginalFlags = {}
 
 if getgenv().Flags then
