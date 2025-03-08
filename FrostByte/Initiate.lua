@@ -2,6 +2,8 @@
 
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
+getgenv().Initiated = true
+
 local function Notify(Text)
 	game:GetService("StarterGui"):SetCore("SendNotification", {
 		Title = "FrostByte Notification",
