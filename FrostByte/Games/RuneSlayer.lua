@@ -223,9 +223,9 @@ local MobTween: Tween
 local ActiveNotification = false
 
 Tab:CreateToggle({
-	Name = "🦌 • Teleport to Mobs",
+	Name = "🦌 • Move to Mobs",
 	CurrentValue = false,
-	Flag = "TPMobs",
+	Flag = "MoveMobs",
 	Looped = true,
 	BeforeLoop = function(Value)
 		if not Value and MobTween then
@@ -376,7 +376,7 @@ local ActiveNotification = false
 Tab:CreateToggle({
 	Name = "🌲 • Move to Harvestables",
 	CurrentValue = false,
-	Flag = "TPHarvestables",
+	Flag = "MoveHarvestables",
 	Looped = true,
 	BeforeLoop = function(Value)
 		if not Value and ResourceTween then
