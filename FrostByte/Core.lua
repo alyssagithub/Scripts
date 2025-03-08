@@ -108,7 +108,15 @@ if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
 end
 
-local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))()
+local Rayfield
+
+if getgenv().Initiated then
+	Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))()
+else
+	Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/RayfieldTesting.luau"))()
+end
+
+getgenv().Initiated = nil
 
 local function SendNotification(Title: string, Text: string, Duration: number?, Button1: string?, Button2: string?, Callback: BindableFunction?)
 	StarterGui:SetCore("SendNotification", {
