@@ -93,7 +93,7 @@ getgenv().ApplyUnsupportedName = ApplyUnsupportedName
 
 local OriginalFlags = {}
 
---[[if getgenv().Flags then
+if getgenv().Flags then
 	for FlagName: string, FlagInfo in getgenv().Flags do
 		if typeof(FlagInfo.CurrentValue) ~= "boolean" then
 			continue
@@ -102,7 +102,7 @@ local OriginalFlags = {}
 		OriginalFlags[FlagName] = FlagInfo.CurrentValue
 		FlagInfo:Set(false)
 	end
-end]]
+end
 
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
