@@ -711,6 +711,8 @@ function CreateUniversalTabs()
 			end
 		end,
 	})
+	
+	HandleConnection(Players.PlayerAdded:Connect(ESP), "ESPPlayerAdded")
 
 	Tab:CreateSection("UI")
 
