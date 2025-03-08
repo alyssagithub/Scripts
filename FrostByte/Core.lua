@@ -60,11 +60,11 @@ getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: ((Child: 
 		if not Child:IsA("PVInstance") then
 			continue
 		end
-		
+
 		if Callback and Callback(Child) then
 			continue
 		end
-		
+
 		local Magnitude = (Child:GetPivot().Position - CurrentPosition).Magnitude
 
 		if Magnitude < ClosestMagnitude then
@@ -93,16 +93,16 @@ getgenv().ApplyUnsupportedName = ApplyUnsupportedName
 
 local OriginalFlags = {}
 
-if getgenv().Flags then
+--[[if getgenv().Flags then
 	for FlagName: string, FlagInfo in getgenv().Flags do
 		if typeof(FlagInfo.CurrentValue) ~= "boolean" then
 			continue
 		end
 
 		OriginalFlags[FlagName] = FlagInfo.CurrentValue
-		pcall(FlagInfo.Set, FlagInfo, false)
+		FlagInfo:Set(false)
 	end
-end
+end]]
 
 if getgenv().Rayfield then
 	getgenv().Rayfield:Destroy()
@@ -110,10 +110,10 @@ end
 
 local Rayfield
 
-if getgenv().Initiated then
-	Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))()
+if getgenv().RayfieldTesting then
+	Rayfield = loadstring(getgenv().RayfieldTesting)()
 else
-	Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/RayfieldTesting.luau"))()
+	Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))()
 end
 
 getgenv().Initiated = nil
@@ -207,42 +207,36 @@ type Tab = {
 
 local Window
 
-pcall(function()
-	Window = Rayfield:CreateWindow({
-		Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
-		Icon = "snowflake",
-		LoadingTitle = "❄ Brought to you by FrostByte ❄",
-		LoadingSubtitle = PlaceName,
-		Theme = "DarkBlue",
+Window = Rayfield:CreateWindow({
+	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
+	Icon = "snowflake",
+	LoadingTitle = "❄ Brought to you by FrostByte ❄",
+	LoadingSubtitle = PlaceName,
+	Theme = "DarkBlue",
 
-		DisableRayfieldPrompts = false,
-		DisableBuildWarnings = false,
+	DisableRayfieldPrompts = false,
+	DisableBuildWarnings = false,
 
-		ConfigurationSaving = {
-			Enabled = true,
-			FolderName = "FrostByte",
-			FileName = `{getgenv().PlaceFileName or `DevMode-{game.PlaceId}`}-{Player.Name}`
-		},
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = "FrostByte",
+		FileName = `{getgenv().PlaceFileName or `DevMode-{game.PlaceId}`}-{Player.Name}`
+	},
 
-		Discord = {
-			Enabled = true,
-			Invite = "sS3tDP6FSB",
-			RememberJoins = true
-		},
-	})
+	Discord = {
+		Enabled = true,
+		Invite = "sS3tDP6FSB",
+		RememberJoins = true
+	},
+})
 
-	getgenv().Window = Window
-end)
+getgenv().Window = Window
 
 function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
 	local VirtualInputManager = game:GetService("VirtualInputManager")
 	local TeleportService = game:GetService("TeleportService")
 	local RunService = game:GetService("RunService")
-
-	if not Window then
-		return
-	end
 
 	local Tab: Tab = Window:CreateTab("Client", "user")
 
@@ -503,7 +497,7 @@ function CreateUniversalTabs()
 	HandleConnection(Players.PlayerAdded:Connect(CheckIfStaff), "StaffJoin")
 
 	getgenv().Role = GetStaffRole(Player)
-	
+
 	Tab:CreateDivider()
 
 	local Connections = {}
@@ -572,25 +566,25 @@ function CreateUniversalTabs()
 		Flag = "NameReplacement",
 		Callback = function()end,
 	})
-	
+
 	Tab:CreateDivider()
-	
+
 	Tab:CreateToggle({
 		Name = "🌀 • Noclip",
 		CurrentValue = false,
 		Flag = "Noclip",
 		Callback = function(Value)
 			local Character = Player.Character
-			
+
 			if not Character then
 				return Notify("Error", "You do not have a character.")
 			end
-			
+
 			for _, Part: Part in Character:GetChildren() do
 				if not Part:IsA("BasePart") then
 					continue
 				end
-				
+
 				if Value then
 					Part:SetAttribute("OriginalCollide", Part.CanCollide)
 					Part.CanCollide = false
@@ -600,18 +594,18 @@ function CreateUniversalTabs()
 			end
 		end,
 	})
-	
+
 	Tab:CreateSection("Visualizing")
-	
+
 	local CoreGui: Folder = game:GetService("CoreGui")
-	
+
 	local function ESP(TargetPlayer: Player)
 		local TargetCharacter = TargetPlayer.Character or TargetPlayer.CharacterAdded:Wait()
-		
+
 		local LocalCharacter = Player.Character
-		
+
 		local FolderName = `{TargetPlayer.Name}_ESP`
-		
+
 		local Holder = Instance.new("Folder")
 		Holder.Name = FolderName
 		Holder.Parent = CoreGui
@@ -652,35 +646,35 @@ function CreateUniversalTabs()
 		TextLabel.Text = "Unloaded"
 		TextLabel.ZIndex = 10
 		TextLabel.Parent = BillboardGui
-		
+
 		TargetPlayer.CharacterAdded:Once(function()
 			if not Flags.ESP.CurrentValue or not Holder.Parent then
 				return
 			end
-			
+
 			if Holder.Parent then
 				Holder:Destroy()
 			end
-			
+
 			ESP(Player)
 		end)
-		
+
 		TargetPlayer.CharacterRemoving:Once(function()
 			Holder:Destroy()
 		end)
-		
+
 		local RenderSteppedConnection: RBXScriptConnection
 		RenderSteppedConnection = RunService.RenderStepped:Connect(function()
 			if not Flags.ESP.CurrentValue then
 				RenderSteppedConnection:Disconnect()
 				return
 			end
-			
+
 			if not Holder.Parent then
 				RenderSteppedConnection:Disconnect()
 				return
 			end
-			
+
 			if not TargetCharacter or not TargetCharacter:FindFirstChildOfClass("Humanoid") or not LocalCharacter or not LocalCharacter:FindFirstChild("Humanoid") then
 				return
 			end
@@ -689,7 +683,7 @@ function CreateUniversalTabs()
 			TextLabel.Text = `Name: {TargetPlayer.Name} | Health: {math.floor(TargetCharacter.Humanoid.Health)} | Studs: {Distance}`
 		end)
 	end
-	
+
 	Tab:CreateToggle({
 		Name = "🔍 • Infinite Yield ESP",
 		CurrentValue = false,
@@ -699,14 +693,14 @@ function CreateUniversalTabs()
 				if not Object.Name:find("_ESP") then
 					continue
 				end
-				
+
 				Object:Destroy()
 			end
-			
+
 			if not Value then
 				return
 			end
-			
+
 			for _, TargetPlayer in Players:GetPlayers() do
 				if TargetPlayer == Player then
 					continue
@@ -797,7 +791,7 @@ function CreateUniversalTabs()
 			if not FlagInfo then
 				continue
 			end
-			
+
 			pcall(FlagInfo.Set, FlagInfo, CurrentValue)
 		end
 	end)
