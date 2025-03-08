@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.3"
+getgenv().ScriptVersion = "v0.0.4"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -20,8 +20,6 @@ local TweenService = game:GetService("TweenService")
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
 local Player = game:GetService("Players").LocalPlayer
-
-local Window = getgenv().Window
 
 local function GetChildInCharacter(ChildName: string)
 	local Character = Player.Character
@@ -63,27 +61,62 @@ local function GetInputRemote(RemoteName: string): RemoteEvent
 	return Events:FindFirstChild(RemoteName)
 end
 
+local LastFired = 0
+
 local function TeleportLocalCharacter(NewLocation: CFrame)
 	local Character = Player.Character
 
 	if not Character then
 		return
 	end
-
-	local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
-
-	if not Humanoid then
+	
+	local InvisibleParts: Folder = workspace:FindFirstChild("InvisibleParts")
+	
+	if not InvisibleParts then
 		return
 	end
+	
+	local MandrakeRope: Part = InvisibleParts:FindFirstChild("MandrakeRope")
+	
+	if not MandrakeRope then
+		return
+	end
+	
+	local MandrakePit: Part = InvisibleParts:FindFirstChild("MandrakePit")
 
-	Humanoid.Health = 0
+	if not MandrakePit then
+		return
+	end
+	
+	local Interact = GetInputRemote("Interact")
 
-	Player.CharacterAdded:Once(function(NewCharacter)
-		task.wait(1.5)
+	if not Interact then
+		return
+	end
+	
+	--if (Character:GetPivot().Position - NewLocation.Position).Magnitude > 250 then
+		if tick() - LastFired >= 2 then
+			Interact:FireServer({
+				player = Player,
+				Object = MandrakeRope,
+				Action = "Enter"
+			})
+			LastFired = tick()
+		end
+		
+		local Start = tick()
 
-		NewCharacter:PivotTo(NewLocation)
-	end)
+		repeat
+			task.wait()
+		until (Character:GetPivot().Position - MandrakePit.Position).Magnitude <= 10 or tick() - Start >= 1
+
+		task.wait(0.1)
+	--end
+	
+	Character:PivotTo(NewLocation)
 end
+
+local Window = getgenv().Window
 
 local Tab: Tab = Window:CreateTab("Combat", "swords")
 
@@ -93,29 +126,28 @@ Tab:CreateToggle({
 	Name = ApplyUnsupportedName("⚔ • Auto Attack", Success),
 	CurrentValue = false,
 	Flag = "Attack",
-	Callback = function(Value)
+	Looped = true,
+	Callback = function()
 		if not Success then
 			return
 		end
 
-		while Flags.Attack.CurrentValue and task.wait() do
-			local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
-				if Child == Player.Character then
-					return true
-				end
-			end, Flags.Distance.CurrentValue)
-
-			if not ClosestMob then
-				continue
+		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
+			if Child == Player.Character then
+				return true
 			end
+		end, Flags.Distance.CurrentValue)
 
-			Network.connect("MouseInput", "Fire", Player.Character, {
-				Config = "Button1Down"
-			})
-			Network.connect("MouseInput", "Fire", Player.Character, {
-				Config = "Button1Up"
-			})
+		if not ClosestMob then
+			return
 		end
+
+		Network.connect("MouseInput", "Fire", Player.Character, {
+			Config = "Button1Down"
+		})
+		Network.connect("MouseInput", "Fire", Player.Character, {
+			Config = "Button1Up"
+		})
 	end,
 })
 
@@ -125,50 +157,52 @@ Tab:CreateToggle({
 	Name = "🎯 • Look At Closest Enemy",
 	CurrentValue = false,
 	Flag = "LookAt",
+	Looped = true,
 	Callback = function(Value)
-		while Flags.LookAt.CurrentValue and task.wait() do
-			local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
-				if Child == Player.Character then
-					return true
-				end
-			end, Flags.Distance.CurrentValue)
-
-			local Character = Player.Character
-
-			if not Character then
-				continue
+		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
+			if Child == Player.Character then
+				return true
 			end
+		end, Flags.Distance.CurrentValue)
 
-			local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
+		local Character = Player.Character
 
-			if not Humanoid then
-				continue
-			end
-
-			if not ClosestMob then
-				Humanoid.AutoRotate = true
-				continue
-			end
-
-			local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
-
-			if not HumanoidRootPart then
-				continue
-			end
-
-			Humanoid.AutoRotate = false
-
-			local Position = HumanoidRootPart.Position
-			local ClosestPosition = ClosestMob:GetPivot().Position
-
-			HumanoidRootPart.CFrame = CFrame.lookAt(Position, Vector3.new(ClosestPosition.X, Position.Y, ClosestPosition.Z))
+		if not Character then
+			return
 		end
 
 		local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
 
-		if Humanoid then
-			Humanoid.AutoRotate = true
+		if not Humanoid then
+			return
 		end
+
+		if not ClosestMob then
+			Humanoid.AutoRotate = true
+			return
+		end
+
+		local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
+
+		if not HumanoidRootPart then
+			return
+		end
+
+		Humanoid.AutoRotate = false
+
+		local Position = HumanoidRootPart.Position
+		local ClosestPosition = ClosestMob:GetPivot().Position
+
+		HumanoidRootPart.CFrame = CFrame.lookAt(Position, Vector3.new(ClosestPosition.X, Position.Y, ClosestPosition.Z))
+	end,
+	AfterLoop = function()
+		local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
+
+		if not Humanoid then
+			return
+		end
+
+		Humanoid.AutoRotate = true
 	end,
 })
 
@@ -181,58 +215,70 @@ Tab:CreateSlider({
 	Suffix = "Studs",
 	CurrentValue = 20,
 	Flag = "Distance",
-	Callback = function()end,
 })
 
-Tab:CreateSection("Tweening")
+Tab:CreateSection("Moving")
 
 local MobTween: Tween
+local ActiveNotification = false
 
 Tab:CreateToggle({
-	Name = "🦌 • Tween to Mobs",
+	Name = "🦌 • Teleport to Mobs",
 	CurrentValue = false,
-	Flag = "TweenMobs",
-	Callback = function(Value)
+	Flag = "TPMobs",
+	Looped = true,
+	BeforeLoop = function(Value)
 		if not Value and MobTween then
 			MobTween:Cancel()
 			MobTween = nil
 		end
+	end,
+	Callback = function()
+		local Closest = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
+			if not table.find(Flags.SelectedMobs.CurrentOption, Child.Name:split(".")[1]) then
+				return true
+			end
+		end)
 
-		while Flags.TweenMobs.CurrentValue and task.wait() do
-			local Closest = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
-				local Species = Child:FindFirstChild("Species")
-				
-				if not Species then
-					return true
-				end
-				
-				if not table.find(Flags.Mobs.CurrentOption, Species.Value) then
-					return true
-				end
-			end)
-
-			if not Closest then
+		if not Closest then
+			if not ActiveNotification then
 				Notify("Failed", "Couldn't find anything, try getting closer to it so it can load.")
-				task.wait(5)
-				continue
+				ActiveNotification = true
+				task.delay(5, function()
+					ActiveNotification = false
+				end)
 			end
+			return
+		end
 
-			local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
+		local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
 
-			local GoTo = CFrame.new(Closest:GetPivot().Position)
+		local GoTo = CFrame.new(Closest:GetPivot().Position)
 
-			local Distance = (HumanoidRootPart.Position - GoTo.Position).Magnitude
+		local Distance = (HumanoidRootPart.Position - GoTo.Position).Magnitude
 
-			if Distance <= 5 then
-				continue
-			end
-
+		if Distance <= 5 then
+			return
+		end
+		
+		if Flags.MobsMethod.CurrentOption[1] == "Teleport" then
+			TeleportLocalCharacter(GoTo)
+		else
 			MobTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Distance / 250, Enum.EasingStyle.Linear), {CFrame = GoTo})
 			MobTween:Play()
 			MobTween.Completed:Wait()
 			MobTween = nil
 		end
 	end,
+})
+
+local Dropdown
+Dropdown = Tab:CreateDropdown({
+	Name = "🐻 • Movement Method",
+	Options = {"Teleport", "Tween"},
+	CurrentOption = "Teleport",
+	MultipleOptions = false,
+	Flag = "MobsMethod",
 })
 
 local Mobs = {}
@@ -248,7 +294,6 @@ Tab:CreateDropdown({
 	Options = Mobs,
 	MultipleOptions = true,
 	Flag = "Mobs",
-	Callback = function()end,
 })
 
 local Tab: Tab = Window:CreateTab("Resources", "apple")
@@ -259,23 +304,52 @@ Tab:CreateToggle({
 	Name = "🍎 • Auto Gather (No Tools Required)",
 	CurrentValue = false,
 	Flag = "Gather",
-	Callback = function(Value)
+	Looped = true,
+	Callback = function()
 		if not Success then
 			return
 		end
 
-		while Flags.Gather.CurrentValue and task.wait(0.1) do
-			local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
-				if Child == Player.Character then
-					return true
-				end
+		local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
+			if Child == Player.Character then
+				return true
+			end
 
-				if Child:GetAttribute("SetRespawn") then
-					return true
-				end
-			end)
+			if Child:GetAttribute("SetRespawn") then
+				return true
+			end
+		end)
 
-			if not Closest then
+		if not Closest then
+			return
+		end
+
+		local Interact = GetInputRemote("Interact")
+
+		if not Interact then
+			return
+		end
+
+		Interact:FireServer({
+			player = Player,
+			Object = Closest,
+			Action = "Gather"
+		})
+	end,
+})
+
+Tab:CreateToggle({
+	Name = "🥚 • Auto Pick Up Items",
+	CurrentValue = false,
+	Flag = "PickUp",
+	Looped = true,
+	Callback = function()
+		if not Success then
+			return
+		end
+
+		for _, Item: Model? in workspace.Effects:GetChildren() do
+			if not Item:FindFirstChild("InteractPrompt") then
 				continue
 			end
 
@@ -287,91 +361,79 @@ Tab:CreateToggle({
 
 			Interact:FireServer({
 				player = Player,
-				Object = Closest,
-				Action = "Gather"
+				Object = Item,
+				Action = "Pick Up"
 			})
 		end
 	end,
 })
 
-Tab:CreateToggle({
-	Name = "🥚 • Auto Pick Up Items",
-	CurrentValue = false,
-	Flag = "PickUp",
-	Callback = function(Value)
-		if not Success then
-			return
-		end
-
-		while Flags.PickUp.CurrentValue and task.wait(0.1) do
-			for _, Item: Model? in workspace.Effects:GetChildren() do
-				if not Item:FindFirstChild("InteractPrompt") then
-					continue
-				end
-
-				local Interact = GetInputRemote("Interact")
-
-				if not Interact then
-					continue
-				end
-
-				Interact:FireServer({
-					player = Player,
-					Object = Item,
-					Action = "Pick Up"
-				})
-			end
-		end
-	end,
-})
-
-Tab:CreateSection("Tweening")
+Tab:CreateSection("Moving")
 
 local ResourceTween: Tween
+local ActiveNotification = false
 
 Tab:CreateToggle({
-	Name = "⛏ • Tween to Resources",
+	Name = "🌲 • Move to Harvestables",
 	CurrentValue = false,
-	Flag = "TweenResources",
-	Callback = function(Value)
+	Flag = "TPHarvestables",
+	Looped = true,
+	BeforeLoop = function(Value)
 		if not Value and ResourceTween then
 			ResourceTween:Cancel()
 			ResourceTween = nil
 		end
+	end,
+	Callback = function()
+		local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
+			if not table.find(Flags.Harvestables.CurrentOption, Child.Name) then
+				return true
+			end
 
-		while Flags.TweenResources.CurrentValue and task.wait() do
-			local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
-				if not table.find(Flags.Resources.CurrentOption, Child.Name) then
-					return true
-				end
+			if Child:GetAttribute("SetRespawn") then
+				return true
+			end
+		end)
 
-				if Child:GetAttribute("SetRespawn") then
-					return true
-				end
-			end)
-
-			if not Closest then
+		if not Closest then
+			if not ActiveNotification then
 				Notify("Failed", "Couldn't find anything, try getting closer to it so it can load.")
-				task.wait(5)
-				continue
+				ActiveNotification = true
+				task.delay(5, function()
+					ActiveNotification = false
+				end)
 			end
+			return
+		end
 
-			local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
+		local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
 
-			local GoTo = CFrame.new(Closest:GetPivot().Position + Vector3.one * 5)
+		local GoTo = CFrame.new(Closest:GetPivot().Position + Vector3.one * 5)
 
-			local Distance = (HumanoidRootPart.Position - GoTo.Position).Magnitude
+		local Distance = (HumanoidRootPart.Position - GoTo.Position).Magnitude
 
-			if Distance <= 5 then
-				continue
-			end
-
+		if Distance <= 5 then
+			return
+		end
+		
+		if Flags.HarvestablesMethod.CurrentOption[1] == "Teleport" then
+			TeleportLocalCharacter(GoTo)
+		else
 			ResourceTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Distance / 250, Enum.EasingStyle.Linear), {CFrame = GoTo})
 			ResourceTween:Play()
 			ResourceTween.Completed:Wait()
 			ResourceTween = nil
 		end
 	end,
+})
+
+local Dropdown
+Dropdown = Tab:CreateDropdown({
+	Name = "🌾 • Movement Method",
+	Options = {"Teleport", "Tween"},
+	CurrentOption = "Teleport",
+	MultipleOptions = false,
+	Flag = "HarvestablesMethod",
 })
 
 local Resources = {}
@@ -387,11 +449,10 @@ end
 table.sort(Resources)
 
 Tab:CreateDropdown({
-	Name = "💎 • Resources",
+	Name = "💎 • Harvestables",
 	Options = Resources,
 	MultipleOptions = true,
-	Flag = "Resources",
-	Callback = function()end,
+	Flag = "Harvestables",
 })
 
 Tab:CreateSection("Selling")
@@ -400,37 +461,36 @@ Tab:CreateToggle({
 	Name = "💰 • Auto Sell Resources",
 	CurrentValue = false,
 	Flag = "Sell",
-	Callback = function(Value)
+	Looped = true,
+	Callback = function()
 		if not Success then
 			return
 		end
 
-		while Flags.Sell.CurrentValue and task.wait() do
-			for _, Tool in Player.Backpack:GetChildren() do
-				if not Tool:IsA("Tool") then
-					continue
-				end
-
-				if table.find(Flags.Blacklist.CurrentOption, Tool.Name) then
-					continue
-				end
-
-				if Tool:GetAttribute("Equipped") then
-					continue
-				end
-
-				if not Tool:GetAttribute("Rarity") then
-					continue
-				end
-
-				local SellEvent = GetInputRemote("SellEvent")
-
-				if not SellEvent then
-					continue
-				end
-
-				SellEvent:FireServer(Tool)
+		for _, Tool in Player.Backpack:GetChildren() do
+			if not Tool:IsA("Tool") then
+				continue
 			end
+
+			if table.find(Flags.Blacklist.CurrentOption, Tool.Name) then
+				continue
+			end
+
+			if Tool:GetAttribute("Equipped") then
+				continue
+			end
+
+			if not Tool:GetAttribute("Rarity") then
+				continue
+			end
+
+			local SellEvent = GetInputRemote("SellEvent")
+
+			if not SellEvent then
+				continue
+			end
+
+			SellEvent:FireServer(Tool)
 		end
 	end,
 })
@@ -452,7 +512,6 @@ Tab:CreateDropdown({
 	Options = Items,
 	MultipleOptions = true,
 	Flag = "Blacklist",
-	Callback = function()end,
 })
 
 Tab:CreateSection("Crafting")
@@ -490,7 +549,6 @@ Tab:CreateSlider({
 	Suffix = "Items",
 	CurrentValue = 1,
 	Flag = "Quantity",
-	Callback = function()end,
 })
 
 local Tab: Tab = Window:CreateTab("Movement", "keyboard")
@@ -501,34 +559,33 @@ Tab:CreateToggle({
 	Name = ApplyUnsupportedName("⚡ • Auto Sprint", Success),
 	CurrentValue = false,
 	Flag = "Sprint",
-	Callback = function(Value)
+	Looped = true,
+	Callback = function()
 		if not Success then
 			return
 		end
 
-		while Flags.Sprint.CurrentValue and task.wait() do
-			local Character = Player.Character
+		local Character = Player.Character
 
-			if not Character then
-				continue
-			end
-
-			local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
-
-			if not Humanoid then
-				continue
-			end
-
-			if Humanoid.MoveDirection.Magnitude == Vector3.zero then
-				continue
-			end
-
-			Network.connect("Sprint", "Fire", Character, true)
+		if not Character then
+			return
 		end
+
+		local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+
+		if not Humanoid then
+			return
+		end
+
+		if Humanoid.MoveDirection.Magnitude == Vector3.zero then
+			return
+		end
+
+		Network.connect("Sprint", "Fire", Character, true)
 	end,
 })
 
-Tab:CreateSection("Teleporting")
+Tab:CreateSection("Moving")
 
 local WorldAreas = game:GetService("ReplicatedStorage").WorldModel.Areas
 
@@ -538,13 +595,13 @@ for _, Object: Part in WorldAreas:GetChildren() do
 	if table.find(Areas, Object.Name) then
 		continue
 	end
-	
+
 	table.insert(Areas, Object.Name)
 end
 
 local Dropdown
 Dropdown = Tab:CreateDropdown({
-	Name = "🌄 • Suicide Teleport to Area",
+	Name = "🌄 • Teleport to Area",
 	Options = Areas,
 	CurrentOption = "",
 	MultipleOptions = false,
@@ -556,7 +613,7 @@ Dropdown = Tab:CreateDropdown({
 		end
 
 		local SelectedArea: Part = WorldAreas[CurrentOption]
-		
+
 		local Success = pcall(function()
 			local Result = workspace:Raycast(SelectedArea.Position, Vector3.yAxis * -10000)
 
@@ -570,7 +627,7 @@ Dropdown = Tab:CreateDropdown({
 
 			Dropdown:Set({""})
 		end)
-		
+
 		if not Success then
 			return Notify("Error", "Failed to teleport.")
 		end
@@ -666,14 +723,26 @@ Tab:CreateButton({
 	Name = "💔 • Suicide Heal",
 	Callback = function()
 		local Character = Player.Character
-		
+
 		if not Character then
 			return
 		end
-		
+
 		local PreviousLocation = Character:GetPivot()
-		
-		TeleportLocalCharacter(PreviousLocation)
+
+		local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+
+		if not Humanoid then
+			return
+		end
+
+		Humanoid.Health = 0
+
+		Player.CharacterAdded:Once(function(NewCharacter)
+			task.wait(1.5)
+
+			NewCharacter:PivotTo(PreviousLocation)
+		end)
 	end,
 })
 
