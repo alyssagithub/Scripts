@@ -23,10 +23,6 @@ local Player = game:GetService("Players").LocalPlayer
 
 local Window = getgenv().Window
 
-if not Window then
-	return
-end
-
 local function GetChildInCharacter(ChildName: string)
 	local Character = Player.Character
 
