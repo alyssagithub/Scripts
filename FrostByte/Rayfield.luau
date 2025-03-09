@@ -618,14 +618,6 @@ Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
 
 -- Thanks to Latte Softworks for the Lucide integration for Roblox
-local Icons
-
-repeat
-	pcall(function()
-		Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
-	end)
-	task.wait()
-until Icons
 
 -- Variables
 
@@ -684,6 +676,17 @@ local function ChangeTheme(Theme)
 		end
 	end
 end
+
+local Icons
+
+task.spawn(function()
+	repeat
+		pcall(function()
+			Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
+		end)
+		task.wait()
+	until Icons
+end)
 
 local function getIcon(name : string)
 	name = string.match(string.lower(name), "^%s*(.*)%s*$") :: string
