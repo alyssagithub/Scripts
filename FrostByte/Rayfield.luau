@@ -1566,7 +1566,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 
 	if Settings.Discord and not useStudio then
-		if isfolder and not isfolder(RayfieldFolder.."/Discord Invites") then
+		local Success, Result = pcall(isfolder, RayfieldFolder.."/Discord Invites")
+		if Success and not Result then
 			makefolder(RayfieldFolder.."/Discord Invites")
 		end
 
