@@ -793,18 +793,20 @@ function CreateUniversalTabs()
 			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
+	
+	Rayfield:LoadConfiguration()
 
-	task.delay(1, function()
-		for FlagName: string, CurrentValue: boolean? in OriginalFlags do
-			local FlagInfo = Flags[FlagName]
+	task.wait(1)
+	
+	for FlagName: string, CurrentValue: boolean? in OriginalFlags do
+		local FlagInfo = Flags[FlagName]
 
-			if not FlagInfo then
-				continue
-			end
-
-			pcall(FlagInfo.Set, FlagInfo, CurrentValue)
+		if not FlagInfo then
+			continue
 		end
-	end)
+
+		pcall(FlagInfo.Set, FlagInfo, CurrentValue)
+	end
 
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
