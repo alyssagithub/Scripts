@@ -1568,11 +1568,14 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	if Settings.Discord and not useStudio then
 		local Success, Result = pcall(isfolder, RayfieldFolder.."/Discord Invites")
+		
 		if Success and not Result then
 			makefolder(RayfieldFolder.."/Discord Invites")
 		end
+		
+		local Success, Result = pcall(isfile, RayfieldFolder.."/Discord Invites".."/"..Settings.Discord.Invite..ConfigurationExtension)
 
-		if isfile and not isfile(RayfieldFolder.."/Discord Invites".."/"..Settings.Discord.Invite..ConfigurationExtension) then
+		if Success and not Result then
 			if request then
 				pcall(function()
 					request({
