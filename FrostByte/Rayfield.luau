@@ -679,14 +679,12 @@ end
 
 local Icons
 
-task.spawn(function()
-	repeat
-		pcall(function()
-			Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
-		end)
-		task.wait()
-	until Icons
-end)
+repeat
+	pcall(function()
+		Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
+	end)
+	task.wait()
+until Icons
 
 local function getIcon(name : string)
 	name = string.match(string.lower(name), "^%s*(.*)%s*$") :: string
