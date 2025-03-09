@@ -618,7 +618,14 @@ Rayfield.DisplayOrder = 100
 LoadingFrame.Version.Text = Release
 
 -- Thanks to Latte Softworks for the Lucide integration for Roblox
-local Icons = useStudio and require(script.Parent.icons) or loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
+local Icons
+
+repeat
+	pcall(function()
+		Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
+	end)
+	task.wait()
+until Icons
 
 -- Variables
 
@@ -681,6 +688,14 @@ end
 local function getIcon(name : string)
 	name = string.match(string.lower(name), "^%s*(.*)%s*$") :: string
 	local sizedicons = Icons['48px']
+	
+	if not sizedicons then
+		return {
+			id = 0,
+			imageRectSize = Vector2.zero,
+			imageRectOffset = Vector2.zero
+		}
+	end
 
 	local r = sizedicons[name]
 	if not r then
@@ -1438,8 +1453,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 				RayfieldLibrary:Notify({Title = 'Build Mismatch', Content = 'Rayfield may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of Rayfield is intended for interface build '..InterfaceBuild..'.\n\nTry rejoining and then run the script twice.', Image = 4335487866, Duration = 15})		
 			end)
 	end
+	
+	local Success, Result = pcall(isfolder, RayfieldFolder)
 
-	if isfolder and not isfolder(RayfieldFolder) then
+	if Success and not Result then
 		makefolder(RayfieldFolder)
 	end
 
@@ -1577,7 +1594,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			if Settings.Discord.RememberJoins then -- We do logic this way so if the developer changes this setting, the user still won't be prompted, only new users
-				writefile(RayfieldFolder.."/Discord Invites".."/"..Settings.Discord.Invite..ConfigurationExtension,"Rayfield RememberJoins is true for this invite, this invite will not ask you to join again")
+				pcall(writefile, `{RayfieldFolder}/Discord Invites/{Settings.Discord.Invite}{ConfigurationExtension}`, "Rayfield RememberJoins is true for this invite, this invite will not ask you to join again")
 			end
 		end
 	end
