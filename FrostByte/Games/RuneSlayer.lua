@@ -39,26 +39,12 @@ local function GetInputRemote(RemoteName: string): RemoteEvent
 	if not Character then
 		return
 	end
+	
+	local Remote = Character:FindFirstChild(RemoteName, true)
+	
+	task.spawn(assert, Remote, `Could not find the '{RemoteName}' remote within your character.`)
 
-	local CharacterHandler: LocalScript = Character:FindFirstChild("CharacterHandler")
-
-	if not CharacterHandler then
-		return
-	end
-
-	local Input: Folder = CharacterHandler:FindFirstChild("Input")
-
-	if not Input then
-		return
-	end
-
-	local Events: Folder = Input:FindFirstChild("Events")
-
-	if not Events then
-		return
-	end
-
-	return Events:FindFirstChild(RemoteName)
+	return Remote
 end
 
 local LastFired = 0
@@ -88,30 +74,28 @@ local function TeleportLocalCharacter(NewLocation: CFrame)
 		return
 	end
 	
-	local Interact = GetInputRemote("Interact")
+	if tick() - LastFired >= 2 then
+		local Interact = GetInputRemote("Interact")
 
-	if not Interact then
-		return
-	end
-	
-	--if (Character:GetPivot().Position - NewLocation.Position).Magnitude > 250 then
-		if tick() - LastFired >= 2 then
-			Interact:FireServer({
-				player = Player,
-				Object = MandrakeRope,
-				Action = "Enter"
-			})
-			LastFired = tick()
+		if not Interact then
+			return
 		end
-		
-		local Start = tick()
 
-		repeat
-			task.wait()
-		until (Character:GetPivot().Position - MandrakePit.Position).Magnitude <= 10 or tick() - Start >= 1
+		Interact:FireServer({
+			player = Player,
+			Object = MandrakeRope,
+			Action = "Enter"
+		})
+		LastFired = tick()
+	end
 
-		task.wait(0.1)
-	--end
+	local Start = tick()
+
+	repeat
+		task.wait()
+	until (Character:GetPivot().Position - MandrakePit.Position).Magnitude <= 10 or tick() - Start >= 1
+
+	task.wait(0.1)
 	
 	Character:PivotTo(NewLocation)
 end
