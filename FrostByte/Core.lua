@@ -160,13 +160,15 @@ task.spawn(function()
 	end
 end)
 
+if not getgenv().PlaceFileName then
+	local PlaceFileName = PlaceName:gsub("%b[]", "")
+	PlaceFileName = PlaceFileName:gsub("[^%a]", "")
+	getgenv().PlaceFileName = PlaceFileName
+end
+
 task.spawn(function()
 	if ScriptVersion and ScriptVersion ~= "Universal" then
 		local PlaceFileName = getgenv().PlaceFileName
-
-		if not PlaceFileName then
-			return
-		end
 
 		local BindableFunction = Instance.new("BindableFunction")
 
