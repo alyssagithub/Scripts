@@ -1,3 +1,4 @@
+-- Core
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
 getgenv().ScriptVersion = "v0.0.5"
@@ -12,12 +13,18 @@ Removed the "Client" tab and everything it had
 (Suggest what you want re-added and the game you want it for in the Discord)
 ]]
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+loadstring(
+	game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua")
+)()
+
+-- Types
 
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> Section,
 	CreateDivider: (self: Tab) -> Divider,
 }
+
+-- Variables
 
 local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
@@ -110,6 +117,8 @@ local function TeleportLocalCharacter(NewLocation: CFrame)
 	
 	Character:PivotTo(NewLocation)
 end
+
+-- Features
 
 local Window = getgenv().Window
 
