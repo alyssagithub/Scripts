@@ -268,22 +268,6 @@ end)
 
 Tab:CreateSection("Changelog")
 
-getgenv().Changelog = [[
-	🛠️ Changes & Fixes
-💰 Renamed "Auto Sell Unequipped Items" to "Auto Sell Resources"
-⚡ Made Auto Sell as fast as I could
-:heart: Renamed "Regeneration" section to "Healing"
-	🎉 What's New?
-:crossed_swords: Combat -> Tweening
-🦌 Tween to Mobs
-🐔 Mobs
-🍎 Resources -> Tweening
-⛏ Tween to Resources
-💎 Resources
-🌄 Movement -> Teleporting -> Suicide Teleport to Area
-💔 Safety -> Regeneration -> Suicide Heal
-]]
-
 Tab:CreateParagraph({Title = `{PlaceName} {ScriptVersion}`, Content = getgenv().Changelog or "Changelog Not Found"})
 
 --------------------------------------------------------------------------------------------------------------
