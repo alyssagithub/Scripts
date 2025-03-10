@@ -349,6 +349,30 @@ getgenv().CreateFeature = function(Tab: Tab, FeatureName: string)
 	end
 end
 
+getgenv().CreateUniversalTabs = function() end
+
+Rayfield:LoadConfiguration()
+
+task.wait(1)
+
+for FlagName: string, CurrentValue: boolean? in OriginalFlags do
+	local FlagInfo = Flags[FlagName]
+
+	if not FlagInfo then
+		continue
+	end
+
+	FlagInfo:Set(CurrentValue)
+end
+
+Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
+
+local FrostByteStarted = getgenv().FrostByteStarted
+
+if FrostByteStarted then
+	FrostByteStarted()
+end
+
 --[[function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
 	local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -903,27 +927,3 @@ end
 		end,
 	})
 end]]
-
-getgenv().CreateUniversalTabs = function() end
-
-Rayfield:LoadConfiguration()
-
-task.wait(1)
-
-for FlagName: string, CurrentValue: boolean? in OriginalFlags do
-	local FlagInfo = Flags[FlagName]
-
-	if not FlagInfo then
-		continue
-	end
-	
-	FlagInfo:Set(CurrentValue)
-end
-
-Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
-
-local FrostByteStarted = getgenv().FrostByteStarted
-
-if FrostByteStarted then
-	FrostByteStarted()
-end
