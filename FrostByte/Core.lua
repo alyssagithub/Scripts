@@ -920,6 +920,8 @@ end
 	})
 end]]
 
+getgenv().CreateUniversalTabs = function() end
+
 Rayfield:LoadConfiguration()
 
 task.wait(1)
