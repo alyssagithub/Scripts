@@ -1,6 +1,16 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.4a"
+getgenv().ScriptVersion = "v0.0.5"
+
+getgenv().Changelog = [[
+		🎉 Rune Slayer Changes
+⚡ Put speed changing in Movement tab
+🔃 Safety -> Healing -> Delay After Respawn
+		🌐 Universal Changes
+Added a "Home" tab
+Removed the "Client" tab and everything it had
+(Suggest what you want re-added and the game you want it for in the Discord)
+]]
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -12,6 +22,7 @@ type Tab = {
 local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
+local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFeature
 
 local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 
@@ -569,7 +580,11 @@ Tab:CreateToggle({
 	end,
 })
 
-Tab:CreateSection("Moving")
+Tab:CreateSection("Speed")
+
+CreateFeature(Tab, "Speed")
+
+Tab:CreateSection("Transporation")
 
 local WorldAreas = game:GetService("ReplicatedStorage").WorldModel.Areas
 
@@ -723,11 +738,20 @@ Tab:CreateButton({
 		Humanoid.Health = 0
 
 		Player.CharacterAdded:Once(function(NewCharacter)
-			task.wait(1.5)
+			task.wait(Flags.Delay.CurrentValue)
 
 			NewCharacter:PivotTo(PreviousLocation)
 		end)
 	end,
+})
+
+Tab:CreateSlider({
+	Name = "🔃 • Delay After Respawn",
+	Range = {0, 5},
+	Increment = 0.01,
+	Suffix = "Seconds",
+	CurrentValue = 1.5,
+	Flag = "Delay",
 })
 
 local Tab: Tab = Window:CreateTab("Effects", "sparkles")
@@ -766,5 +790,3 @@ Tab:CreateToggle({
 		end
 	end,
 })
-
-getgenv().CreateUniversalTabs()
