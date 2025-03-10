@@ -20,6 +20,10 @@ local isrbxactive: () -> (boolean) = getfenv().isrbxactive
 local setclipboard: (Text: string) -> () = getfenv().setclipboard
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
 
+if not getgenv().ScriptVersion then
+	getgenv().ScriptVersion = "Dev Mode"
+end
+
 local ScriptVersion = getgenv().ScriptVersion
 
 getgenv().gethui = function()
@@ -154,12 +158,6 @@ end
 
 getgenv().Notify = Notify
 
-task.spawn(function()
-	while task.wait(Random.new():NextNumber(5 * 60, 10 * 60)) do
-		Notify("Enjoying this script?", "Join the discord at discord.gg/sS3tDP6FSB", "heart")
-	end
-end)
-
 if not getgenv().PlaceFileName then
 	local PlaceFileName = PlaceName:gsub("%b[]", "")
 	PlaceFileName = PlaceFileName:gsub("[^%a]", "")
@@ -167,7 +165,7 @@ if not getgenv().PlaceFileName then
 end
 
 task.spawn(function()
-	if ScriptVersion and ScriptVersion ~= "Universal" then
+	if ScriptVersion:sub(1, 1) == "v" then
 		local PlaceFileName = getgenv().PlaceFileName
 
 		local BindableFunction = Instance.new("BindableFunction")
@@ -208,22 +206,30 @@ task.spawn(function()
 	end
 end)
 
+local VirtualUser = game:GetService("VirtualUser")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+HandleConnection(Player.Idled:Connect(function()
+	VirtualUser:CaptureController()
+	VirtualUser:ClickButton2(Vector2.zero)
+	VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightMeta, false, game)
+	VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightMeta, false, game)
+end), "AntiAFK")
+
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> Section,
 	CreateDivider: (self: Tab) -> Divider,
 }
 
-local Window
-
-Window = Rayfield:CreateWindow({
+local Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
 	Icon = "snowflake",
 	LoadingTitle = "❄ Brought to you by FrostByte ❄",
 	LoadingSubtitle = PlaceName,
 	Theme = "DarkBlue",
 
-	DisableRayfieldPrompts = false,
-	DisableBuildWarnings = false,
+	DisableRayfieldPrompts = true,
+	DisableBuildWarnings = true,
 
 	ConfigurationSaving = {
 		Enabled = true,
@@ -240,7 +246,126 @@ Window = Rayfield:CreateWindow({
 
 getgenv().Window = Window
 
-function CreateUniversalTabs()
+local Tab: Tab = Window:CreateTab("Home", "snowflake")
+
+Tab:CreateSection("Join our Discord!")
+
+Tab:CreateLabel("discord.gg/sS3tDP6FSB", "messages-square")
+
+Tab:CreateSection("Performance")
+
+local PingLabel = Tab:CreateLabel("Ping: 0 ms", "wifi")
+local FPSLabel = Tab:CreateLabel("FPS: 0/s", "monitor")
+
+local Stats = game:GetService("Stats")
+
+task.spawn(function()
+	while getgenv().Flags == Flags and task.wait(0.25) do
+		PingLabel:Set(`Ping: {math.floor(Stats.PerformanceStats.Ping:GetValue() * 100) / 100} ms`)
+		FPSLabel:Set(`FPS: {math.floor(1 / Stats.FrameTime * 10) / 10}/s`)
+	end
+end)
+
+Tab:CreateSection("Changelog")
+
+getgenv().Changelog = [[
+	🛠️ Changes & Fixes
+💰 Renamed "Auto Sell Unequipped Items" to "Auto Sell Resources"
+⚡ Made Auto Sell as fast as I could
+:heart: Renamed "Regeneration" section to "Healing"
+	🎉 What's New?
+:crossed_swords: Combat -> Tweening
+🦌 Tween to Mobs
+🐔 Mobs
+🍎 Resources -> Tweening
+⛏ Tween to Resources
+💎 Resources
+🌄 Movement -> Teleporting -> Suicide Teleport to Area
+💔 Safety -> Regeneration -> Suicide Heal
+]]
+
+Tab:CreateParagraph({Title = `{PlaceName} {ScriptVersion}`, Content = getgenv().Changelog or "Changelog Not Found"})
+
+--------------------------------------------------------------------------------------------------------------
+
+local SpeedConnection: RBXScriptConnection
+local ConnectedHumanoid
+
+local function SetSpeed()
+	local Character = Player.Character
+
+	if not Character then
+		return
+	end
+
+	local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+
+	if not Humanoid then
+		return
+	end
+
+	if Flags.ChangeSpeed.CurrentValue then
+		Humanoid.WalkSpeed = Flags.Speed.CurrentValue
+	end
+
+	if not WalkSpeedConnection then
+		WalkSpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetSpeed)
+		ConnectedHumanoid = Humanoid
+		HandleConnection(WalkSpeedConnection, "WalkSpeedConnection")
+	end
+end
+
+HandleConnection(Player.CharacterAdded:Connect(function()
+	if WalkSpeedConnection then
+		WalkSpeedConnection:Disconnect()
+		WalkSpeedConnection = nil
+	end
+
+	SetSpeed()
+end), "WalkSpeedCharacterAdded")
+
+local Features = {
+	Speed = {
+		{
+			Element = "Toggle",
+			Info = {
+				Name = "⚡ • Change Speed",
+				CurrentValue = false,
+				Flag = "ChangeSpeed",
+				Callback = function(Value)
+					
+					if not Player.Character or not Value then
+						return
+					end
+					
+					SetSpeed()
+				end,
+			},
+		},
+		{
+			Element = "Slider",
+			Info = {
+				Name = "⏱️ • Speed",
+				Range = {0, 250},
+				Increment = 1,
+				Suffix = "Studs/s",
+				CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
+				Flag = "Speed",
+				Callback = SetSpeed,
+			}
+		},
+	},
+}
+
+getgenv().CreateFeature = function(Tab: Tab, FeatureName: string)
+	assert(Features[FeatureName], `The feature '{FeatureName}' does not exist in the Features.`)
+	
+	for _, Data in Features[FeatureName] do
+		Tab[`Create{Data.Element}`](Tab, Data.Info)
+	end
+end
+
+--[[function CreateUniversalTabs()
 	local VirtualUser = game:GetService("VirtualUser")
 	local VirtualInputManager = game:GetService("VirtualInputManager")
 	local TeleportService = game:GetService("TeleportService")
@@ -793,29 +918,23 @@ function CreateUniversalTabs()
 			TeleportService:Teleport(game.PlaceId, Player, {FrostByteRejoin = true})
 		end,
 	})
-	
-	Rayfield:LoadConfiguration()
+end]]
 
-	task.wait(1)
-	
-	for FlagName: string, CurrentValue: boolean? in OriginalFlags do
-		local FlagInfo = Flags[FlagName]
+Rayfield:LoadConfiguration()
 
-		if not FlagInfo then
-			continue
-		end
+task.wait(1)
 
-		pcall(FlagInfo.Set, FlagInfo, CurrentValue)
+for FlagName: string, CurrentValue: boolean? in OriginalFlags do
+	local FlagInfo = Flags[FlagName]
+
+	if not FlagInfo then
+		continue
 	end
-
-	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
+	
+	FlagInfo:Set(CurrentValue)
 end
 
-getgenv().CreateUniversalTabs = CreateUniversalTabs
-
-if not ScriptVersion or ScriptVersion == "Universal" then
-	CreateUniversalTabs()
-end
+Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 
 local FrostByteStarted = getgenv().FrostByteStarted
 
