@@ -2466,7 +2466,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			Input.InputFrame.InputBox.FocusLost:Connect(function()
 				local Success, Response = pcall(function()
-					InputSettings.Callback(Input.InputFrame.InputBox.Text)
+					if InputSettings.Callback then
+						InputSettings.Callback(Input.InputFrame.InputBox.Text)
+					end
+					
 					InputSettings.CurrentValue = Input.InputFrame.InputBox.Text
 				end)
 
