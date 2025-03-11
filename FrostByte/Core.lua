@@ -308,6 +308,38 @@ HandleConnection(Player.CharacterAdded:Connect(function()
 	SetSpeed()
 end), "WalkSpeedCharacterAdded")
 
+local Connections = {}
+
+local OriginalText = {}
+
+local function HandleUsernameChange(Object: Instance)
+	if not Flags.HideIdentity.CurrentValue then
+		return
+	end
+
+	if not Object:IsA("TextLabel") and not Object:IsA("TextBox") and not Object:IsA("TextButton") then
+		return
+	end
+
+	local NameReplacement = Flags.NameReplacement.CurrentValue
+
+	if not Connections[Object] then
+		Connections[Object] = Object:GetPropertyChangedSignal("Text"):Connect(function()
+			HandleUsernameChange(Object)
+		end)
+	end
+
+	if Object.Text:find(Player.Name) then
+		OriginalText[Object] = Object.Text
+		Object.Text = Object.Text:gsub(Player.Name, NameReplacement)
+	elseif Object.Text:find(Player.DisplayName) then
+		OriginalText[Object] = Object.Text
+		Object.Text = Object.Text:gsub(Player.DisplayName, NameReplacement)
+	end
+end
+
+local DescendantAddedConnection
+
 local Features = {
 	Speed = {
 		{
@@ -329,7 +361,7 @@ local Features = {
 		{
 			Element = "Slider",
 			Info = {
-				Name = "⏱️ • Speed",
+				Name = "⚡ • Speed",
 				Range = {0, 250},
 				Increment = 1,
 				Suffix = "Studs/s",
@@ -338,34 +370,88 @@ local Features = {
 				Callback = SetSpeed,
 			}
 		},
+		{
+			Element = "Keybind",
+			Info = {
+				Name = "⚡ • Change Speed Keybind",
+				CurrentKeybind = "Z",
+				HoldToInteract = false,
+				Flag = "ChangeSpeedKeybind",
+				Callback = function()
+					Flags.ChangeSpeed:Set(not Flags.ChangeSpeed.CurrentValue)
+				end,
+			}
+		}
 	},
+	HideIdentity = {
+		{
+			Element = "Toggle",
+			Info = {
+				Name = "🎭 • Hide Identity (Client-Sided)",
+				CurrentValue = false,
+				Flag = "HideIdentity",
+				Callback = function(Value)
+					if Value and not DescendantAddedConnection then
+						for i,v in game:GetDescendants() do
+							HandleUsernameChange(v)
+						end
+
+						DescendantAddedConnection = game.DescendantAdded:Connect(HandleUsernameChange)
+
+						HandleConnection(DescendantAddedConnection, "HideIdentity")
+					elseif DescendantAddedConnection then
+						DescendantAddedConnection:Disconnect()
+						DescendantAddedConnection = nil
+
+						for Object: TextLabel?, Text in OriginalText do
+							Object.Text = Text
+						end
+
+						OriginalText = {}
+					end
+				end,
+			}
+		},
+		{
+			Element = "Input",
+			Info = {
+				Name = "💬 • Name To Replace With",
+				CurrentValue = "FrostByte",
+				PlaceholderText = "New Name Here",
+				RemoveTextAfterFocusLost = false,
+				Flag = "NameReplacement",
+			}
+		}
+	}
 }
 
 getgenv().CreateFeature = function(Tab: Tab, FeatureName: string)
-	assert(Features[FeatureName], `The feature '{FeatureName}' does not exist in the Features.`)
+	if not Features[FeatureName] then
+		return warn(`The feature '{FeatureName}' does not exist in the Features.`)
+	end
 	
 	for _, Data in Features[FeatureName] do
 		Tab[`Create{Data.Element}`](Tab, Data.Info)
 	end
 end
 
-getgenv().CreateUniversalTabs = function() end
+getgenv().CreateUniversalTabs = function()
+	Rayfield:LoadConfiguration()
 
-Rayfield:LoadConfiguration()
+	task.wait(1)
 
-task.wait(1)
+	for FlagName: string, CurrentValue: boolean? in OriginalFlags do
+		local FlagInfo = Flags[FlagName]
 
-for FlagName: string, CurrentValue: boolean? in OriginalFlags do
-	local FlagInfo = Flags[FlagName]
+		if not FlagInfo then
+			continue
+		end
 
-	if not FlagInfo then
-		continue
+		FlagInfo:Set(CurrentValue)
 	end
 
-	FlagInfo:Set(CurrentValue)
+	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 end
-
-Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
 
 local FrostByteStarted = getgenv().FrostByteStarted
 
