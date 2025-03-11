@@ -1,16 +1,27 @@
 -- Core
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.5"
+getgenv().ScriptVersion = "v0.0.6"
 
 getgenv().Changelog = [[
-		🎉 Rune Slayer Changes
-⚡ Put speed changing in Movement tab
-🔃 Safety -> Healing -> Delay After Respawn
-		🌐 Universal Changes
-Added a "Home" tab
-Removed the "Client" tab and everything it had
-(Suggest what you want re-added and the game you want it for in the Discord)
+			🛠️ Changes & Fixes
+🦌 Made it so Move to Mobs will not target tamed mobs
+🐻 Moved the movement method below the mobs selection
+	🌾 Did the same for Move to Resources' movement method
+🌫 Replaced the Effects tab with Visuals
+
+			🎉 What's New?
+⚔ Combat -> Moving 
+	📐 Offset
+	🔼 Height Offset
+🛡 Resources -> Moving -> Safety Mode
+⚡ Movement -> Speed -> Change Speed Keybind
+😷 Safety -> Identity
+	🎭 Hide Identity (Client-Sided)
+	💬 Name To Replace With
+🔍 Visuals -> ESP
+	🧍‍ Player ESP
+	🐺 Mob ESP
 ]]
 
 loadstring(
@@ -30,10 +41,13 @@ local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
 local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFeature
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 
 local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
 
@@ -92,30 +106,46 @@ local function TeleportLocalCharacter(NewLocation: CFrame)
 		return
 	end
 	
-	if tick() - LastFired >= 2 then
-		local Interact = GetInputRemote("Interact")
+	if (Character:GetPivot().Position - NewLocation.Position).Magnitude > 50 then
+		if tick() - LastFired >= 2 then
+			local Interact = GetInputRemote("Interact")
 
-		if not Interact then
-			return
+			if not Interact then
+				return
+			end
+
+			Interact:FireServer({
+				player = Player,
+				Object = MandrakeRope,
+				Action = "Enter"
+			})
+			LastFired = tick()
 		end
 
-		Interact:FireServer({
-			player = Player,
-			Object = MandrakeRope,
-			Action = "Enter"
-		})
-		LastFired = tick()
+		local Start = tick()
+
+		repeat
+			task.wait()
+		until (Character:GetPivot().Position - MandrakePit.Position).Magnitude <= 10 or tick() - Start >= 1
+
+		task.wait(0.1)
 	end
-
-	local Start = tick()
-
-	repeat
-		task.wait()
-	until (Character:GetPivot().Position - MandrakePit.Position).Magnitude <= 10 or tick() - Start >= 1
-
-	task.wait(0.1)
 	
 	Character:PivotTo(NewLocation)
+end
+
+local function EmulateClick()
+	if not Success then
+		return
+	end
+	
+	Network.connect("MouseInput", "Fire", Player.Character, {
+		Config = "Button1Down"
+	})
+	
+	Network.connect("MouseInput", "Fire", Player.Character, {
+		Config = "Button1Up"
+	})
 end
 
 -- Features
@@ -132,10 +162,6 @@ Tab:CreateToggle({
 	Flag = "Attack",
 	Looped = true,
 	Callback = function()
-		if not Success then
-			return
-		end
-
 		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
 			if Child == Player.Character then
 				return true
@@ -146,12 +172,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		Network.connect("MouseInput", "Fire", Player.Character, {
-			Config = "Button1Down"
-		})
-		Network.connect("MouseInput", "Fire", Player.Character, {
-			Config = "Button1Up"
-		})
+		EmulateClick()
 	end,
 })
 
@@ -242,6 +263,10 @@ Tab:CreateToggle({
 			if not table.find(Flags.Mobs.CurrentOption, Child.Name:split(".")[1]) then
 				return true
 			end
+			
+			if Child:FindFirstChild("Master") then
+				return true
+			end
 		end)
 
 		if not Closest then
@@ -257,12 +282,16 @@ Tab:CreateToggle({
 
 		local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
 
-		local GoTo = CFrame.new(Closest:GetPivot().Position)
+		local GoTo = CFrame.new(Closest:GetPivot().Position) 
+			+ Closest:GetPivot().LookVector 
+			* Flags.Offset.CurrentValue 
+			+ Vector3.yAxis 
+			* Flags.HeightOffset.CurrentValue
 
 		local Distance = (HumanoidRootPart.Position - GoTo.Position).Magnitude
 
 		if Distance <= 5 then
-			return
+			--return
 		end
 		
 		if Flags.MobsMethod.CurrentOption[1] == "Teleport" then
@@ -274,15 +303,6 @@ Tab:CreateToggle({
 			MobTween = nil
 		end
 	end,
-})
-
-local Dropdown
-Dropdown = Tab:CreateDropdown({
-	Name = "🐻 • Movement Method",
-	Options = {"Teleport", "Tween"},
-	CurrentOption = "Teleport",
-	MultipleOptions = false,
-	Flag = "MobsMethod",
 })
 
 local Mobs = {}
@@ -298,6 +318,35 @@ Tab:CreateDropdown({
 	Options = Mobs,
 	MultipleOptions = true,
 	Flag = "Mobs",
+})
+
+Tab:CreateDivider()
+
+local Dropdown
+Dropdown = Tab:CreateDropdown({
+	Name = "🐻 • Movement Method",
+	Options = {"Teleport", "Tween"},
+	CurrentOption = "Teleport",
+	MultipleOptions = false,
+	Flag = "MobsMethod",
+})
+
+Tab:CreateSlider({
+	Name = "📐 • Offset",
+	Range = {-10, 10},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = -5,
+	Flag = "Offset",
+})
+
+Tab:CreateSlider({
+	Name = "🔼 • Height Offset",
+	Range = {-10, 10},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 0,
+	Flag = "HeightOffset",
 })
 
 local Tab: Tab = Window:CreateTab("Resources", "apple")
@@ -376,6 +425,7 @@ Tab:CreateSection("Moving")
 
 local ResourceTween: Tween
 local ActiveNotification = false
+local SavedPosition: Vector3
 
 Tab:CreateToggle({
 	Name = "🌲 • Move to Harvestables",
@@ -387,6 +437,8 @@ Tab:CreateToggle({
 			ResourceTween:Cancel()
 			ResourceTween = nil
 		end
+		
+		SavedPosition = Player.Character:GetPivot().Position
 	end,
 	Callback = function()
 		local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
@@ -407,7 +459,28 @@ Tab:CreateToggle({
 					ActiveNotification = false
 				end)
 			end
+			
+			if Flags.SafetyMode.CurrentValue then
+				local Part: Part = workspace:FindFirstChild("SafetyModePart")
+				
+				if Part then
+					return
+				end
+				
+				Part = Instance.new("Part")
+				Part.Name = "SafetyModePart"
+				Part.Size = Vector3.new(15, 5, 15)
+				Part.Anchored = true
+				Part.Parent = workspace
+				Part.Position = Player.Character:GetPivot().Position + Vector3.yAxis * 750
+				
+				TeleportLocalCharacter(CFrame.new(Part.Position + Vector3.yAxis * 5))
+			end
 			return
+		end
+		
+		if workspace:FindFirstChild("SafetyModePart") then
+			workspace.SafetyModePart:Destroy()
 		end
 
 		local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
@@ -429,15 +502,16 @@ Tab:CreateToggle({
 			ResourceTween = nil
 		end
 	end,
-})
+	AfterLoop = function(Value)
+		local Part: Part = workspace:FindFirstChild("SafetyModePart")
 
-local Dropdown
-Dropdown = Tab:CreateDropdown({
-	Name = "🌾 • Movement Method",
-	Options = {"Teleport", "Tween"},
-	CurrentOption = "Teleport",
-	MultipleOptions = false,
-	Flag = "HarvestablesMethod",
+		if not Part then
+			return
+		end
+		
+		TeleportLocalCharacter(CFrame.new(SavedPosition))
+		Part:Destroy()
+	end,
 })
 
 local Resources = {}
@@ -457,6 +531,30 @@ Tab:CreateDropdown({
 	Options = Resources,
 	MultipleOptions = true,
 	Flag = "Harvestables",
+})
+
+Tab:CreateDivider()
+
+local Dropdown
+Dropdown = Tab:CreateDropdown({
+	Name = "🌾 • Movement Method",
+	Options = {"Teleport", "Tween"},
+	CurrentOption = "Teleport",
+	MultipleOptions = false,
+	Flag = "HarvestablesMethod",
+})
+
+Tab:CreateToggle({
+	Name = "🛡 • Safety Mode",
+	CurrentValue = false,
+	Flag = "SafetyMode",
+	Callback = function(Value)
+		if Value then
+			return
+		end
+		
+		Flags.MoveHarvestables.AfterLoop()
+	end,
 })
 
 Tab:CreateSection("Selling")
@@ -560,7 +658,7 @@ local Tab: Tab = Window:CreateTab("Movement", "keyboard")
 Tab:CreateSection("Sprinting")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("⚡ • Auto Sprint", Success),
+	Name = ApplyUnsupportedName("💨 • Auto Sprint", Success),
 	CurrentValue = false,
 	Flag = "Sprint",
 	Looped = true,
@@ -727,6 +825,8 @@ Tab:CreateButton({
 	end,
 })
 
+Tab:CreateDivider()
+
 Tab:CreateButton({
 	Name = "💔 • Suicide Heal",
 	Callback = function()
@@ -763,9 +863,167 @@ Tab:CreateSlider({
 	Flag = "Delay",
 })
 
-local Tab: Tab = Window:CreateTab("Effects", "sparkles")
+Tab:CreateSection("Identity")
 
-Tab:CreateSection("Fog")
+CreateFeature(Tab, "HideIdentity")
+
+local Tab: Tab = Window:CreateTab("Visuals", "sparkles")
+
+Tab:CreateSection("ESP")
+
+local CoreGui: Folder = game:GetService("CoreGui")
+
+local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
+	local FolderName = `{Model.Name}_{FlagName}`
+	
+	if not Flags[FlagName].CurrentValue then
+		local Holder = CoreGui:FindFirstChild(FolderName)
+		
+		if not Holder then
+			return
+		end
+		
+		Holder:Destroy()
+		
+		return
+	end
+	
+	if CoreGui:FindFirstChild(FolderName) then
+		CoreGui[FolderName]:Destroy()
+	end
+
+	local Holder = Instance.new("Folder")
+	Holder.Name = FolderName
+	Holder.Parent = CoreGui
+
+	for _, Object: BasePart | Model in Model:GetChildren() do
+		if not Object:IsA("PVInstance") then
+			continue
+		end
+
+		local BoxHandleAdornment = Instance.new("BoxHandleAdornment")
+		BoxHandleAdornment.Name = Model.Name
+		BoxHandleAdornment.Adornee = Object
+		BoxHandleAdornment.AlwaysOnTop = true
+		BoxHandleAdornment.ZIndex = 10
+		BoxHandleAdornment.Size = if Object:IsA("BasePart") then Object.Size else Object:GetExtentsSize()
+		BoxHandleAdornment.Transparency = 0.5
+		BoxHandleAdornment.Color = BrickColor.White()
+		BoxHandleAdornment.Parent = Holder
+	end
+
+	local BillboardGui = Instance.new("BillboardGui")
+	BillboardGui.Name = Model.Name
+	BillboardGui.Adornee = Model:FindFirstChild("Head") or Model:FindFirstChildWhichIsA("PVInstance")
+	BillboardGui.Size = UDim2.new(0, 100, 0, 150)
+	BillboardGui.StudsOffset = Vector3.new(0, 1, 0)
+	BillboardGui.AlwaysOnTop = true
+	BillboardGui.Parent = Holder
+
+	local TextLabel = Instance.new("TextLabel")
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.Position = UDim2.new(0, 0, 0, -50)
+	TextLabel.Size = UDim2.new(0, 100, 0, 100)
+	TextLabel.Font = Enum.Font.SourceSansSemibold
+	TextLabel.TextSize = 20
+	TextLabel.TextColor3 = Color3.new(1, 1, 1)
+	TextLabel.TextStrokeTransparency = 0
+	TextLabel.TextYAlignment = Enum.TextYAlignment.Bottom
+	TextLabel.Text = "Unloaded"
+	TextLabel.ZIndex = 10
+	TextLabel.Parent = BillboardGui
+
+	local RenderSteppedConnection: RBXScriptConnection
+	RenderSteppedConnection = RunService.RenderStepped:Connect(function()
+		if not Flags[FlagName].CurrentValue then
+			Holder:Destroy()
+			RenderSteppedConnection:Disconnect()
+			return
+		end
+
+		if not Holder.Parent then
+			RenderSteppedConnection:Disconnect()
+			return
+		end
+		
+		local ModelHumanoid = Model and Model:FindFirstChild("Humanoid")
+
+		if not Model or not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) or not Player.Character or not Player.Character:FindFirstChild("Humanoid") then
+			Holder:Destroy()
+			RenderSteppedConnection:Disconnect()
+			return
+		end
+
+		local Distance = math.floor((Player.Character:GetPivot().Position - Model:GetPivot().Position).Magnitude)
+		
+		OverheadText = OverheadText:gsub("<NAME>", Model.Name)
+		OverheadText = OverheadText:gsub("<DISTANCE>", math.floor(Distance))
+		
+		if ModelHumanoid then
+			OverheadText = OverheadText:gsub("<HEALTH>", math.floor(Model.Humanoid.Health))
+			OverheadText = OverheadText:gsub("<MAXHEALTH>", math.floor(Model.Humanoid.MaxHealth))
+			OverheadText = OverheadText:gsub("<HEALTHPERCENTAGE>", math.floor(Model.Humanoid.Health / Model.Humanoid.MaxHealth * 100))
+		end
+		
+		TextLabel.Text = OverheadText
+	end)
+end
+
+local PlayerText = "Player: <NAME> | Health: <HEALTH>/<MAXHEALTH> (<HEALTHPERCENTAGE>%) | Distance: <DISTANCE>"
+
+local function PlayerESP(TargetPlayer: Player)
+	local function BeginEsp(NewCharacter: Model)
+		ESPModel(NewCharacter, "PlayerESP", PlayerText)
+	end
+	
+	if TargetPlayer.Character then
+		BeginEsp(TargetPlayer.Character)
+	end
+	
+	HandleConnection(TargetPlayer.CharacterAdded:Connect(BeginEsp), "PlayerESPCharacterAdded")
+end
+
+Tab:CreateToggle({
+	Name = "🧍‍ • Player ESP",
+	CurrentValue = false,
+	Flag = "PlayerESP",
+	Callback = function(Value)
+		for _, TargetPlayer in Players:GetPlayers() do
+			if TargetPlayer == Player then
+				continue
+			end
+
+			PlayerESP(TargetPlayer)
+		end
+	end,
+})
+
+HandleConnection(Players.PlayerAdded:Connect(PlayerESP), "PlayerESP")
+
+local MobText = "Mob: <NAME> | Health: <HEALTH>/<MAXHEALTH> (<HEALTHPERCENTAGE>%) | Distance: <DISTANCE>"
+
+local function MobESP(Mob: Model)
+	if not Mob:GetAttribute("NPC") then
+		return
+	end
+
+	ESPModel(Mob, "MobESP", MobText)
+end
+
+Tab:CreateToggle({
+	Name = "🐺 • Mob ESP",
+	CurrentValue = false,
+	Flag = "MobESP",
+	Callback = function(Value)
+		for _, Mob: Model in workspace.Alive:GetChildren() do
+			MobESP(Mob)
+		end
+	end,
+})
+
+HandleConnection(workspace.Alive.ChildAdded:Connect(MobESP), "MobESP")
+
+Tab:CreateSection("Effects")
 
 local Lighting = game:GetService("Lighting")
 
@@ -799,3 +1057,5 @@ Tab:CreateToggle({
 		end
 	end,
 })
+
+getgenv().CreateUniversalTabs()
