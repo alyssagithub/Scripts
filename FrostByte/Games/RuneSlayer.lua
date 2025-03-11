@@ -473,12 +473,18 @@ Tab:CreateToggle({
 					return
 				end
 				
+				local Character = Player.Character
+				
+				if not Character then
+					return
+				end
+				
 				Part = Instance.new("Part")
 				Part.Name = "SafetyModePart"
 				Part.Size = Vector3.new(15, 5, 15)
 				Part.Anchored = true
 				Part.Parent = workspace
-				Part.Position = Player.Character:GetPivot().Position + Vector3.yAxis * 750
+				Part.Position = Character:GetPivot().Position + Vector3.yAxis * 750
 				
 				TeleportLocalCharacter(CFrame.new(Part.Position + Vector3.yAxis * 5))
 			end
