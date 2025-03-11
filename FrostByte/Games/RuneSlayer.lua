@@ -438,7 +438,13 @@ Tab:CreateToggle({
 			ResourceTween = nil
 		end
 		
-		SavedPosition = Player.Character:GetPivot().Position
+		local Character = Player.Character
+		
+		if not Character then
+			return
+		end
+		
+		SavedPosition = Character:GetPivot().Position
 	end,
 	Callback = function()
 		local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
