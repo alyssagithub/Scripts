@@ -960,16 +960,18 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		
 		local ModelHumanoid = Model and Model:FindFirstChild("Humanoid")
 
-		if not Model or not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) or not Player.Character or not Player.Character:FindFirstChild("Humanoid") then
+		if not Model or not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) then
 			Holder:Destroy()
 			RenderSteppedConnection:Disconnect()
 			return
 		end
-
-		local Distance = math.floor((Player.Character:GetPivot().Position - Model:GetPivot().Position).Magnitude)
 		
 		OverheadText = OverheadText:gsub("<NAME>", Model.Name)
-		OverheadText = OverheadText:gsub("<DISTANCE>", math.floor(Distance))
+		
+		if Player.Character and Player.Character:FindFirstChild("Humanoid") then
+			local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
+			OverheadText = OverheadText:gsub("<DISTANCE>", math.floor(Distance))
+		end
 		
 		if ModelHumanoid then
 			OverheadText = OverheadText:gsub("<HEALTH>", math.floor(Model.Humanoid.Health))
