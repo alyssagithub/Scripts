@@ -544,8 +544,10 @@ Tests = {
 		local Success, Result = pcall(require, Module)
 
 		assert(Success, `Failed to require module '{Module.Name}' with error:`, Result)
+		
+		assert(Result ~= nil, "Module failed to return a value.")
 
-		return Module.Name
+		return `Module: {Module.Name}, Value: {Result}`
 	end,
 
 	ismoduleloaded = function()
@@ -1229,8 +1231,8 @@ for LibraryName, LibraryFunctionNames in LibraryNoTests do
 	Tests[LibraryName] = NewLibrary
 end
 
-for OriginalFunctioName, FunctionAliases in Aliases do
-	assert(Tests[OriginalFunctioName], `A test for the function {OriginalFunctioName} does not exist, and cannot have aliases.`)
+for OriginalFunctionName, FunctionAliases in Aliases do
+	assert(Tests[OriginalFunctionName], `A test for the function {OriginalFunctionName} does not exist, and cannot have aliases.`)
 
 	for _, Alias in FunctionAliases do
 		assert(not Tests[Alias], `A test for the alias '{Alias}' exists and needs to be removed.`)
