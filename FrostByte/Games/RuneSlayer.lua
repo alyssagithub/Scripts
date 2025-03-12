@@ -1,9 +1,10 @@
 -- Core
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.6"
+getgenv().ScriptVersion = "v0.0.6a"
 
 getgenv().Changelog = [[
+				v0.0.06
 			🛠️ Changes & Fixes
 🦌 Made it so Move to Mobs will not target tamed mobs
 🐻 Moved the movement method below the mobs selection
@@ -22,6 +23,10 @@ getgenv().Changelog = [[
 🔍 Visuals -> ESP
 	🧍‍ Player ESP
 	🐺 Mob ESP
+	
+				v.0.0.6a
+🛠 Fixed a small issue with Auto Sell
+📃 Renamed "Sell Blacklist" to "Items To Not Sell" since people kept getting confused on what it's for
 ]]
 
 loadstring(
@@ -580,8 +585,14 @@ Tab:CreateToggle({
 		if not Success then
 			return
 		end
+		
+		local Backpack: Backpack = Player:FindFirstChild("Backpack")
+		
+		if not Backpack then
+			return
+		end
 
-		for _, Tool in Player.Backpack:GetChildren() do
+		for _, Tool in Backpack:GetChildren() do
 			if not Tool:IsA("Tool") then
 				continue
 			end
@@ -622,7 +633,7 @@ end
 table.sort(Items)
 
 Tab:CreateDropdown({
-	Name = "📃 • Sell Blacklist",
+	Name = "📃 • Items To Not Sell",
 	Options = Items,
 	MultipleOptions = true,
 	Flag = "Blacklist",
