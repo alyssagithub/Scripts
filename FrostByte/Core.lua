@@ -1,3 +1,4 @@
+--!strict
 local StartLoadTime = tick()
 
 local HttpService = game:GetService("HttpService")
@@ -32,7 +33,7 @@ end
 
 getgenv().FrostByteConnections = getgenv().FrostByteConnections or {}
 
-local function HandleConnection(Connection: RBXScriptConnection, Name: string)
+local function HandleConnection(Connection: RBXScriptConnection?, Name: string)
 	if getgenv().FrostByteConnections[Name] then
 		getgenv().FrostByteConnections[Name]:Disconnect()
 	end
@@ -80,13 +81,6 @@ getgenv().GetClosestChild = function(Children: {PVInstance}, Callback: ((Child: 
 	return ClosestChild
 end
 
-if not firesignal and getconnections then
-	firesignal = function(Signal: RBXScriptSignal)
-		local Connections = getconnections(Signal)
-		Connections[#Connections]:Fire()
-	end
-end
-
 local UnsupportedName = " (Executor Unsupported)"
 
 local function ApplyUnsupportedName(Name: string, Condition: boolean)
@@ -95,38 +89,11 @@ end
 
 getgenv().ApplyUnsupportedName = ApplyUnsupportedName
 
-local OriginalFlags = {}
-
-if getgenv().Flags then
-	for FlagName: string, FlagInfo in getgenv().Flags do
-		if typeof(FlagInfo.CurrentValue) ~= "boolean" then
-			continue
-		end
-
-		OriginalFlags[FlagName] = FlagInfo.CurrentValue
-		FlagInfo:Set(false)
-	end
+if not getgenv().PlaceFileName then
+	local PlaceFileName = PlaceName:gsub("%b[]", "")
+	PlaceFileName = PlaceFileName:gsub("[^%a]", "")
+	getgenv().PlaceFileName = PlaceFileName
 end
-
-if getgenv().Rayfield then
-	getgenv().Rayfield:Destroy()
-end
-
-local Rayfield
-
-if getgenv().RayfieldTesting then
-	Rayfield = loadstring(getgenv().RayfieldTesting)()
-	print("Running Rayfield Testing")
-else
-	repeat
-		pcall(function()
-			Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))()
-		end)
-		task.wait()
-	until Rayfield
-end
-
-getgenv().Initiated = nil
 
 local function SendNotification(Title: string, Text: string, Duration: number?, Button1: string?, Button2: string?, Callback: BindableFunction?)
 	StarterGui:SetCore("SendNotification", {
@@ -137,31 +104,6 @@ local function SendNotification(Title: string, Text: string, Duration: number?, 
 		Button2 = Button2,
 		Callback = Callback
 	})
-end
-
-local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = Rayfield.Flags
-
-getgenv().Flags = Flags
-
-local function Notify(Title: string, Content: string, Image: string)
-	if not Rayfield then
-		return
-	end
-
-	Rayfield:Notify({
-		Title = Title,
-		Content = Content,
-		Duration = 10,
-		Image = Image or "info",
-	})
-end
-
-getgenv().Notify = Notify
-
-if not getgenv().PlaceFileName then
-	local PlaceFileName = PlaceName:gsub("%b[]", "")
-	PlaceFileName = PlaceFileName:gsub("[^%a]", "")
-	getgenv().PlaceFileName = PlaceFileName
 end
 
 task.spawn(function()
@@ -181,7 +123,13 @@ task.spawn(function()
 			Response = true
 
 			if Button == Button1 then
-				loadstring(game:HttpGet(File))()
+				local Temp = loadstring(game:HttpGet(File))
+
+				if not Temp then
+					return warn("Failed to load the script for the current game.")
+				end
+
+				Temp()
 			end
 		end
 
@@ -216,10 +164,90 @@ HandleConnection(Player.Idled:Connect(function()
 	VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightMeta, false, game)
 end), "AntiAFK")
 
-type Tab = {
-	CreateSection: (self: Tab, Name: string) -> Section,
-	CreateDivider: (self: Tab) -> Divider,
+local OriginalFlags = {}
+
+if getgenv().Flags then
+	for FlagName: string, FlagInfo in getgenv().Flags do
+		if typeof(FlagInfo.CurrentValue) ~= "boolean" then
+			continue
+		end
+
+		OriginalFlags[FlagName] = FlagInfo.CurrentValue
+		FlagInfo:Set(false)
+	end
+end
+
+if getgenv().Rayfield then
+	getgenv().Rayfield:Destroy()
+end
+
+local Rayfield
+
+if getgenv().RayfieldTesting then
+	local Temp = loadstring(getgenv().RayfieldTesting)
+	
+	if not Temp then
+		return warn("Failed to load rayfield testing.")
+	end
+	
+	Rayfield = Temp()
+	print("Running Rayfield Testing")
+else
+	repeat
+		pcall(function()
+			local Temp = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))
+			
+			if not Temp then
+				return warn("Failed to load rayfield.")
+			end
+
+			Rayfield = Temp()
+		end)
+		task.wait()
+	until Rayfield
+end
+
+getgenv().Initiated = nil
+
+type Element = {
+	CurrentValue: any,
+	CurrentOption: {string},
+	Set: (self: Element, any) -> ()
 }
+
+type Flags = {
+	[string]: Element
+}
+
+type Tab = {
+	CreateSection: (self: Tab, Name: string) -> Element,
+	CreateDivider: (self: Tab) -> Element,
+	CreateToggle: (self: Tab, any) -> Element,
+	CreateSlider: (self: Tab, any) -> Element,
+	CreateDropdown: (self: Tab, any) -> Element,
+	CreateButton: (self: Tab, any) -> Element,
+	CreateLabel: (self: Tab, any, any?) -> Element,
+	CreateParagraph: (self: Tab, any) -> Element,
+}
+
+local function Notify(Title: string, Content: string, Image: string)
+	if not Rayfield then
+		return
+	end
+
+	Rayfield:Notify({
+		Title = Title,
+		Content = Content,
+		Duration = 10,
+		Image = Image or "info",
+	})
+end
+
+getgenv().Notify = Notify
+
+local Flags: Flags = Rayfield.Flags
+
+getgenv().Flags = Flags
 
 local Window = Rayfield:CreateWindow({
 	Name = `FrostByte | {PlaceName} | {ScriptVersion or "Dev Mode"}`,
@@ -272,7 +300,7 @@ Tab:CreateParagraph({Title = `{PlaceName} {ScriptVersion}`, Content = getgenv().
 
 --------------------------------------------------------------------------------------------------------------
 
-local SpeedConnection: RBXScriptConnection
+local SpeedConnection: RBXScriptConnection?
 local ConnectedHumanoid
 
 local function SetSpeed()
@@ -292,17 +320,17 @@ local function SetSpeed()
 		Humanoid.WalkSpeed = Flags.Speed.CurrentValue
 	end
 
-	if not WalkSpeedConnection then
-		WalkSpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetSpeed)
+	if not SpeedConnection then
+		SpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetSpeed)
 		ConnectedHumanoid = Humanoid
-		HandleConnection(WalkSpeedConnection, "WalkSpeedConnection")
+		HandleConnection(SpeedConnection, "WalkSpeedConnection")
 	end
 end
 
 HandleConnection(Player.CharacterAdded:Connect(function()
-	if WalkSpeedConnection then
-		WalkSpeedConnection:Disconnect()
-		WalkSpeedConnection = nil
+	if SpeedConnection then
+		SpeedConnection:Disconnect()
+		SpeedConnection = nil
 	end
 
 	SetSpeed()
@@ -312,7 +340,7 @@ local Connections = {}
 
 local OriginalText = {}
 
-local function HandleUsernameChange(Object: Instance)
+local function HandleUsernameChange(Object)
 	if not Flags.HideIdentity.CurrentValue then
 		return
 	end
@@ -340,7 +368,16 @@ end
 
 local DescendantAddedConnection
 
-local Features = {
+type FeaturesList = {
+	[string]: {
+		{
+			Element: string,
+			Info: {}
+		}
+	}
+}
+
+local Features: FeaturesList = {
 	Speed = {
 		{
 			Element = "Toggle",
@@ -403,7 +440,7 @@ local Features = {
 						DescendantAddedConnection:Disconnect()
 						DescendantAddedConnection = nil
 
-						for Object: TextLabel?, Text in OriginalText do
+						for Object, Text in OriginalText do
 							Object.Text = Text
 						end
 
