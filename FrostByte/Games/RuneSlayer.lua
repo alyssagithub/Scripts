@@ -4,10 +4,10 @@ local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 getgenv().ScriptVersion = "v0.0.6b"
 
 getgenv().Changelog = [[
-				v.0.0.6b
+				v0.0.6b
 ❓ Applied minor fixes, cleaned up the code (could've caused issues)
 				
-				v.0.0.6a
+				v0.0.6a
 🛠 Fixed a small issue with Auto Sell
 📃 Renamed "Sell Blacklist" to "Items To Not Sell" since people kept getting confused on what it's for
 
