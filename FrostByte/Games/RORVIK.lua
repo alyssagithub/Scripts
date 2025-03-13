@@ -1,6 +1,12 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v1.5.6"
+getgenv().ScriptVersion = "v1.5.7"
+
+getgenv().Changelog = [[
+		🛠️ Changes & Fixes
+- 💎 Made auto collect drops also collect tokens
+- 🧱 Made teleport below ores have a fixed position instead of increasing based on ore size
+]]
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
 
@@ -148,9 +154,9 @@ Tab:CreateToggle({
 
 				local Size = Ore.Base.Size
 				
-				LastTPLocation = Ore.Base:GetPivot() - Vector3.yAxis * Size.Y * 2
+				LastTPLocation = Ore.Base:GetPivot() - Vector3.yAxis * 5
 				HumanoidRootPart:PivotTo(LastTPLocation)
-				Character.Humanoid.CameraOffset = Vector3.yAxis * 10
+				Character.Humanoid.CameraOffset = Vector3.yAxis * 15
 				DidTP = true
 				break
 			end
@@ -169,6 +175,17 @@ Tab:CreateToggle({
 
 Tab:CreateDivider()
 
+local function Collect(Drop: Model)
+	local Frame = Drop:FindFirstChild("Frame")
+
+	if not Frame then
+		return
+	end
+
+	firetouchinterest(Frame, Player.Character.HumanoidRootPart, 0)
+	firetouchinterest(Frame, Player.Character.HumanoidRootPart, 1)
+end
+
 local function CollectDrops(Enabled: boolean)
 	if not firetouchinterest then
 		return
@@ -179,14 +196,11 @@ local function CollectDrops(Enabled: boolean)
 	end
 
 	for _, Drop: Model in workspace.Drops:GetChildren() do
-		local Frame = Drop:FindFirstChild("Frame")
-
-		if not Frame then
-			continue
-		end
-
-		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 0)
-		firetouchinterest(Frame, Player.Character.HumanoidRootPart, 1)
+		Collect(Drop)
+	end
+	
+	for _, Drop: Model in workspace.Tokens:GetChildren() do
+		Collect(Drop)
 	end
 end
 
