@@ -1,4 +1,4 @@
--- Core
+--!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
 getgenv().ScriptVersion = "v0.0.6a"
@@ -41,18 +41,26 @@ end
 
 -- Types
 
+type Set = {
+	Set: (self: any, NewValue: any) -> ()
+}
+
 type Tab = {
-	CreateSection: (self: Tab, Name: string) -> Section,
-	CreateDivider: (self: Tab) -> Divider,
+	CreateSection: (self: Tab, Name: string) -> Set,
+	CreateDivider: (self: Tab) -> Set,
+	CreateToggle: (self: Tab, any) -> Set,
+	CreateSlider: (self: Tab, any) -> Set,
+	CreateDropdown: (self: Tab, any) -> Set,
+	CreateButton: (self: Tab, any) -> Set
 }
 
 -- Variables
 
-local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
-local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
-local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFeature
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local Notify: (Title: string, Content: string, Image: string?) -> () = getgenv().Notify
+local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> () | boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
+local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFeature
 
 local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 
@@ -64,7 +72,7 @@ local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = 
 
 local Player = game:GetService("Players").LocalPlayer
 
-local function GetChildInCharacter(ChildName: string)
+local function GetChildInCharacter(ChildName: string): Instance?
 	local Character = Player.Character
 
 	if not Character then
@@ -76,7 +84,7 @@ local function GetChildInCharacter(ChildName: string)
 	return Child
 end
 
-local function GetInputRemote(RemoteName: string): RemoteEvent
+local function GetInputRemote(RemoteName: string): RemoteEvent?
 	local Character = Player.Character
 
 	if not Character then
@@ -105,13 +113,13 @@ local function TeleportLocalCharacter(NewLocation: CFrame)
 		return
 	end
 	
-	local MandrakeRope: Part = InvisibleParts:FindFirstChild("MandrakeRope")
+	local MandrakeRope = InvisibleParts:FindFirstChild("MandrakeRope")
 	
 	if not MandrakeRope then
 		return
 	end
 	
-	local MandrakePit: Part = InvisibleParts:FindFirstChild("MandrakePit")
+	local MandrakePit = InvisibleParts:FindFirstChild("MandrakePit") :: Part
 
 	if not MandrakePit then
 		return
@@ -207,7 +215,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
+		local Humanoid = GetChildInCharacter("Humanoid") :: Humanoid
 
 		if not Humanoid then
 			return
@@ -232,7 +240,7 @@ Tab:CreateToggle({
 		HumanoidRootPart.CFrame = CFrame.lookAt(Position, Vector3.new(ClosestPosition.X, Position.Y, ClosestPosition.Z))
 	end,
 	AfterLoop = function()
-		local Humanoid: Humanoid = GetChildInCharacter("Humanoid")
+		local Humanoid = GetChildInCharacter("Humanoid") :: Humanoid
 
 		if not Humanoid then
 			return
@@ -255,7 +263,7 @@ Tab:CreateSlider({
 
 Tab:CreateSection("Moving")
 
-local MobTween: Tween
+local MobTween: any
 local ActiveNotification = false
 
 Tab:CreateToggle({
@@ -412,7 +420,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		for _, Item: Model? in workspace.Effects:GetChildren() do
+		for _, Item: Model in workspace.Effects:GetChildren() do
 			if not Item:FindFirstChild("InteractPrompt") then
 				continue
 			end
@@ -434,7 +442,7 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Moving")
 
-local ResourceTween: Tween
+local ResourceTween: any
 local ActiveNotification = false
 local SavedPosition: Vector3
 
@@ -489,19 +497,17 @@ Tab:CreateToggle({
 			end
 			
 			if Flags.SafetyMode.CurrentValue then
-				local Part: Part = workspace:FindFirstChild("SafetyModePart")
-				
-				if Part then
-					return
-				end
-				
 				local Character = Player.Character
 				
 				if not Character then
 					return
 				end
 				
-				Part = Instance.new("Part")
+				if workspace:FindFirstChild("SafetyModePart") then
+					return
+				end
+				
+				local Part = Instance.new("Part")
 				Part.Name = "SafetyModePart"
 				Part.Size = Vector3.new(15, 5, 15)
 				Part.Anchored = true
@@ -655,7 +661,7 @@ Dropdown = Tab:CreateDropdown({
 	Options = Items,
 	CurrentOption = "",
 	MultipleOptions = false,
-	Callback = function(CurrentOption)
+	Callback = function(CurrentOption: any)
 		CurrentOption = CurrentOption[1]
 
 		if CurrentOption == "" then
@@ -710,7 +716,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		if Humanoid.MoveDirection.Magnitude == Vector3.zero then
+		if Humanoid.MoveDirection == Vector3.zero then
 			return
 		end
 
@@ -742,7 +748,7 @@ Dropdown = Tab:CreateDropdown({
 	Options = Areas,
 	CurrentOption = "",
 	MultipleOptions = false,
-	Callback = function(CurrentOption)
+	Callback = function(CurrentOption: any)
 		CurrentOption = CurrentOption[1]
 
 		if CurrentOption == "" then
@@ -810,7 +816,7 @@ Tab:CreateToggle({
 	Callback = function(Value)
 		if Value then
 			for _, Part: Part in workspace:GetDescendants() do
-				if Part.Name ~= "lava" then
+				if Part.Name ~= "lava" or not Part:IsA("Part") then
 					continue
 				end
 
@@ -818,7 +824,7 @@ Tab:CreateToggle({
 				Part.Parent = nil
 			end
 		else
-			for Part: Part, Parent: Part in LavaParts do
+			for Part: Part, Parent in LavaParts do
 				Part.Parent = Parent
 			end
 
@@ -904,6 +910,10 @@ Tab:CreateSection("ESP")
 
 local CoreGui: Folder = game:GetService("CoreGui")
 
+local function StringFloor(Number): string
+	return tostring(math.floor(Number))
+end
+
 local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 	local FolderName = `{Model.Name}_{FlagName}`
 	
@@ -919,16 +929,20 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		return
 	end
 	
-	if CoreGui:FindFirstChild(FolderName) then
-		CoreGui[FolderName]:Destroy()
+	do
+		local ExistingFolder = CoreGui:FindFirstChild(FolderName)
+		
+		if ExistingFolder then
+			ExistingFolder:Destroy()
+		end
 	end
 
 	local Holder = Instance.new("Folder")
 	Holder.Name = FolderName
 	Holder.Parent = CoreGui
 
-	for _, Object: BasePart | Model in Model:GetChildren() do
-		if not Object:IsA("PVInstance") then
+	for _, Object in Model:GetChildren() do
+		if not Object:IsA("BasePart") and not Object:IsA("Model") then
 			continue
 		end
 
@@ -939,7 +953,7 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		BoxHandleAdornment.ZIndex = 10
 		BoxHandleAdornment.Size = if Object:IsA("BasePart") then Object.Size else Object:GetExtentsSize()
 		BoxHandleAdornment.Transparency = 0.5
-		BoxHandleAdornment.Color = BrickColor.White()
+		BoxHandleAdornment.Color3 = Color3.fromRGB(255, 255, 255)
 		BoxHandleAdornment.Parent = Holder
 	end
 
@@ -977,7 +991,7 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 			return
 		end
 		
-		local ModelHumanoid = Model and Model:FindFirstChild("Humanoid")
+		local ModelHumanoid = Model and Model:FindFirstChild("Humanoid") :: Humanoid
 
 		if not Model or not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) then
 			Holder:Destroy()
@@ -989,13 +1003,13 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		
 		if Player.Character and Player.Character:FindFirstChild("Humanoid") then
 			local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
-			OverheadText = OverheadText:gsub("<DISTANCE>", math.floor(Distance))
+			OverheadText = OverheadText:gsub("<DISTANCE>", StringFloor(Distance))
 		end
 		
 		if ModelHumanoid then
-			OverheadText = OverheadText:gsub("<HEALTH>", math.floor(Model.Humanoid.Health))
-			OverheadText = OverheadText:gsub("<MAXHEALTH>", math.floor(Model.Humanoid.MaxHealth))
-			OverheadText = OverheadText:gsub("<HEALTHPERCENTAGE>", math.floor(Model.Humanoid.Health / Model.Humanoid.MaxHealth * 100))
+			OverheadText = OverheadText:gsub("<HEALTH>", StringFloor(ModelHumanoid.Health))
+			OverheadText = OverheadText:gsub("<MAXHEALTH>", StringFloor(ModelHumanoid.MaxHealth))
+			OverheadText = OverheadText:gsub("<HEALTHPERCENTAGE>", StringFloor(ModelHumanoid.Health / ModelHumanoid.MaxHealth * 100))
 		end
 		
 		TextLabel.Text = OverheadText
