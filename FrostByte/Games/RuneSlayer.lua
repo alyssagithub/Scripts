@@ -4,7 +4,11 @@ local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 getgenv().ScriptVersion = "v0.0.6a"
 
 getgenv().Changelog = [[
-				v0.0.06
+				v.0.0.6a
+🛠 Fixed a small issue with Auto Sell
+📃 Renamed "Sell Blacklist" to "Items To Not Sell" since people kept getting confused on what it's for
+
+				v0.0.6
 			🛠️ Changes & Fixes
 🦌 Made it so Move to Mobs will not target tamed mobs
 🐻 Moved the movement method below the mobs selection
@@ -23,10 +27,6 @@ getgenv().Changelog = [[
 🔍 Visuals -> ESP
 	🧍‍ Player ESP
 	🐺 Mob ESP
-	
-				v.0.0.6a
-🛠 Fixed a small issue with Auto Sell
-📃 Renamed "Sell Blacklist" to "Items To Not Sell" since people kept getting confused on what it's for
 ]]
 
 loadstring(
@@ -432,6 +432,17 @@ local ResourceTween: Tween
 local ActiveNotification = false
 local SavedPosition: Vector3
 
+local function HarvestablesAfterLoop()
+	local Part: Part = workspace:FindFirstChild("SafetyModePart")
+
+	if not Part then
+		return
+	end
+
+	TeleportLocalCharacter(CFrame.new(SavedPosition))
+	Part:Destroy()
+end
+
 Tab:CreateToggle({
 	Name = "🌲 • Move to Harvestables",
 	CurrentValue = false,
@@ -519,16 +530,7 @@ Tab:CreateToggle({
 			ResourceTween = nil
 		end
 	end,
-	AfterLoop = function(Value)
-		local Part: Part = workspace:FindFirstChild("SafetyModePart")
-
-		if not Part then
-			return
-		end
-		
-		TeleportLocalCharacter(CFrame.new(SavedPosition))
-		Part:Destroy()
-	end,
+	AfterLoop = HarvestablesAfterLoop,
 })
 
 local Resources = {}
@@ -570,7 +572,7 @@ Tab:CreateToggle({
 			return
 		end
 		
-		Flags.MoveHarvestables.AfterLoop()
+		HarvestablesAfterLoop()
 	end,
 })
 
