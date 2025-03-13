@@ -29,9 +29,15 @@ getgenv().Changelog = [[
 	🐺 Mob ESP
 ]]
 
-loadstring(
-	game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua")
-)()
+do
+	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua")); 
+	
+	if not Core then
+		return warn("Failed to load the FrostByte Core")
+	end
+	
+	Core()
+end
 
 -- Types
 
