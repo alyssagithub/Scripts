@@ -44,17 +44,25 @@ end
 
 -- Types
 
-type Set = {
-	Set: (self: any, NewValue: any) -> ()
+type Element = {
+	CurrentValue: any,
+	CurrentOption: {string},
+	Set: (self: Element, any) -> ()
+}
+
+type Flags = {
+	[string]: Element
 }
 
 type Tab = {
-	CreateSection: (self: Tab, Name: string) -> Set,
-	CreateDivider: (self: Tab) -> Set,
-	CreateToggle: (self: Tab, any) -> Set,
-	CreateSlider: (self: Tab, any) -> Set,
-	CreateDropdown: (self: Tab, any) -> Set,
-	CreateButton: (self: Tab, any) -> Set
+	CreateSection: (self: Tab, Name: string) -> Element,
+	CreateDivider: (self: Tab) -> Element,
+	CreateToggle: (self: Tab, any) -> Element,
+	CreateSlider: (self: Tab, any) -> Element,
+	CreateDropdown: (self: Tab, any) -> Element,
+	CreateButton: (self: Tab, any) -> Element,
+	CreateLabel: (self: Tab, any, any?) -> Element,
+	CreateParagraph: (self: Tab, any) -> Element,
 }
 
 -- Variables
@@ -71,7 +79,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
+local Flags: Flags = getgenv().Flags
 
 local Player = game:GetService("Players").LocalPlayer
 
@@ -450,14 +458,16 @@ local ActiveNotification = false
 local SavedPosition: Vector3
 
 local function HarvestablesAfterLoop()
+	if SavedPosition then
+		TeleportLocalCharacter(CFrame.new(SavedPosition))
+		task.wait(1)
+	end
+	
 	local Part: Part = workspace:FindFirstChild("SafetyModePart")
 
-	if not Part then
-		return
+	if Part then
+		Part:Destroy()
 	end
-
-	TeleportLocalCharacter(CFrame.new(SavedPosition))
-	Part:Destroy()
 end
 
 Tab:CreateToggle({
