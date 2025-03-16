@@ -65,30 +65,16 @@ local Flags: Flags = getgenv().Flags
 
 local Player = game:GetService("Players").LocalPlayer
 
-local function GetChildInCharacter(ChildName: string): Instance?
+local function GetChildInCharacter(ChildName: string): (RemoteEvent & BasePart & Humanoid)?
 	local Character = Player.Character
 
 	if not Character then
 		return
 	end
 
-	local Child = Character:FindFirstChild(ChildName)
+	local Child = Character:FindFirstChild(ChildName, true)
 
 	return Child
-end
-
-local function GetInputRemote(RemoteName: string): RemoteEvent?
-	local Character = Player.Character
-
-	if not Character then
-		return
-	end
-	
-	local Remote = Character:FindFirstChild(RemoteName, true)
-	
-	task.spawn(assert, Remote, `Could not find the '{RemoteName}' remote within your character.`)
-
-	return Remote
 end
 
 local LastFired = 0
@@ -120,7 +106,7 @@ local function TeleportLocalCharacter(NewLocation: CFrame)
 	
 	if (Character:GetPivot().Position - NewLocation.Position).Magnitude > 50 then
 		if tick() - LastFired >= 2 then
-			local Interact = GetInputRemote("Interact")
+			local Interact = GetChildInCharacter("Interact")
 
 			if not Interact then
 				return
@@ -212,7 +198,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		local Humanoid = GetChildInCharacter("Humanoid") :: Humanoid
+		local Humanoid = GetChildInCharacter("Humanoid")
 
 		if not Humanoid then
 			return
@@ -223,7 +209,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		local HumanoidRootPart = GetChildInCharacter("HumanoidRootPart") :: Part
+		local HumanoidRootPart = GetChildInCharacter("HumanoidRootPart")
 
 		if not HumanoidRootPart then
 			return
@@ -237,7 +223,7 @@ Tab:CreateToggle({
 		HumanoidRootPart.CFrame = CFrame.lookAt(Position, Vector3.new(ClosestPosition.X, Position.Y, ClosestPosition.Z))
 	end,
 	AfterLoop = function()
-		local Humanoid = GetChildInCharacter("Humanoid") :: Humanoid
+		local Humanoid = GetChildInCharacter("Humanoid")
 
 		if not Humanoid then
 			return
@@ -390,7 +376,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		local Interact = GetInputRemote("Interact")
+		local Interact = GetChildInCharacter("Interact")
 
 		if not Interact then
 			return
@@ -419,7 +405,7 @@ Tab:CreateToggle({
 				continue
 			end
 
-			local Interact = GetInputRemote("Interact")
+			local Interact = GetChildInCharacter("Interact")
 
 			if not Interact then
 				continue
@@ -619,7 +605,7 @@ Tab:CreateToggle({
 				continue
 			end
 
-			local SellEvent = GetInputRemote("SellEvent")
+			local SellEvent = GetChildInCharacter("SellEvent")
 
 			if not SellEvent then
 				continue
@@ -877,7 +863,7 @@ Tab:CreateButton({
 			return Notify("Error", "Could not find a bed to sleep in.")
 		end
 
-		local Interact = GetInputRemote("Interact")
+		local Interact = GetChildInCharacter("Interact")
 
 		if not Interact then
 			return
