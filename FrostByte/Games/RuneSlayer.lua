@@ -1,35 +1,17 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.6b"
+getgenv().ScriptVersion = "v0.0.7"
 
 getgenv().Changelog = [[
-				v0.0.6b
-❓ Applied minor fixes, cleaned up the code (could've caused issues)
-				
-				v0.0.6a
-🛠 Fixed a small issue with Auto Sell
-📃 Renamed "Sell Blacklist" to "Items To Not Sell" since people kept getting confused on what it's for
-
-				v0.0.6
-			🛠️ Changes & Fixes
-🦌 Made it so Move to Mobs will not target tamed mobs
-🐻 Moved the movement method below the mobs selection
-	🌾 Did the same for Move to Resources' movement method
-🌫 Replaced the Effects tab with Visuals
-
-			🎉 What's New?
-⚔ Combat -> Moving 
-	📐 Offset
-	🔼 Height Offset
-🛡 Resources -> Moving -> Safety Mode
-⚡ Movement -> Speed -> Change Speed Keybind
-😷 Safety -> Identity
-	🎭 Hide Identity (Client-Sided)
-	💬 Name To Replace With
-🔍 Visuals -> ESP
-	🧍‍ Player ESP
-	🐺 Mob ESP
+		🛠️ Changes & Fixes
+🐺 Auto Attack and Look At Closest Mob will no longer target your tamed pet
+🦌 Move to Mobs will now make you look at the mob you're moving to
+🍎 Removed "(No Tools Required)" from Auto Gather's name
+💨 Auto Sprint will not try to sprint again while you're already sprinting
+🔎 Both ESPs will now update their Distance and Health automatically
+		🎉 What's New?
+💬 Movement -> Transportation -> Teleport to NPC
 ]]
 
 do
@@ -178,6 +160,18 @@ local function EmulateClick()
 	})
 end
 
+local function IsInvalidMob(Child: PVInstance): ()
+	if Child == Player.Character then
+		return true
+	end
+
+	local Master = Child:FindFirstChild("Master") :: ObjectValue
+
+	if Master and Master.Value == Player.Character then
+		return true
+	end
+end
+
 -- Features
 
 local Window = getgenv().Window
@@ -192,11 +186,7 @@ Tab:CreateToggle({
 	Flag = "Attack",
 	Looped = true,
 	Callback = function()
-		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
-			if Child == Player.Character then
-				return true
-			end
-		end, Flags.Distance.CurrentValue)
+		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), IsInvalidMob, Flags.Distance.CurrentValue)
 
 		if not ClosestMob then
 			return
@@ -214,11 +204,7 @@ Tab:CreateToggle({
 	Flag = "LookAt",
 	Looped = true,
 	Callback = function(Value)
-		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), function(Child)
-			if Child == Player.Character then
-				return true
-			end
-		end, Flags.Distance.CurrentValue)
+		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), IsInvalidMob, Flags.Distance.CurrentValue)
 
 		local Character = Player.Character
 
@@ -237,7 +223,7 @@ Tab:CreateToggle({
 			return
 		end
 
-		local HumanoidRootPart: Part = Character:FindFirstChild("HumanoidRootPart")
+		local HumanoidRootPart = GetChildInCharacter("HumanoidRootPart") :: Part
 
 		if not HumanoidRootPart then
 			return
@@ -312,17 +298,14 @@ Tab:CreateToggle({
 
 		local HumanoidRootPart: Part = Player.Character.HumanoidRootPart
 
-		local GoTo = CFrame.new(Closest:GetPivot().Position) 
-			+ Closest:GetPivot().LookVector 
-			* Flags.Offset.CurrentValue 
-			+ Vector3.yAxis 
-			* Flags.HeightOffset.CurrentValue
+		local GoTo = CFrame.new(
+			Closest:GetPivot().Position
+				+ Closest:GetPivot().LookVector * Flags.Offset.CurrentValue
+				+ Vector3.yAxis * Flags.HeightOffset.CurrentValue
+			, Closest:GetPivot().Position
+		)
 
 		local Distance = (HumanoidRootPart.Position - GoTo.Position).Magnitude
-
-		if Distance <= 5 then
-			--return
-		end
 		
 		if Flags.MobsMethod.CurrentOption[1] == "Teleport" then
 			TeleportLocalCharacter(GoTo)
@@ -384,7 +367,7 @@ local Tab: Tab = Window:CreateTab("Resources", "apple")
 Tab:CreateSection("Gathering")
 
 Tab:CreateToggle({
-	Name = "🍎 • Auto Gather (No Tools Required)",
+	Name = "🍎 • Auto Gather",
 	CurrentValue = false,
 	Flag = "Gather",
 	Looped = true,
@@ -732,6 +715,10 @@ Tab:CreateToggle({
 		if Humanoid.MoveDirection == Vector3.zero then
 			return
 		end
+		
+		if Character:FindFirstChild("ServerRun") then
+			return
+		end
 
 		Network.connect("Sprint", "Fire", Character, true)
 	end,
@@ -780,13 +767,42 @@ Dropdown = Tab:CreateDropdown({
 			local GoTo = CFrame.new(Result.Position)
 
 			TeleportLocalCharacter(GoTo)
-
-			Dropdown:Set({""})
 		end)
+		
+		Dropdown:Set({""})
 
 		if not Success then
 			return Notify("Error", "Failed to teleport.")
 		end
+	end,
+})
+
+local NPCs = {}
+
+for _, v: Model in workspace.Effects.NPCS:GetChildren() do
+	table.insert(NPCs, v.Name)
+end
+
+table.sort(NPCs)
+
+local Dropdown
+Dropdown = Tab:CreateDropdown({
+	Name = "💬 • Teleport to NPC",
+	Options = NPCs,
+	CurrentOption = "",
+	MultipleOptions = false,
+	Callback = function(CurrentOption: any)
+		CurrentOption = CurrentOption[1]
+
+		if CurrentOption == "" then
+			return
+		end
+
+		local SelectedNPC: Model = workspace.Effects.NPCS:FindFirstChild(CurrentOption)
+
+		TeleportLocalCharacter(SelectedNPC:GetPivot())
+
+		Dropdown:Set({""})
 	end,
 })
 
@@ -995,12 +1011,6 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 	RenderSteppedConnection = RunService.RenderStepped:Connect(function()
 		if not Flags[FlagName].CurrentValue then
 			Holder:Destroy()
-			RenderSteppedConnection:Disconnect()
-			return
-		end
-
-		if not Holder.Parent then
-			RenderSteppedConnection:Disconnect()
 			return
 		end
 		
@@ -1008,24 +1018,30 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 
 		if not Model or not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) then
 			Holder:Destroy()
+			return
+		end
+		
+		if not Holder.Parent then
 			RenderSteppedConnection:Disconnect()
 			return
 		end
 		
-		OverheadText = OverheadText:gsub("<NAME>", Model.Name)
+		local NewText = OverheadText:gsub("<NAME>", Model.Name)
+		
+		local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
 		
 		if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-			local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
-			OverheadText = OverheadText:gsub("<DISTANCE>", StringFloor(Distance))
+			--local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
+			NewText = NewText:gsub("<DISTANCE>", StringFloor(Distance))
 		end
 		
 		if ModelHumanoid then
-			OverheadText = OverheadText:gsub("<HEALTH>", StringFloor(ModelHumanoid.Health))
-			OverheadText = OverheadText:gsub("<MAXHEALTH>", StringFloor(ModelHumanoid.MaxHealth))
-			OverheadText = OverheadText:gsub("<HEALTHPERCENTAGE>", StringFloor(ModelHumanoid.Health / ModelHumanoid.MaxHealth * 100))
+			NewText = NewText:gsub("<HEALTH>", StringFloor(ModelHumanoid.Health))
+			NewText = NewText:gsub("<MAXHEALTH>", StringFloor(ModelHumanoid.MaxHealth))
+			NewText = NewText:gsub("<HEALTHPERCENTAGE>", StringFloor(ModelHumanoid.Health / ModelHumanoid.MaxHealth * 100))
 		end
 		
-		TextLabel.Text = OverheadText
+		TextLabel.Text = NewText
 	end)
 end
 
