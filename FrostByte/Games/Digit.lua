@@ -1376,6 +1376,7 @@ if not Success then
 		Venom = Color3.fromRGB(26, 255, 0);
 		Hydrated = Color3.fromRGB(0, 115, 255);
 		Lovely = Color3.fromRGB(255, 0, 136);
+		Lucky = Color3.fromRGB();
 	}
 end
 
