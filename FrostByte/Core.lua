@@ -1,4 +1,5 @@
 --!strict
+
 local StartLoadTime = tick()
 
 local HttpService = game:GetService("HttpService")
@@ -8,6 +9,17 @@ local StarterGui = game:GetService("StarterGui")
 local Player = Players.LocalPlayer
 
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
+
+if getgenv().CoreTesting then
+	print("Loading Core Testing")
+	local Core = loadstring(getgenv().CoreTesting)
+
+	if not Core then
+		return warn("Failed to load the FrostByte Core")
+	end
+
+	return Core()
+end
 
 local PlaceName: string = getgenv().PlaceName or game:GetService("AssetService"):GetGamePlacesAsync(game.GameId):GetCurrentPage()[1].Name
 
@@ -330,6 +342,8 @@ end)
 
 --------------------------------------------------------------------------------------------------------------
 
+local StarterPlayer = game:GetService("StarterPlayer")
+
 local SpeedConnection: RBXScriptConnection?
 local ConnectedHumanoid
 
@@ -346,9 +360,7 @@ local function SetSpeed()
 		return
 	end
 
-	if Flags.ChangeSpeed.CurrentValue then
-		Humanoid.WalkSpeed = Flags.Speed.CurrentValue
-	end
+	Humanoid.WalkSpeed = if Flags.ChangeSpeed.CurrentValue then Flags.Speed.CurrentValue else StarterPlayer.CharacterWalkSpeed
 
 	if not SpeedConnection then
 		SpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetSpeed)
@@ -415,14 +427,7 @@ local Features: FeaturesList = {
 				Name = "⚡ • Change Speed",
 				CurrentValue = false,
 				Flag = "ChangeSpeed",
-				Callback = function(Value)
-					
-					if not Player.Character or not Value then
-						return
-					end
-					
-					SetSpeed()
-				end,
+				Callback = SetSpeed,
 			},
 		},
 		{
@@ -432,7 +437,7 @@ local Features: FeaturesList = {
 				Range = {0, 250},
 				Increment = 1,
 				Suffix = "Studs/s",
-				CurrentValue = game:GetService("StarterPlayer").CharacterWalkSpeed,
+				CurrentValue = StarterPlayer.CharacterWalkSpeed,
 				Flag = "Speed",
 				Callback = SetSpeed,
 			}
