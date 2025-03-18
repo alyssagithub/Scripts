@@ -26,8 +26,7 @@ if Success and Code:find("ScriptVersion = ") then
 	getgenv().PlaceFileName = PlaceName
 else
 	Notify("Game not found, loading universal.")
-	getgenv().ScriptVersion = "Universal"
-	Code = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua")
+	Code = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/Universal.luau")
 end
 
 getgenv().FrostByteHandleFunction(loadstring(Code))
