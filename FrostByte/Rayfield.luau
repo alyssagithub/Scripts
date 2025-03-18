@@ -1459,6 +1459,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
+	Topbar.Title.RichText = true
 
 	Main.Size = UDim2.new(0, 420, 0, 100)
 	Main.Visible = true
