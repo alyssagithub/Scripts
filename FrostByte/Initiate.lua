@@ -17,9 +17,9 @@ getgenv().PlaceName = PlaceName
 PlaceName = PlaceName:gsub("%b[]", "")
 PlaceName = PlaceName:gsub("[^%a]", "")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Analytics.luau"))()
 
-local Success, Code: string = pcall(game.HttpGet, game, `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.lua`)
+local Success, Code: string = pcall(game.HttpGet, game, `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceName}.luau`)
 
 if Success and Code:find("ScriptVersion = ") then
 	Notify("Game found, the script is loading.")
