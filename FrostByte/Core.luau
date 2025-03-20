@@ -129,7 +129,7 @@ task.spawn(function()
 		local Button1 = "✅ Yes" 
 		local Button2 = "❌ No"
 
-		local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.lua`
+		local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.luau`
 
 		BindableFunction.OnInvoke = function(Button: string)
 			Response = true
