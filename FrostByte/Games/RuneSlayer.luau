@@ -16,11 +16,9 @@ getgenv().Changelog = [[
 
 do
 	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))
-	
-	if not Core then
-		return warn("Failed to load the FrostByte Core")
-	end
-	
+
+	assert(Core, "[FrostByte]: Failed to load the FrostByte Core")
+
 	Core()
 end
 
@@ -49,7 +47,6 @@ type Tab = {
 
 -- Variables
 
-local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string?) -> () = getgenv().Notify
 local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> () | boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
@@ -167,9 +164,10 @@ local Tab: Tab = Window:CreateTab("Combat", "swords")
 Tab:CreateSection("Attacking")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("⚔ • Auto Attack", Success),
+	Name = "⚔ • Auto Attack",
 	CurrentValue = false,
 	Flag = "Attack",
+	RequiredValue = Success,
 	Looped = true,
 	Callback = function()
 		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), IsInvalidMob, Flags.Distance.CurrentValue)
@@ -677,9 +675,10 @@ local Tab: Tab = Window:CreateTab("Movement", "keyboard")
 Tab:CreateSection("Sprinting")
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("💨 • Auto Sprint", Success),
+	Name = "💨 • Auto Sprint",
 	CurrentValue = false,
 	Flag = "Sprint",
+	RequiredValue = Success,
 	Looped = true,
 	Callback = function()
 		if not Success then
@@ -799,9 +798,10 @@ Tab:CreateSection("Damage")
 local Original
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🩸 • Remove Fall Damage", Success),
+	Name = "🩸 • Remove Fall Damage",
 	CurrentValue = false,
 	Flag = "FallDamage",
+	RequiredValue = Success,
 	Callback = function(Value)
 		if not Success then
 			return
