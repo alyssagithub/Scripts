@@ -15,7 +15,7 @@ getgenv().Changelog = [[
 ]]
 
 do
-	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))
+	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))
 	
 	if not Core then
 		return warn("Failed to load the FrostByte Core")
@@ -1014,10 +1014,8 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		
 		local NewText = OverheadText:gsub("<NAME>", Model.Name)
 		
-		local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
-		
 		if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-			--local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
+			local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
 			NewText = NewText:gsub("<DISTANCE>", StringFloor(Distance))
 		end
 		
