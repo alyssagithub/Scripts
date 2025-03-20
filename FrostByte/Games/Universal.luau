@@ -8,7 +8,7 @@ Thank you for using FrostByte!
 ]]
 
 do
-	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))
+	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))
 
 	if not Core then
 		return warn("Failed to load the FrostByte Core")
