@@ -4,7 +4,7 @@ getgenv().ScriptVersion = "ThemeCreator"
 getgenv().PlaceName = "Projects"
 getgenv().PlaceFileName = `Projects-{getgenv().ScriptVersion}`
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))()
 
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> Section,
