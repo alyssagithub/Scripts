@@ -849,6 +849,11 @@ local function SaveConfiguration()
 
 	local Data = {}
 	for i, v in pairs(RayfieldLibrary.Flags) do
+		if typeof(v) ~= "table" then
+			warn(`[Rayfield]: Flag '{i}' is not a table, current type is '{typeof(v)}', it is being removed.`)
+			RayfieldLibrary.Flags[i] = nil
+		end
+		
 		if v.Type == "ColorPicker" then
 			Data[i] = PackColor(v.Color)
 		else
