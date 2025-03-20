@@ -8,7 +8,7 @@ getgenv().Changelog = [[
 - 🧱 Made teleport below ores have a fixed position instead of increasing based on ore size
 ]]
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))()
 
 local firetouchinterest: (Part1: BasePart, Part2: BasePart, Ended: number) -> () = getfenv().firetouchinterest
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
