@@ -1,4 +1,11 @@
 --!strict
+local getgenv: () -> ({[string]: any}) = getfenv().getgenv
+
+if not getgenv().ScriptVersion then
+	getgenv().ScriptVersion = "Dev Mode"
+end
+
+local ScriptVersion = getgenv().ScriptVersion
 
 local StartLoadTime = tick()
 
@@ -8,15 +15,12 @@ local StarterGui = game:GetService("StarterGui")
 
 local Player = Players.LocalPlayer
 
-local getgenv: () -> ({[string]: any}) = getfenv().getgenv
-
 if getgenv().CoreTesting then
 	print("Loading Core Testing")
+	
 	local Core = loadstring(getgenv().CoreTesting)
 
-	if not Core then
-		return warn("Failed to load the FrostByte Core")
-	end
+	assert(Core, "[FrostByte]: Failed to load the FrostByte Core")
 
 	return Core()
 end
@@ -32,16 +36,6 @@ local setfpscap: (FPS: number) -> () = getfenv().setfpscap
 local isrbxactive: () -> (boolean) = getfenv().isrbxactive
 local setclipboard: (Text: string) -> () = getfenv().setclipboard
 local firesignal: (RBXScriptSignal) -> () = getfenv().firesignal
-
-if not getgenv().ScriptVersion then
-	getgenv().ScriptVersion = "Dev Mode"
-end
-
-local ScriptVersion = getgenv().ScriptVersion
-
-getgenv().gethui = function()
-	return game:GetService("CoreGui")
-end
 
 getgenv().FrostByteConnections = getgenv().FrostByteConnections or {}
 
@@ -179,35 +173,20 @@ if getgenv().Flags then
 	end
 end
 
-if getgenv().Rayfield then
-	getgenv().Rayfield:Destroy()
-end
-
 local Rayfield
 
 if getgenv().RayfieldTesting then
-	local Temp = loadstring(getgenv().RayfieldTesting)
-	
-	if not Temp then
-		return warn("Failed to load rayfield testing.")
-	end
-	
-	Rayfield = Temp()
 	print("Running Rayfield Testing")
+	Rayfield = getgenv().RayfieldTesting
 else
-	repeat
-		pcall(function()
-			local Temp = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau"))
-			
-			if not Temp then
-				return warn("Failed to load rayfield.")
-			end
-
-			Rayfield = Temp()
-		end)
-		task.wait()
-	until Rayfield
+	Rayfield = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau")
 end
+
+Rayfield = loadstring(Rayfield)
+
+assert(Rayfield, "[FrostByte]: Failed to load rayfield")
+
+Rayfield = Rayfield()
 
 getgenv().Initiated = nil
 
@@ -380,7 +359,7 @@ end), "WalkSpeedCharacterAdded")
 
 local Connections = {}
 
-local OriginalText = {}
+local OriginalText: {[TextLabel]: string} = {}
 
 local function HandleUsernameChange(Object)
 	if not Flags.HideIdentity.CurrentValue then
