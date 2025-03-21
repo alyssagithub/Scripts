@@ -338,9 +338,13 @@ local function SetSpeed()
 	if not Humanoid then
 		return
 	end
-
-	Humanoid.WalkSpeed = if Flags.ChangeSpeed.CurrentValue then Flags.Speed.CurrentValue else StarterPlayer.CharacterWalkSpeed
-
+	
+	if Flags.ChangeSpeed.CurrentValue then
+		Humanoid.WalkSpeed = Flags.Speed.CurrentValue
+	elseif ConnectedHumanoid then
+		Humanoid.WalkSpeed = StarterPlayer.CharacterWalkSpeed
+	end
+	
 	if not SpeedConnection then
 		SpeedConnection = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(SetSpeed)
 		ConnectedHumanoid = Humanoid
