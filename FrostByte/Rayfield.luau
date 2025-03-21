@@ -533,7 +533,9 @@ local CoreGui = getService("CoreGui")
 
 local Rayfield = game:GetObjects("rbxassetid://10804731440")[1]
 
-assert(typeof(Rayfield) == "Instance", "[Rayfield]: Failed to load the Rayfield object.")
+if typeof(Rayfield) ~= "Instance" then
+	return warn("[Rayfield]: Failed to load the Rayfield object.")
+end
 
 Rayfield:AddTag("RayfieldLibrary")
 
@@ -670,7 +672,9 @@ local Icons
 	
 Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))
 
-assert(Icons, "[Rayfield]: Failed to load icons.")
+if not Icons then
+	return warn("[Rayfield]: Failed to load icons.")
+end
 
 Icons = Icons()
 
@@ -2654,7 +2658,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 						CurrentOption = CurrentOption[1]
 					end
 
-					DropdownSettings.Callback(DropdownSettings.CurrentOption)
+					DropdownSettings.Callback(CurrentOption)
 					
 					if DropdownSettings.ResetAfterCallback then
 						DropdownSettings:Set({""})
