@@ -13,7 +13,7 @@ getgenv().Changelog = [[
 🍏 Resources -> Gathering
 	🐸 Gather Mode
 	🪓 Chop Any Resource
-:pick: Resources -> Selling -> Sell Gear
+⛏ Resources -> Selling -> Sell Gear
 ]]
 
 do
