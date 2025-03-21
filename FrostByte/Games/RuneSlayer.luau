@@ -45,6 +45,7 @@ type Tab = {
 	CreateButton: (self: Tab, any) -> Element,
 	CreateLabel: (self: Tab, any, any?) -> Element,
 	CreateParagraph: (self: Tab, any) -> Element,
+	CreateInput: (self: Tab, any) -> Element,
 }
 
 -- Variables
@@ -605,6 +606,9 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Selling")
 
+local SellNotifyCooldown = false
+local Interacted = false
+
 Tab:CreateToggle({
 	Name = "💰 • Sell Resources",
 	CurrentValue = false,
@@ -659,8 +663,38 @@ Tab:CreateToggle({
 			return
 		end
 		
+		local Interact = GetChildInCharacter("Interact")
+		
+		if not Interact then
+			return
+		end
+		
+		local Merchant = workspace:FindFirstChild("JohnTheMerchant", true)
+		
+		if not Merchant and not Interacted then
+			if not SellNotifyCooldown then
+				SellNotifyCooldown = true
+				
+				Notify("Auto Sell", "Couldn't find any merchants to interact with, try getting closer to one.")
+				
+				task.delay(5, function()
+					SellNotifyCooldown = false
+				end)
+			end
+			return
+		end
+		
+		Interact:FireServer({
+			player = Player,
+			Object = Merchant,
+			Action = "NPC"
+		})
+		
+		SellEvent:FireServer(true)
+		
 		DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
-		DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
+		--task.wait(0.5)
+		--DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
 		
 		for _, Tool in SellTools do
 			SellEvent:FireServer(Tool)
@@ -697,13 +731,15 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Crafting")
 
-Tab:CreateDropdown({
+local Dropdown = Tab:CreateDropdown({
 	Name = "🛠 • Craft Item",
 	Options = Items,
 	CurrentOption = "",
 	MultipleOptions = false,
 	ResetAfterCallback = true,
 	Callback = function(CurrentOption: any)
+		CurrentOption = CurrentOption[1]
+		
 		Player.PlayerGui.CraftingGui.LocalScript.RemoteEvent:FireServer({
 			AmountToCraft = Flags.Quantity.CurrentValue,
 			SelectedItem = {
@@ -789,6 +825,8 @@ Tab:CreateDropdown({
 	MultipleOptions = false,
 	ResetAfterCallback = true,
 	Callback = function(CurrentOption: any)
+		CurrentOption = CurrentOption[1]
+		
 		local SelectedArea: Part = WorldAreas[CurrentOption]
 
 		local Success = pcall(function()
@@ -824,6 +862,8 @@ Tab:CreateDropdown({
 	MultipleOptions = false,
 	ResetAfterCallback = true,
 	Callback = function(CurrentOption: any)
+		CurrentOption = CurrentOption[1]
+		
 		local SelectedNPC: Model = workspace.Effects.NPCS:FindFirstChild(CurrentOption)
 
 		TeleportLocalCharacter(SelectedNPC:GetPivot())
