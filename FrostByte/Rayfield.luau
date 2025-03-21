@@ -3021,7 +3021,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 			
 			local function RunToggleCallback()
 				local Success, Response = pcall(function()
-					if debugX then warn('Running toggle \''..ToggleSettings.Name..'\' (Interact)') end
+					if ToggleSettings.RequiredValue == false then
+						return
+					end
 
 					local function RunCallbackFunction(CallbackName: string)
 						if not ToggleSettings[CallbackName] then
@@ -3035,7 +3037,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 						RunCallbackFunction("BeforeLoop")
 
 						while ToggleSettings.CurrentValue and task.wait() do
-							ToggleSettings.Callback()
+							RunCallbackFunction("Callback")
 						end
 
 						RunCallbackFunction("AfterLoop")
