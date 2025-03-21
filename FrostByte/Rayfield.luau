@@ -2654,7 +2654,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 					
 					local CurrentOption = DropdownSettings.CurrentOption
 					
-					if not DropdownSettings.MultipleOptions then
+					if not DropdownSettings.MultipleOptions and CurrentOption[1] then
 						CurrentOption = CurrentOption[1]
 					end
 
