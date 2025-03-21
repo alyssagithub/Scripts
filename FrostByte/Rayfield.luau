@@ -2647,8 +2647,18 @@ function RayfieldLibrary:CreateWindow(Settings)
 					if not DropdownSettings.Callback then
 						return
 					end
+					
+					local CurrentOption = DropdownSettings.CurrentOption
+					
+					if not DropdownSettings.MultipleOptions then
+						CurrentOption = CurrentOption[1]
+					end
 
 					DropdownSettings.Callback(DropdownSettings.CurrentOption)
+					
+					if DropdownSettings.ResetAfterCallback then
+						DropdownSettings:Set({""})
+					end
 				end)
 
 				if not Success then
