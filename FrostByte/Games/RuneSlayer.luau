@@ -1,17 +1,19 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.7"
+getgenv().ScriptVersion = "v0.0.8"
 
 getgenv().Changelog = [[
-		🛠️ Changes & Fixes
-🐺 Auto Attack and Look At Closest Mob will no longer target your tamed pet
-🦌 Move to Mobs will now make you look at the mob you're moving to
-🍎 Removed "(No Tools Required)" from Auto Gather's name
-💨 Auto Sprint will not try to sprint again while you're already sprinting
-🔎 Both ESPs will now update their Distance and Health automatically
-		🎉 What's New?
-💬 Movement -> Transportation -> Teleport to NPC
+			🛠️ Changes & Fixes
+🔨 Made all features (except fall damage) supported by any executor
+:label: Removed "Auto" from any feature names
+📏 Made all Tween speeds slower to avoid being killed by the anticheat
+🔃 Made the default for Delay After Respawn be 5 seconds
+			🎉 What's New?
+🍏 Resources -> Gathering
+	🐸 Gather Mode
+	🪓 Chop Any Resource
+:pick: Resources -> Selling -> Sell Gear
 ]]
 
 do
@@ -52,8 +54,6 @@ local Notify: (Title: string, Content: string, Image: string?) -> () = getgenv()
 local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> () | boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
 local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFeature
 
-local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
-
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -62,7 +62,7 @@ local Flags: Flags = getgenv().Flags
 
 local Player = game:GetService("Players").LocalPlayer
 
-local function GetChildInCharacter(ChildName: string): (RemoteEvent & BasePart & Humanoid)?
+local function GetChildInCharacter(ChildName: string): (RemoteEvent & BasePart & Humanoid & BindableEvent)?
 	local Character = Player.Character
 
 	if not Character then
@@ -130,15 +130,17 @@ local function TeleportLocalCharacter(NewLocation: CFrame)
 end
 
 local function EmulateClick()
-	if not Success then
+	local MouseInput = GetChildInCharacter("MouseInput")
+	
+	if not MouseInput then
 		return
 	end
 	
-	Network.connect("MouseInput", "Fire", Player.Character, {
+	MouseInput:Fire({
 		Config = "Button1Down"
 	})
 	
-	Network.connect("MouseInput", "Fire", Player.Character, {
+	MouseInput:Fire({
 		Config = "Button1Up"
 	})
 end
@@ -164,10 +166,9 @@ local Tab: Tab = Window:CreateTab("Combat", "swords")
 Tab:CreateSection("Attacking")
 
 Tab:CreateToggle({
-	Name = "⚔ • Auto Attack",
+	Name = "⚔ • Attack",
 	CurrentValue = false,
 	Flag = "Attack",
-	RequiredValue = Success,
 	Looped = true,
 	Callback = function()
 		local ClosestMob = GetClosestChild(workspace.Alive:GetChildren(), IsInvalidMob, Flags.Distance.CurrentValue)
@@ -294,7 +295,7 @@ Tab:CreateToggle({
 		if Flags.MobsMethod.CurrentOption[1] == "Teleport" then
 			TeleportLocalCharacter(GoTo)
 		else
-			MobTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Distance / 250, Enum.EasingStyle.Linear), {CFrame = GoTo})
+			MobTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Distance / 50, Enum.EasingStyle.Linear), {CFrame = GoTo})
 			MobTween:Play()
 			MobTween.Completed:Wait()
 			MobTween = nil
@@ -351,16 +352,20 @@ local Tab: Tab = Window:CreateTab("Resources", "apple")
 Tab:CreateSection("Gathering")
 
 Tab:CreateToggle({
-	Name = "🍎 • Auto Gather",
+	Name = "🍎 • Gather",
 	CurrentValue = false,
 	Flag = "Gather",
 	Looped = true,
 	Callback = function()
-		if not Success then
-			return
+		local Collection
+		
+		if Flags.GatherMode.CurrentOption[1] == "Harvestables" then
+			Collection = workspace.Harvestable:GetChildren()
+		else
+			Collection = workspace.Alive:GetChildren()
 		end
-
-		local Closest = GetClosestChild(workspace.Harvestable:GetChildren(), function(Child)
+		
+		local Closest = GetClosestChild(Collection, function(Child)
 			if Child == Player.Character then
 				return true
 			end
@@ -368,7 +373,7 @@ Tab:CreateToggle({
 			if Child:GetAttribute("SetRespawn") then
 				return true
 			end
-		end)
+		end, 50)
 
 		if not Closest then
 			return
@@ -388,16 +393,22 @@ Tab:CreateToggle({
 	end,
 })
 
+Tab:CreateDropdown({
+	Name = "🐸 • Gather Mode",
+	Options = {"Harvestables", "Mobs"},
+	CurrentOption = "Harvestables",
+	MultipleOptions = false,
+	Flag = "GatherMode",
+})
+
+Tab:CreateDivider()
+
 Tab:CreateToggle({
-	Name = "🥚 • Auto Pick Up Items",
+	Name = "🥚 • Pick Up Items",
 	CurrentValue = false,
 	Flag = "PickUp",
 	Looped = true,
 	Callback = function()
-		if not Success then
-			return
-		end
-
 		for _, Item: Model in workspace.Effects:GetChildren() do
 			if not Item:FindFirstChild("InteractPrompt") then
 				continue
@@ -415,6 +426,34 @@ Tab:CreateToggle({
 				Action = "Pick Up"
 			})
 		end
+	end,
+})
+
+Tab:CreateDivider()
+
+Tab:CreateToggle({
+	Name = "🪓 • Chop Any Resource",
+	CurrentValue = false,
+	Flag = "Chop",
+	Looped = true,
+	Callback = function()
+		local Interact = GetChildInCharacter("Interact")
+		
+		if not Interact then
+			return
+		end
+		
+		local Closest = GetClosestChild(workspace.Harvestable:GetChildren())
+		
+		if not Closest then
+			return
+		end
+		
+		Interact:FireServer({
+			player = Player,
+			Object = Closest,
+			Action = "Chop"
+		})
 	end,
 })
 
@@ -516,7 +555,7 @@ Tab:CreateToggle({
 		if Flags.HarvestablesMethod.CurrentOption[1] == "Teleport" then
 			TeleportLocalCharacter(GoTo)
 		else
-			ResourceTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Distance / 250, Enum.EasingStyle.Linear), {CFrame = GoTo})
+			ResourceTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Distance / 50, Enum.EasingStyle.Linear), {CFrame = GoTo})
 			ResourceTween:Play()
 			ResourceTween.Completed:Wait()
 			ResourceTween = nil
@@ -544,10 +583,7 @@ Tab:CreateDropdown({
 	Flag = "Harvestables",
 })
 
-Tab:CreateDivider()
-
-local Dropdown
-Dropdown = Tab:CreateDropdown({
+Tab:CreateDropdown({
 	Name = "🌾 • Movement Method",
 	Options = {"Teleport", "Tween"},
 	CurrentOption = "Teleport",
@@ -571,20 +607,18 @@ Tab:CreateToggle({
 Tab:CreateSection("Selling")
 
 Tab:CreateToggle({
-	Name = "💰 • Auto Sell Resources",
+	Name = "💰 • Sell Resources",
 	CurrentValue = false,
 	Flag = "Sell",
 	Looped = true,
 	Callback = function()
-		if not Success then
-			return
-		end
-		
 		local Backpack: Backpack = Player:FindFirstChild("Backpack")
 		
 		if not Backpack then
 			return
 		end
+		
+		local SellTools = {}
 
 		for _, Tool in Backpack:GetChildren() do
 			if not Tool:IsA("Tool") then
@@ -602,17 +636,40 @@ Tab:CreateToggle({
 			if not Tool:GetAttribute("Rarity") then
 				continue
 			end
-
-			local SellEvent = GetChildInCharacter("SellEvent")
-
-			if not SellEvent then
+			
+			if not Flags.SellGear.CurrentValue and Tool:GetAttribute("Category") == "Gear" then
 				continue
 			end
+			
+			table.insert(SellTools, Tool)
+		end
+		
+		if not SellTools[1] then
+			return
+		end
+		
+		local SellEvent = GetChildInCharacter("SellEvent")
 
+		if not SellEvent then
+			return
+		end
+		
+		local DialogueEvent = GetChildInCharacter("DialogueEvent")
+		
+		if not DialogueEvent then
+			return
+		end
+		
+		DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
+		DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
+		
+		for _, Tool in SellTools do
 			SellEvent:FireServer(Tool)
 		end
 	end,
 })
+
+
 
 local Items = {}
 
@@ -631,6 +688,12 @@ Tab:CreateDropdown({
 	Options = Items,
 	MultipleOptions = true,
 	Flag = "Blacklist",
+})
+
+Tab:CreateToggle({
+	Name = "⛏ • Sell Gear",
+	CurrentValue = false,
+	Flag = "SellGear",
 })
 
 Tab:CreateSection("Crafting")
@@ -675,16 +738,11 @@ local Tab: Tab = Window:CreateTab("Movement", "keyboard")
 Tab:CreateSection("Sprinting")
 
 Tab:CreateToggle({
-	Name = "💨 • Auto Sprint",
+	Name = "💨 • Always Sprint",
 	CurrentValue = false,
 	Flag = "Sprint",
-	RequiredValue = Success,
 	Looped = true,
 	Callback = function()
-		if not Success then
-			return
-		end
-
 		local Character = Player.Character
 
 		if not Character then
@@ -704,8 +762,14 @@ Tab:CreateToggle({
 		if Character:FindFirstChild("ServerRun") then
 			return
 		end
-
-		Network.connect("Sprint", "Fire", Character, true)
+		
+		local Sprint = GetChildInCharacter("Sprint")
+		
+		if not Sprint then
+			return
+		end
+		
+		Sprint:Fire(true)
 	end,
 })
 
@@ -795,6 +859,7 @@ local Tab: Tab = Window:CreateTab("Safety", "shield")
 
 Tab:CreateSection("Damage")
 
+local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 local Original
 
 Tab:CreateToggle({
@@ -803,10 +868,6 @@ Tab:CreateToggle({
 	Flag = "FallDamage",
 	RequiredValue = Success,
 	Callback = function(Value)
-		if not Success then
-			return
-		end
-
 		if Value then
 			Original = Network.connect
 			Network.connect = function(RemoteName, Method, Character, Settings, ...)
@@ -853,10 +914,6 @@ Tab:CreateSection("Healing")
 Tab:CreateButton({
 	Name = "💤 • Quick Sleep Anywhere (Heal)",
 	Callback = function()
-		if not Success then
-			return
-		end
-
 		local Bed = workspace.Map:FindFirstChild("Bed", true)
 
 		if not Bed then
@@ -911,7 +968,7 @@ Tab:CreateSlider({
 	Range = {0, 5},
 	Increment = 0.01,
 	Suffix = "Seconds",
-	CurrentValue = 1.5,
+	CurrentValue = 5,
 	Flag = "Delay",
 })
 
