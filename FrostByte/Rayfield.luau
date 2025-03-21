@@ -532,6 +532,11 @@ local CoreGui = getService("CoreGui")
 -- Interface Management
 
 local Rayfield = game:GetObjects("rbxassetid://10804731440")[1]
+
+assert(typeof(Rayfield) == "Instance", "[Rayfield]: Failed to load the Rayfield object.")
+
+Rayfield:AddTag("RayfieldLibrary")
+
 local buildAttempts = 0
 local correctBuild = false
 local warned
@@ -565,14 +570,11 @@ elseif not useStudio then
 	Rayfield.Parent = CoreGui
 end
 
-for _, Interface in ipairs(CoreGui:GetChildren()) do
-	if Interface.Name == Rayfield.Name and Interface ~= Rayfield then
-		--Interface.Enabled = false
-		--Interface.Name = "Rayfield-Old"
+for _, Interface in game:GetService("CollectionService"):GetTagged("RayfieldLibrary") do
+	if Interface ~= Rayfield then
 		Interface:Destroy()
 	end
 end
-
 
 local minSize = Vector2.new(1024, 768)
 local useMobileSizing
