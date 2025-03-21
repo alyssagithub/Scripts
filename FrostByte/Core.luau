@@ -341,8 +341,6 @@ local function SetSpeed()
 	
 	if Flags.ChangeSpeed.CurrentValue then
 		Humanoid.WalkSpeed = Flags.Speed.CurrentValue
-	elseif ConnectedHumanoid then
-		Humanoid.WalkSpeed = StarterPlayer.CharacterWalkSpeed
 	end
 	
 	if not SpeedConnection then
@@ -411,6 +409,21 @@ local Features: FeaturesList = {
 				CurrentValue = false,
 				Flag = "ChangeSpeed",
 				Callback = SetSpeed,
+				AfterLoop = function()
+					local Character = Player.Character
+
+					if not Character then
+						return
+					end
+
+					local Humanoid: Humanoid = Character:FindFirstChild("Humanoid")
+
+					if not Humanoid then
+						return
+					end
+					
+					Humanoid.WalkSpeed = StarterPlayer.CharacterWalkSpeed
+				end,
 			},
 		},
 		{
