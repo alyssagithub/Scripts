@@ -320,8 +320,7 @@ Tab:CreateDropdown({
 
 Tab:CreateDivider()
 
-local Dropdown
-Dropdown = Tab:CreateDropdown({
+Tab:CreateDropdown({
 	Name = "🐻 • Movement Method",
 	Options = {"Teleport", "Tween"},
 	CurrentOption = "Teleport",
@@ -698,19 +697,13 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Crafting")
 
-local Dropdown
-Dropdown = Tab:CreateDropdown({
+Tab:CreateDropdown({
 	Name = "🛠 • Craft Item",
 	Options = Items,
 	CurrentOption = "",
 	MultipleOptions = false,
+	ResetAfterCallback = true,
 	Callback = function(CurrentOption: any)
-		CurrentOption = CurrentOption[1]
-
-		if CurrentOption == "" then
-			return
-		end
-
 		Player.PlayerGui.CraftingGui.LocalScript.RemoteEvent:FireServer({
 			AmountToCraft = Flags.Quantity.CurrentValue,
 			SelectedItem = {
@@ -719,8 +712,6 @@ Dropdown = Tab:CreateDropdown({
 				Name = CurrentOption
 			}
 		})
-
-		Dropdown:Set({""})
 	end,
 })
 
@@ -791,19 +782,13 @@ for _, Object: Part in WorldAreas:GetChildren() do
 	table.insert(Areas, Object.Name)
 end
 
-local Dropdown
-Dropdown = Tab:CreateDropdown({
+Tab:CreateDropdown({
 	Name = "🌄 • Teleport to Area",
 	Options = Areas,
 	CurrentOption = "",
 	MultipleOptions = false,
+	ResetAfterCallback = true,
 	Callback = function(CurrentOption: any)
-		CurrentOption = CurrentOption[1]
-
-		if CurrentOption == "" then
-			return
-		end
-
 		local SelectedArea: Part = WorldAreas[CurrentOption]
 
 		local Success = pcall(function()
@@ -817,8 +802,6 @@ Dropdown = Tab:CreateDropdown({
 
 			TeleportLocalCharacter(GoTo)
 		end)
-		
-		Dropdown:Set({""})
 
 		if not Success then
 			return Notify("Error", "Failed to teleport.")
@@ -834,24 +817,16 @@ end
 
 table.sort(NPCs)
 
-local Dropdown
-Dropdown = Tab:CreateDropdown({
+Tab:CreateDropdown({
 	Name = "💬 • Teleport to NPC",
 	Options = NPCs,
 	CurrentOption = "",
 	MultipleOptions = false,
+	ResetAfterCallback = true,
 	Callback = function(CurrentOption: any)
-		CurrentOption = CurrentOption[1]
-
-		if CurrentOption == "" then
-			return
-		end
-
 		local SelectedNPC: Model = workspace.Effects.NPCS:FindFirstChild(CurrentOption)
 
 		TeleportLocalCharacter(SelectedNPC:GetPivot())
-
-		Dropdown:Set({""})
 	end,
 })
 
