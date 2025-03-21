@@ -2863,12 +2863,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 					Name = "⌨ • Search Option",
 					CurrentValue = "",
 					PlaceholderText = "Option Name Here",
-					RemoveTextAfterFocusLost = false,
+					RemoveTextAfterFocusLost = true,
 					Callback = function(Text)
 						local NewList = {}
 
 						for _, Name: string in OriginalOptions do
-							if Name:sub(1, #Text):lower() ~= Text:lower() then
+							if not Name:lower():find(Text:lower()) then
 								continue
 							end
 
