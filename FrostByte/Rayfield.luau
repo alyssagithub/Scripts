@@ -2596,6 +2596,22 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			Dropdown.Toggle.Rotation = 180
+			
+			local function OpenDropdown()
+				TweenService:Create(Dropdown, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 180)}):Play()
+				Dropdown.List.Visible = true
+				TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 0.7}):Play()
+				TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 0}):Play()	
+				for _, DropdownOpt in ipairs(Dropdown.List:GetChildren()) do
+					if DropdownOpt.ClassName == "Frame" and DropdownOpt.Name ~= "Placeholder" then
+						if DropdownOpt.Name ~= Dropdown.Selected.Text then
+							TweenService:Create(DropdownOpt.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+						end
+						TweenService:Create(DropdownOpt, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+						TweenService:Create(DropdownOpt.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+					end
+				end
+			end
 
 			Dropdown.Interact.MouseButton1Click:Connect(function()
 				TweenService:Create(Dropdown, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
@@ -2620,19 +2636,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 					Dropdown.List.Visible = false
 					Debounce = false
 				else
-					TweenService:Create(Dropdown, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 180)}):Play()
-					Dropdown.List.Visible = true
-					TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 0.7}):Play()
-					TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 0}):Play()	
-					for _, DropdownOpt in ipairs(Dropdown.List:GetChildren()) do
-						if DropdownOpt.ClassName == "Frame" and DropdownOpt.Name ~= "Placeholder" then
-							if DropdownOpt.Name ~= Dropdown.Selected.Text then
-								TweenService:Create(DropdownOpt.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-							end
-							TweenService:Create(DropdownOpt, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-							TweenService:Create(DropdownOpt.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-						end
-					end
+					OpenDropdown()
 				end
 			end)
 
@@ -2790,6 +2794,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 						end)
 					end
 				end
+				
+				if Dropdown.List.Visible then
+					OpenDropdown()
+				end
 			end
 			
 			SetDropdownOptions()
@@ -2847,6 +2855,30 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Dropdown.Toggle.ImageColor3 = SelectedTheme.TextColor
 				TweenService:Create(Dropdown, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
+			
+			local OriginalOptions = DropdownSettings.Options
+			
+			if #OriginalOptions >= 25 then
+				Tab:CreateInput({
+					Name = "⌨ • Search Option",
+					CurrentValue = "",
+					PlaceholderText = "Option Name Here",
+					RemoveTextAfterFocusLost = false,
+					Callback = function(Text)
+						local NewList = {}
+
+						for _, Name: string in OriginalOptions do
+							if Name:sub(1, #Text):lower() ~= Text:lower() then
+								continue
+							end
+
+							table.insert(NewList, Name)
+						end
+
+						DropdownSettings:Refresh(NewList)
+					end,
+				})
+			end
 
 			return DropdownSettings
 		end
