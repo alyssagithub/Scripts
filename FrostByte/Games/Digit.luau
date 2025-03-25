@@ -1,6 +1,6 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.3"
+getgenv().ScriptVersion = "v2.9.3a"
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))()
 
@@ -607,11 +607,7 @@ local Tab: Tab = Window:CreateTab("Storage", "warehouse")
 
 Tab:CreateSection("Depositing")
 
-local OwnsStoreAnywhere = RemoteFunctions.Marketplace:InvokeServer({
-	Command = "OwnsProduct",
-	UserId = Player.UserId,
-	Product = "Store Anywhere"
-})
+local OwnsStoreAnywhere = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, 1016536588)
 
 Tab:CreateToggle({
 	Name = "🏧 • Auto Bank Items",
