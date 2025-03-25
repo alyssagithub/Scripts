@@ -2,6 +2,11 @@ local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
 getgenv().ScriptVersion = "v2.9.3a"
 
+getgenv().Changelog = [[
+			🛠️ Changes & Fixes
+Fixed being unable to load past storage
+]]
+
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))()
 
 local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
