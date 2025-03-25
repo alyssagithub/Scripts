@@ -612,7 +612,11 @@ local Tab: Tab = Window:CreateTab("Storage", "warehouse")
 
 Tab:CreateSection("Depositing")
 
-local OwnsStoreAnywhere = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, 1016536588)
+local Success, OwnsStoreAnywhere = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, Player.UserId, 1016536588)
+
+if not Success then
+	OwnsStoreAnywhere = false
+end
 
 Tab:CreateToggle({
 	Name = "🏧 • Auto Bank Items",
