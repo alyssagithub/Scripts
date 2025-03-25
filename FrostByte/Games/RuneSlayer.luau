@@ -256,6 +256,7 @@ Tab:CreateToggle({
 	CurrentValue = false,
 	Flag = "Equip",
 	Looped = true,
+	RequiredValue = Success,
 	Callback = EquipWeapon,
 })
 
