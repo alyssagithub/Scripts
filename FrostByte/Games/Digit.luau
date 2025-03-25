@@ -1,17 +1,20 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.3a"
+getgenv().ScriptVersion = "v2.9.3b"
 
 getgenv().Changelog = [[
-			🛠️ Changes & Fixes
-Fixed being unable to load past storage
-]]
+🛠️ Changes & Fixes
+v2.9.3b
+- 🏦 Fixed bank withdraw anywhere
+v2.9.3a
+- 📦 Fixed being unable to load past storage]]
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))()
 
 local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
 local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
 local checkcaller: () -> (boolean) = getfenv().checkcaller
+local hookfunction: (FunctionToHook: () -> (), Hook: () -> ()) -> (() -> ()) = getfenv().hookfunction
 
 local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
@@ -716,29 +719,26 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Withdrawing")
 
+local CanRequireModules, OwnsProduct = pcall(require, game:GetService("ReplicatedStorage").Source.Util.Marketplace.OwnsProduct)
 local OpenBankHook
 
 Tab:CreateToggle({
-	Name = ApplyUnsupportedName("🏦 • Bank Withdraw Anywhere", hookmetamethod and getnamecallmethod and checkcaller),
+	Name = "🏦 • Bank Withdraw Anywhere",
 	CurrentValue = false,
 	Flag = "Bank",
+	RequiredValue = CanRequireModules and hookfunction or false,
 	Callback = function(Value)
-		if not (hookmetamethod and getnamecallmethod and checkcaller) then
+		if not Value or OpenBankHook then
 			return
 		end
-
-		if Value and not OpenBankHook then
-			OpenBankHook = hookmetamethod(RemoteFunctions.Marketplace, "__namecall", function(self, ...)
-				local method = getnamecallmethod()
-				local args = {...}
-
-				if not checkcaller() and method == "InvokeServer" and args[1].Command == "OwnsProduct" and args[1].Product == "Store Anywhere" and Flags.Bank.CurrentValue then
-					return true
-				end
-
-				return OpenBankHook(self, ...)
-			end)
-		end
+		
+		OpenBankHook = hookfunction(OwnsProduct, function(ProductName: string, ...)
+			if ProductName == "Store Anywhere" then
+				return true
+			end
+			
+			return OpenBankHook(ProductName, ...)
+		end)
 	end,
 })
 
