@@ -1,19 +1,11 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v0.0.8"
+getgenv().ScriptVersion = "v0.0.9"
 
 getgenv().Changelog = [[
-			🛠️ Changes & Fixes
-🔨 Made all features (except fall damage) supported by any executor
-:label: Removed "Auto" from any feature names
-📏 Made all Tween speeds slower to avoid being killed by the anticheat
-🔃 Made the default for Delay After Respawn be 5 seconds
 			🎉 What's New?
-🍏 Resources -> Gathering
-	🐸 Gather Mode
-	🪓 Chop Any Resource
-⛏ Resources -> Selling -> Sell Gear
+🏹 Combat -> Moving -> Equip Weapon
 ]]
 
 do
@@ -58,6 +50,8 @@ local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFea
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+
+local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 
 local Flags: Flags = getgenv().Flags
 
@@ -231,6 +225,38 @@ Tab:CreateToggle({
 
 		Humanoid.AutoRotate = true
 	end,
+})
+
+Tab:CreateSection("Moving")
+
+local function EquipWeapon()
+	if not Flags.Equip.CurrentValue then
+		return
+	end
+	
+	local Character = Player.Character
+	
+	if not Character then
+		return
+	end
+	
+	local Weapon = Character:FindFirstChild("sword")
+	
+	if Weapon then
+		return
+	end
+	
+	Network.connect("MasterEvent", "FireServer", Character, {
+		Config = "EquipWeapon"
+	})
+end
+
+Tab:CreateToggle({
+	Name = "🏹 • Equip Weapon",
+	CurrentValue = false,
+	Flag = "Equip",
+	Looped = true,
+	Callback = EquipWeapon,
 })
 
 Tab:CreateSection("Configuration")
@@ -874,7 +900,6 @@ local Tab: Tab = Window:CreateTab("Safety", "shield")
 
 Tab:CreateSection("Damage")
 
-local Success, Network = pcall(require, game:GetService("ReplicatedStorage").Modules.Network)
 local Original
 
 Tab:CreateToggle({
