@@ -2421,6 +2421,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Paragraph.UIStroke.Transparency = 1
 			Paragraph.Title.TextTransparency = 1
 			Paragraph.Content.TextTransparency = 1
+			
+			if ParagraphSettings.Changelog then
+				Paragraph.Content.TextXAlignment = Enum.TextXAlignment.Center
+				Paragraph.Title.TextXAlignment = Enum.TextXAlignment.Center
+			end
 
 			Paragraph.BackgroundColor3 = SelectedTheme.SecondaryElementBackground
 			Paragraph.UIStroke.Color = SelectedTheme.SecondaryElementStroke
