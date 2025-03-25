@@ -184,9 +184,11 @@ end
 
 Rayfield = loadstring(Rayfield)
 
-assert(Rayfield, "[FrostByte]: Failed to load rayfield")
+assert(Rayfield, "[FrostByte]: Failed to load rayfield [1]")
 
 Rayfield = Rayfield()
+
+assert(Rayfield, "[FrostByte]: Failed to load rayfield [2]")
 
 getgenv().Initiated = nil
 
