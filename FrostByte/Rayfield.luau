@@ -1,7 +1,3 @@
-if debugX then
-	warn('Initialising Rayfield')
-end
-
 local function getService(name)
 	local service = game:GetService(name)
 	return if cloneref then cloneref(service) else service
@@ -530,12 +526,17 @@ local Players = getService("Players")
 local CoreGui = getService("CoreGui")
 
 -- Interface Management
+local Rayfield
 
-local Rayfield = game:GetObjects("rbxassetid://10804731440")[1]
-
-if typeof(Rayfield) ~= "Instance" then
-	return warn("[Rayfield]: Failed to load the Rayfield object.")
-end
+repeat
+	Rayfield = game:GetObjects("rbxassetid://10804731440")[1]
+	
+	task.wait()
+	
+	if typeof(Rayfield) ~= "Instance" then
+		warn("[Rayfield]: Failed to get the Rayfield object, retrying...")
+	end
+until typeof(Rayfield) == "Instance"
 
 Rayfield:AddTag("RayfieldLibrary")
 
@@ -668,13 +669,17 @@ local function ChangeTheme(Theme)
 	end
 end
 
-local Icons 
-	
-Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))
+local Icons
 
-if not Icons then
-	return warn("[Rayfield]: Failed to load icons.")
-end
+repeat
+	Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))
+	
+	task.wait()
+	
+	if not Icons then
+		warn("[Rayfield]: Failed to load icons, retrying...")
+	end
+until Icons
 
 Icons = Icons()
 
