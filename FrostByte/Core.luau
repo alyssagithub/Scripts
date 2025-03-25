@@ -265,7 +265,7 @@ Tab:CreateLabel("discord.gg/sS3tDP6FSB", "messages-square")
 
 Tab:CreateSection("Changelog")
 
-Tab:CreateParagraph({Title = `{PlaceName} {ScriptVersion}`, Content = getgenv().Changelog or "Changelog Not Found"})
+Tab:CreateParagraph({Title = `{PlaceName} {ScriptVersion}`, Content = getgenv().Changelog or "Changelog Not Found", Changelog = true})
 
 Tab:CreateSection("Performance")
 
