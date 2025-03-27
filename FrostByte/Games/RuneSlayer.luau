@@ -161,7 +161,7 @@ local Tab: Tab = Window:CreateTab("Combat", "swords")
 Tab:CreateSection("Attacking")
 
 Tab:CreateToggle({
-	Name = "⚔ • Attack",
+	Name = "⚔️ • Attack",
 	CurrentValue = false,
 	Flag = "Attack",
 	Looped = true,
@@ -619,7 +619,7 @@ Tab:CreateDropdown({
 })
 
 Tab:CreateToggle({
-	Name = "🛡 • Safety Mode",
+	Name = "🛡️ • Safety Mode",
 	CurrentValue = false,
 	Flag = "SafetyMode",
 	Callback = function(Value)
@@ -720,16 +720,12 @@ Tab:CreateToggle({
 		SellEvent:FireServer(true)
 		
 		DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
-		--task.wait(0.5)
-		--DialogueEvent:FireServer("Yes, I do have things to sell.", "Vendor")
 		
 		for _, Tool in SellTools do
 			SellEvent:FireServer(Tool)
 		end
 	end,
 })
-
-
 
 local Items = {}
 
@@ -751,7 +747,7 @@ Tab:CreateDropdown({
 })
 
 Tab:CreateToggle({
-	Name = "⛏ • Sell Gear",
+	Name = "⛏️ • Sell Gear",
 	CurrentValue = false,
 	Flag = "SellGear",
 })
@@ -759,7 +755,7 @@ Tab:CreateToggle({
 Tab:CreateSection("Crafting")
 
 local Dropdown = Tab:CreateDropdown({
-	Name = "🛠 • Craft Item",
+	Name = "🛠️ • Craft Item",
 	Options = Items,
 	CurrentOption = "",
 	MultipleOptions = false,
@@ -1098,15 +1094,10 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 			return
 		end
 		
-		local ModelHumanoid = Model and Model:FindFirstChild("Humanoid") :: Humanoid
+		local ModelHumanoid = Model:FindFirstChild("Humanoid") :: Humanoid
 
-		if not Model or not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) then
+		if not Model.Parent or (ModelHumanoid and ModelHumanoid.Health == 0) then
 			Holder:Destroy()
-			return
-		end
-		
-		if not Holder.Parent then
-			RenderSteppedConnection:Disconnect()
 			return
 		end
 		
@@ -1124,6 +1115,10 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		end
 		
 		TextLabel.Text = NewText
+	end)
+	
+	Holder.Destroying:Once(function()
+		RenderSteppedConnection:Disconnect()
 	end)
 end
 
