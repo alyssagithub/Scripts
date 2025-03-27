@@ -9,7 +9,7 @@ getgenv().Changelog = [[
 ]]
 
 do
-	local Core = loadstring(game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Core.luau"))
+	local Core = loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Core.luau"))
 
 	assert(Core, "[FrostByte]: Failed to load the FrostByte Core")
 
