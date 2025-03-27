@@ -123,13 +123,15 @@ task.spawn(function()
 		local Button1 = "✅ Yes" 
 		local Button2 = "❌ No"
 
-		local File = `https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Games/{PlaceFileName}.luau`
+		local File = `https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Games/{PlaceFileName}.luau`
+		
+		local Result
 
 		BindableFunction.OnInvoke = function(Button: string)
 			Response = true
 
 			if Button == Button1 then
-				local Temp = loadstring(game:HttpGet(File))
+				local Temp = loadstring(Result)
 
 				if not Temp then
 					return warn("Failed to load the script for the current game.")
@@ -140,7 +142,7 @@ task.spawn(function()
 		end
 
 		while task.wait(60) do
-			local Result = game:HttpGet(File)
+			Result = game:HttpGet(File)
 
 			if not Result then
 				continue
@@ -179,7 +181,7 @@ if getgenv().RayfieldTesting then
 	print("Running Rayfield Testing")
 	Rayfield = getgenv().RayfieldTesting
 else
-	Rayfield = game:HttpGet("https://raw.githubusercontent.com/alyssagithub/Scripts/refs/heads/main/FrostByte/Rayfield.luau")
+	Rayfield = game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Rayfield.luau")
 end
 
 Rayfield = loadstring(Rayfield)
