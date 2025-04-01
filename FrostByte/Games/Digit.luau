@@ -1,9 +1,10 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.3b"
+getgenv().ScriptVersion = "v2.9.3c"
 
 getgenv().Changelog = [[
-🛠️ Changes & Fixes
+v2.9.3c
+- 🌥 Changed up Lunar Clouds teleport since they removed the spawn point
 v2.9.3b
 - 🏦 Fixed bank withdraw anywhere
 v2.9.3a
@@ -73,6 +74,38 @@ local function ReEquipTool(Tool: Tool)
 
 	Humanoid:UnequipTools()
 	pcall(Humanoid.EquipTool, Humanoid, Tool)
+end
+
+local function GetIslandTeleport(IslandName: string)
+	local Island: Folder = workspace.Map.Islands:FindFirstChild(IslandName)
+
+	if not Island then
+		return Notify("Error", "That island doesn't currently exist.")
+	end
+	
+	local SetCFrames = {
+		Badlands = CFrame.new(1085, 9, 334),
+		["Ancient Trial"] = CFrame.new(3766, -414, -453),
+		["Gorgon Maze"] = CFrame.new(1713, -454, 1176),
+		["Devil’s Pit"] = CFrame.new(3759, -421, -371),
+		["The Evil Hall"] = CFrame.new(1820, -471, 1373),
+		["The Oasis"] = CFrame.new(3765, -466, -745),
+		["Thunder Cave"] = CFrame.new(1973, -471, 1444)
+	}
+
+	local TeleportLocation
+
+	if Island:FindFirstChild("LocationSpawn") then
+		TeleportLocation = Island.LocationSpawn.CFrame
+	elseif Island:FindFirstChild("SpawnPoint") then
+		TeleportLocation = Island.SpawnPoint.CFrame
+	elseif SetCFrames[IslandName] then
+		TeleportLocation = SetCFrames[IslandName]
+	else
+		TeleportLocation = Island:GetAttribute("Pivot")
+	end
+	
+	return TeleportLocation
 end
 
 HandleConnection(game:GetService("ScriptContext").Error:Connect(function(Message, StackTrace, CallingScript)
@@ -1492,7 +1525,7 @@ local function LunarCloudsTeleport(Lunar: Model)
 
 	PreviousLocation = Character:GetPivot()
 	
-	Character:PivotTo(Lunar.SpawnPoint.CFrame)
+	Character:PivotTo(GetIslandTeleport(Lunar.Name))
 end
 
 Tab:CreateToggle({
@@ -1554,38 +1587,8 @@ TeleportToIsland = Tab:CreateDropdown({
 		if CurrentOption == "" then
 			return
 		end
-
-		local Island: Folder = workspace.Map.Islands:FindFirstChild(CurrentOption)
-
-		if not Island then
-			return Notify("Error", "That island doesn't currently exist.")
-		end
 		
-		local TeleportLocation
-
-		if Island:FindFirstChild("LocationSpawn") then
-			TeleportLocation = Island.LocationSpawn.CFrame
-		elseif Island:FindFirstChild("SpawnPoint") then
-			TeleportLocation = Island.SpawnPoint.CFrame
-		elseif CurrentOption == "Badlands" then
-			TeleportLocation = CFrame.new(1085, 9, 334)
-		elseif CurrentOption == "Ancient Trial" then
-			TeleportLocation = CFrame.new(3766, -414, -453)
-		elseif CurrentOption == "Gorgon Maze" then
-			TeleportLocation = CFrame.new(1713, -454, 1176)
-		elseif CurrentOption == "Devil’s Pit" then
-			TeleportLocation = CFrame.new(3759, -421, -371)
-		elseif CurrentOption == "The Evil Hall" then
-			TeleportLocation = CFrame.new(1820, -471, 1373)
-		elseif CurrentOption == "The Oasis" then
-			TeleportLocation = CFrame.new(3765, -466, -745)
-		elseif CurrentOption == "Thunder Cave" then
-			TeleportLocation = CFrame.new(1973, -471, 1444)
-		else
-			TeleportLocation = Island:GetAttribute("Pivot")
-		end
-		
-		Player.Character:PivotTo(TeleportLocation)
+		Player.Character:PivotTo(GetIslandTeleport(CurrentOption))
 		
 		TeleportToIsland:Set({""})
 	end,
