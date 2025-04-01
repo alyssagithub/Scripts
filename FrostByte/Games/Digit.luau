@@ -1525,7 +1525,13 @@ local function LunarCloudsTeleport(Lunar: Model)
 
 	PreviousLocation = Character:GetPivot()
 	
-	Character:PivotTo(GetIslandTeleport(Lunar.Name))
+	local TeleportLocation = GetIslandTeleport(Lunar.Name)
+	
+	if not TeleportLocation then
+		return
+	end
+	
+	Character:PivotTo(TeleportLocation)
 end
 
 Tab:CreateToggle({
@@ -1588,7 +1594,13 @@ TeleportToIsland = Tab:CreateDropdown({
 			return
 		end
 		
-		Player.Character:PivotTo(GetIslandTeleport(CurrentOption))
+		local TeleportLocation = GetIslandTeleport(CurrentOption)
+		
+		if not TeleportLocation then
+			return
+		end
+		
+		Player.Character:PivotTo(TeleportLocation)
 		
 		TeleportToIsland:Set({""})
 	end,
