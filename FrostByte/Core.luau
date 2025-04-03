@@ -19,8 +19,10 @@ if getgenv().CoreTesting then
 	print("Loading Core Testing")
 	
 	local Core = loadstring(getgenv().CoreTesting)
-
-	assert(Core, "[FrostByte]: Failed to load the FrostByte Core")
+	
+	if not Core then
+		return warn("[FrostByte]: Failed to load the Core Testing")
+	end
 
 	return Core()
 end
@@ -191,13 +193,19 @@ else
 	Rayfield = game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Rayfield.luau")
 end
 
-Rayfield = loadstring(Rayfield)
-
-assert(Rayfield, "[FrostByte]: Failed to load rayfield [1]")
-
-Rayfield = Rayfield()
-
-assert(Rayfield, "[FrostByte]: Failed to load rayfield [2]")
+repeat
+	Rayfield = loadstring(Rayfield)
+	
+	if Rayfield then
+		Rayfield = Rayfield()
+	end
+	
+	if not Rayfield then
+		warn("[FrostByte]: Failed to load Rayfield, retrying")
+	end
+	
+	task.wait()
+until Rayfield
 
 getgenv().Initiated = nil
 
