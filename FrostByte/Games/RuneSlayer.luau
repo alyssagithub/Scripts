@@ -9,11 +9,17 @@ getgenv().Changelog = [[
 ]]
 
 do
-	local Core = loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Core.luau"))
-
-	assert(Core, "[FrostByte]: Failed to load the FrostByte Core")
-
-	Core()
+	repeat
+		local Core = loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Core.luau"))
+		
+		if Core then
+			Core()
+		else
+			warn("[FrostByte]: Failed to load the Core, retrying")
+		end
+		
+		task.wait()
+	until Core
 end
 
 -- Types
@@ -44,7 +50,7 @@ type Tab = {
 
 local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
 local Notify: (Title: string, Content: string, Image: string?) -> () = getgenv().Notify
-local GetClosestChild: (Children: {PVInstance}, Callback: ((Child: PVInstance) -> () | boolean)?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
+local GetClosestChild: (Children: {PVInstance}, (Child: PVInstance) -> ()?, MaxDistance: number?) -> PVInstance? = getgenv().GetClosestChild
 local CreateFeature: (Tab: Tab, FeatureName: string) -> () = getgenv().CreateFeature
 
 local TweenService = game:GetService("TweenService")
