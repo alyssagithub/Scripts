@@ -27,4 +27,4 @@ else
 	Code = game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Games/Universal.luau")
 end
 
-getgenv().FrostByteHandleFunction(loadstring(Code))
+getgenv().FrostByteHandleFunction(loadstring(Code), "Game")
