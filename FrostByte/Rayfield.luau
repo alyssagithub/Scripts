@@ -101,37 +101,6 @@ if debugX then
 	warn('Settings Loaded')
 end
 
-if not requestsDisabled then
-	if debugX then
-		warn('Querying Settings for Reporter Information')
-	end
-	local function sendReport()
-		if useStudio then
-			print('Sending Analytics')
-		else
-			if debugX then warn('Reporting Analytics') end
-			task.spawn(function()
-				local success, reporter = pcall(function()
-					return loadstring(game:HttpGet("https://analytics.sirius.menu/v1/reporter", true))()
-				end)
-				if success and reporter then
-					pcall(function()
-						reporter.report("Rayfield", Release, InterfaceBuild)
-					end)
-				else
-					warn("Failed to load or execute the reporter. \nPlease notify Rayfield developers at sirius.menu/discord.")
-				end
-			end)
-			if debugX then warn('Finished Report') end
-		end
-	end
-	if cachedSettings and (#cachedSettings == 0 or (cachedSettings.System and cachedSettings.System.usageAnalytics and cachedSettings.System.usageAnalytics.Value)) then
-		sendReport()
-	elseif not cachedSettings then
-		sendReport()
-	end
-end
-
 if debugX then
 	warn('Moving on to continue initialisation')
 end
@@ -529,7 +498,12 @@ local CoreGui = getService("CoreGui")
 local Rayfield
 
 repeat
-	Rayfield = game:GetObjects("rbxassetid://10804731440")[1]
+	local Success
+	Success, Rayfield = pcall(game.GetObjects, game, "rbxassetid://10804731440")
+	
+	if Success and Rayfield then
+		Rayfield = Rayfield[1]
+	end
 	
 	task.wait()
 	
@@ -969,8 +943,13 @@ function RayfieldLibrary:Notify(data) -- action e.g open messages
 
 		local waitDuration = math.min(math.max((#newNotification.Description.Text * 0.1) + 2.5, 3), 10)
 		task.wait(data.Duration or waitDuration)
-
+		
+		if not newNotification.Parent or not Notifications:FindFirstChild("UIListLayout") then
+			return
+		end
+		
 		newNotification.Icon.Visible = false
+		
 		TweenService:Create(newNotification, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 		TweenService:Create(newNotification.UIStroke, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 		TweenService:Create(newNotification.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
@@ -2370,6 +2349,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 			TweenService:Create(Label.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = Color and 0.2 or 0}):Play()	
 
 			function LabelValue:Set(NewLabel, Icon, Color)
+				if not Label:FindFirstChild("Title") then
+					return
+				end
+				
 				Label.Title.Text = NewLabel
 
 				if Color then
