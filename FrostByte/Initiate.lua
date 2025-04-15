@@ -32,8 +32,8 @@ local function GetCode(PlaceName)
 	return Code
 end
 
-loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Analytics.luau"))()
-
 local Code = GetCode(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
+
+loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Analytics.luau"))()
 
 getgenv().FrostByteHandleFunction(loadstring(Code), "Game")
