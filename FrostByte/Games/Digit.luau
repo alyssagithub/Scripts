@@ -144,10 +144,12 @@ Tab:CreateToggle({
 				continue
 			end
 			
-			RemoteFunctions.Digging:InvokeServer({
-				Command = "DigPile",
-				TargetPileIndex = Adornee:GetAttribute("PileIndex")
-			})
+			pcall(function()
+				RemoteFunctions.Digging:InvokeServer({
+					Command = "DigPile",
+					TargetPileIndex = Adornee:GetAttribute("PileIndex")
+				})
+			end)
 		end
 	end,
 })
