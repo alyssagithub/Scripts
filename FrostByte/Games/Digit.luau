@@ -1249,6 +1249,11 @@ EnchantShovel = Tab:CreateToggle({
 				local Equipment = RemoteFunctions.Player:InvokeServer({
 					Command = "GetEquipment"
 				})
+				
+				if not Equipment then
+					print("Failed to GetEquipment in Auto Enchant")
+					continue
+				end
 
 				for Name, Info in Equipment.Shovels do
 					if Name ~= Shovel.Name then
