@@ -1,10 +1,10 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "BETA"
+getgenv().ScriptVersion = "ESP"
 
 getgenv().Changelog = [[
-aun is a femboy
+only making this have an esp bc im lazy
 ]]
 
 do
@@ -73,7 +73,7 @@ local function StringFloor(Number): string
 	return tostring(math.floor(Number))
 end
 
-local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
+local function ESPModel(Model: Model, FlagName: string, ColorCallback: ((Model: Model) -> Color3)?, OverheadTextCallback: (Model: Model) -> string)
 	local FolderName = `{Model.Name}_{FlagName}`
 
 	if not Flags[FlagName].CurrentValue then
@@ -112,7 +112,7 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 		BoxHandleAdornment.ZIndex = 10
 		BoxHandleAdornment.Size = if Object:IsA("BasePart") then Object.Size else Object:GetExtentsSize()
 		BoxHandleAdornment.Transparency = 0.5
-		BoxHandleAdornment.Color3 = if Players:GetPlayerFromCharacter(Model) then BrickColor.new("Lapis").Color else BrickColor.new("Bright red").Color
+		BoxHandleAdornment.Color3 = if ColorCallback then ColorCallback(Model) else Color3.fromRGB(255, 255, 255)
 		BoxHandleAdornment.Parent = Holder
 	end
 
@@ -151,20 +151,7 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 			return
 		end
 
-		local NewText = OverheadText:gsub("<NAME>", Model.Name)
-
-		if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-			local Distance = math.floor((Model:GetPivot().Position - Player.Character:GetPivot().Position).Magnitude)
-			NewText = NewText:gsub("<DISTANCE>", StringFloor(Distance))
-		end
-
-		if ModelHumanoid then
-			NewText = NewText:gsub("<HEALTH>", StringFloor(ModelHumanoid.Health))
-			NewText = NewText:gsub("<MAXHEALTH>", StringFloor(ModelHumanoid.MaxHealth))
-			NewText = NewText:gsub("<HEALTHPERCENTAGE>", StringFloor(ModelHumanoid.Health / ModelHumanoid.MaxHealth * 100))
-		end
-
-		TextLabel.Text = NewText
+		TextLabel.Text = OverheadTextCallback(Model)
 	end)
 
 	Holder.Destroying:Once(function()
@@ -172,29 +159,32 @@ local function ESPModel(Model: Model, FlagName: string, OverheadText: string)
 	end)
 end
 
-local PlayerText = "Player: <NAME> | Health: <HEALTH>/<MAXHEALTH> (<HEALTHPERCENTAGE>%) | Distance: <DISTANCE>"
+local function PlayerESP()
+	for _, Target: Model in workspace:GetChildren() do
+		if not Target:GetAttribute("LivesLeft") then
+			continue
+		end
 
-local function PlayerESP(Target: Model)
-	if not Target:GetAttribute("LivesLeft") then
-		return
+		if Target.Name == Player.Name then
+			continue
+		end
+		
+		ESPModel(Target, "PlayerESP", 
+			function(Model)
+				return if Players:GetPlayerFromCharacter(Model) then BrickColor.new("Lapis").Color else BrickColor.new("Bright red").Color
+			end, 
+			function(Model)
+				return `Player: {Model.Name} | Lives: {Model:GetAttribute("LivesLeft")}`
+			end
+		)
 	end
-	
-	if Target.Name == Player.Name then
-		return
-	end
-
-	ESPModel(Target, "PlayerESP", PlayerText)
 end
 
 Tab:CreateToggle({
 	Name = "🧍‍ • Player ESP",
 	CurrentValue = false,
 	Flag = "PlayerESP",
-	Callback = function(Value)
-		for _, Target in workspace:GetChildren() do
-			PlayerESP(Target)
-		end
-	end,
+	Callback = PlayerESP,
 })
 
 HandleConnection(workspace.ChildAdded:Connect(PlayerESP), "PlayerESP")
