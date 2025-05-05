@@ -4,10 +4,9 @@ local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 getgenv().ScriptVersion = "0.0.1"
 
 getgenv().Changelog = [[
-released
-
-
-YXVuIGlzIGEgZmVtYm95CmkgbG92ZSBhdW4=]]
+🛠️ Changes
+🐟 Renamed "Drop Fish" to "Drop Baby Fish"
+🐠 Made Drop Baby Fish and Drop Food automatically equip the items before dropping.]]
 
 do
 	repeat
