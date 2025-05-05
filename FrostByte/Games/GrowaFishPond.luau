@@ -1,7 +1,7 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "0.0.0"
+getgenv().ScriptVersion = "0.0.1"
 
 getgenv().Changelog = [[
 released
@@ -92,12 +92,56 @@ Tab:CreateToggle({
 
 Tab:CreateSection("Dropping")
 
+local function GetItemInInventory(FilterName: string)
+	local IDs = {}
+	
+	for _,v: Frame in Player.PlayerGui.ScreenGui.HUD.Hotbar.Hotbar:GetChildren() do
+		local Item = v:GetAttribute("Item")
+		
+		local ItemLabel = v:FindFirstChild("Item") :: TextLabel
+		
+		if not Item or not ItemLabel.Text:find(FilterName) then
+			continue
+		end
+		
+		table.insert(IDs, Item)
+	end
+	
+	for _, v: Frame in Player.PlayerGui.ScreenGui.HUD.Inventory.Scroll:GetChildren() do
+		if not v:IsA("Frame") then
+			continue
+		end
+		
+		local Item = v:FindFirstChild("Template"):FindFirstChild("Item") :: TextLabel
+		
+		if not Item.Text:find(FilterName) then
+			continue
+		end
+		
+		table.insert(IDs, v.Name)
+	end
+	
+	return IDs
+end
+
 Tab:CreateToggle({
-	Name = "🐟 • Drop Fish",
+	Name = "🐟 • Drop Baby Fish",
 	CurrentValue = false,
 	Flag = "DropFish",
 	Looped = true,
 	Callback = function()
+		local Id = GetItemInInventory("Baby")[1]
+		
+		if not Id then
+			return
+		end
+		
+		if not Player.Character:FindFirstChild(Id) then
+			Net["RE/EquipItem"]:FireServer(Id)
+
+			Player.Character:WaitForChild(Id)
+		end
+		
 		Net["URE/Drop Fish"]:FireServer()
 	end,
 })
@@ -179,6 +223,18 @@ Tab:CreateToggle({
 	Flag = "DropFood",
 	Looped = true,
 	Callback = function()
+		local Id = GetItemInInventory("Bag o'")[1]
+
+		if not Id then
+			return
+		end
+
+		if not Player.Character:FindFirstChild(Id) then
+			Net["RE/EquipItem"]:FireServer(Id)
+
+			Player.Character:WaitForChild(Id)
+		end
+		
 		Net["URE/Drop Food"]:FireServer(Vector3.new(-171.23582458496094, 2.619150161743164, -455.3417663574219))
 	end,
 })
