@@ -1,9 +1,14 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "0.0.1"
+getgenv().ScriptVersion = "0.0.1a"
 
 getgenv().Changelog = [[
+0.0.1a
+🛠️ Changes
+🦈 Renamed 'Pickup Closest Fish' to 'Pickup Fish'
+🎣 Made Pickup Fish just try to pick up all the fish instead of specifically the closest one
+0.0.1
 🛠️ Changes
 🐟 Renamed "Drop Fish" to "Drop Baby Fish"
 🐠 Made Drop Baby Fish and Drop Food automatically equip the items before dropping.]]
@@ -148,29 +153,25 @@ Tab:CreateToggle({
 Tab:CreateSection("Collecting")
 
 Tab:CreateToggle({
-	Name = "🎣 • Pickup Closest Fish",
+	Name = "🎣 • Pickup Fish",
 	CurrentValue = false,
 	Flag = "Pickup",
 	Looped = true,
 	RequiredValue = fireproximityprompt,
 	Callback = function()
-		local Closest = GetClosestChild(Plot.Scripted.Fishes:GetChildren(), function(Child)
-			if Child:GetAttribute("Stage") < 5 then
-				return true
+		for _, Fish in Plot.Scripted.Fishes:GetChildren() do
+			if Fish:GetAttribute("Stage") < 5 then
+				continue
 			end
-		end)
-		
-		if not Closest then
-			return
+			
+			local FishGrabPrompt = Fish:FindFirstChild("FishGrabPrompt") :: ProximityPrompt
+
+			if not FishGrabPrompt then
+				return
+			end
+
+			fireproximityprompt(FishGrabPrompt)
 		end
-		
-		local FishGrabPrompt = Closest:FindFirstChild("FishGrabPrompt") :: ProximityPrompt
-		
-		if not FishGrabPrompt then
-			return
-		end
-		
-		fireproximityprompt(FishGrabPrompt)
 	end,
 })
 
