@@ -266,7 +266,7 @@ Tab:CreateToggle({
 	Flag = "DropFood",
 	Looped = true,
 	Callback = function()
-		local Id = GetItemInInventory("Bag o'")[1]
+		local Id = GetItemInInventory("Bag o'")[1] or GetItemInInventory("Food")[1]
 
 		if not Id then
 			return
