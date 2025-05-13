@@ -524,7 +524,7 @@ getgenv().CreateFeature = function(Tab: Tab, FeatureName: string)
 	end
 end
 
-getgenv().CreateUniversalTabs = function()
+getgenv().SetupFinished = function()
 	Rayfield:LoadConfiguration()
 
 	task.wait(1)
@@ -541,6 +541,8 @@ getgenv().CreateUniversalTabs = function()
 
 	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - SessionStart) * 10) / 10}s`, "loader-circle")
 end
+
+getgenv().CreateUniversalTabs = getgenv().SetupFinished
 
 local FrostByteStarted = getgenv().FrostByteStarted
 
