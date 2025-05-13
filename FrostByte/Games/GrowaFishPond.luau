@@ -398,12 +398,18 @@ Tab:CreateToggle({
 					continue
 				end
 
-				RemovedFoods[Part] = Part.Parent
+				RemovedFoods[Part] = {
+					Parent = Part.Parent,
+					Destroying = Part.Destroying:Once(function()
+						RemovedFoods[Part] = nil
+					end)
+				}
 				Part.Parent = nil
 			end
 		else
-			for Object, Parent in RemovedFoods do
-				Object.Parent = Parent
+			for Object, Info in RemovedFoods do
+				Object.Parent = Info.Parent
+				Info.Destroying:Disconnect()
 				RemovedFoods[Object] = nil
 			end
 		end
