@@ -7,7 +7,9 @@ end
 
 local ScriptVersion = getgenv().ScriptVersion
 
-local StartLoadTime = tick()
+local SessionStart = getgenv().SessionStart or tick()
+
+getgenv().SessionStart = SessionStart
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -334,7 +336,7 @@ local PlaytimeLabel = Tab:CreateLabel(`{PlaytimeMessage} 0 seconds`, "timer")
 
 task.spawn(function()
 	while getgenv().Flags == Flags and task.wait(1) do
-		PlaytimeLabel:Set(`{PlaytimeMessage} {math.floor(tick() - StartLoadTime)} seconds`)
+		PlaytimeLabel:Set(`{PlaytimeMessage} {math.floor(tick() - SessionStart)} seconds`)
 	end
 end)
 
@@ -537,7 +539,7 @@ getgenv().CreateUniversalTabs = function()
 		FlagInfo:Set(CurrentValue)
 	end
 
-	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - StartLoadTime) * 10) / 10}s`, "loader-circle")
+	Notify("Welcome to FrostByte", `Loaded in {math.floor((tick() - SessionStart) * 10) / 10}s`, "loader-circle")
 end
 
 local FrostByteStarted = getgenv().FrostByteStarted
