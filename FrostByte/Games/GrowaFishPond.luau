@@ -10,6 +10,8 @@ getgenv().Changelog = [[
 🍓 Drop Food & Drop Fish should no longer go back and forth with equipping
 🍉 Buy Food now has a 1 second cooldown incase you can't afford the food
 🎣 Pickup Fish now has a 1 second cooldown
+🍎 Renamed "Remove Foods" to "Remove Other Plot Foods"
+🍏 Remove Other Plot Foots now only removes foods from other plots (since it stopped fish from feeding i guess)
 
 0.0.2
 
@@ -413,7 +415,7 @@ Tab:CreateSection("Optimization")
 local RemovedFoods = {}
 
 Tab:CreateToggle({
-	Name = "🍎 • Remove Foods",
+	Name = "🍎 • Remove Other Plot Foods",
 	CurrentValue = false,
 	Flag = "RemoveFoods",
 	Callback = function(Value)
@@ -424,6 +426,10 @@ Tab:CreateToggle({
 				end
 				
 				if not Part:IsA("Part") then
+					continue
+				end
+				
+				if Part:IsDescendantOf(Plot) then
 					continue
 				end
 
