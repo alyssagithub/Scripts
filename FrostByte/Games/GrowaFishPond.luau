@@ -1,9 +1,17 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "0.0.2"
+getgenv().ScriptVersion = "0.0.2a"
 
 getgenv().Changelog = [[
+0.0.2a
+
+💰 Sell All Fish no longer tries to sell baby fish
+🍓 Drop Food & Drop Fish should no longer go back and forth with equipping
+🍉 Buy Food now has a 1 second delay incase you can't afford the food
+
+0.0.2
+
 🎉 Additions
 
 🔱 Buying -> Merchant Section
@@ -175,6 +183,8 @@ Tab:CreateToggle({
 
 			Net["RE/BuyItem"]:FireServer("Food", v)
 		end
+		
+		task.wait(1)
 	end,
 })
 
@@ -234,6 +244,8 @@ Tab:CreateDropdown({
 
 local Tab: Tab = Window:CreateTab("Dropping", "apple")
 
+local Dropping: any
+
 Tab:CreateSection("Fish")
 
 Tab:CreateToggle({
@@ -242,11 +254,18 @@ Tab:CreateToggle({
 	Flag = "DropFish",
 	Looped = true,
 	Callback = function()
+		if Dropping and Dropping ~= "Fish" then
+			return
+		end
+		
 		local Id = GetItemInInventory("Baby")[1]
 
 		if not Id then
+			Dropping = nil
 			return
 		end
+		
+		Dropping = "Fish"
 
 		if not Player.Character:FindFirstChild(Id) then
 			Net["RE/EquipItem"]:FireServer(Id)
@@ -266,11 +285,18 @@ Tab:CreateToggle({
 	Flag = "DropFood",
 	Looped = true,
 	Callback = function()
+		if Dropping and Dropping ~= "Food" then
+			return
+		end
+		
 		local Id = GetItemInInventory("Bag o'")[1] or GetItemInInventory("Food")[1]
 
 		if not Id then
+			Dropping = nil
 			return
 		end
+		
+		Dropping = "Food"
 
 		if not Player.Character:FindFirstChild(Id) then
 			Net["RE/EquipItem"]:FireServer(Id)
@@ -292,7 +318,7 @@ Tab:CreateToggle({
 	Flag = "Sell",
 	Looped = true,
 	Callback = function()
-		if not GetItemInInventory("%[")[1] then
+		if not GetItemInInventory("kg")[1] then
 			return
 		end
 		
