@@ -8,7 +8,8 @@ getgenv().Changelog = [[
 
 💰 Sell All Fish no longer tries to sell baby fish
 🍓 Drop Food & Drop Fish should no longer go back and forth with equipping
-🍉 Buy Food now has a 1 second delay incase you can't afford the food
+🍉 Buy Food now has a 1 second cooldown incase you can't afford the food
+🎣 Pickup Fish now has a 1 second cooldown
 
 0.0.2
 
@@ -350,6 +351,8 @@ Tab:CreateToggle({
 
 			fireproximityprompt(FishGrabPrompt)
 		end
+		
+		task.wait(1)
 	end,
 })
 
