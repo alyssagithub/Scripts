@@ -1,6 +1,18 @@
 --!strict
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
+if getgenv().CoreTesting then
+	print("Loading Core Testing")
+
+	local Core = loadstring(getgenv().CoreTesting)
+
+	if not Core then
+		return warn("[FrostByte]: Failed to load the Core Testing")
+	end
+
+	return Core()
+end
+
 if not getgenv().ScriptVersion then
 	getgenv().ScriptVersion = "Dev Mode"
 end
@@ -16,18 +28,6 @@ local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 
 local Player = Players.LocalPlayer
-
-if getgenv().CoreTesting then
-	print("Loading Core Testing")
-	
-	local Core = loadstring(getgenv().CoreTesting)
-	
-	if not Core then
-		return warn("[FrostByte]: Failed to load the Core Testing")
-	end
-
-	return Core()
-end
 
 local PlaceName: string = getgenv().PlaceName or game:GetService("AssetService"):GetGamePlacesAsync(game.GameId):GetCurrentPage()[1].Name
 
@@ -284,7 +284,7 @@ Tab:CreateLabel("discord.gg/sS3tDP6FSB", "messages-square")
 
 Tab:CreateSection("Changelog")
 
-Tab:CreateParagraph({Title = `{PlaceName} {ScriptVersion}`, Content = getgenv().Changelog or "Changelog Not Found", Changelog = true})
+Tab:CreateParagraph({Title = `{PlaceName} | {ScriptVersion}`, Content = getgenv().Changelog or "Changelog Not Found", Changelog = true})
 
 Tab:CreateSection("Performance")
 
