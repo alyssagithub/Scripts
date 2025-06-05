@@ -1,39 +1,720 @@
-local getgenv: () -> ({[string]: any}) = getfenv().getgenv
+-- This script was protected using the MoonVeil Obfuscator v1.2.1 [https://moonveil.cc]
 
-local function Notify(Text)
-	game:GetService("StarterGui"):SetCore("SendNotification", {
-		Title = "FrostByte Notification",
-		Text = Text,
-		Duration = 10
-	})
+local n=table.unpack;
+local c,l,b,ca,R,r,G,E,D,V,z
+G,c={[4983]=-14829,[21510]=21516,[2723]=-12763,[-11234]=8207,[-26198]=26658,[-18285]=13822,[-22036]=-15713,[-19053]=-25045,[-4437]=21253,[-11743]=-15159,[20165]=25180,[10066]=24867,[-14391]=-25045,[29815]=21253,[-9567]=21253,[6596]=-15159,[8416]=25180,[-25529]=25180,[14993]=26658,[3455]=26658,[25160]=26658,[-13796]=-15159,[3438]=21516,[-12085]=21516,[-31670]=21516},function(F)
+    return G[F+13230]
 end
-
-local RanPlaces = false
-
-local function GetCode(PlaceName)
-	getgenv().PlaceName = PlaceName
-	
-	PlaceName = PlaceName:gsub("%b[]", "")
-	PlaceName = PlaceName:gsub("[^%a]", "")
-	
-	local Success, Code: string = pcall(game.HttpGet, game, `https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Games/{PlaceName}.luau`)
-
-	if Success and Code:find("ScriptVersion = ") then
-		Notify("Game found, the script is loading.")
-		getgenv().PlaceFileName = PlaceName
-	elseif not RanPlaces then
-		RanPlaces = true
-		return GetCode(game:GetService("AssetService"):GetGamePlacesAsync(game.GameId):GetCurrentPage()[1].Name)
-	else
-		Notify("Game not found, loading universal.")
-		Code = game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Games/Universal.luau")
-	end
-	
-	return Code
+ca=c(-27026)
+repeat
+    while true do
+        if ca==-1.0609566023093413e-05*-2027981159 then
+            z,V,E=(select),(table.create),(table.move);
+            ca=c(-27621);
+        elseif ca==1791620189-1791635348 then
+            D=(getfenv());
+            ca=c(11930);
+        elseif ca==-1593914462+1593941120 then
+            r,R,b=(string.char),(string.byte),(bit32 .bxor);
+            ca=c(-44900);
+        elseif ca==-490343088- -490318043 then
+            l=(function(...)
+                local H=z('#',...)
+                local g=V(H,nil);
+                E({...},1,H,1,g)
+                return{[1]=g,[2]=H}
+            end);
+            ca=c(-24464);
+            break;
+        end
+    end
+until ca==223199107-223190900
+local U=D[(function(da,K)
+    local e=''
+    for M=0,#da-1 do
+        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+    end
+    return e
+end)('\3\172\r\2\172\23\18','d\201y')]()[(function(da,K)
+    local e=''
+    for M=0,#da-1 do
+        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+    end
+    return e
+end)('{\17\177{\17\171j','\28t\197')]
+local function q(ea)
+    local u,I,aa,S,W,f,_a,a,p,B,j,x
+    I,f={[5124]=-12583,[-11729]=26258,[-18955]=4654,[-16927]=13063,[10292]=31434,[-20631]=20175,[16685]=-5669,[24999]=-11624,[-20427]=20944,[4880]=6257,[-31349]=-30909,[30062]=17514,[-27025]=4654},function(P)
+        return I[P-26833]
+    end
+    B=f(56895)
+    repeat
+        while true do
+            if B==1772928987+-1772924333 then
+                B=f(9906);
+                break;
+            elseif B==-8742960154223/-1397308639 then
+                S='a\251\202WQ\231\215X'
+                B=f(15104)
+            elseif B==2111437960-2111417785 then
+                x={[x]=aa,[u]=ea,[S]=W}
+                B=638443048785/319381215
+            elseif B==-1.7048222412686514e-05*-1027321182 then
+                _a=D[(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('\209\27\219\31','\182z')]:GetService((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('\210\163\r\19\254\228\165+\20\227','\129\215la\138'))
+                B=37474663203626/1945826014
+            elseif B==-4.7505461525426011e-06*1193336475 then
+                u='\244\15\186\vbj\194\242\154Fz'
+                B=1506885500+-1506909331
+            elseif B==1335006778+-1335019361 then
+                aa='\178}\213x\22(\187\134\255f4\155{\211m\v\t\163\134\243)\20'
+                B=f(43518)
+            elseif B==3440547077894/1721134106 then
+                p=j(_a,p,x)
+                B=f(-192)
+            elseif B==24794481+-24822772 then
+                x=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(x,aa)
+                B=f(31957)
+            elseif B==10170938872198/-343450357 then
+                a=349833187
+                B=-11099672269650/865471522
+            elseif B==1.2999741713647231e-05*-510394756 then
+                x='\203\173\235\168\250'
+                B=f(6406)
+            elseif B==-37903379895258/1590507318 then
+                aa=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(aa,u)
+                B=2403240735700/1961829172
+            elseif B==3.9656320564143624e-05*485647678 then
+                j=_a.SetCore
+                B=f(51832)
+            elseif B==737686732-737698356 then
+                p='\n\t\n\191\192\208\205\20?\5\a\186\250\214\214\19'
+                B=1385515277-1385492410
+            elseif B==-24519489168532/1172171774 then
+                W=349833197
+                B=528957486-528987100
+            elseif B==730172318-730149451 then
+                x='Yld\219\142\191\185}'
+                B=f(37125)
+            elseif B==37499944147480/1428134060 then
+                W='%\142\184\54'
+                B=1590661137-1590671399
+            elseif B==-721901084- -721932518 then
+                p=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(p,x)
+                B=-3.8829467507441897e-06*1708753796
+            elseif B==-6.393887894769749e-06*1604970273 then
+                S=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(S,W)
+                B=331954401-331975319
+            elseif B==-730835700- -730822875 then
+                W=W-a
+                B=f(6202)
+            elseif B==-678781472+678782697 then
+                u='\153.\181?'
+                B=2.2080933683453925e-05*-800962507
+            elseif B==31188336393606/-1763447721 then
+                S='\205K'
+                B=-1196227569- -1196217713
+            elseif B==-862156152+862146296 then
+                u=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(u,S)
+                B=f(31713)
+            elseif B==-2146561661- -2146582605 then
+                aa='\159\196'
+                B=-812984786- -812956495
+            end
+        end
+    until B==1011391142+-1011378079
 end
-
-local Code = GetCode(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
-
-loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Analytics.luau"))()
-
-getgenv().FrostByteHandleFunction(loadstring(Code), "Game")
+local v=false
+local function d(t)
+    local O,J,h,k,Y,s,i,L,T,N
+    i,J={[3278]=-90,[2286]=-3251,[1014]=-20184,[9744]=-5146,[11873]=10105,[-30748]=18694,[19950]=-24181,[-28279]=-1792,[8296]=30394,[18667]=14701,[-2927]=13144,[-12990]=32693,[21926]=23526,[-24013]=-30191,[-14249]=12916,[-31666]=64,[18807]=-18304,[27320]=32611,[-26312]=3470,[-4909]=22879,[-21857]=24718,[9760]=4300,[-4512]=-899,[20318]=-9073,[-32081]=14487,[12996]=-134,[-22482]=5422,[19072]=26844,[-14271]=-9162,[28468]=-15317,[-24093]=-899,[4087]=-8793,[18002]=-26608,[-8175]=-5258,[-21364]=-27676,[-27199]=-9206,[23851]=-899,[-11271]=3134,[-25103]=8155,[-31647]=-16212,[17888]=-9366,[9522]=-5946,[17471]=25963,[20835]=-22793,[-24840]=8793,[-19495]=23441,[29655]=8840,[31584]=22841,[-18412]=-11189,[19992]=-16674,[-4976]=4300,[7354]=-21124,[22210]=-134,[-18562]=18694,[-13895]=14487,[4757]=-9162,[13490]=-18304,[-11861]=23895,[4642]=23895,[-3350]=-9206,[23934]=3134,[24234]=3134,[24003]=12916,[21184]=12916,[11165]=-16674,[-23440]=4300,[15297]=4300,[-12507]=4300,[-9522]=30394,[8269]=30394,[-9348]=30394,[-27786]=30394,[30891]=30394,[-3800]=30394,[-15669]=25963,[25254]=3470,[11617]=20231,[-32327]=-8793,[18613]=-8793,[-19803]=-8793,[-24408]=-25751,[5387]=-25751,[31976]=-5146,[22947]=-5146,[9189]=-5146,[24983]=-5146,[16488]=-5146,[22054]=-5146,[27258]=-5146},function(w)
+        return i[w+-2606]
+    end
+    T=J(23790)
+    repeat
+        while true do
+            if T==-4391717567699/185437553 then
+                O='\209\0\242\4'
+                T=J(-29060)
+            elseif T==-1462253795+1462279564 then
+                k=n(s[1],1,s[2])[Y]
+                T=34162339240898/-1442483606
+            elseif T==-2.0921936297222672e-06*-1633214035 then
+                s=l(O(k))
+                T=J(22556)
+            elseif T==1487658350+-1487658286 then
+                s='\159a'
+                T=J(5884)
+            elseif T==-1003479597+1003468408 then
+                k='\19\129\2\142\15'
+                T=J(-2303)
+            elseif T==-1.3854329332745834e-05*-1045665918 then
+                k='9\49\50>\237\50j\129~\235\199\145\197Jz\158\130\17\49;2\163;%\128\48\228\222\129\217]7\210\192'
+                T=405550617-405560002
+            elseif T==-4.3825180972468824e-05*76189075 then
+                s="\237\31\234r\19\244\251;\219\181\138=J^\171y\144!*\249\133\15\160\219\149\166\31h\25yV\245\152\215\134\20\170@\\\170\25\255uO\163\181}\210\243\184\'PO\241X\134\56\96\183\174\23\190\205\135\238#r\24zQ\168\184\213\152S\182AN\240"
+                T=-5.6760537010303105e-06*1881236606
+            elseif T==7.2625671571122868e-06*1586629046 then
+                k=D[(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('j.\96*','\rO')]:GetService((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('\252:E\146\237\252\216;@\158\250\202','\189I6\247\153\175')):GetGamePlacesAsync(D[(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('\234\203\224\207','\141\170')][(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('~\247:\\\223\51','9\150W')])
+                T=-2055421953- -2055441853
+            elseif T==-11078150874384/1037474328 then
+                Y='\133k\158\2\96\206\212\20\188\220\254U?<\133\26\255L\5\152\233v\211\168\244\193v\28q\f4\218\203\180\244}\218\52/'
+                T=-18492748458535/774241091
+            elseif T==4209285957186/-174074106 then
+                Y=147874026
+                T=389938689-389957383
+            elseif T==1339557264+-1339581149 then
+                s=l((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(s,Y))
+                T=-1450001892+1450032835
+            elseif T==-259835013- -259825628 then
+                O='~P_[\205\\\5\245^\141\168\228\171.V\190\238'
+                T=1536612647+-1536587767
+            elseif T==1.6606431482036115e-05*-1615338011 then
+                Y=''
+                T=J(12128)
+            elseif T==27541898916332/-1932222458 then
+                O=k.HttpGet
+                T=1080563015+-1080566354
+            elseif T==-1854515374- -1854521422 then
+                s=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(s,Y)
+                T=J(-29041)
+            elseif T==-1616952180- -1616921989 then
+                k=q(n(k[1],1,k[2]))
+                T=J(7993)
+            elseif T==3.2595919814126746e-06*1787953840 then
+                O='\236\181\230\177'
+                T=-2.3860415718039005e-05*-964694005
+            elseif T==10699077343944/813989451 then
+                s=D[s]
+                T=-7.9490978255287204e-06*1568605680
+            elseif T==-1304998731+1305006886 then
+                k=l(d(k))
+                T=J(-13063)
+            elseif T==-9.9787763284633369e-06*2119398141 then
+                O=D[O]
+                T=J(-5569)
+            elseif T==-1541697023+1541727966 then
+                s=l(O(k,n(s[1],1,s[2])))
+                T=J(24816)
+            elseif T==-236531486766/1765160349 then
+                h=n(s[1],1,s[2]);
+                T=J(19094)
+            elseif T==342244933+-342221407 then
+                s='\131x\253G'
+                T=-103270148+103288965
+            elseif T==761444156-761420537 then
+                Y='\24ne'
+                T=J(-22234)
+            elseif T==-346695906- -346694114 then
+                O=O[s]
+                T=J(20494)
+            elseif T==-17615409734633/-870713743 then
+                k='%\192\183\31\53\161&C\242\56#K\30!\t\130\245\1\211\179\na\231 E\188\48\96\n\14 \2\197\168'
+                T=-32645914360488/1152995492
+            elseif T==919140038+-919127122 then
+                U()[(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('\182\255*\14\131\221*\0\131','\230\147Km')]=t;
+                T=1870986084-1870958985;
+            elseif T==-22997336+22991204 then
+                s='O\236\49\211I'
+                T=J(-10384)
+            elseif T==-7.2327656493442315e-06*1254430247 then
+                Y=Y+N
+                T=1830066207-1830040438
+            elseif T==5212510466625/299655675 then
+                Y='\250\157'
+                T=J(-16889)
+            elseif T==-1018824376+1018798825 then
+                k=k[n(O[1],1,O[2])]
+                T=J(-22497)
+            elseif T==-656242501- -656233708 then
+                U()[(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('o\2\14\144prV\2\n\189tYZ','?no\243\21\52')]=t;
+                T=J(25553)
+            elseif T==263498743-263503889 then
+                return h
+            elseif T==-7.7696126352659021e-08*1158358907 then
+                O=l((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(O,s))
+                T=-1232737935+1232712384
+            elseif T==13778131332596/-1104990884 then
+                k=l(k(O,s,`https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Games/{t}.luau`))
+                T=J(27860)
+            elseif T==-29123547358332/1746644318 then
+                t=n(s[1],1,s[2]);
+                T=J(-15806);
+            elseif T==-17100389554200/-859316058 then
+                O=k.GetCurrentPage
+                T=434716448+-434713031
+            elseif T==1838239042772/-349608034 then
+                s='P\26\17h)\0l'
+                T=-1846443388- -1846467007
+            elseif T==-889862446- -889858482 then
+                s=l(O(k,s,Y))
+                T=J(-15956)
+            elseif T==-15881206542180/979595765 then
+                Y=''
+                T=1210499898-1210503862
+            elseif T==-1.7465932915028587e-05*-1867120420 then
+                k=t
+                T=-15971751796644/662893326
+            elseif T==-1.3857448739170254e-05*-1651025411 then
+                O='c\226'
+                T=7784973767776/-1187276768
+            elseif T==1836816994-1836841088 then
+                O=k.gsub
+                T=0.00018350053667622713*-33416796
+            elseif T==9.6547472057084627e-06*-1936249557 then
+                N=-147874025
+                T=J(22924)
+            elseif T==-43447591182591/-1603291309 then
+                k=t
+                T=J(34190)
+            elseif T==-24026167606805/1427155783 then
+                k=q(n(k[1],1,k[2]))
+                T=J(-29721)
+            elseif T==-1368405645- -1368430525 then
+                k=l((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(k,O))
+                T=J(-21407)
+            elseif T==-384952443- -384955913 then
+                L,h=n(k[1],1,k[2]);
+                if not(L and h:find((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('0=\177 \195\172qy\17-\170&\221\248\26<','wv_\208Z\25r\24'),(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('BX\138X\191\177C\197','Vp\22\193'))))then
+                    T=J(-19876)
+                    break
+                else
+                    T=J(14223)
+                    break
+                end
+                T=J(11795)
+            elseif T==1.6091440008109245e-05*1161735680 then
+                t=n(s[1],1,s[2]);
+                T=J(29926);
+            elseif T==-8.3106071162832585e-05*-274841533 then
+                O=k.gsub
+                T=J(24532)
+            elseif T==-1556038839- -1556012231 then
+                O=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(O,s)
+                T=-14335603687130/677838370
+            elseif T==-2.6189521092485777e-05*-207029368 then
+                if not(not v)then
+                    T=J(-11289)
+                    break
+                else
+                    T=J(26540)
+                    break
+                end
+                T=J(29864)
+            elseif T==2.1632345387875437e-05*1083608808 then
+                s=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(s,Y)
+                T=J(-321)
+            elseif T==1418877617-1418905931 then
+                O='b\161\218z\21\199I6\156\\\15kjIl\162\134'
+                T=J(4892)
+            elseif T==489058688+-489055554 then
+                v=true;
+                T=-0.00011797775379612338*-97670956;
+            elseif T==1417314207+-1417288244 then
+                return n(k[1],1,k[2])
+            elseif T==-6.197113463966588e-06*959478963 then
+                s=l(O(k,s,Y))
+                T=J(13771)
+            elseif T==-3.2307535128299025e-06*2029557493 then
+                k=l((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(k,O))
+                T=1168652503-1168640305
+            elseif T==-1874899021+1874917838 then
+                Y='\166\26'
+                T=-7.0669802994393129e-06*-855811074
+            elseif T==16457281697214/1349178693 then
+                k=D[n(k[1],1,k[2])]
+                T=-895217638- -895223466
+            elseif T==1885402224+-1885386018 then
+                s=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(s,Y)
+                T=39966285622900/-1489889492
+            elseif T==-421441654- -421450447 then
+                s=(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(s,Y)
+                T=J(-25673)
+            elseif T==612188588+-612155895 then
+                Y='\20\178'
+                T=-227130715- -227146921
+            elseif T==-14918710997022/1592858317 then
+                s='\157\252\151\248'
+                T=1.712899601013641e-05*1015529456
+            elseif T==2.7494110464400124e-05*-936600587 then
+                k=D[(function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)('\23\27\29\31','pz')]
+                T=-1359546986+1359532732
+            elseif T==-31419260131684/-1364986538 then
+                s='\139\212'
+                T=J(20608)
+            elseif T==-4861145543255/1495277005 then
+                k=l((function(da,K)
+                    local e=''
+                    for M=0,#da-1 do
+                        e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                    end
+                    return e
+                end)(k,O))
+                T=-8.8567167901808021e-06*1900817244
+            end
+        end
+    until T==-1507440416+1507460517
+end
+local m,X,y,ba,A,Z,Q,_,C
+ba,m={[5562]=11199,[-29350]=-17078,[23129]=-21675,[27251]=18322,[15722]=15255,[-7816]=29835,[3442]=26272,[19900]=2031,[8278]=-14962,[14220]=12867,[-24378]=-29219,[9810]=12030,[7548]=31907,[13961]=-30441,[8634]=-26245,[-29601]=5154,[-32651]=784,[-26382]=-28250,[-16990]=-24353,[19589]=11471,[-14401]=-29014,[31868]=-25165,[-28362]=-26245,[-12708]=-30121,[-23541]=-25165,[-1328]=-29219},function(o)
+    return ba[o+-10508]
+end
+Z=m(-2200)
+repeat
+    while true do
+        if Z==-1886261541- -1886293448 then
+            _=l((function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(_,y))
+            Z=m(-15874)
+        elseif Z==5742964350442/814489342 then
+            _='\207n\143\252g\167\251'
+            Z=m(30097)
+        elseif Z==-1372377003+1372350758 then
+            Z=m(-22143);
+            break;
+        elseif Z==-1185540150- -1185524787 then
+            X=X(C)
+            Z=m(13950)
+        elseif Z==1841863826022/-599760282 then
+            Q='3\134\57\130'
+            Z=m(16070)
+        elseif Z==-5.6699283827753713e-05*301203099 then
+            X='(I\135\161\143'
+            Z=m(37759)
+        elseif Z==532809333+-532836829 then
+            Q=D[n(Q[1],1,Q[2])]
+            Z=3.4299978011870428e-06*2055686449
+        elseif Z==-1.0324994200008938e-05*2099274787 then
+            X=D[X]
+            Z=-11510598516444/749241588
+        elseif Z==-1.9684588919152837e-05*760086993 then
+            _="k\184a\169\27\197rT\142\238\153Z\221\4\0\25VN0?\154\218j\17\210#Z\188\196U\174L\v\249\208\191s\184f\246\26\158*T\132\230\132\\\135 \\\21JW]\'\130\198\54#\221%_\177\216I\175\16v\246\215\183v"
+            Z=m(-19093)
+        elseif Z==-44357433040646/-1491206651 then
+            _=l((function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(_,y))
+            Z=-1715083878+1715067910
+        elseif Z==8.7522301367572262e-05*-80562324 then
+            _=l((function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(_,y))
+            Z=1945350698+-1945366397
+        elseif Z==-2075846219- -2075821866 then
+            A=A()
+            Z=m(-13033)
+        elseif Z==78618297+-78633174 then
+            A=A(X,n(Q[1],1,Q[2]))
+            Z=m(-17854)
+        elseif Z==-46528568053800/1848939720 then
+            A=U()
+            Z=507397343+-507422141
+        elseif Z==-56150693606644/1864170964 then
+            A=D[(function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)('\225-\235)','\134L')]:GetService((function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)('\140\219\211\248\254\r\189\155\139\162\223\242\246\233\15\164\148\143','\193\186\161\147\155y\205\247\234'))
+            Z=m(30408)
+        elseif Z==2.5205405255810233e-06*747458722 then
+            Q='\220\200\26\96\146\233\191\200(\251v'
+            Z=-1.4456974208255443e-05*1599781508
+        elseif Z==-2.2813787891386031e-07*-1713875845 then
+            y='\192L'
+            Z=m(18056)
+        elseif Z==2136566785+-2136536950 then
+            A=l(d(A))
+            Z=m(9180)
+        elseif Z==8.5736776473423102e-06*2137005933 then
+            A=(function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(A,X)
+            Z=-1441704621- -1441685113
+        elseif Z==-627309261- -627280042 then
+            C=n(A[1],1,A[2]);
+            Z=m(20318);
+        elseif Z==-1.336923935210955e-05*1729941352 then
+            X=(function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(X,Q)
+            Z=-17874816011668/-1557989716
+        elseif Z==-699044383- -699055856 then
+            A=A[X]
+            Z=-1522542551+1522565810
+        elseif Z==-10738168497456/684003344 then
+            Q=Q[n(_[1],1,_[2])]
+            Z=6.5834615085307579e-06*2043150094
+        elseif Z==793434435+-793439524 then
+            Q=l((function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(Q,_))
+            Z=-1.5151020153566817e-05*981914079
+        elseif Z==1556142241-1556118982 then
+            X='\n\132\209kJ\18\153\217a^'
+            Z=-8582855445807/1035201477
+        elseif Z==1456301802-1456289772 then
+            A='D&\230\197\252\\;\238\207\232'
+            Z=m(-18842)
+        elseif Z==3.395692547460602e-05*-296198783 then
+            X=(function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(X,Q)
+            Z=m(33637)
+        elseif Z==231709025634/74768966 then
+            _='\142-\173)'
+            Z=1148182422+-1148182031
+        elseif Z==1.5023106552243101e-05*343071520 then
+            y='\3\204\21\217h\255]{\233\135\237\50\168f.z9#\31^\246\163\25b\179D3\200\172 \204cX\154\162\214'
+            Z=-13887028732392/-466853652
+        elseif Z==-369422982+369403474 then
+            A=D[A]
+            Z=-12425022960512/961093979
+        elseif Z==1892207422-1892223390 then
+            _=l(Q(X,n(_[1],1,_[2])))
+            Z=-786766132- -786776344
+        elseif Z==3.6576352934384297e-05*279196781 then
+            A=A(n(_[1],1,_[2]))
+            Z=m(-6482)
+        elseif Z==-268885112+268896583 then
+            y='\159\2\238'
+            Z=1594062375+-1594069426
+        elseif Z==1.0987091891090994e-05*-754612784 then
+            Q='f\235\176\15\57'
+            Z=-15332925583152/1524450744
+        elseif Z==1955539060+-1955567310 then
+            A=n(Q[1],1,Q[2])[n(_[1],1,_[2])]
+            Z=m(2692)
+        elseif Z==1651316408-1651341206 then
+            X='\154\186u\19\230\171\198\188M\179\23\178\172v\5\212\156\209\171\\\146\25\178'
+            Z=2000427699+-2000425815
+        elseif Z==-135911727872/10512974 then
+            X=D[(function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)('\15$\5 ','hE')]
+            Z=34496077390298/-1326211118
+        elseif Z==-1403425821- -1403437020 then
+            _='T\231'
+            Z=m(26230)
+        elseif Z==1212773967+-1212799978 then
+            Q=X.HttpGet
+            Z=m(18786)
+        elseif Z==-1.285894956936107e-05*-1186333294 then
+            Q=l((function(da,K)
+                local e=''
+                for M=0,#da-1 do
+                    e=e..r(b(R(da,M+1),R(K,M%#K+1)))
+                end
+                return e
+            end)(Q,_))
+            Z=-11396917015456/414493636
+        elseif Z==-26873973094560/-1022913105 then
+            Q='\249\49\211\53'
+            Z=m(24728)
+        elseif Z==1872848400465/145554395 then
+            _='\190P'
+            Z=-351826355+351821266
+        elseif Z==-1209353189+1209366640 then
+            Q=l(X(A,Q))
+            Z=1358083403814/438232786
+        elseif Z==-314183262- -314185293 then
+            X=A.GetProductInfo
+            Z=1.8340293902869384e-06*-1674455173
+        end
+    end
+until Z==-1386457255568/-1768440377
