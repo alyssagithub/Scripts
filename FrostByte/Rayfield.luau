@@ -500,13 +500,13 @@ local Rayfield
 repeat
 	local Success
 	Success, Rayfield = pcall(game.GetObjects, game, "rbxassetid://10804731440")
-	
+
 	if Success and Rayfield then
 		Rayfield = Rayfield[1]
 	end
-	
+
 	task.wait()
-	
+
 	if typeof(Rayfield) ~= "Instance" then
 		warn("[Rayfield]: Failed to get the Rayfield object, retrying...")
 	end
@@ -532,7 +532,7 @@ repeat
 		print('Rayfield may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of Rayfield is intended for interface build '..InterfaceBuild..'.')
 		warned = true
 	end
-	
+
 	Rayfield:Destroy()
 	Rayfield = game:GetObjects("rbxassetid://10804731440")[1]
 
@@ -568,7 +568,7 @@ end
 -- Object Variables
 
 local Main = Rayfield.Main
-local MPrompt = Rayfield:FindFirstChild('Prompt')
+local MPrompt = nil
 local Topbar = Main.Topbar
 local Elements = Main.Elements
 local LoadingFrame = Main.LoadingFrame
@@ -647,9 +647,9 @@ local Icons
 
 repeat
 	Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))
-	
+
 	task.wait()
-	
+
 	if not Icons then
 		warn("[Rayfield]: Failed to load icons, retrying...")
 	end
@@ -660,7 +660,7 @@ Icons = Icons()
 local function getIcon(name : string)
 	name = string.match(string.lower(name), "^%s*(.*)%s*$") :: string
 	local sizedicons = Icons['48px']
-	
+
 	if not sizedicons then
 		return {
 			id = 0,
@@ -824,7 +824,7 @@ local function SaveConfiguration()
 			warn(`[Rayfield]: Flag '{i}' is not a table, current type is '{typeof(v)}', it is being removed.`)
 			RayfieldLibrary.Flags[i] = nil
 		end
-		
+
 		if v.Type == "ColorPicker" then
 			Data[i] = PackColor(v.Color)
 		else
@@ -943,13 +943,13 @@ function RayfieldLibrary:Notify(data) -- action e.g open messages
 
 		local waitDuration = math.min(math.max((#newNotification.Description.Text * 0.1) + 2.5, 3), 10)
 		task.wait(data.Duration or waitDuration)
-		
+
 		if not newNotification.Parent or not Notifications:FindFirstChild("UIListLayout") then
 			return
 		end
-		
+
 		newNotification.Icon.Visible = false
-		
+
 		TweenService:Create(newNotification, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 		TweenService:Create(newNotification.UIStroke, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 		TweenService:Create(newNotification.Shadow, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
@@ -1413,25 +1413,12 @@ local function createSettings(window)
 end
 
 function RayfieldLibrary:CreateWindow(Settings)
-	if Rayfield:FindFirstChild('Loading') then
-		if getgenv and not getgenv().rayfieldCached then
-			Rayfield.Enabled = true
-			Rayfield.Loading.Visible = true
-
-			task.wait(1.4)
-			Rayfield.Loading.Visible = false
-		end
-	end
-
-	if getgenv then getgenv().rayfieldCached = true end
-
 	if not correctBuild and not Settings.DisableBuildWarnings then
-		task.delay(3, 
-			function() 
-				RayfieldLibrary:Notify({Title = 'Build Mismatch', Content = 'Rayfield may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of Rayfield is intended for interface build '..InterfaceBuild..'.\n\nTry rejoining and then run the script twice.', Image = 4335487866, Duration = 15})		
-			end)
+		task.delay(3, function() 
+			RayfieldLibrary:Notify({Title = 'Build Mismatch', Content = 'Rayfield may encounter issues as you are running an incompatible interface version ('.. ((Rayfield:FindFirstChild('Build') and Rayfield.Build.Value) or 'No Build') ..').\n\nThis version of Rayfield is intended for interface build '..InterfaceBuild..'.\n\nTry rejoining and then run the script twice.', Image = 4335487866, Duration = 15})		
+		end)
 	end
-	
+
 	local Success, Result = pcall(isfolder, RayfieldFolder)
 
 	if Success and not Result then
@@ -1550,11 +1537,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 	if Settings.Discord and not useStudio then
 		local Success, Result = pcall(isfolder, RayfieldFolder.."/Discord Invites")
-		
+
 		if Success and not Result then
 			makefolder(RayfieldFolder.."/Discord Invites")
 		end
-		
+
 		local Success, Result = pcall(isfile, RayfieldFolder.."/Discord Invites".."/"..Settings.Discord.Invite..ConfigurationExtension)
 
 		if Success and not Result then
@@ -2352,7 +2339,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				if not Label:FindFirstChild("Title") then
 					return
 				end
-				
+
 				Label.Title.Text = NewLabel
 
 				if Color then
@@ -2404,7 +2391,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Paragraph.UIStroke.Transparency = 1
 			Paragraph.Title.TextTransparency = 1
 			Paragraph.Content.TextTransparency = 1
-			
+
 			if ParagraphSettings.Changelog then
 				Paragraph.Content.TextXAlignment = Enum.TextXAlignment.Center
 				Paragraph.Title.TextXAlignment = Enum.TextXAlignment.Center
@@ -2460,7 +2447,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 					if InputSettings.Callback then
 						InputSettings.Callback(Input.InputFrame.InputBox.Text)
 					end
-					
+
 					InputSettings.CurrentValue = Input.InputFrame.InputBox.Text
 				end)
 
@@ -2529,7 +2516,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			if Settings.ConfigurationSaving and Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
 				RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
 			end
-			
+
 			local Dropdown = Elements.Template.Dropdown:Clone()
 			if string.find(DropdownSettings.Name,"closed") then
 				Dropdown.Name = "Dropdown"
@@ -2589,7 +2576,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			Dropdown.Toggle.Rotation = 180
-			
+
 			local function OpenDropdown()
 				TweenService:Create(Dropdown, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 180)}):Play()
 				Dropdown.List.Visible = true
@@ -2642,19 +2629,19 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Dropdown.MouseLeave:Connect(function()
 				TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
-			
+
 			local function RunDropdownCallback()
 				local Success, Response = pcall(function()
 					if not DropdownSettings.Callback then
 						return
 					end
-					
+
 					if DropdownSettings.CurrentOption[1] == "" then
 						return
 					end
 
 					DropdownSettings.Callback(DropdownSettings.CurrentOption)
-					
+
 					if DropdownSettings.ResetAfterCallback then
 						DropdownSettings:Set({""})
 					end
@@ -2769,7 +2756,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 						DropdownOption.UIStroke.Color = SelectedTheme.ElementStroke
 					end)
 				end
-				
+
 				for _, droption in ipairs(Dropdown.List:GetChildren()) do
 					if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
 						if not table.find(DropdownSettings.CurrentOption, droption.Name) then
@@ -2787,12 +2774,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 						end)
 					end
 				end
-				
+
 				if Dropdown.List.Visible then
 					OpenDropdown()
 				end
 			end
-			
+
 			SetDropdownOptions()
 
 			function DropdownSettings:Set(NewOption)
@@ -2834,13 +2821,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			function DropdownSettings:Refresh(optionsTable: table) -- updates a dropdown with new options from optionsTable
 				DropdownSettings.Options = optionsTable
-				
+
 				for _, option in Dropdown.List:GetChildren() do
 					if option.ClassName == "Frame" and option.Name ~= "Placeholder" then
 						option:Destroy()
 					end
 				end
-				
+
 				SetDropdownOptions()
 			end
 
@@ -2848,9 +2835,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 				Dropdown.Toggle.ImageColor3 = SelectedTheme.TextColor
 				TweenService:Create(Dropdown, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
-			
+
 			local OriginalOptions = DropdownSettings.Options
-			
+
 			if #OriginalOptions >= 25 then
 				Tab:CreateInput({
 					Name = "⌨ • Search Option",
@@ -3012,11 +2999,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 			if ToggleSettings.Flag then
 				RayfieldLibrary.Flags[ToggleSettings.Flag] = ToggleSettings
 			end
-			
+
 			if ToggleSettings.RequiredValue == false then
 				ToggleSettings.Name ..= " (Executor Unsupported)"
 			end
-			
+
 			local ToggleValue = {}
 
 			local Toggle = Elements.Template.Toggle:Clone()
@@ -3057,7 +3044,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Toggle.MouseLeave:Connect(function()
 				TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
-			
+
 			local function RunToggleCallback()
 				local Success, Response = pcall(function()
 					if ToggleSettings.RequiredValue == false then
@@ -3120,7 +3107,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()		
 				end
-				
+
 				RunToggleCallback()
 
 				if not ToggleSettings.Ext then
@@ -3242,16 +3229,16 @@ function RayfieldLibrary:CreateWindow(Settings)
 					SLDragging = false 
 				end 
 			end)
-			
+
 			local function RunSliderCallback(NewValue)
 				local Success, Response = pcall(function()
 					if not SliderSettings.Callback then
 						return
 					end
-					
+
 					SliderSettings.Callback(NewValue)
 				end)
-				
+
 				if not Success then
 					TweenService:Create(Slider, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
 					TweenService:Create(Slider.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
