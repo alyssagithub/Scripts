@@ -1,4 +1,5 @@
 -- This script was protected using the MoonVeil Obfuscator v1.2.1 [https://moonveil.cc]
+getgenv().ScriptVersion = "v0.0.0"
 
 local Zb,ba,ja,p=pairs,getmetatable,table.unpack,type;
 local Za,db,kb,Ua,Fa,Xb,e,Yb,Qb,Ja,sb
