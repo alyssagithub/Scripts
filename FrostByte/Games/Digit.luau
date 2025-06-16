@@ -1,8 +1,10 @@
 local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
-getgenv().ScriptVersion = "v2.9.3c"
+getgenv().ScriptVersion = "v2.9.3d"
 
 getgenv().Changelog = [[
+v2.9.3d
+- 🔨 Fixed the features not loading
 v2.9.3c
 - 🌥 Changed up Lunar Clouds teleport since they removed the spawn point
 v2.9.3b
@@ -49,9 +51,8 @@ local Players = game:GetService("Players")
 
 local Player = Players.LocalPlayer
 
-local Network = ReplicatedStorage:WaitForChild("Source"):WaitForChild("Network")
-local RemoteFunctions: Folder & {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
-local RemoteEvents: Folder & {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents")
+local RemoteFunctions: Folder & {[string]: RemoteFunction} = ReplicatedStorage.RemoteFunctions
+local RemoteEvents: Folder & {[string]: RemoteEvent} = ReplicatedStorage.RemoteEvents
 
 local Window = getgenv().Window
 
