@@ -1,1 +1,0 @@
-loadstring(game:HttpGet("https://github.com/alyssagithub/Scripts/raw/main/FrostByte/Initiate.lua"))()
